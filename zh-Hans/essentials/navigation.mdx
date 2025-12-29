@@ -1,0 +1,87 @@
+---
+title: '导航'
+description: 'docs.json 中的 navigation 字段定义侧边栏的页面'
+icon: 'map'
+---
+
+导航菜单是每个网站上显示的一组链接。
+
+通常每新增一个页面就需要更新 `docs.json`，页面不会自动出现。
+
+## 导航语法
+
+导航语法是递归的，因此可以创建嵌套的导航分组。页面名称不需要包含 `.mdx`。
+
+<CodeGroup>
+
+```json 普通导航
+"navigation": {
+  "tabs": [
+    {
+      "tab": "Docs",
+      "groups": [
+        {
+          "group": "Getting Started",
+          "pages": ["quickstart"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+```json 嵌套导航
+"navigation": {
+  "tabs": [
+    {
+      "tab": "Docs",
+      "groups": [
+        {
+          "group": "Getting Started",
+          "pages": [
+            "quickstart",
+            {
+              "group": "Nested Reference Pages",
+              "pages": ["nested-reference-page"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+</CodeGroup>
+
+## 文件夹
+
+将 MDX 文件放入文件夹，并在 `docs.json` 中更新路径即可。
+
+例如，要创建页面 `https://yoursite.com/your-folder/your-page`，你需要创建 `your-folder` 文件夹，并在其中创建 `your-page.mdx`。
+
+<Warning>
+
+除非嵌套在其他文件夹下，否则不能使用 `api` 作为文件夹名称。Mintlify 使用 Next.js，顶层 `api` 文件夹被保留用于内部服务调用。像 `api-reference` 这样的名称则可以使用。
+
+</Warning>
+
+```json 带文件夹的导航
+"navigation": {
+  "tabs": [
+    {
+      "tab": "Docs",
+      "groups": [
+        {
+          "group": "Group Name",
+          "pages": ["your-folder/your-page"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## 隐藏页面
+
+未在 `docs.json` 中配置的 MDX 文件不会显示在侧边栏，但仍可通过搜索或直接链接访问。

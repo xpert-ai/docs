@@ -1,0 +1,88 @@
+---
+title: 'Markdown 语法'
+description: '标准 Markdown 的文本、标题与样式'
+icon: 'text-size'
+---
+
+## 标题
+
+适用于章节标题。
+
+```md
+## 标题
+```
+
+### 小标题
+
+适用于小节标题。
+
+```md
+### 小标题
+```
+
+<Tip>
+
+每个 **标题** 和 **小标题** 都会生成锚点，并显示在右侧目录中。
+
+</Tip>
+
+## 文本格式
+
+支持大多数 Markdown 格式，只需在文本两侧添加 `**`、`_` 或 `~`。
+
+| 样式 | 写法 | 结果 |
+| ------------- | ----------------- | --------------- |
+| 粗体 | `**bold**` | **bold** |
+| 斜体 | `_italic_` | _italic_ |
+| 删除线 | `~strikethrough~` | ~strikethrough~ |
+
+这些样式可以组合使用。例如，写 `**_bold and italic_**` 将得到 **_bold and italic_**。
+
+上标和下标需要使用 HTML 标签包裹文本，即使用 `<sup>` 或 `<sub>`。
+
+| 文本大小 | 写法 | 结果 |
+| ----------- | ------------------------ | ---------------------- |
+| 上标 | `<sup>superscript</sup>` | <sup>superscript</sup> |
+| 下标 | `<sub>subscript</sub>` | <sub>subscript</sub> |
+
+## 链接到页面
+
+使用 `[]()` 包裹文本即可创建链接。例如，写 `[link to google](https://google.com)` 会生成 [link to google](https://google.com)。
+
+链接到站内页面时需要使用根路径。也就是说要写完整的文件夹路径。例如 `[link to text](/writing-content/text)` 会链接到组件章节中的 “Text” 页面。
+
+像 `[link to text](../text)` 这样的相对链接会更慢，因为我们无法进行同样的优化。
+
+## 引用块
+
+### 单行
+
+在段落前加上 `>` 即可创建引用块。
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+
+```md
+> Dorothy followed her through many of the beautiful rooms in her castle.
+```
+
+### 多行
+
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+
+```md
+> Dorothy followed her through many of the beautiful rooms in her castle.
+>
+> The Witch bade her clean the pots and kettles and sweep the floor and keep the fire fed with wood.
+```
+
+### LaTeX
+
+Mintlify 通过 Latex 组件支持 [LaTeX](https://www.latex-project.org)。
+
+<Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
+
+```md
+<Latex>8 x (vk x H1 - H2) = (0,1)</Latex>
+```

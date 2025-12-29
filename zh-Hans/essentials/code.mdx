@@ -1,0 +1,35 @@
+---
+title: '代码块'
+description: '展示行内代码与代码块'
+icon: 'code'
+---
+
+## 行内代码
+
+要将某个 `单词` 或 `短语` 标记为代码，请使用反引号 (`) 包裹。
+
+```
+要将某个 `单词` 或 `短语` 标记为代码，请使用反引号 (`) 包裹。
+```
+
+## 代码块
+
+使用 [围栏代码块](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks)：用三个反引号包裹代码，并在开头的反引号后标注语言以获得语法高亮。也可以在语言后追加文件名。
+
+```java HelloWorld.java
+class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+```
+
+````md
+```java HelloWorld.java
+class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+```
+````
