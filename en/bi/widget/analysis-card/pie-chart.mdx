@@ -1,74 +1,52 @@
 ---
-title: "饼图"
-description: "饼图用于展示数据的占比关系，适合展示部分与整体的关系。"
+title: Pie Chart
+sidebar_position: 3
 ---
 
+Pie charts are circles divided into multiple regions or slices. Each slice represents a count or percentage of observations for one level of a variable.
 
-# 饼图
+## Pie Chart
 
-## Overview
+Pie charts require one primary dimension and one measure.
 
-饼图用于展示数据的占比关系，适合展示部分与整体的关系。
+![Small](./pie-attributes.png)
 
-## 适用场景
+![Small Shadow](./pie.png)
 
-### 数据特点
+### Doughnut Chart
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+By selecting the pie chart's variant property, you can set the chart effect to a doughnut chart.
 
-### 使用场景
+![Small Shadow](./doughnut.png)
 
-- 典型应用场景
-- 业务场景示例
+### Nightingale Chart
 
-## 配置选项
+By selecting the pie chart's variant property, you can set the chart effect to a Nightingale chart.
 
-### 数据配置
+![Small Shadow](./nightingale.png)
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
+## Trellis
 
-### 样式配置
+Like other charts, pie charts can also display as multiple chart grids by setting a trellis dimension.
 
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
+![Middle Shadow](./trellis.png)
 
-### 交互配置
+As shown below, by adding a calendar dimension and setting its role to **Trellis**.
 
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
+![Small](./trellis-chart-annotation.png)
 
-## 使用示例
+## Chart Properties
 
-### 基本示例
+Detailed chart property list:
 
-```json
-{
-  "type": "饼图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
+| Name | Description | Details |
+| -------- | ----------- | -------- |
+| Series Properties | series properties | |
+| Tooltip | Tooltip properties | |
+| Legend | Legend properties | |
+| Global Color | Global color properties | |
+| Auxiliary Enhancement | Auxiliary enhancement properties | |
 
-## 最佳实践
+## 示例
 
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/01bf76c0-d2c8-480f-9101-dba7049df1dc" width="100%" height="1500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

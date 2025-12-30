@@ -1,73 +1,278 @@
 ---
-title: "自定义图形"
-description: "自定义图形允许您创建自定义的图表类型，满足特殊的数据展示需求。"
+title: 自定义图形
+sidebar_position: 30
 ---
 
-# 自定义图形
+自定义图形类型是用户通过编写图形绘制代码进行自定义图形展示, 相关数据还是通过数据配置进行然后系统获取到数据后传入到自定义代码函数中, 在自定义代码中根据获取到的数据进行图形展示.
 
-## 概述
+## 创建自定义图形逻辑
 
-自定义图形允许您创建自定义的图表类型，满足特殊的数据展示需求。
+创建图形组件, 选择图形类型为 **自定义图形**, 点击代码编辑按钮打开自定义图形逻辑代码编辑器, 在代码编辑器中编写自定义 ECharts 图形计算逻辑.
 
-## 适用场景
+![自定义图形逻辑](/public/img/story/chart-type-custom-logic.png)
 
-### 数据特点
+### 自定义图形名称
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+自定义图形名称是图形组件的名称, 用于在故事仪表板中展示, 也是图形类型的唯一标识.
 
-### 使用场景
+### 自定义图形函数
 
-- 典型应用场景
-- 业务场景示例
+自定义图形的逻辑代码将被作为一个计算函数被图形组件所执行，该函数的参数和范围结果类型如下：
 
-## 配置选项
+* `queryResult` 类型为
+  ```json
+  {
+    status: 'OK',
+    data: any[],
+    schema: {
+      rows?: {
+        name: string,
+        label?: string
+        dataType: string
+      }[],
+      columns: {
+        name: string,
+        label?: string
+        dataType: string
+      }[]
+    }
+  }
+  ```
+  代表数据结果;
+* `chartAnnotation` 图形配置信息
+* `entityType` 多维数据集类型
+* `locale` 当前语言环境
+* `chartsInstance` ECharts 图形实例
+* `utils` 工具函数集
 
-### 数据配置
+自定义逻辑需要返回结果中包含：
+* `options`: ECharts 图形的 Option 配置对象
+* `onClick`: 图形点击事件的响应函数，返回事件和相关切片器
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
+```javascript
+const { getEntityHierarchy, getPropertyCaption } = utils;
 
-### 样式配置
-
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
-
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "自定义图形",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
+return {
+  options: {
+    // ECharts 图形配置
   },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
+  /**
+   * 响应点击事件，返回事件和相关切片器
+   * 
+   * @Optional
+   * @param {object} event ECharts 事件
+   */
+  onClick: (event) => {
+    // 
+    return {
+      ...event,
+      event: event.event.event,
+      slicers: [
+        {
+          dimension: chartAnnotation.dimensions[0],
+          members: [
+            {
+              value: event.data[getEntityHierarchy(chartAnnotation.dimensions[0]).name],
+              caption: event.data[getPropertyCaption(getEntityHierarchy(chartAnnotation.dimensions[0]))]
+            }
+          ]
+        }
+      ]
+    }
   }
 }
 ```
 
-## 最佳实践
+下面举例来看, 下面逻辑可以将数据展示为 3D 散点图:
 
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
+```javascript
+const xName = entityType.properties[chartAnnotation.measures[0].measure].label
+const yName = entityType.properties[chartAnnotation.measures[1].measure].label
+const zName = entityType.properties[chartAnnotation.measures[2].measure].label
 
-## 相关文档
+var symbolSize = 10;
+var options = {
+    grid3D: {},
+    xAxis3D: {
+        name: xName
+    },
+    yAxis3D: {
+        name: yName
+    },
+    zAxis3D: {
+        name: zName
+    },
+    dataset: {
+        dimensions: [
+            chartAnnotation.dimensions[0].dimension,
+            ...chartAnnotation.measures.map(item => item.measure)
+        ],
+        source: queryResult.data
+    },
+    series: [
+        {
+            type: 'scatter3D',
+            symbolSize: symbolSize,
+            encode: {
+                x: chartAnnotation.measures[0].measure,
+                y: chartAnnotation.measures[1].measure,
+                z: chartAnnotation.measures[2].measure,
+                tooltip: [0, 1, 2, 3]
+            }
+        }
+    ]
+};
 
-- [分析卡片概述](/zh-cn/数据分析平台/微件/分析卡片)
-- [其他图表类型](/zh-cn/数据分析平台/微件/分析卡片)
+return {
+  options
+}
+```
+
+在分析图形的属性设置界面里需要配置一个 Dimension 和三个 Measure 字段.
+
+![Middle](./custom.png)
+
+### 自定义响应图形事件
+
+自定义图形逻辑传入了 ECharts 的图形实例，所以可以通过 ECharts 的事件机制来响应图形的各类事件，下面是一个响应 `updateAxisPointer` 事件的例子：
+
+```javascript
+// 移除已有事件回掉函数，防止重复处理（因为自定义逻辑由于数据变化会重复执行）
+chartsInstance?.off('updateAxisPointer')
+chartsInstance?.on('updateAxisPointer', function (event) {
+  const xAxisInfo = event.axesInfo[0];
+  if (xAxisInfo) {
+    const dimension = xAxisInfo.value + 1;
+    chartsInstance.setOption({
+      series: {
+        id: 'pie',
+        label: {
+          formatter: '{b}: {@[' + dimension + ']} ({d}%)'
+        },
+        encode: {
+          value: dimension,
+          tooltip: dimension
+        }
+      }
+    });
+  }
+});
+```
+
+## 附录
+
+utils 工具函数集
+
+| 函数名 | 说明 |
+| --- | --- |
+| `echarts` | ECharts 工具集 |
+| `getEntityHierarchy` | 获取实体层级结构 |
+| `getEntityProperty` | 获取实体的属性 |
+| `getPropertyCaption` | 获取属性的显示名称 |
+| `getDefaultHierarchy` | 获取维度的默认层次结构 |
+| `stringifyProperty` | 字符串化字段标识 |
+
+## 示例
+
+<iframe src="https://app.mtda.cloud/public/story/widget/b69d043e-3cde-4aaa-aab0-69a05c7ce97b" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>
+
+相关代码是
+
+```javascript
+let progress = queryResult.data[0][chartAnnotation.measures[1].measure] / queryResult.data[0][chartAnnotation.measures[0].measure] * 100
+return {
+  options: {
+    textStyle: {
+        fontStyle: 'italic'
+    },
+    series: [
+      {
+        type: 'gauge',
+        center: ['50%', '60%'],
+        startAngle: 180,
+        endAngle: 0,
+        min: 0,
+        max: 100,
+        splitNumber: 10,
+        radius : '98%',
+        itemStyle: {
+          shadowColor: 'rgba(0,138,255,0.45)',
+          shadowBlur: 10,
+          shadowOffsetX: 2,
+          shadowOffsetY: 2
+        },
+        progress: {
+          show: true,
+          roundCap: true,
+          width: 18
+        },
+        pointer: {
+          icon: 'path://M2090.36389,615.30999 L2090.36389,615.30999 C2091.48372,615.30999 2092.40383,616.194028 2092.44859,617.312956 L2096.90698,728.755929 C2097.05155,732.369577 2094.2393,735.416212 2090.62566,735.56078 C2090.53845,735.564269 2090.45117,735.566014 2090.36389,735.566014 L2090.36389,735.566014 C2086.74736,735.566014 2083.81557,732.63423 2083.81557,729.017692 C2083.81557,728.930412 2083.81732,728.84314 2083.82081,728.755929 L2088.2792,617.312956 C2088.32396,616.194028 2089.24407,615.30999 2090.36389,615.30999 Z',
+          length: '75%',
+          width: 16,
+          offsetCenter: [0, '5%']
+        },
+        axisLine: {
+          roundCap: true,
+          lineStyle: {
+            width: 18
+          }
+        },
+        axisTick: {
+          splitNumber: 2,
+          lineStyle: {
+            width: 2,
+            color: '#999'
+          }
+        },
+        splitLine: {
+          length: 6,
+          lineStyle: {
+            width: 3,
+            color: '#999'
+          }
+        },
+        axisLabel: {
+          distance: 20,
+          color: '#999',
+          fontSize: 20
+        },
+        title: {
+          show: false
+        },
+        detail: {
+          backgroundColor: '#fff',
+          borderColor: '#999',
+          borderWidth: 2,
+          width: '90%',
+          lineHeight: 40,
+          height: 40,
+          borderRadius: 8,
+          offsetCenter: [0, '35%'],
+          valueAnimation: true,
+          formatter: function (value) {
+            return '{value|' + value.toFixed(1) + '}{unit|%}';
+          },
+          rich: {
+            value: {
+              fontSize: 50,
+              fontWeight: 'bolder',
+              color: '#ffab00'
+            },
+            unit: {
+              fontSize: 20,
+              color: '#999',
+              padding: [0, 0, -10, 10]
+            }
+          }
+        },
+        data: [
+          {
+            value: progress
+          }
+        ]
+      }
+    ]
+  }
+}
+```

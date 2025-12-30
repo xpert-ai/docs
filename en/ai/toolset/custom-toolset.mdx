@@ -1,43 +1,45 @@
 ---
-title: "自定义工具集"
-description: "自定义工具集开发指南"
+title: Custom Toolsets
+sidebar_position: 3
 ---
 
+A **Custom Toolset** is a collection of tools created and configured by users to meet their specific needs, designed to extend the system's functionality and flexibility. With custom toolsets, users can integrate various services and data sources to address specific business requirements.
 
-# 自定义工具集
+Custom toolsets support multiple protocols, including:
 
-## Overview
+- **OpenAPI Protocol**: OpenAPI is a standardized format for describing RESTful APIs. By supporting OpenAPI, custom toolsets can easily integrate with REST-based services, providing standardized interface definitions and interaction methods.
 
-自定义工具集允许您开发自定义工具，扩展智能体的功能。
+- **OData Protocol**: OData is an open protocol for accessing and querying data. Custom toolsets that support OData can interact with various data sources, offering flexible data query and operation capabilities.
 
-## 开发工具
 
-### 工具开发
+## Custom OpenAPI Toolset
 
-1. 创建工具项目
-2. 实现工具逻辑
-3. 配置工具参数
-4. 测试工具
-5. 发布工具
+The custom OpenAPI toolset allows users to create toolsets by providing a URL or manually entering a Swagger OpenAPI specification. The system automatically parses the specification, identifying API paths and parameters, simplifying the integration process.
 
-### 工具类型
+Users only need to provide the URL of the OpenAPI specification or directly input the content in the interface. The system then generates the corresponding interface definitions, enabling users to quickly build and configure custom toolsets.
 
-- **数据处理工具**: 处理数据的工具
-- **API工具**: 调用API的工具
-- **文件工具**: 处理文件的工具
+![Custom Toolset OpenAPI](/public/img/ai/custom-toolset-openapi.png)
 
-## 工具注册
 
-### 注册步骤
+## Custom OData Toolset
 
-1. 进入自定义工具集页面
-2. 点击"新建工具"
-3. 填写工具信息
-4. 上传工具代码
-5. 配置工具参数
-6. 注册工具
+The custom OData toolset allows users to create toolsets by providing the URL of an OData service or manually entering OData metadata. The system automatically parses the metadata to identify entity sets and generates the corresponding CRUD (Create, Read, Update, Delete) interface definitions, streamlining the integration process.
 
-## Related Documentation
+Users can simply provide the OData service URL or directly input the metadata content in the interface. The system will generate the necessary interface definitions, helping users quickly build and configure custom toolsets.
 
-- [内置工具集](/en/智能体AI 平台/工具集/内置工具集)
-- [插件开发](/en/智能体AI 平台/插件开发/概述)
+![Custom Toolset OData](/public/img/ai/custom-toolset-odata.png)
+
+
+## Authorization Methods
+
+Custom API toolsets support the following authorization methods:
+
+1. **None**: No authorization required to access the API. This method is suitable for public API interfaces that users can call without providing credentials.
+
+2. **Basic**: Basic authorization using a username and password. Users must include a Base64-encoded combination of the username and password in the request header for authentication.
+
+3. **API Key**: Authorization using an API key. Users must include a specific API key in the request, typically passed through the request header or query parameters, to validate access permissions.
+
+![Custom Toolset Authorization](/public/img/ai/custom-toolset-authorization-method.png)
+
+These authorization methods provide flexible options to meet the security requirements of different APIs.

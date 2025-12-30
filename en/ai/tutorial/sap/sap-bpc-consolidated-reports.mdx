@@ -1,20 +1,107 @@
 ---
-title: "SAP BPC 合并报表"
-description: "SAP BPC合并报表教程"
+title: SAP BPC Consolidated Reports
+sidebar_position: 2
 ---
 
+This article uses the **Consolidation** model in the **BPC420_00** environment of the SAP BPC system as an example to introduce how to build a financial consolidated reporting analysis system.
 
-# SAP BPC 合并报表
+BPC Environment:
 
-## Overview
+![Tiny Shadow](./bpc-env.png)
 
-SAP BPC合并报表功能用于生成和管理企业合并财务报表。
+BPC Model:
 
-## 内容
+![Middle Shadow](./consolidation-model.png)
 
-此教程正在完善中，更多详细信息即将推出。
+:::tip Environment
 
-## Related Documentation
+System environment used in this article: Personal Edition account
 
-- [SAP BPC](/en/智能体AI 平台/教程/SAP/SAP BPC)
-- [如何分析 SAP BW 数据模型](/en/智能体AI 平台/教程/SAP/如何分析 SAP BW 数据模型)
+:::
+
+## How to Create Dashboards Based on SAP BPC System
+
+1. Create SAP BPC system data source
+2. Create semantic model corresponding to the financial management reporting model in SAP BPC system
+3. Create indicator groups
+4. Create indicators based on management reporting semantic model
+
+### 1. Create BPC System Data Source
+
+SAP BPC is based on the SAP BW system, so for creating SAP BPC system data sources, please refer to [SAP BW Data Source](../../../server/datasources/sap-bw).
+
+### 2. Create Business Grouping
+
+Semantic models, indicators, and stories are all managed by business domain, so for grouping and permission control, corresponding business domain grouping architecture needs to be created. Refer to [Business Domain Documentation](../../../server/organization/business-area)
+
+Create a business domain named **Finance**.
+
+### 3. Create Semantic Model
+
+Semantic models, as metadata management objects, are the foundation for system data analysis. To implement permission control on semantic models, semantic models need to be created within corresponding business domains. Open the semantic model management interface:
+
+1. Click the New button on the **Finance** business domain row, select the BPC data source created in the previous step, click Next;
+2. Select Catalog **$INFOCUBE**, enter model name, click Create
+
+The semantic model created now only has basic configuration. If you need to enhance metadata for SAP BW models, you need to create corresponding Cubes or Dimensions in this semantic model and add corresponding enhanced metadata.
+
+Find the BW model corresponding to the BPC model through the following method: Open BW system SAP GUI, use transaction code **SE11** to view table **UJA_APPL** content, select conditions as APPSET_ID: *BPC420_00*, APPLICATION_ID: *Consolidation*. You will get a table record, find the INFOCUBE field value such as */CPMB/FOITS7D* which is the BW model.
+
+![Middle Shadow](./bpc-applications.png)
+
+Find this model in the data table area of the semantic model interface, drag it to the MDX model area, and enter text description to create the corresponding semantic model entity.
+
+![Small Shadow](./semantic-model.png)
+
+
+After creating the entity corresponding to the BW model in the semantic model, the page will jump to the model editing interface, and the left sidebar will show the dimension and measure information structure automatically obtained by the system for this model.
+
+Now enhance this original metadata by adding default time hierarchy and calculated measure information [Enhance Time Hierarchy Dimension](../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube#enhance-calendar-type-dimension):
+
+#### Create Calculated Measure
+
+Since the BPC model stores revenue amounts as negative values, when displaying, you need to negate the revenue amount. This can be achieved using calculated measures.
+
+Click Create in the calculated member group in the left sidebar, select the newly added row node, and enter in the right settings panel: Name: amount, Label: Amount, Formula: `-[Measures].[/CPMB/SDATA]`.
+
+### 4. Create Story Dashboard
+
+Next, create corresponding report dashboards based on the semantic model. In the semantic model interface, select menu *General* -> *Story* -> *Create Story* to create a story. You can also click the Create button in the story list interface (first select the corresponding business group) to create.
+
+Then you can draw the dashboard you want to analyze in the story editing interface.
+
+## Building Indicator System for BPC Financial Model
+
+Enterprise financial analysis indicator system is an important part of enterprise financial management. As an important resource for enterprise information analysis, it provides financial analysis data for enterprise decision-makers, enabling scientific decisions and playing an active supporting and guaranteeing role in achieving the goal of maximizing enterprise value.
+
+Based on the BPC model, we will create 4 financial core indicators: **Solvency**, **Profitability**, **Operating Capability**, **Development Capability**.
+
+### 1. Create Core Indicator Business Domain
+
+To better manage financial indicators, we create a separate **Core Indicators** business domain under the **Finance** business domain. Then create four sub-domains under the core indicators domain: Solvency, Profitability, Operating Capability, Development Capability.
+
+### 2. Create Indicators
+
+Take **Asset-Liability Ratio** in solvency as an example to create an indicator. Refer to [Indicator Registration](../../../indicators/register) documentation to fill in corresponding information. Here, the naming conventions for indicator names and codes need to be managed according to customer needs, the system itself has no restrictions. After selecting data source and model, select indicator type as **Derived Indicator**, under derived indicators you can set calculated measure formula: `([Account Dim].[Total Liabilities], [Measures].[Amount]) / ([Account Dim].[Total Assets], [Measures].[Amount])`, and set the unit to **%** in basic information.
+
+Register indicators into the system through manual entry or batch upload on the indicator registration page. Then you can select and use indicators for display in Story. You can also view and favorite indicator lists in [Indicator Application](../../../indicators/app/).
+
+### 3. Detail Indicators
+
+Based on different management methods of different companies, core indicators can also drill down to detail indicators for definition. For example, gross profit margin in profitability can be defined as the group's total gross profit margin in core indicators, or detailed gross profit margins can be defined for different sales regions such as: **China Region Gross Profit Margin**, **Overseas Gross Profit Margin**. You can also define for different product lines: **Automotive Product Gross Profit Margin**, **Mobile Phone Product Gross Profit Margin**, **Home Appliance Product Gross Profit Margin**, etc.
+
+In this case, the gross profit margin formula remains unchanged, what changes are different dimension members. This way we can define the gross profit margin formula in the semantic model. Add a calculated measure member for gross profit margin in [Semantic Model #Create Calculated Member](../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube#create-calculated-member), and select this measure when defining indicators, then add different filter conditions (dimension member restrictions) for different detail indicators.
+
+:::tip Solve Order
+
+When defining calculated measure members, pay attention to the Solve Order property setting, which relates to the priority order of different operations in the calculation process and affects the final result.
+
+--- [MDX Data Manipulation - Understanding Pass Order and Solve Order](https://learn.microsoft.com/en-us/analysis-services/multidimensional-models/mdx/mdx-data-manipulation-understanding-pass-order-and-solve-order?view=asallproducts-allversions)
+
+:::
+
+## Calendar Dimension
+
+Since financial data is all period-based analysis, calendar dimensions are needed as a common time axis. Set corresponding default calendar dimensions in the semantic model:
+
+Refer to [Calendar Dimension](../../../models/mdx-modeling/calendar-dimension)

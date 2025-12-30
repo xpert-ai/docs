@@ -1,19 +1,154 @@
 ---
-title: "从零打造 Agentic ChatBI 智能体"
-description: "从零打造 Agentic ChatBI 智能体教程"
+title: Building an Agentic ChatBI Agent from Scratch
+sidebar_position: 6
+tags:
+  - Agent
+  - ChatBI
 ---
 
+:::success
+**Realizing Conversational and Thoughtful Data Intelligence Analysis in the XpertAI Platform**
+:::
 
-# 从零打造 Agentic ChatBI 智能体
+In an era where the demand for digital operations and business intelligence is rapidly growing, enterprises are no longer satisfied with traditional static reports or one-off Q&A analysis tools. Instead, they aim to build data analysis agents with **autonomous understanding and task execution capabilities**. The XpertAI platform, with its core concept of "**Agentic ChatBI**," delivers a brand-new conversational data analysis experience.
 
-## Overview
+**Agentic** stands for "agent-driven," supporting not only natural language Q&A but also emphasizing the agent's capabilities in **context memory, goal management, tool invocation, and iterative optimization**. Compared to traditional Prompt Engineering or SQL template-based solutions, XpertAI’s Agentic ChatBI offers the following unique advantages:
 
-从零打造 Agentic ChatBI 智能体教程将帮助您了解如何使用相关功能。
+* 🧠 **True Agent Architecture**: Each ChatBI entity is an orchestratable, configurable independent agent with capabilities for perception (user intent recognition), reasoning (metric inference, semantic parsing), and action (metric construction and chart output).
+* 🔌 **End-to-End Closed-Loop Design**: From data source integration and semantic modeling to conversational deployment, the platform supports seamless configuration without coding, enabling non-technical users to start from scratch.
+* 🧩 **Extensible Toolchain**: Supports multi-tool collaboration (e.g., search, function calls, knowledge retrieval) and adapts to various AI models (OpenAI, Tongyi Qianwen, Deepseek, etc.), improving Q&A accuracy and business adaptability.
+* 🧭 **Context Awareness and Intent Memory**: Supports real-time data context recognition, historical conversation tracking, and personalized responses, making the analysis process smarter and more coherent.
 
-## 内容
+This article will guide you step-by-step through the process of building a deployable ChatBI agent from scratch.
 
-此教程正在完善中，更多详细信息即将推出。
+---
 
-## Related Documentation
+## Step 1: Create Data Source Connections
 
-- [教程](/en/智能体AI 平台/教程)
+The foundation of ChatBI is data, and the entry point is connecting to diverse data sources. XpertAI supports integration with mainstream databases and data warehouses, including but not limited to:
+
+* MySQL / PostgreSQL / SQL Server
+* SAP BW / SAP HANA
+* ClickHouse / Doris / Hive / Presto
+* Snowflake / Redshift
+* Excel / CSV and other structured data sources
+
+Simply configure the connection details in the **[Data Source Management](/docs/server/datasources/)** section, and the platform will automatically validate the connection.
+
+---
+
+## Step 2: Create a Semantic Model (Semantic Data Cube)
+
+To help the agent understand the relationship between business concepts and data, we introduced the concept of a [**"semantic model"**](/docs/models/), which is a collection of data cubes. You can build data cubes through a graphical interface, defining:
+
+* Dimensions (shared dimensions, inline dimensions)
+* Measures (numeric fields, aggregation methods)
+* Relationships between fact data tables and dimensions (primary-foreign key joins)
+
+This step transforms the underlying data structure into an analysis model that is easy for AI models (and business users) to understand and use.
+
+### Dimension Member Retrieval
+
+The platform also provides the **[Dimension Member Retrieval](/docs/models/member-retriever)** function. This function dynamically synchronizes and vectorizes dimension member information, offering more accurate and efficient support for data analysis, enabling the agent to have stronger contextual awareness when identifying query intent and constructing filtering conditions.
+
+---
+
+## Step 3: Manage Semantic Model Metrics (Optional)
+
+If you want to predefine commonly used KPI metrics (e.g., GMV, conversion rate, average order value) in the model, you can do so in the **[Metric Management](/docs/indicators/)** section for definition and categorization. These metrics will serve as key references for the agent to understand query intent and construct queries.
+
+> ✅ **Tip**: This step is optional but highly recommended in complex business scenarios to improve the accuracy and business context understanding of intelligent Q&A. You can also implement equivalent logical calculations in the **[Calculated Members](/docs/models/mdx-modeling/calculated-member)** section.
+
+---
+
+## Step 4: Create ChatBI Data Model Configuration
+
+This **[Conversational Model](/docs/ai/tool/chatbi/models)** configuration binds the semantic model to the agent's interaction context, serving as a bridge between the underlying data and the upper-layer ChatBI toolchain.
+
+You need to:
+
+* Select the created semantic model
+* Choose the entities (data cubes) within the semantic model
+* Provide a brief description and a detailed description to help the large language model understand its meaning
+
+Once this step is complete, the agent can select and use the model based on its description.
+
+---
+
+## Step 5: Create a ChatBI Agent
+
+With everything prepared, you can now formally create the ChatBI agent.
+
+> ⚙️ **Note**: Ensure that the platform has configured AI models (e.g., OpenAI, Deepseek, Claude, Tongyi Qianwen, etc.) and set the default conversational model in the **[Model Management]** section.
+
+Follow these steps:
+
+### 1. Create a Workspace
+
+A workspace serves as a container to organize different agents and tools, facilitating management for multiple teams or business lines.
+
+### 2. Create a ChatBI Toolset
+
+* Select the "ChatBI" tool type
+* Reference the data model configured in Step 4
+* Optionally configure data permissions (when disabled, actual data is filtered, and only dimension member information is sent to the large language model; otherwise, complete data results are sent)
+* Enable all tools and save
+
+### 3. Create an Agent and Mount Tools
+
+* Set the agent’s name and base AI model (e.g., “Sales Data Analysis Expert”)
+* Mount the ChatBI toolset
+* Optionally set different AI model types (e.g., reasoning models) for specific agent nodes
+* (Optional) Configure additional auxiliary capabilities, such as search tools or MCP invocation plugins
+
+### 4. Test and Deploy
+
+In the preview area, simulate real-world questions (e.g., “What were last month’s sales?”) to verify whether the system can correctly generate chart configurations and return expected results. Once testing is successful, deploy with a single click.
+
+In addition to using this digital expert in the conversation interface, you can also publish to platforms such as [Feishu](/docs/ai/tool/chatbi/#adapting-chatbi-for-feishu), [DingTalk](/docs/ai/tool/chatbi/), or [WeChat Work](/docs/ai/tool/chatbi/).  
+If you want to use it in third-party systems, you can also use the [web embedding](/docs/ai/xpert/embedded) method.
+
+---
+
+## Step 6: Use the ChatBI Agent for Conversational Analysis
+
+In the final conversational interface, you can interact with the ChatBI agent as if chatting with a colleague, asking business-related questions:
+
+> “Which city had the fastest order growth in the past week?”
+>
+> “Compare GMV and year-over-year growth by province for this quarter.”
+>
+> “Analyze the customer profile for high-value products.”
+
+The system will automatically perform intent recognition, chart generation, question recommendations, and even provide analysis interpretations and summaries, making data insights readily accessible.
+
+---
+
+## Why Choose XpertAI’s Agentic ChatBI?
+
+### Comparison with Traditional BI Tools and RAG+SQL Solutions:
+
+| Feature Dimension       | Traditional BI Tools | RAG+SQL Model Invocation | **Agentic ChatBI** |
+|-----------------------|---------------------|-------------------------|---------------------------|
+| **Interaction Method** | Drag-and-drop charts, predefined queries | Single-round natural language Q&A | Multi-round contextual conversations, proactive questioning, and clarification |
+| **Technical Barrier**  | Requires understanding of data structures and modeling languages | Requires pre-designed Prompt + SQL templates | No coding required, graphical configuration |
+| **Intelligence Level** | Static reports, passive responses | Limited Q&A capability, reliant on corpus accuracy | Agent with reasoning, memory, and tool invocation capabilities |
+| **Data Understanding** | Lacks semantic layer, direct field name translation | Simple field mapping + embedding matching | Semantic modeling + metric system + cube context awareness |
+| **Extensibility**      | Difficult to customize, developer-dependent | Requires rewriting Prompts for new business needs | Modular toolchain, supports custom functions and plugins |
+| **Result Quality**     | Relies on user operations and business knowledge | Prone to generating incorrect SQL, lacks control | High-accuracy SQL construction + auditable raw data |
+| **Target Audience**    | Data analysts, report developers | Data engineering + AI engineering teams | Product managers, operations staff, business analysts, and other non-technical roles |
+
+> **In One Sentence:**
+> Traditional BI tools solve the “display problem,” RAG+SQL solves the “questioning problem,” while XpertAI’s Agentic ChatBI addresses the “understanding, decision-making, and action” problem.
+
+---
+
+## Summary: Everyone Can Build Their Own Intelligent Data Analysis Expert
+
+XpertAI’s Agentic ChatBI is not just a tool but a paradigm shift in data-driven thinking. It makes the entire process—from data modeling and analysis logic to natural language interaction—**configurable**, **manageable**, and **intelligently optimizable**.
+
+Start your ChatBI agent journey today and make data analysis truly **conversational, understandable, and actionable**.
+
+---
+
+For a product demo, visit the [XpertAI Official Website](https://app.mtda.cloud/) or contact the platform [administrator](/#connect) for support.

@@ -1,74 +1,30 @@
 ---
-title: "树图"
-description: "树图用于展示层级结构数据，通过矩形大小表示数据值。"
+title: Tree Chart
+sidebar_position: 7
+tags:
+    - Hierarchy
 ---
 
+**Tree Chart** (Tree) is a visualization method that uses containment relationships to express hierarchical data. Tree charts can decompose things or phenomena into branch-like structures, also called tree diagrams or system diagrams.
 
-# 树图
+## Tree Chart
 
-## Overview
+Select the chart type as **Tree Chart** (Tree), and add one dimension, set the finest level of the dimension to display, and set its **Include Parent Levels** property.
 
-树图用于展示层级结构数据，通过矩形大小表示数据值。
+![Small](./tree-attributes.png)
 
-## 适用场景
+This way, the member data relationships of this hierarchy will be displayed in the form of a tree chart:
 
-### 数据特点
+![Small Shadow](./tree.png)
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+## Chart Subtypes
 
-### 使用场景
+You can set the tree chart's direction as **Horizontal** or **Vertical**, and also set the tree chart subtype as **Reverse** or **Radial**.
 
-- 典型应用场景
-- 业务场景示例
+Combining direction properties and reverse types can display tree charts in four orientations. Radial tree chart nodes are displayed in a radar emission form:
 
-## 配置选项
+![Small Shadow](./tree-radial.png)
 
-### 数据配置
+## 示例
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
-
-### 样式配置
-
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
-
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "树图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
-
-## 最佳实践
-
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/1098d7cc-e9db-4366-91c9-f774ef865478" width="100%" height="1000px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

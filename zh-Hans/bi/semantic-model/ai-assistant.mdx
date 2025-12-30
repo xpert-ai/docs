@@ -1,19 +1,206 @@
 ---
-title: "AI智能助理"
-description: "AI智能助理功能说明"
+title: 🤖 AI 智能助理
+sidebar_position: 10
+tags:
+  - AI
+  - Copilot
+  - MDX
+  - SQL
 ---
 
-# AI智能助理
+关于 AI 智能助理的通用功能请参考 [🤖 AI 智能助理](../../ai/copilot/) 。
 
-## 概述
+语义模型副驾命令列表：
 
-AI智能助理是语义模型功能的重要组成部分。
+| 命令 | 说明 |
+| --- | --- |
+| [`/table`](#table) | 创建物理表 |
+| [`/dimension`](#dimension) | 创建共享维度 |
+| [`/hierarchy`](#hierarchy) | 创建层次结构 |
+| [`/cube`](#cube) | 创建多维数据集 |
+| [`/query`](#query) | 创建查询语句 |
+| [`/calculated`](#calculated) | 创建计算成员命令 |
+| [`/modeler`](#modeler) | 建模员命令 |
 
-## 功能说明
+## 模型全局命令
 
-此功能正在完善中，更多详细信息即将推出。
+在语义模型界面 AI 智能助理有以下命令可用：
 
-## 相关文档
+- `/table` `/t` [🦜️🔗][🦜️🔗] 创建物理表
+- `/dimension` `/d` [🦜️🔗][🦜️🔗] 创建维度
+- `/cube` `/c` [🦜️🔗][🦜️🔗] 创建立方体
 
-- [多维模型介绍](/zh-cn/数据分析平台/语义模型/多维模型介绍)
-- [管理语义模型](/zh-cn/数据分析平台/语义模型/管理语义模型)
+### /table
+
+`/table` 或 `/t` [🦜️🔗][🦜️🔗] 命令用于创建物理表。
+
+### /dimension
+
+`/dimension` `/d` [🦜️🔗][🦜️🔗] 命令用于根据表信息和提问创建共享维度。
+
+:::tip
+用户需要提供必要的维度表信息，可以通过拖拽数据表区域里的表名至副驾驶内将元数据插入到对话中。
+:::
+
+例如：
+
+```bash
+/d create dimension call 'product_category' includes product category and model levels.
+```
+
+### /cube
+
+`/cube` `/c` [🦜️🔗][🦜️🔗] 命令用于根据表信息和提问创建立方体。
+
+:::tip
+用户需要提供必要的立方体信息，可以通过拖拽数据表区域里的表名至副驾驶内将元数据插入到对话中。
+:::
+
+例如：
+
+```bash
+/cube create cube call 'sales_cube' that includes shared dimensions: product and customer, and measures: sales amount, product cost, sales profit
+```
+
+## 查询实验室命令
+
+在查询实验室界面 AI 智能助理有以下命令可用：
+
+- `/query` [🦜️🔗][🦜️🔗] 根据用户描述执行数据查询；
+
+在此界面中的副驾驶对话内容可以被保存在查询记录中，用户重新打开查询时副驾驶对话内容会被恢复。关于查询实验室更多功能请参考 [查询实验室](../query-lab/)
+
+### /query
+
+`/query` `/q` [🦜️🔗][🦜️🔗] 命令用于根据用户描述执行数据查询。用户需要提供必要的查询逻辑信息和表信息。
+
+:::tip
+用户可以通过将表区域的表名拖至 **表结构** 区域内，以提供必要的表信息。
+:::
+
+```sql
+/query 每个国家每年的客户销售额
+
+SELECT
+    c.country_region,
+    SUBSTRING(s.order_date_key, 1, 4) AS year,
+    SUM(s.sales_amount) AS total_sales_amount
+FROM
+    adv_sales s
+    JOIN adv_customer c ON s.customer_key = c.customer_key
+GROUP BY
+    c.country_region,
+    year
+ORDER BY
+    c.country_region,
+    year;
+```
+
+命令完成时会自动执行查询并返回结果。
+
+修改查询语句：
+
+```bash
+/query 将国家字段改成城市字段
+```
+
+### 查询多维数据源
+
+如果语义模型对应的数据源是多维数据源（如 SAP BW，Microsoft Analysis Services 等支持 Xmla 接口服务的系统），Query 命令自动使用 MDX 语法的语句进行查询。
+
+```sql
+/query sum SignData for every entity where category is [/CPMB/OUDV1E2].[Actual]
+
+SELECT
+  {[Measures].[/CPMB/SDATA]} ON COLUMNS,
+  {[/CPMB/OUDMS0O].[LEVEL01].Members} ON ROWS
+FROM [$/CPMB/OUMFJWF]
+WHERE {[/CPMB/OUDV1E2].[Actual]}
+```
+
+## 维度界面命令
+
+有以下命令可用：
+
+- `/hierarchy` `/h` [🦜️🔗][🦜️🔗] 根据用户描述创建新的层次结构
+
+### /hierarchy
+
+`/hierarchy` `/h` [🦜️🔗][🦜️🔗] 命令用于创建新的层次结构
+
+:::tip
+用户需要将用到的表从数据表区域拖至 AI 对话框内以提供必要的维度表信息。如果未提供表信息，副驾驶将只根据当前维度中用到的表信息进行创建层次结构。
+:::
+
+例如：
+
+```bash
+/h 创建层次结构包含产品和类别
+```
+
+## 数据集命令
+
+有以下命令可用：
+
+- `/calculated` `/calc` [🦜️🔗][🦜️🔗] 创建新的计算成员；
+
+查询界面
+
+- `/query` `/q` [🦜️🔗][🦜️🔗] 根据用户描述执行数据查询
+
+计算界面
+
+- `/formula` `/f` [🦜️🔗][🦜️🔗] 根据用户描述修改当前的计算公式。
+
+### /query
+
+`/query` `/q` [🦜️🔗][🦜️🔗] 命令用于根据用户描述执行数据查询。
+
+```bash
+/query Create a statement to query the data: the most sales reseller
+```
+
+`/query` 命令还可以对当前编辑器中的查询语句进行修改：
+
+```bash
+/query Edit current statement refer to the error message: MDX object '[Reseller].[Reseller].[Not Applicable].[Not Applicable]' not found in cube 'Sales'
+```
+
+### /calculated
+
+`calculated` `/calc` [🦜️🔗][🦜️🔗] 命令用于创建新的计算成员，用户需要提供必要的计算逻辑信息。
+
+```bash
+/calc 创建计算成员
+名称: 利润率
+公式: (销售额 - 成本) / 销售额 * 100
+描述: 计算产品的利润率
+```
+
+### /formula
+
+`/formula` `/f` [🦜️🔗][🦜️🔗] 命令用于编辑当前的计算度量公式，用户需要提供必要的计算逻辑信息。
+
+## 访问控制界面命令
+
+有以下命令可用：
+
+- `/role` 根据用户描述创建角色
+
+## 虚拟立方体页面命令
+
+### /formula
+  
+  `/formula` 命令用于创建虚拟立方体计算公式的建议。用户可以在副驾驶对话框中输入命令和需求，然后副驾驶将为您生成相应的计算公式。
+  
+```bash
+/formula 创建一个计算销售利润率
+```
+
+## /modeler
+
+`/modeler` 或 `/m` 数据建模员根据用户提示和表信息，参考业务角色示例，可以创建共享维度和多维数据集。这一命令使得数据建模过程更加自动化和高效，用户可以专注于数据分析和决策。
+
+![Modeler Command](/public/img/copilot/command-modeler.png)
+
+[🦜️🔗]: ../../ai/copilot/#langchain

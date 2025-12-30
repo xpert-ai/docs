@@ -1,20 +1,45 @@
 ---
-title: "SAP BPC"
-description: "SAP BPC教程"
+title: SAP BPC
+sidebar_position: 1
+tags:
+  - MDX
 ---
 
+## 1. What is SAP BPC
 
-# SAP BPC
+BPC (SAP Business Planning and Consolidation) is a business intelligence and financial consolidation solution.
 
-## Overview
+SAP BPC is a product in the CPM (Corporate Performance Management) software market. It is currently SAP's flagship product in the financial application field, offering planning, budgeting, forecasting, and financial reporting consolidation capabilities. It enables easy adjustment of enterprise-level strategic planning and forecasting, accelerates budgeting and closing cycles, and ensures compliance with the latest IFRS standards. Its customers are mainly CFOs, finance professionals, and decision-makers.
 
-SAP BPC (Business Planning and Consolidation) 是SAP的企业规划和合并解决方案。
+SAP BPC is a comprehensive budget management solution provided by SAP for enterprises. Comprehensive budget management is an important link between company strategic goals and daily operations, forming a complete closed-loop management process from the strategic level to the execution level.
 
-## 内容
+## 2. What can it do
 
-此教程正在完善中，更多详细信息即将推出。
+SAP BPC covers the entire process of comprehensive budget management cycle: business goal setting -> budgeting -> budget control -> feedback/analysis -> budget adjustment -> performance evaluation.
 
-## Related Documentation
+Many companies and organizations worldwide adopt SAP BPC to achieve budget management and business analysis.
 
-- [SAP BPC 合并报表](/en/智能体AI 平台/教程/SAP/SAP BPC 合并报表)
-- [如何分析 SAP BW 数据模型](/en/智能体AI 平台/教程/SAP/如何分析 SAP BW 数据模型)
+## 3. Development history
+
+BPC (Business Planning & Consolidation) was formerly known as Outlooksoft. SAP acquired this company in 2007. After the acquisition, SAP developed a new product based on the Netweaver BW platform while retaining the original MS OLAP platform. Therefore, SAP BPC now has two product lines based on different OLAP engine architectures. In terms of functionality, the NW version of BPC has most of the MS features. After SAP acquired another heavyweight BI vendor, Business Objects, BPC integrated many BO products. SAP concentrated and integrated its own products, setting up a large EPM (Enterprise Performance Management) platform with BPC as the core in the next generation of EPM product line.
+
+## 4. Relationship between BW and BPC
+
+BW is the business data warehouse in the SAP system, used for data management and data mining. BPC is an application built on top of BW.
+
+In BPC, we create an environment, which corresponds to an InfoArea in the backend.
+
+In this environment, we create multiple dimensions, which correspond to InfoObjects in the backend.
+
+We select several dimensions in this environment and create a model, which corresponds to an InfoCube in the backend.
+
+| Name | Corresponding Relationship | 1 | 2 | 3 |
+| -- | -- | -- | -- | -- |
+| BPC | Application | Environment | Dimension | Model |
+| BW | Foundation | InfoArea | InfoObject | InfoCube |
+
+## 5. Application scope
+
+BPC is currently more common in the European and American markets, and it has also been promoted in many companies in China. BPC's functionality in the Excel client makes it more appealing to traditional finance users. However, for implementation, it increases the difficulty of secondary development. Typically, BPC projects require consultants to develop a certain amount of macros and use BPC's built-in scripting language (script logic) to write business logic. Configuration for consolidation functionality is also challenging.
+
+https://learn.microsoft.com/en-us/power-query/connectors/sap-bw/sap-bw-fundamentals

@@ -1,72 +1,53 @@
 ---
-title: "步骤四: 上传文件"
-description: "上传文件到知识流水线指南"
+title: "Step 4: Upload Files"
+sidebar_position: 4
+---
+After you have finished configuring, debugging, and successfully publishing your knowledge pipeline, you can upload files by navigating to the document list page:
+
+## Upload Process
+
+### 1. Select Data Source
+
+Choose an upload method from the data source types configured in the pipeline.
+Currently, XpertAI supports the following data sources:
+
+* **Local file upload** (pdf, docx, txt, markdown, etc.)
+* **Remote file systems** (such as S3, FTP, etc.)
+* **Online drives** (in development)
+* **Online documents** (such as Feishu Docs)
+* **Web crawling** (such as Firecrawl and other plugins)
+
+You can also find more data source support in the [XpertAI Plugin Marketplace](https://app.mtda.cloud/settings/plugins).
+
+:::tip **Tip**:
+Even if you have configured a knowledge pipeline for your knowledge base, you can still use the **basic configuration mode** to upload files directly, without processing them through the pipeline.
+This allows your knowledge base to support both automated processing and flexible manual additions or quick testing scenarios.
+:::
+
 ---
 
+### 2. Fill in File Processing Parameters and Input Variables
 
-# 步骤四: 上传文件
+If user input fields were defined during pipeline configuration, you will need to fill in the corresponding parameters and variables when uploading files.
+After completing the form, you can click **Preview Segmentation** to view how the document will be chunked.
+Once confirmed, click **Save and Process** to start creating and processing the knowledge base document.
 
-## Overview
+---
 
-上传文件步骤用于将文档文件上传到知识流水线进行处理，支持多种文件格式。
+### 3. Document Processing and Progress Tracking
 
-## 支持的文件格式
+After the file upload is complete, the system will automatically start the document processing workflow.
+You can monitor the processing progress of each file in real time. Once embedding is complete, click **Go to Document** to enter the knowledge base page.
 
-### 文档格式
+---
 
-- **PDF**: PDF文档
-- **Word**: Word文档（.doc, .docx）
-- **Markdown**: Markdown文档
-- **文本**: 纯文本文件（.txt）
+### 4. View File List
 
-### 其他格式
+After entering the knowledge base document interface, you can view:
 
-- **Excel**: Excel表格（.xls, .xlsx）
-- **PowerPoint**: PPT文档（.ppt, .pptx）
-- **HTML**: HTML文件
+* The number of uploaded files
+* The processing status and progress of each file
+* Whether embedding is complete and the file is available
 
-## 上传方法
+On this page, you can also reprocess, delete, or append files to documents, making it easy to maintain the latest content in your knowledge base.
 
-### 1. 单文件上传
-
-1. 点击"上传文件"按钮
-2. 选择要上传的文件
-3. 等待上传完成
-4. 文件自动进入处理流程
-
-### 2. 批量上传
-
-1. 点击"批量上传"按钮
-2. 选择多个文件
-3. 确认上传
-4. 批量处理文件
-
-### 3. 文件夹上传
-
-1. 选择文件夹
-2. 上传整个文件夹
-3. 自动处理文件夹中的所有文件
-
-## 文件处理
-
-### 处理状态
-
-- **上传中**: 文件正在上传
-- **处理中**: 文件正在处理
-- **已完成**: 文件处理完成
-- **失败**: 文件处理失败
-
-### 查看处理结果
-
-- **处理进度**: 查看文件处理进度
-- **处理日志**: 查看处理日志
-- **结果预览**: 预览处理结果
-
-## 下一步
-
-文件上传后，进入[步骤五: 管理和使用知识库](/en/智能体AI 平台/知识库/通过知识流水线创建知识库/步骤五: 管理和使用知识库)
-
-## Related Documentation
-
-- [步骤三: 发布知识流水线](/en/智能体AI 平台/知识库/通过知识流水线创建知识库/步骤三: 发布知识流水线)
-- [步骤五: 管理和使用知识库](/en/智能体AI 平台/知识库/通过知识流水线创建知识库/步骤五: 管理和使用知识库)

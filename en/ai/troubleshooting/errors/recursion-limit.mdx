@@ -1,84 +1,82 @@
 ---
-title: "递归次数限制"
-description: "递归次数限制错误排查指南"
+title: Recursion Limit
+sidebar_position: 1
 ---
 
-
-# 递归次数限制
-
-## Overview
-
-递归次数限制错误表示工作流或智能体在执行过程中达到了递归调用的最大次数限制，导致执行被终止。
-
-## 错误原因
-
-### 常见原因
-
-1. **循环调用**: 工作流中存在循环调用，导致无限递归
-2. **递归深度过大**: 递归调用深度超过了系统限制
-3. **配置错误**: 工作流配置错误导致递归调用
-4. **逻辑错误**: 业务逻辑错误导致无限循环
-
-## 排查步骤
-
-### 1. 检查工作流配置
-
-1. 检查工作流中是否存在循环调用
-2. 检查子流程调用是否形成循环
-3. 检查条件分支是否导致无限循环
-
-### 2. 检查递归调用
-
-1. 查看工作流执行日志
-2. 识别递归调用的起点
-3. 分析递归调用的路径
-4. 找出导致无限递归的原因
-
-### 3. 修复问题
-
-1. **添加终止条件**: 为递归调用添加终止条件
-2. **限制递归深度**: 设置递归深度限制
-3. **重构工作流**: 重构工作流避免循环调用
-4. **添加检查点**: 添加检查点防止无限循环
-
-## 解决方案
-
-### 方案一：添加终止条件
-
-在工作流中添加终止条件，确保递归调用能够正常结束：
+When using the Xpert AI platform for agent invocation or task orchestration, you may encounter an error message like:
 
 ```
-如果 (递归次数 > 最大限制) {
-  终止执行
-  返回错误
-}
+Before reaching the stopping condition, the recursion limit of 20 has been hit. You can increase this limit by configuring the "Recursion Limit" in the Agent Settings of the Digital Expert Studio.
 ```
 
-### 方案二：限制递归深度
+Or a similar error stack message, indicating that the recursion depth has exceeded the system’s preset limit. This guide will help you understand why this limit exists and provide best practices and troubleshooting tips.
 
-在配置中设置递归深度限制：
+---
 
-1. 进入工作流配置
-2. 设置最大递归深度
-3. 保存配置
+### ❓ Why is a Recursion Limit Needed?
 
-### 方案三：重构工作流
+The Xpert AI platform supports collaboration among multiple agents, enabling **multi-turn processing**, **conditional logic**, and **context passing**. These features may lead to nested invocations, such as:
 
-重构工作流，避免循环调用：
+- Agent A delegates part of a task to Agent B, which then delegates to Agent C, and so on  
+- A failed task triggers a rollback or retry mechanism  
+- An agent re-invokes itself to optimize inference based on output results
 
-1. 识别循环调用的部分
-2. 使用迭代节点替代递归调用
-3. 重新设计工作流逻辑
+Without a recursion limit, misconfigured logic or infinite loops can cause:
 
-## 预防措施
+- Excessive token consumption  
+- Severe response delays  
+- System instability  
 
-1. **设计审查**: 在设计工作流时避免循环调用
-2. **测试验证**: 充分测试工作流，确保不会无限递归
-3. **监控告警**: 设置监控告警，及时发现递归问题
-4. **文档记录**: 记录工作流设计，便于排查问题
+To ensure system performance and stability, the platform enforces a maximum recursion limit.
 
-## Related Documentation
+---
 
-- [错误处理](/en/智能体AI 平台/工作流/错误处理)
-- [子流程](/en/智能体AI 平台/工作流/子流程)
-- [逻辑分支(路由)](/en/智能体AI 平台/工作流/逻辑分支(路由))
+### ✅ Best Practices
+
+1. **Clarify the Task Flow**: Ensure that the task call paths are **convergent**, not infinite loops.  
+2. **Implement Exit Mechanisms**: Define stop conditions in agent logic—e.g., max rounds reached, goal achieved, confidence no longer improving.  
+3. **Avoid Unnecessary Nesting**: Minimize deep call chains. Prefer flat, modular agent designs with clear responsibilities.  
+4. **Configure Limits Wisely**: In certain modes (e.g., developer mode), recursion limits can be manually increased. Set conservatively.
+
+---
+
+### 🔍 How to Troubleshoot `recursion_limit` Errors
+
+Follow these steps:
+
+#### 1. **Check Invocation Logs**  
+- Log into the Xpert AI Console  
+- Navigate to the agent execution logs  
+- Locate the faulty task and inspect the message chain
+
+#### 2. **Identify Recursion Paths**  
+- Review model capabilities used by the agent  
+- Check for circular invocation patterns, such as A → B → A → B → …
+
+#### 3. **Check Condition Logic**  
+- Verify whether stop conditions like `if complete` are functioning  
+- Ensure conditional checks prevent redundant inferences
+
+#### 4. **Fix and Test**  
+- Modify the agent prompt or logic to avoid infinite loops  
+- Monitor task logs to confirm if the recursion limit is still being triggered
+
+#### 5. **Temporarily Increase the Limit (Not Recommended for Production)**  
+- In development or testing environments, advanced settings allow you to raise the `recursion_limit`  
+- Always monitor logs and revert to a safe value once the issue is resolved
+
+---
+
+### 📌 Example Scenarios and Optimization Tips
+
+| Scenario | Issue | Optimization Tip |
+|----------|-------|------------------|
+| Agent keeps rewriting the same response | No stop condition | Set a max rewrite round limit (e.g., 3) |
+| Multiple subtasks depend on each other | Circular dependency | Designate one master agent to control task dispatching |
+| Retry logic lacks a cap | Infinite retries | Add a max retry counter |
+
+---
+
+### 📞 Need Help?
+
+If you're still unable to identify the issue, feel free to contact our technical support team. We’re here to assist with a step-by-step inspection of the agent behavior chain to ensure stable platform operation.

@@ -1,51 +1,77 @@
 ---
-title: "对话机器人"
-description: "对话机器人配置指南"
+title: 🤖对话机器人
+sidebar_position: 2
 ---
 
-# 对话机器人
 
-## 概述
+开始对话时，ChatBI 机器人会给出当前可用的数据模型的常见问题，帮助用户快速开始对话。用户可以直接点击关心的问题，或手动输入自定义问题进行对话。
 
-对话机器人功能用于创建和管理智能对话机器人，提供自然语言交互能力。
+![Lark chatbot welcome](/public/img/chatbi/lark-chatbot-welcome.png)
 
-## 功能特性
+## 基础问题
 
-- **机器人创建**: 创建对话机器人
-- **对话能力**: 配置机器人的对话能力
-- **知识库集成**: 集成知识库
-- **多轮对话**: 支持多轮对话
+用户还可以自由询问数据模型相关问题，例如询问模型具体有哪些指标、维度等信息，还可以问 ChatBI 能帮你创建哪些图形之类的。
 
-## 创建机器人
+![Lark chatbot measures](/public/img/chatbi/lark-chatbot-measures.png)
 
-### 步骤
+自由询问数据问题或点击示例快速对话，ChatBI 会根据你的问题结合系统中的数据模型信息，在知识库中查找相关问题知识作为参考，然后调用大模型给出答案。
+ChatBI 再根据大模型给出的答案，去调用数据源拿到实际的数据结果，将以各种形式，如图形、指标或表格的形式返回给用户消息。
 
-1. 进入对话机器人页面
-2. 点击"新建机器人"
-3. 填写机器人信息
-   - 机器人名称
-   - 机器人描述
-   - 机器人头像
-4. 配置对话能力
-5. 关联知识库（可选）
-6. 保存机器人
+![Lark chatbot kpi](/public/img/chatbi/lark-chatbot-kpi.png)
 
-## 机器人配置
+如果以图形形式返回数据结果，目前机器人消息中支持柱形图、线形图和饼图三种图形类型。
+![Lark chatbot chart](/public/img/chatbi/lark-chatbot-chart.png)
 
-### 对话设置
+数据还可以以数据表格的形式返回在消息中。
+![Lark chatbot table](/public/img/chatbi/lark-chatbot-table.png)
 
-- **欢迎语**: 设置机器人欢迎语
-- **回复风格**: 配置回复风格
-- **对话上下文**: 设置上下文长度
+## 计算指标问题
 
-### 知识库集成
+对于没有直接对应度量的指标来说，ChatBI 会自动创建计算公式指标，并使用该计算指标来回答问题，并给出相关数据结果。
+![Lark chatbot calculated indicator](/public/img/chatbi/lark-chatbot-indicator.png)
 
-- **选择知识库**: 选择机器人使用的知识库
-- **检索策略**: 配置知识检索策略
-- **引用显示**: 配置是否显示知识来源
+:::tip
+计算指标的准确性还跟知识库中的知识丰富度有关，在使用 ChatBI 之前请导入相关知识库。
+:::
 
-## 相关文档
+## 多轮对话
 
-- [对话模型](/zh-cn/智能体AI 平台/工具集/ChatBI 工具集/对话模型)
-- [自建应用配置](/zh-cn/智能体AI 平台/工具集/ChatBI 工具集/自建应用配置)
-- [快捷应用](/zh-cn/智能体AI 平台/工具集/ChatBI 工具集/快捷应用)
+ChatBI 背后使用的技术架构属于多轮对话智能体，每次回答问题都会将本轮对话上下文内容带到大语言模型的请求当中，这样才能做到更加智能地理解用户的问题上下文。
+
+用户可以点击机器人消息下方的“结束对话”按钮或手动输入“结束对话”来结束本轮对话。然后再次询问时将开启新一轮对话上下文。
+
+![Lark chatbot end conversation](/public/img/chatbi/lark-chatbot-end.png)
+
+:::tip
+为了避免不必要的内容或者降低 token 的使用量，请及时结束对话。
+:::
+
+## 群聊对话
+
+除了单人对话以外，ChatBI 支持在群里多个用户之间进行多轮对话。在群里对于 ChatBI 机器人对话，需要用户 @ 机器人并输入问题进行询问，不同用户之间会有不同的对话上下文，但如果一个用户点击另外一个用户消息中的示例按钮，对话仍然在原上下文中执行。
+
+![Lark chatbot in group](/public/img/chatbi/lark-chatbot-group-kpi.png)
+
+:::tip
+在群里 @ 你的老板并 @ 上 ChatBI 带上问题，让 ChatBI 智能地分析数据给老板看吧！
+:::
+
+## 分享转发
+
+用户可以将 ChatBI 给出的问题答案消息转发给其他人或到群里，便于同事之间更加高效地协同办公。
+
+![Lark chatbot share](/public/img/chatbi/lark-chatbot-share.png)
+
+分享到群内的消息。
+
+![Lark chatbot shared message](/public/img/chatbi/lark-chatbot-shared-message.png)
+
+## 技术分析
+
+为了更快地了解 ChatBI 是如何获取数据的，用户可以打开“查询语句”按钮查看具体的查询语句，对于技术人员来说，可以根据查询语句来判断 ChatBI 所给出的答案是否准备，以便后续进行改进。
+
+![Lark chatbot query](/public/img/chatbi/lark-chatbot-query.png)
+
+在计算指标里也可以查看计算指标的计算公式，以便更加清晰地了解 ChatBI 所给出的答案是否准确，也能对知识库进行升级。
+
+![Lark chatbot formula](/public/img/chatbi/lark-chatbot-formula.png)

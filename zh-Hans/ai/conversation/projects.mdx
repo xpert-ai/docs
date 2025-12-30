@@ -1,52 +1,91 @@
 ---
-title: "项目"
-description: "对话项目管理指南"
+title: 项目
+sidebar_position: 2
 ---
 
-# 项目
+**专家项目** 是 XpertAI 智能体平台推出的全新协作型智能项目组功能，以帮助用户通过灵活组合数字专家智能体、工具集及文件资源，高效完成复杂任务目标。无论是个人用户的多步骤项目，还是团队的协作需求，Xpert 项目均可提供动态规划、智能执行与资源整合的一站式解决方案。
 
-## 概述
+![描述图像的替代文本](/img/ai/project/project-files.png)
 
-项目是对话功能的核心组织单位，用于管理和组织对话相关的配置和数据。
+## 核心功能  
 
-## 功能特性
+### 1. 项目创建与管理
 
-- **项目管理**: 创建和管理对话项目
-- **项目配置**: 配置项目的基本信息和设置
-- **权限管理**: 管理项目的访问权限
-- **数据管理**: 管理项目相关的对话数据
+用户可在数字专家对话界面直接创建项目，并自定义项目名称与头像。所有项目资源（数字专家智能体、工具、文件、会话记录）集中管理，支持随时编辑和存档。  
 
-## 创建项目
+**操作步骤**  
+1. 在智能体对话界面点击「新建项目」按钮。  
+2. 一键保存并进入项目管理面板。  
+3. 编辑项目名称和头像。
 
-### 步骤
+### 2. 多智能体协同工作
 
-1. 进入对话页面
-2. 点击"新建项目"按钮
-3. 填写项目信息
-   - 项目名称
-   - 项目描述
-   - 项目类型
-4. 配置项目设置
-5. 保存项目
+支持将已发布的数字专家智能体引入项目，智能体之间可共享文件存储，协作生成更精准的解决方案。  
 
-## 项目管理
+**应用场景**  
+- **市场分析项目**：组合「数据分析专家」「行业趋势预测员」「文案生成助手」共同完成报告。  
+- **技术开发项目**：调用「代码生成器」「测试工程师」「文档编写助手」协同处理任务。  
 
-### 项目列表
+### 3. 工具集集成（MCP 工具兼容）
+  
+从绑定的智能体工作空间添加工具集（如 MCP 工具），扩展项目通用智能体的能力边界。工具调用结果可实时同步至项目上下文。  
 
-在项目列表中，您可以：
-- 查看所有项目
-- 搜索项目
-- 筛选项目
-- 排序项目
+![Project tools](/public/img/ai/project/project-tools.png)
 
-### 项目设置
+**支持的工具类型**  
+- 数据处理工具（如 Excel 解析、API 调用）  
+- 开发工具（代码调试、版本管理）  
+- 行业专用工具（如数据建模、设计渲染）  
+- 兼容其他 MCP 市场的所有工具。
 
-- **基本信息**: 修改项目名称、描述等
-- **配置设置**: 配置项目相关设置
-- **权限设置**: 设置项目访问权限
-- **删除项目**: 删除项目及其所有数据
+### 4. 文件上传与上下文共享  
 
-## 相关文档
+支持上传文本文件（如 PDF、TXT、DOCX）作为项目全局知识库，所有智能体均可读取文件内容并基于此生成回答或执行任务。  
 
-- [数字专家](/zh-cn/en/ai/digital-expert/multi-agent-architecture)
-- [知识库](/zh-cn/en/ai/knowledge-base/knowledge-base-features)
+![Project files](/public/img/ai/project/project-files.png)
+
+**优势**  
+- 跨会话持久化存储文件内容  
+- 按需自动提取文件内容以增强对话上下文。
+
+### 5. 智能执行模式切换  
+
+项目通用智能体支持两种执行模式，满足不同任务需求：  
+1. **探索模式**：AI 自主拆解任务并动态优化执行路径，适合快速试错型场景。  
+2. **规划模式**：AI 预先制定详细步骤计划，按阶段推进任务，适合流程严谨型需求。  
+
+![Project plan](/public/img/ai/project/project-plan.png)
+
+### 6. 团队协作与权限管理  
+
+- **成员邀请**：添加同事共同操作项目。  
+- **会话管理**：保留完整对话历史与执行记录。  
+- **系统指令**：自定义项目级指令（如格式规范、术语表），统一所有智能体行为。  
+
+## 提示词
+
+- 核心功能和工作流程管理的提示词示例：
+```markdown
+# CORE IDENTITY & CAPABILITIES
+You are a full-spectrum autonomous agent capable of executing complex tasks across domains including information gathering, content creation, software development, data analysis, and problem-solving. You have access to a Linux environment with internet connectivity, file system operations, terminal commands, web browsing, and programming runtimes.
+
+# WORKFLOW MANAGEMENT
+
+## AUTONOMOUS WORKFLOW SYSTEM
+You operate through a self-maintained tasks that serves as your central source of truth and execution roadmap:
+
+1. Upon receiving a task, immediately create a lean, focused plan with essential sections covering the task lifecycle
+2. Each section contains specific, actionable subtasks based on complexity - use only as many as needed, no more
+3. Each task should be specific, actionable, and have clear completion criteria
+4. MUST actively work through these tasks one by one, checking them off as completed
+5. Adapt the plan as needed while maintaining its integrity as your execution compass
+```
+
+- [虚拟环境工具的提示词](/docs/ai/tool/sandbox/#提示词)
+
+## 典型使用场景  
+1. **跨领域研究**：整合行业专家、数据分析工具与文献资料完成深度分析。  
+2. **产品开发**：从需求文档解析到代码生成、测试的全流程自动化协作。  
+3. **团队知识库建设**：基于上传文件构建问答系统，由智能体提供实时支持。  
+
+立即体验 Xpert Project，开启智能协作新时代！

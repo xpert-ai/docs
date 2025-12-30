@@ -1,49 +1,91 @@
 ---
-title: "滑动微件"
-description: "滑动微件使用指南"
+title: 滑动微件
+sidebar_position: 6
 ---
 
-# 滑动微件
+滑动微件使用了 [**Swiper**](https://swiperjs.com/) 库进行组件卡片的滚动效果展现.
 
-## 概述
+在故事编辑界面, 点击工具栏中插入区域更多里的"**滑动微件**", 在当前页面中创建一个滑动微件. 选中此组件后在右侧属性编辑栏中对其设置进行编辑:
 
-滑动微件用于创建可滑动的微件容器，可以在有限的空间内展示多个微件，支持横向或纵向滑动。
+## 滑动属性
 
-## 功能特性
+滑动微件的整体属性设置, 对应到 [**Swiper**](https://swiperjs.com/) 库里的属性.
 
-- **滑动展示**: 支持横向或纵向滑动
-- **多微件支持**: 可以在滑动容器中添加多个微件
-- **自动播放**: 支持自动滑动播放
-- **导航控制**: 支持导航按钮和指示器
+属性列表:
 
-## 使用方法
+| 名称       | 属性           | 描述                                                                                                              |
+| ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 每屏卡片数 | slidesPerView  | Number of slides per view (slides visible at the same time on slider's container).                                |
+| 卡片间隔   | spaceBetween   | Distance between slides in px.                                                                                    |
+| 居中       | centeredSlides | active slide will be centered, not always on the left side.                                                       |
+| 方向       | direction      | 'horizontal'                                                                                                      / 'vertical' |
+| 抓手       | grabCursor     | This option may a little improve desktop usability. If true, user will see the "grab" cursor when hover on Swiper |
+| 循环 | loop | Set to true to enable continuous loop mode. |
+| 效果 | effect | Transition effect. Can be 'slide', 'fade', 'cube', 'coverflow', 'flip' or 'creative' |
+| 创意效果 | creativeEffect | Object with Creative-effect parameters. |
 
-### 添加滑动微件
 
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"滑动微件"
-3. 选择滑动方向（横向/纵向）
-4. 添加要滑动的微件
-5. 配置滑动选项
-6. 设置导航控制
-7. 保存配置
+## 幻灯片
 
-## 配置选项
+幻灯片表格配置是对滑动微件进行配置的表格, 点击表格下方的**新增**按钮添加新行即新的一个滑动微件. 每个卡片行配置属性如下:
 
-### 滑动设置
+- **组件类型**: 卡片所使用的组件类型, 目前支持:
+  - **分析卡片**: 对应图形分析组件;
+  - **指标卡片**: 对应指标卡片组件;
+- **详情**: 对选择的组件类型进行相应的详细配置, 具体参考对应的组件类型配置;
+- **操作**: 删除当前配置行;
 
-- **滑动方向**: 选择横向或纵向滑动
-- **滑动速度**: 设置滑动速度
-- **自动播放**: 启用自动播放
-- **播放间隔**: 设置自动播放间隔
+幻灯片属性列表:
 
-### 导航控制
+| 名称     | 说明                           | 详细信息                  |
+| -------- | ------------------------------ | ------------------------- |
+| 组件类型 |                                | 1. 指标卡片; 2. 分析卡片; |
+| 详情配置 | 打开指定组件类型的具体配置界面 |                           |
+| 操作     | 删除按钮, 删除当前行幻灯片配置 |                           |
 
-- **导航按钮**: 显示/隐藏导航按钮
-- **指示器**: 显示/隐藏滑动指示器
-- **触摸支持**: 启用触摸滑动支持
+## 自动播放
 
-## 相关文档
+自动播放属性列表:
 
-- [选项卡](/zh-cn/数据分析平台/微件/选项卡)
-- [页面布局](/zh-cn/数据分析平台/故事仪表盘/页面布局)
+| 名称 | 属性 | 描述 |
+| ---- | ---- | -------- |
+| 延迟 | delay     | 每次变换的延迟时间 |
+| 交互时暂停 | disableOnInteraction     |  |
+| 鼠标悬停暂停 | pauseOnMouseEnter     |  |
+| 反向 | reverseDirection     |  |
+| 最后一张停止 | stopOnLastSlide     |  |
+| 等待过渡 | waitForTransition     |  |
+
+## 分页
+
+分页属性列表:
+
+| 名称 | 属性 | 描述 |
+| ---- | ---- | -------- |
+| 启用 | enabled     |  |
+| 类型 | type     | 'bullets' / 'fraction' / 'progressbar' |
+| 点击 | clickable     | clicking on pagination button will cause transition to appropriate slide. Only for bullets pagination type |
+| 点击隐藏 | hideOnClick     |  |
+| 动态子弹 | dynamicBullets     |  |
+
+对应 [Swiper Pagination Parameters](https://swiperjs.com/swiper-api#pagination) 属性配置.
+
+## 自适应断点
+
+自适应断点属性，允许为不同的响应断点（屏幕大小）设置不同的参数。不是所有的参数都可以在断点上更改，只有那些不需要不同布局和逻辑的参数，如 slidesPerView、slidesPerGroup、spaceBetween、grid.rows。这样的参数，如 loop 和 effect 不会生效。
+
+自适应断点属性列表:
+
+| 名称       | 属性 | 描述 |
+| ---------- | ---- | ---- |
+| 大小       | size     | when window width is >= [size]px     |
+| 每屏卡片数 | slidesPerView     | 同滑动属性     |
+| 卡片间隔   | spaceBetween     | 同滑动属性     |
+| 触摸率     | touchRatio     | 触摸灵敏度     |
+| 操作       |      | 删除配置     |
+
+对应 [Initialize Swiper breakpoints](https://swiperjs.com/swiper-api#param-breakpoints) 属性配置.
+
+## 示例
+
+<iframe src="https://app.mtda.cloud/public/story/widget/73da3f53-4c61-4f60-bc1e-c95e51980a87" width="100%" height="350px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

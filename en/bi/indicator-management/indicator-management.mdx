@@ -1,0 +1,35 @@
+---
+title: 💹 Indicator Management
+sidebar_position: 4
+tags:
+  - MDX
+  - SQL
+---
+
+Before introducing indicator management, let's unify the concepts and terms in our system:
+
+* **Measure**: It refers to assigning a numerical value to a property of an object or event, allowing comparison with the same property of other objects or events. A measure must have a numerical value and a unit of measurement to be meaningful. Specifically in the context of multidimensional models, a measure refers to a numeric type field that measures a certain property of the model.
+* **Indicator**: It refers to the measured value under a specific time granularity and statistical basis. Here, time and basis are different dimensions of the multidimensional model. In other words, an indicator refers to the measured values in specific business scenarios.
+
+> For example, let's consider a financial revenue model with dimensions such as **accounts**, **companies**, **departments**, **product lines**, **countries**, **time**, and a measure of **revenue amount**. When we mention revenue amount, we are referring to the revenue amount field in the model. When we mention revenue indicator, we are referring to the measured values under all or some dimensions.
+> For instance:
+> * "Revenue (amount measure) of Tesla (company) automobiles (product line) in China (country) in 2021 (time) under operating (account)": Here, we are discussing indicators.
+> * "Revenue amount": We are referring to the amount measure field in the model.
+
+Indicator management consists of the following functionalities:
+
+* [Indicator Registration](./register/)
+* [Indicator Market](./market/)
+* [Indicator Application](./app/)
+* [Indicator Measurement](./indicator-measure)
+* [Indicator Copilot](./copilot)
+
+:::info
+
+**Indicator Application Module** currently only supports [MDX models](../models/mdx-modeling/).
+
+:::
+
+## Dimensionality Reduction
+
+A core capability of indicator functionality is **dimensionality reduction**, where indicators reduce the number of dimensions that need to be considered in analysis by setting dimension filters, thereby reducing the complexity for business users when utilizing the model.

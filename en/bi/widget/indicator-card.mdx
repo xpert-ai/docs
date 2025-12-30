@@ -1,56 +1,38 @@
 ---
-title: "指标卡片"
-description: "指标卡片微件使用指南"
+title: Indicator Card
+sidebar_position: 21
 ---
 
+The indicator card is a card component type that displays indicators. It can set one primary indicator and multiple secondary indicators or detail indicators.
 
-# 指标卡片
+## Creating the Component
 
-## Overview
+Click "Insert More" in the story dashboard editing toolbar, select the component type "Indicator Card", and add an indicator card component.
 
-指标卡片微件用于以卡片形式展示单个指标，突出显示指标值和变化趋势。
+Click the newly added component to open the property editing panel on the right for property settings.
 
-## Features
+1. Select data source;
+2. Select multidimensional model;
+3. Select indicators under the model;
 
-- **指标展示**: 清晰展示指标值和单位
-- **趋势显示**: 显示指标变化趋势（上升/下降）
-- **对比显示**: 显示与基准期的对比
-- **样式定制**: 支持自定义卡片样式
+At this point, you may see an error message: 'Not set current time granularity'. This is because the indicator card is a component related to period dimensions and requires setting the current time and time granularity.
 
-## Usage
+We generally set the global current time and current time granularity through the global filter bar. Click the global filter bar button on the left to open the global filter panel, click the panel and open the property settings panel on the right to set properties for the global filter bar:
 
-### 添加指标卡片
+1. In the options area, enable "Enable Current Time Input", select time granularity and time granularity sequence;
+2. Select a preset default time, or enter a string in the format `yyyy-MM-dd` as the default time;
 
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"指标卡片"
-3. 选择要展示的指标
-4. 配置指标显示方式
-5. 设置趋势和对比
-6. 自定义样式
-7. 保存配置
+With the current time granularity set, the indicator data for the indicator card will be displayed.
 
-## 配置选项
+> Note that the model corresponding to the indicator needs a time dimension.
 
-### 指标配置
 
-- **指标选择**: 选择要展示的指标
-- **指标名称**: 显示指标名称
-- **指标值**: 显示指标当前值
-- **单位**: 显示指标单位
+![](./indicators.png)
 
-### 趋势配置
+## Detail Indicators
 
-- **趋势显示**: 启用趋势显示
-- **趋势类型**: 选择趋势类型（箭头、图标等）
-- **趋势颜色**: 设置上升/下降的颜色
+In addition to the primary indicator, you can also set a detail indicator list for the indicator card, generally set to detail indicators that can explain the primary indicator from a business perspective.
 
-### 样式配置
+Click the "Detail Indicators" button to open the detail indicator settings table, add records, and select indicators.
 
-- **卡片样式**: 选择卡片样式
-- **背景颜色**: 设置卡片背景颜色
-- **字体样式**: 设置字体大小和颜色
-
-## Related Documentation
-
-- [关键指标](/en/数据分析平台/微件/关键指标)
-- [指标表格](/en/数据分析平台/微件/指标表格)
+If you don't want to use the indicator's original name, you can also set an alias for the indicator.

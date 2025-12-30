@@ -1,21 +1,56 @@
 ---
-title: "参数"
-description: "参数功能说明"
+title: Parameter
+sidebar_position: 14
 ---
+**Parameters** refer to variables that can be configured and changed in reports. They help users more flexibly control the display and behavior of reports. Parameters are often used as controllers for handling dynamic calculated measures when creating stories.
+
+## Using Parameters in Calculated Formulas
+
+Parameters can be used in the calculation formulas of calculated measures, where the parameters in the formula will be replaced with the actual values entered by the user at runtime. As shown in the figure below, parameters can be created and modified in the parameter tab on the right sidebar of the calculation formula window. Dragging the parameter item into the left editing area can insert the parameter into the formula code. Parameters can also be manually written in the fixed format `[@ParameterName]`.
+
+![Using Parameters in Calculated Formulas](/public/img/story/parameter-in-calculated-measure.png)
+
+### Creating Parameters
+
+Click the **+Parameter** button in the interface to create a new parameter. Parameter types include:
+
+* **Input**
+* **Selection**
+* **Dimension**
+
+#### Input Value Parameters
+
+The input type requires the user to manually enter the value needed for the parameter. The value type can be number and string, etc. The Date type is not yet implemented TODO.
 
 
-# 参数
+#### Selection Parameters
 
-## Overview
+You can manually create several fixed options for users to choose from, selecting one as the default value.
 
-参数是故事仪表盘功能的重要组成部分。
 
-## 功能说明
+## Using Parameters in Restricted Measures
 
-此功能正在完善中，更多详细信息即将推出。
+Parameters can also be set on the dimension of the restriction condition of [restricted measures](../calculations/#2-受限度量-restricted-measure). Click the hierarchy button on the dimension in the selection context, choose a hierarchy or use the default hierarchy without selection, then select fixed dimension members, or **+Create Parameter**. After the parameter is successfully created, you need to click to select this parameter.
 
-## Related Documentation
 
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+Create dimension member selection parameters. As shown in the figure below, the dimension member list will display dimension members according to the hierarchy set in the dimension selector. You can select multiple members you want users to choose from and click apply to create the parameter.
+
+
+## Using Parameters in Conditional Aggregation
+
+Parameters can also be used on the dimension of conditional aggregation. The creation process is the same as other dimension parameters. As shown in the figure below, to calculate the average profit of the store selected by the user.
+
+
+## Parameter Input Controllers
+
+To allow users to control the value of parameters, you need to create input [controller components](../../widgets/input-control#) in the story. In the **Dimension/Measure** parameter dropdown list of the input controller, select the parameters in the **Parameter** area.
+
+
+The input controller will display dimension members or input boxes for users to select and input values.
+
+
+## Managing Parameters
+
+Unified management of story parameters is in the story preferences menu, click the **Parameter** submenu to open the parameter management window.
+
+In the parameter management window, you can browse the parameters of multiple model entities, and then edit or delete parameters.

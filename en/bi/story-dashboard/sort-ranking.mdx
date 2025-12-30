@@ -1,21 +1,45 @@
 ---
-title: "排序排名"
-description: "排序排名功能说明"
+title: 🔝 Sorting and Ranking
+sidebar_position: 8
 ---
+Sorting and Ranking is a very common requirement in data analysis applications, providing views for sorting and ranking data. Users are always interested in the top 10 lists and often want to see who or what ranked first last month or last year. In this chapter, we will introduce the basics of sorting and ranking and explore some advanced sorting and ranking calculations.
+
+## Sorting and Ranking
+
+To sort dimension members, you can set sorting attributes on the measures, and the program will sort the dimension members based on the measure values. You can also set sorting attributes on the dimension itself, and the program will sort according to the dimension's own order.
+
+The following image shows the sorting attributes set on a measure:
 
 
-# 排序排名
+After sorting, you can set the ranking by using the "Top" attribute in the display variant to select the top members:
 
-## Overview
 
-排序排名是故事仪表盘功能的重要组成部分。
+The result after sorting and ranking will display the top members sorted by measure, here showing the top 10 members in descending order. By setting the "Reverse" attribute on the chart's **category axis**, the data will be displayed from largest to smallest from top to bottom, as shown below:
 
-## 功能说明
 
-此功能正在完善中，更多详细信息即将推出。
+## Advanced Sorting and Ranking
 
-## Related Documentation
+> MDX
 
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+Further, if we want to view the top 10 **product brands** by **profit** for **each year**, we can achieve this by setting up an advanced slicer.
+
+First, the chart's dimensions need to be set to **Calendar/Year** and **Product/Brand**. Then, add a filter of the **Advanced Slicer** type in the selection criteria. Set the **Product** dimension as the context for the advanced slicer, choose the operator (function) as **TopCount**, set the value to **10**, and select **Profit** as the measure (which can be different from the measure in the chart configuration).
+
+For detailed configuration of the advanced slicer, please refer to [Advanced Slicer](../advanced-slicer/).
+
+
+Set the **role** attribute of the **Calendar/Year** dimension to **Tile**, and you will get different coordinate systems drawn for each year, showing the top 10 product brands by profit for each year, as shown below:
+
+
+To more clearly compare the differences between different coordinate systems, set the **minimum value**: 5000 and **maximum value**: 20000 in the **value axis** of the chart properties, so all coordinate system value axes will display the same range.
+
+For detailed configuration of chart components, please refer to [Components - Analytical Card](../../widgets/analytical-card).
+
+## Sorting and Ranking Functions
+
+> MDX
+
+For more complex sorting and ranking needs, you can use the sorting (**Order**) and ranking (**Rank**) functions in calculated measure formulas.
+
+Suppose we want to calculate the top 10 customers by purchase and their last order date, create a calculated measure for the customer's last order date **Customer Last Order Date**, with the formula:
+

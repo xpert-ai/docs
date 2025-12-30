@@ -1,19 +1,79 @@
----
-title: "成员固有属性"
-description: "成员固有属性教程"
----
+# Intrinsic Member Properties
 
+## Introduction
 
-# 成员固有属性
+MDX (Multidimensional Expressions) is a query language for multidimensional data. It uses the concept of "members" to reference data. Members are elements within multidimensional data, such as dimension members or measure members.
 
-## Overview
+:::info
 
-成员固有属性教程将帮助您了解如何使用相关功能。
+**Member properties** are attributes of dimension members that provide additional information, which you might not want to analyze directly. In other words, member properties are attributes that, while containing valuable information, are not ideal candidates for dimensions. For example, in a standard address, you might want to use country, state, city, and even postal code as dimensions, but a specific address (e.g., 1 Meadow Drive) doesn't have much meaning as a dimension value due to its granularity. Such addresses are ideal candidates for member properties. These properties are still stored in the dimension table alongside standard dimension values. Member properties must have a one-to-one relationship with the members.
 
-## 内容
+:::
 
-此教程正在完善中，更多详细信息即将推出。
+In MDX, members have many intrinsic properties known as **Intrinsic Member Properties**. The most common of these is the member name, which is the unique identifier of the member. Other important properties include the parent member, which indicates the parent level member of the current member, and the depth of the member, which shows the level of the member within the dimension hierarchy. Additionally, child members are a property that includes all related child members of the current member.
 
-## Related Documentation
+There are also many other Intrinsic Member Properties, such as Level, Hierarchy, Member_Ordinal, and Parent_Level, among others. These properties are crucial for querying multidimensional data and can be used to create custom calculations, filtering, and sorting. For example, the Level property can be used to get the hierarchical object of a member's level and use it to filter data in queries. The Hierarchy property can specify which hierarchy to use in a query.
 
-- [教程](/en/智能体AI 平台/教程)
+All these properties can be queried as shown below:
+
+```mdx-code-block
+<Tabs>
+  <TabItem value="Property" label="Property" default>
+```
+```sql
+CurrentMember.Properties("PARENT_UNIQUE_NAME")
+```
+```mdx-code-block
+  </TabItem>
+  <TabItem value="Function" label="Function">
+```
+```sql
+CurrentMember.Parent.UniqueName
+```
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
+
+## List of Intrinsic Properties
+
+| Function                             | Property                | Description                                                                                                                                                                                                                                                                                               |
+| ------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N/A                                  | `CATALOG_NAME`          | The name of the cube to which the member belongs.                                                                                                                                                                                                                                                          |
+| `CurrentMember.Children.Count`       | `CHILDREN_CARDINALITY`  | The number of children of the member. This might be an estimate, so you should not rely on it as an exact count. The provider should return the best possible estimate.                                                                                                                                     |
+| N/A                                  | `DESCRIPTION`           | A readable description of the member.                                                                                                                                                                                                                                                                      |
+| `CurrentMember.Dimension.UniqueName` | `DIMENSION_UNIQUE_NAME` | The unique name of the dimension to which the member belongs. For providers that generate unique names through qualification, each component of that name is a delimiter.                                                                                                                                   |
+| `CurrentMember.Hierarchy.UniqueName` | `HIERARCHY_UNIQUE_NAME` | The unique name of the hierarchy. If the member belongs to multiple hierarchies, there is one row for each hierarchy. For providers that generate unique names through qualification, each component of that name is a delimiter.                                                                             |
+| `CurrentMember.Level.Ordinal`        | `LEVEL_NUMBER`          | The distance of the member from the root level of the hierarchy. The root level is zero.                                                                                                                                                                                                                   |
+| `CurrentMember.Level.UniqueName`     | `LEVEL_UNIQUE_NAME`     | The unique name of the level to which the member belongs. For providers that generate unique names through qualification, each component of that name is a delimiter.                                                                                                                                       |
+| `CurrentMember.Caption`              | `MEMBER_CAPTION`        | The label or caption associated with the member. The caption is primarily for display purposes. If no caption exists, the query returns the MEMBER_NAME.                                                                                                                                                     |
+| N/A                                  | `MEMBER_KEY`            | The value of the member key in the underlying data type. MEMBER_KEY is for backward compatibility. For non-composite keys, MEMBER_KEY has the same value as KEY0. For composite keys, the MEMBER_KEY property is null.                                                                                     |
+| `CurrentMember.Name`                 | `MEMBER_NAME`           | The name of the member.                                                                                                                                                                                                                                                                                    |
+| N/A                                  | `MEMBER_TYPE`           | The type of the member. This property can have the following values: MDMEMBER_TYPE_REGULAR, MDMEMBER_TYPE_ALL, MDMEMBER_TYPE_FORMULA, MDMEMBER_TYPE_MEASURE, MDMEMBER_TYPE_UNKNOWN. Note: MDMEMBER_TYPE_FORMULA takes precedence over MDMEMBER_TYPE_MEASURE. Thus, if there is a formula (calculated) member in the measures dimension, the MEMBER_TYPE property of the calculated member is MDMEMBER_TYPE_FORMULA. |
+| `CurrentMember.Ordinal`              | `MEMBER_ORDINAL`        | The ordinal value of the member. This might return different values: 2 for shortcut and -1 property.                                                                                                                                                                                                       |
+| `CurrentMember.UniqueName`           | `MEMBER_UNIQUE_NAME`    | The unique name of the member. For providers that generate unique names through qualification, each component of that name is a delimiter.                                                                                                                                                                 |
+| `CurrentMember.Parent.Count`         | `PARENT_COUNT`          | The number of parents the member has.                                                                                                                                                                                                                                                                      |
+| `CurrentMember.Parent.Level.Ordinal` | `PARENT_LEVEL`          | The distance of the member's parent from the root level of the hierarchy. The root level is zero.                                                                                                                                                                                                          |
+| `CurrentMember.Parent.UniqueName`    | `PARENT_UNIQUE_NAME`    | The unique name of the member's parent. For any root level member, this returns NULL. For providers that generate unique names through qualification, each component of that name is a delimiter.                                                                                                           |
+
+## Examples
+
+The following example returns the parent ID, key, and name for each product category. Note that these properties are customized as measures. This allows you to view the properties in the cell set when you run the query without having to look in the member properties dialog. You can run such queries to retrieve member metadata from a deployed cube.
+
+```sql
+WITH  
+MEMBER [Measures].[Parent Member ID] AS  
+ [Product].[Product Categories].CurrentMember.Parent.PROPERTIES("ID")  
+MEMBER [Measures].[Parent Member Key] AS  
+ [Product].[Product Categories].CurrentMember.Parent.PROPERTIES("KEY")  
+MEMBER [Measures].[Parent Member Name] AS  
+ [Product].[Product Categories].CurrentMember.Parent.PROPERTIES("Name")  
+SELECT  
+ {[Measures].[Parent Member ID], [Measures].[Parent Member Key], [Measures].[Parent Member Name] } on COLUMNS,   
+ [Product].[Product Categories].AllMembers on ROWS  
+FROM [Adventure Works]  
+```
+
+## Conclusion
+
+In summary, Intrinsic Member Properties are a crucial concept in MDX. They allow us to easily access elements of multidimensional data and use these elements to create advanced queries. Understanding these properties will enable you to better grasp MDX and be more flexible and efficient when querying data using MDX.

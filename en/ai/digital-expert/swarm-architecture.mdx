@@ -1,21 +1,37 @@
 ---
-title: "蜂群型架构"
-description: "蜂群型架构功能说明"
+title: Swarm
+sidebar_position: 22
 ---
+Create a clustered multi-agent system. **Swarm** is a multi-agent architecture where agents dynamically hand over control to one another based on their respective expertise. The system remembers which agent was last active, ensuring that subsequent interactions continue with that agent.
 
+:::tip Core Concept of Swarm Mode
+Agents can pass requests to each other and share state (memory).
+:::
 
-# 蜂群型架构
+![Swarm Agents](/public/img/ai/xpert/swarm-agents.png)
 
-## Overview
+:::info
+Comparison [Supervisor Architecture](/docs/ai/xpert/supervisor/)
+:::
 
-蜂群型架构是数字专家功能的重要组成部分。
+## How to Orchestrate
 
-## 功能说明
+To implement the swarm mode in XpertAI digital expert agents, simply add call connections from sub-agents to the main agent to switch to swarm mode, while the Supervisor working mode remains available.
 
-此功能正在完善中，更多详细信息即将推出。
+- The large model selected must have tool-calling capabilities.
 
-## Related Documentation
+## Prompt Design
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+When setting prompts for a combination of agents in swarm mode, pay attention to the following points:
+
+- The prompt should clearly specify which tasks are handed over to which agent.
+- The prompt should indicate that control can only be transferred to one agent at a time, avoiding simultaneous transfers to multiple agents.
+
+## Conversation
+
+In the user conversation interface, you can directly interact with the entire digital expert system. The main agent will first receive the user’s message, process it, or pass it to other agent members within the swarm, and so on. The roles of agent members within the swarm are equal (in contrast to the Supervisor mode, where sub-agents must return processed messages to the Supervisor agent, which then decides the next step in the conversation or whether it can end).
+
+![Conversational Swarm Agents](/public/img/ai/xpert/swarm-chat.png)
+
+- Reference template [Customer Support Swarm](https://app.mtda.cloud/explore?search=Customer%20Support%20Swarm).
+- [LangGraph Multi-Agent Swarm](https://github.com/langchain-ai/langgraph-swarm-py)

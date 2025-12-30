@@ -1,74 +1,36 @@
 ---
-title: "矩阵树图"
-description: "矩阵树图是树图的变体，通过矩阵形式展示层级数据。"
+title: Treemap
+sidebar_position: 8
+tags:
+    - Hierarchy
 ---
 
+**Treemap** is suitable for displaying data with hierarchical relationships and can intuitively reflect comparisons between peers. A Tree structure is transformed into a state of rectangular planes.
 
-# 矩阵树图
+Treemaps use rectangles to represent nodes in the hierarchy, and hierarchical relationships between parent and child nodes are expressed through the metaphor of nested rectangles. Starting from the root node, screen space is divided into multiple rectangles according to the number of corresponding child nodes, and the area size of rectangles usually corresponds to node attributes. Each rectangle is recursively divided according to the child nodes of the corresponding node until leaf nodes are reached.
 
-## Overview
+The advantage of treemaps is that compared to traditional tree structure charts, treemaps can use space more effectively and have the function of displaying proportions. The disadvantage of treemaps is that when category proportions are too small, text becomes difficult to arrange. Compared to branching tree charts, treemaps' tree data structure expression is not intuitive or clear enough.
 
-矩阵树图是树图的变体，通过矩阵形式展示层级数据。
+## Hierarchical Treemap
 
-## 适用场景
+Select the chart type as Treemap, add one measure and one dimension, and set the finest level of the dimension to display and check the **Include Parent Levels** property.
 
-### 数据特点
+![Small](./treemap-attribtues.png)
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+The treemap will display the weight relationships between members of this hierarchy regarding this measure value:
 
-### 使用场景
+![Middle Shadow](./treemap.png)
 
-- 典型应用场景
-- 业务场景示例
+## Multi-dimension Treemap
 
-## 配置选项
+You can also display treemaps between multiple dimensions, add multiple measures, and do not set the include parent levels property.
 
-### 数据配置
+![Small](./treemap-dimensions-attribtues.png)
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
+The treemap will display the weight composition relationships between multiple dimensions regarding this measure value:
 
-### 样式配置
+![Middle Shadow](./treemap-dimensions.png)
 
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
+## 示例
 
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "矩阵树图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
-
-## 最佳实践
-
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/cbebb259-3092-43a8-86bb-a3128868bd78" width="100%" height="1000px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

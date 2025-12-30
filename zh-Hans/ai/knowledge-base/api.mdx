@@ -1,44 +1,267 @@
 ---
-title: "API"
-description: "知识库API接口文档"
+title: API
+sidebar_position: 5
 ---
 
-# API
+本教程将详细介绍如何使用 XperAI 平台的知识库 API 来创建知识库、上传文件并处理文档。
 
-## 概述
+:::info
+参考代码 [XpertAI SDK 示例](https://github.com/xpert-ai/xpertai-sdk)
+:::
 
-知识库API提供了完整的接口，允许开发者通过编程方式管理知识库。
+## 准备工作
 
-## API端点
+在开始调用 API 前，您需要准备以下凭证和信息，你可以在环境变量文件中配置（XPERTAI_API_URL 与 XPERTAI_API_KEY）：
 
-### 知识管理
+```javascript
+const apiUrl = process.env.XPERTAI_API_URL; // XperAI API 基础地址
+const apiKey = process.env.XPERTAI_API_KEY; // 您的 API 密钥
+const workspaceId = "your_workspace_id_here"; // 工作空间 ID
+const copilotId = "your_copilot_id_here"; // 智能助手 ID
+// const integrationId = 'your_integration_id_here' // 集成 ID（仅外部知识库需要）
+```
 
-- **POST /api/knowledge**: 创建知识
-- **GET /api/knowledge/{id}**: 获取知识详情
-- **PUT /api/knowledge/{id}**: 更新知识
-- **DELETE /api/knowledge/{id}**: 删除知识
+### 如何获取这些凭证
 
-### 知识检索
+1. **API_URL 和 API_KEY**
+   - 登录 XperAI 平台数字专家或者知识库
+   - 进入「设置」->「API 密钥」页面
+   - 生成或复制您的 API 密钥
+   - API 基础地址通常是 `https://api.mtda.cloud/api/ai/`
 
-- **POST /api/knowledge/search**: 搜索知识
-- **GET /api/knowledge/list**: 获取知识列表
+2. **工作空间 ID**
+   - 在 XperAI 控制台中，进入您的工作空间
+   - 在浏览器地址栏中可以找到工作空间 ID
+   - 格式通常为 UUID（如：`23f2b2ff-9318-43b6-a986-928fcf70d4ea`）
 
-## 请求示例
+3. **智能助理 ID**
+   - 在 XperAI 设置页面中，进入「AI 智能助理」页面
+   - 选择您要关联的智能助理
+   - 在智能助理提供商图标上可以找到 ID
+   - 格式通常为 UUID（如：`9ff28c7c-3e63-4ced-b855-2782d79a21b3`）
 
-### 创建知识
+4. **知识库系统集成 ID**（可选，仅外部知识库需要）
+   - 如果您使用外部知识库集成，需要在集成设置中查找此 ID
+
+## 安装必要的依赖
 
 ```bash
-POST /api/knowledge
-Content-Type: application/json
+npm install axios dotenv form-data fs
+```
 
-{
-  "title": "知识标题",
-  "content": "知识内容",
-  "type": "document"
+## API 调用步骤
+
+### 1. 创建知识库
+
+首先，我们需要创建一个知识库容器：
+
+```javascript
+async function createKnowledgebase() {
+  const knowledgebase = {
+    workspaceId, // 从控制台获取的工作空间 ID
+    name: "Customer service knowledgebase",
+    description: "客户服务知识库",
+    permission: "organization",
+    type: "standard",
+    recall: {
+      topK: 10,
+      score: 0.5,
+    },
+    copilotModel: {
+      copilotId, // 从控制台获取的智能助手 ID
+      modelType: "text-embedding",
+      model: "text-embedding-v4", // 选择合适的嵌入模型
+    },
+    // integrationId, // 可选：外部知识库集成 ID
+    // extKnowledgebaseId: "string", // 可选：外部知识库 ID
+  };
+  
+  try {
+    const response = await axios.post(
+      `${apiUrl}v1/kb`,
+      knowledgebase,
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`, // 使用您的 API 密钥
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("创建知识库失败:", error.response?.data || error.message);
+    return null;
+  }
 }
 ```
 
-## 相关文档
+### 2. 上传文件
 
-- [维护文档](/zh-cn/智能体AI 平台/知识库/维护文档)
-- [知识库功能介绍](/zh-cn/智能体AI 平台/知识库/知识库功能介绍)
+将本地文件上传到 XperAI 平台：
+
+```javascript
+async function uploadFile(filePath) {
+  const formData = new FormData();
+  formData.append("file", fs.createReadStream(filePath));
+
+  const headers = {
+    ...formData.getHeaders(),
+    Authorization: `Bearer ${apiKey}`, // 使用您的 API 密钥
+  };
+
+  try {
+    const response = await axios.post(
+      `${apiUrl}v1/file`,
+      formData,
+      { headers }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("文件上传失败:", error.response?.data || error.message);
+    return null;
+  }
+}
+```
+
+### 3. 创建文档关联
+
+将上传的文件创建为知识库的文档：
+
+```javascript
+async function createDocument(knowledgebaseId, storageFileId) {
+  const document = {
+    knowledgebaseId, // 上一步创建知识库返回的 ID
+    storageFileId, // 上一步上传文件返回的 ID
+    sourceType: "file",
+  };
+  
+  try {
+    const response = await axios.post(
+      `${apiUrl}v1/kb/${knowledgebaseId}/bulk`,
+      [document],
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`, // 使用您的 API 密钥
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("创建文档失败:", error.response?.data || error.message);
+    return null;
+  }
+}
+```
+
+### 4. 开始嵌入处理
+
+启动文档的向量化处理：
+
+```javascript
+async function startEmbedding(knowledgebaseId, documentId) {
+  try {
+    const response = await axios.post(
+      `${apiUrl}v1/kb/${knowledgebaseId}/process`,
+      [documentId], // 上一步创建文档返回的 ID
+      {
+        headers: {
+          Authorization: `Bearer ${apiKey}`, // 使用您的 API 密钥
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("处理文档失败:", error.response?.data || error.message);
+    return null;
+  }
+}
+```
+
+### 5. 检查处理状态
+
+查询文档处理进度：
+
+```javascript
+async function checkDocumentStatus(knowledgebaseId, documentId) {
+  try {
+    const response = await axios.get(
+      `${apiUrl}v1/kb/${knowledgebaseId}/status`,
+      {
+        params: { ids: documentId }, // 要查询的文档 ID
+        headers: {
+          Authorization: `Bearer ${apiKey}`, // 使用您的 API 密钥
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("查询状态失败:", error.response?.data || error.message);
+    return null;
+  }
+}
+```
+
+## 完整使用示例
+
+```javascript
+// 初始化配置
+const apiUrl = process.env.XPERTAI_API_URL;
+const apiKey = process.env.XPERTAI_API_KEY;
+const workspaceId = "your_workspace_id_here"; // 替换为您的实际工作空间 ID
+const copilotId = "your_copilot_id_here"; // 替换为您的实际智能助手 ID
+
+// 主执行函数
+async function main() {
+  // 1. 创建知识库
+  const knowledgebase = await createKnowledgebase();
+  if (!knowledgebase) return;
+  const knowledgebaseId = knowledgebase.id;
+  console.log("知识库创建成功，ID:", knowledgebaseId);
+
+  // 2. 上传文件
+  const storageFile = await uploadFile("./data/file.txt");
+  if (!storageFile) return;
+  console.log("文件上传成功，ID:", storageFile.id);
+
+  // 3. 创建文档关联
+  const documents = await createDocument(knowledgebaseId, storageFile.id);
+  if (!documents || documents.length === 0) return;
+  const document = documents[0];
+  console.log("文档创建成功，ID:", document.id);
+
+  // 4. 开始处理
+  const processedDocs = await startEmbedding(knowledgebaseId, document.id);
+  if (!processedDocs || processedDocs.length === 0) return;
+  let currentDoc = processedDocs[0];
+  
+  // 5. 轮询检查状态
+  let status = currentDoc.status;
+  while (status === "running") {
+    process.stdout.write(`\r处理进度: ${currentDoc.progress}%`);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const statusData = await checkDocumentStatus(knowledgebaseId, document.id);
+    if (!statusData || statusData.length === 0) {
+      console.error("获取状态失败");
+      return;
+    }
+    
+    currentDoc = statusData[0];
+    status = currentDoc.status;
+  }
+  
+  console.log(`\n文档处理完成，最终状态: ${status}`);
+}
+
+// 执行主函数
+main().catch(console.error);
+```
+
+## 注意事项
+
+1. 请确保所有 ID 参数都使用从 XperAI 平台获取的正确值
+2. API 密钥需要妥善保管，不要泄露或提交到版本控制系统
+3. 文件上传有大小限制，请参考官方文档了解具体限制
+4. 文档处理时间取决于文件大小和内容复杂度
+5. 建议添加适当的错误处理和重试机制以提高可靠性
+
+通过以上步骤，您可以成功创建知识库、上传文档并完成向量化处理，为后续的智能问答和检索功能做好准备。

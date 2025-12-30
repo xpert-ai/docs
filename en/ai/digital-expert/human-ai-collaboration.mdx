@@ -1,21 +1,24 @@
 ---
-title: "人机协同"
-description: "人机协同功能说明"
+title: Human in the loop
+sidebar_position: 4
 ---
+Human-machine collaboration (or "human-in-the-loop") enhances agent functionality through several common user interaction patterns:
 
+- **Approval**: Actions requiring user confirmation, interrupting before invoking the node.  
+- **Editing**: Actions requiring user input, interrupting before invoking the tool.  
 
-# 人机协同
+## Configuring Sensitive Agents and Tools  
 
-## Overview
+By designating sub-agents or tools as sensitive, the primary agent will be interrupted before invoking these sensitive nodes. At this point, the system presents a confirmation and parameter editing window, allowing users to review and modify the parameters about to be used. The primary agent will proceed with the invocation only after the user confirms and approves. This mechanism ensures user involvement and control at critical nodes, enhancing the system's safety and flexibility.  
 
-人机协同是数字专家功能的重要组成部分。
+![Set as sensitive](/public/img/ai/human-in-the-loop-sensitive.png)  
 
-## 功能说明
+After users review or edit the parameter values, the agent will proceed with invoking the sub-agent or tool using the updated parameters.  
 
-此功能正在完善中，更多详细信息即将推出。
+![Interrupt sensitive nodes](/public/img/ai/human-in-the-loop-approval.png)  
 
-## Related Documentation
+## Implementation Principles  
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+The interruption of sensitive nodes in human-machine collaboration is implemented through the Breakpoints feature in **langgraph.js**. Breakpoints allow the setting of pause points at specific nodes. When the agent reaches these nodes, the system halts execution and triggers the user interaction interface. This mechanism ensures user participation at critical points, enabling users to review, edit, or confirm parameters during execution.  
+
+![Edit parameters of tool calls](/public/img/ai/human-in-the-loop-edit-toolcall.png)

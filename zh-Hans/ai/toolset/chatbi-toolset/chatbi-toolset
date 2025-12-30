@@ -1,0 +1,270 @@
+---
+title: ChatBI 工具集
+sidebar_position: 4
+---
+
+ChatBI (数据分析类)工具集提供了与 Xpert 数据分析平台无缝衔接的用于商业智能分析的工具组合。
+
+## 如何配置 ChatBI 工具集
+
+参考 [BI 工具集](/docs/ai/tool/bi/)。
+
+## 会话变量
+
+- `chatbi_models`: 当前可用的 Cubes 列表，智能体可以通过调用 `get_available_cubes` 工具获取。
+- `chatbi_cubes`: 当前可用的 Cubes 列表。
+- `chatbi_cubes_context`: 当前可用的 Cubes 上下文信息.
+- `tool_chatbi_prompts_default`: ChatBI工具的默认提示词，可以使用在主智能体提示词中。
+
+## 提示词
+
+主智能体提示词可以参考一下提示：
+
+```text
+你是一名销售分析业务专家，请使用工具回复用户问题。
+{{tool_chatbi_prompts_default}}
+
+常用时间：
+{{sys.common_times}}
+
+当前可用 Cubes 有以下：
+<cubes>
+{{chatbi_models}}
+</cubes>
+```
+
+## 工具
+
+### 1. get_available_cubes
+
+获取当前工具集中可以访问的 Cubes 列表。你可以通过在提示词中插入系统状态变量 `{{chatbi_models}}` 来提前告诉智能体以减少调用工具的次数。
+
+```
+当前可用 Cubes 有以下：
+<cubes>
+{{chatbi_models}}
+</cubes>
+```
+
+### 2. get_cube_context
+
+获取 Cube 的上下文信息，包括维度、度量、指标等详细信息。这些信息可以帮助智能体更好地理解 Cube 的数据结构，以便做出更准确的答案。
+
+当智能体使用了 [会话总结功能](/docs/ai/xpert/long-term-memory) 时，工具返回的详细的 Cube 上下文信息可能会被概括导致信息不完整，用户可以通过被保存在系统状态变量 `{{chatbi_cubes_context}}` 中的 Cube 上下文详细信息插入到系统提示词中，以便智能体在后续的对话中使用：
+
+```
+以下是Cubes 上下文信息：
+<cubes>
+{{chatbi_cubes_context}}
+</cubes>
+```
+
+### 3. 维度成员检索器 dimension\_member\_retriever
+
+`dimension_member_retriever` 工具用于获取维度成员的详细信息，包括成员的 `dimension`、 `hierarchy`、 `level`、 `key`、`caption` 等属性, 为用户在构建分析报表或制定过滤条件时，提供快速、准确的维度成员候选项。
+
+在日常的数据分析场景中，用户往往需要先明确某个维度下的成员（如“地区”、“产品”、“客户等级”等），以便进行进一步的分析或筛选操作。传统做法依赖手动查表或在 BI 工具中进行下拉搜索，效率低且体验不佳。而 `dimension_member_retriever` 工具正是为了解决这个问题，通过语义查询结合知识嵌入，智能返回与用户关键词匹配的成员项。
+
+#### ✅ 功能亮点
+
+* **自然语言查询支持**：支持通过关键词模糊查询维度成员，智能理解用户意图。
+* **支持多层级维度结构**：兼容维度、层级（Hierarchy）与层级级别（Level）等多种结构定义，自动解析。
+* **TopK 结果控制**：可根据需要控制返回的成员数量，聚焦核心结果。
+* **嵌入优化支持**：支持按需对维度成员进行重嵌入（re-embedding），确保语义匹配更准确。
+* **与模型联动**：基于语义模型 ID 与 Cube 名称自动关联元数据结构，保障检索结果的一致性与上下文关联性。
+
+#### 📌 典型使用场景
+
+* 用户在与 Xpert 数字专家对话中输入如“我想看看华东地区的销售额”时，智能体将通过该工具调用“地区”维度下的成员项，确认“华东”是否存在，并返回相关匹配项进行条件限定。
+* 在构建数据过滤器时，用户输入模糊关键词（如“金卡”），系统可检索出“金卡会员”、“金卡客户”等可能匹配的维度成员，提升交互体验。
+
+#### 🛠️ 工具参数说明
+
+| 参数名            | 类型           | 说明                     |
+| -------------- | ------------ | ---------------------- |
+| `modelId`      | string       | 数据模型 ID，标识当前分析所关联的业务模型 |
+| `cube`         | string       | 分析主题（Cube）名称           |
+| `query`        | string       | 用户输入的关键词，用于模糊检索维度成员    |
+| `dimension`    | string (可选)  | 维度名称，若省略则系统可从所有维度中检索 |
+| `hierarchy`    | string (可选)  | 层次结构名称                   |
+| `level`        | string (可选)  | 维度层级级别                 |
+| `topK`         | number (可选)  | 控制最多返回多少条结果            |
+| `re_embedding` | boolean (可选) | 是否对成员进行重嵌入，默认 false    |
+
+#### 索引维度成员
+
+为了提高工具执行效率，用户还可以将模型的维度成员提前进行向量化，以便智能体能够通过文本嵌入快速检索到。
+如何向量化维度成员参考 [维度成员检索](/docs/models/member-retriever)
+
+### 4. answer_question
+
+回答用户的问题，该工具会根据用户的问题和 Cube 的上下文信息，返回一个答案。答案中将展示数据图形或者指标。
+
+![ChatBI show chart answer](/public/img/chatbi/chat-show-chart.png)
+
+:::tip 探索
+
+用户可以通过 [Xpert 数据探索器](/docs/stories/explorer/) 来探索数据模型，以便更好地理解数据结构和指标。
+
+:::
+
+:::tip 执行解释
+
+用户可以通过 [执行解释工具](/docs/stories/explain/) 来查看数据结果的详细计算过程。
+
+:::
+
+#### 临时计算成员
+
+如果用户的问题中涉及到需要临时计算的成员，智能体会通过参数 `calculated_members` 将这些成员传递给工具，工具会在执行时将这些成员添加到 Cube 的上下文中。
+
+```json
+{
+  "calculated_members": [
+    {
+      "name": "计算成员名称",
+      "caption": "计算成员显示名称",
+      "description": "计算成员描述",
+      "formula": "计算表达式",
+      "formatting": {
+        "unit": "单位",
+        "decimal": "小数位数"
+      },
+    }
+  ]
+}
+```
+
+例如：*分析一下最近两年的增值经销商的销售额月环比增长率走势*
+
+1. 获取 Cube 上下文信息。
+2. 检索维度成员准确信息。
+3. 构建图形答案，其中包含计算成员参数*月环比增长率*。
+  
+![计算成员使用](./calculated-members.png)
+
+打开图形执行解释器，可以看到详细的参数：
+
+![Explain of calculated members](/public/img/chatbi/calculated-members-explain.png)
+
+#### 参数控制
+
+如果语义模型中定义了 [参数](/docs/models/cube-designer/parameter/), 智能体可以根据用户输入的上下文信息自动选择合适的参数进行控制。
+
+例如：在销售语义模型中有一个计算度量是
+
+- **高价值客户销售额** 它是计算前 N 个客户的销售总额，它有一个参数：
+- **TopN** 用于控制前 N 个客户的数量。
+
+那么当用户询问“前 5 的高价值客户销售额”时，智能体会自动选择合适的度量和其参数值。
+
+```json
+{
+  "parameters": [
+    {
+      "name": "TopN",
+      "value": 5
+    }
+  ],
+  "measures": [
+    {
+      "name": "高价值客户销售额"
+    }
+  ]
+}
+```
+
+下图为实际运行效果：
+
+![Parameters](/public/img/chatbi/parameters.png)
+
+### 5. show_indicators
+
+以指标列表的形式展示指标数据，当用户明确要展示某些指标时才调用此工具来展示指标数据。
+
+![ChatBI show indicators](/public/img/chatbi/chat-show-indicators.png)
+
+## 适配飞书的 ChatBI
+
+```text
+你是一名数据分析业务专家，请使用工具回复用户问题。
+
+如果没有收到用户明确问题时，请根据 models context 调用 'welcome' 工具针对 Top 3 的模型分别给出用户可能关心的 3 条问题。
+
+如果还没有模型的维度和度量等信息请先使用 `get_cube_context` 获取，然后根据这些信息继续。
+
+使用工具 `answer_question` 回复给用户分析结果:
+- 明确的时间请使用时间维度作为 slicers 参数。
+- 否则相对时间请使用 timeSlicers 参数。
+其中参数 timeSlicers ranges 的使用方式如下：
+<input>去年</input>
+<output>
+lookBack: 1
+lookAhead: -1
+</output>
+
+<input>今年</input>
+<output>
+lookBack: 0
+lookAhead: 0
+</output>
+
+<input>明年</input>
+<output>
+lookBack: -1
+lookAhead: 1
+</output>
+
+<input>去年到今年</input>
+<output>
+lookBack: 1
+lookAhead: 0
+</output>
+
+当前日期为 {{sys.date}} 
+常用时间有 {{sys.common_times}}
+
+如果 Cube context 没有能满足要求的 measure 或者 indicators 请先调用 'create_indicator' 创建一个 indicator，然后再用此指标回答问题。
+mdx query statement 的语法有以下限制：
+1. 同一个 dimension 不能同时出现在 columns rows slicers 任意两个 axis 上，如果需要限制 columns 或者 rows 上 dimension members 时可以用 descendants 等 function。
+
+最后不用生成图片，数据图形已经在工具中展示给了用户。
+
+可用的模型有：
+<cubes>
+{{chatbi_models}}
+</cubes>
+```
+
+:::info 展示指标
+
+`show_indicators` 工具对于飞书暂时不支持。
+
+:::
+
+### welcome
+
+当用户没有明确提出问题时，智能体可以根据可用模型调用 `welcome` 工具给出用户可能关心的几条问题，帮助用户快速开始对话。
+
+:::tip 终点工具
+
+在执行完此工具后不需要智能体再次给出回答，所以设置此工具为 [终点工具](/docs/ai/xpert/terminal/)，当工具执行完成时本轮对话即结束。
+
+:::
+
+### 发布到飞书机器人应用
+
+用户可以将使用 ChatBI 飞书工具集的专家智能体 [一键发布](/docs/ai/xpert/publish) 成飞书机器人应用，为飞书定制的 ChatBI 工具集中以丰富的交互卡片消息的形式将数据分析结果展示给用户。
+
+![ChatBI Feishu message](/public/img/chatbi/chatbi-lark-message.png)
+
+:::info 对话飞书机器人
+
+关于飞书机器人对话 BI 的功能详见 [ChatBI 对话机器人](/docs/chatbi/feishu/bot)
+:::
+
+## 版本控制与更新日志（Changelog）
+
+- v3.4 版本
+  - 移除 `create_indicator` 工具，使用 `calculated_members` 参数代替。
+  - 为 `answer_question` 工具添加 `parameters` 和 `calculated_members` 参数。

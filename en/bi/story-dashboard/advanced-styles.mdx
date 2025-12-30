@@ -1,21 +1,37 @@
 ---
-title: "高级样式"
-description: "高级样式功能说明"
+title: Advanced Styles
+sidebar_position: 11
 ---
+The **Advanced Styles** of the story allow you to set any style for the story by writing `css` code.
 
+Users with basic front-end programming knowledge can use the advanced styles feature to modify the story's style to achieve a professional display effect. For example, the following code can display the story in a **black and red** theme style:
 
-# 高级样式
+```css
+.ngm-analytical-card .mat-button-toggle-group {
+  border: 2px solid red;
+}
+.ngm-analytical-card
+  .mat-button-toggle-group.mat-button-toggle-group-appearance-standard.mat-primary
+  .mat-button-toggle.mat-button-toggle-checked {
+  background-color: black;
+}
+.ngm-analytical-card
+  .mat-button-toggle-group.mat-button-toggle-group-appearance-standard.mat-primary
+  .mat-button-toggle.mat-button-toggle-checked
+  .mat-button-toggle-button {
+  font-weight: 600;
+}
 
-## Overview
+.ngm-analytical-grid .cdk-cell {
+  border-bottom-color: black;
+  border-bottom-width: 2px;
+}
 
-高级样式是故事仪表盘功能的重要组成部分。
-
-## 功能说明
-
-此功能正在完善中，更多详细信息即将推出。
-
-## Related Documentation
-
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+.ngm-analytical-grid.cdk-focused .cdk-row.selected .cdk-cell.selected-cell {
+  background-color: black;
+  border-right: 1px solid red;
+  border-bottom: 1px solid red;
+  box-shadow: inset 1px 1px red;
+  color: white;
+}
+```

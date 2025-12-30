@@ -19,6 +19,86 @@ const DEFAULT_GROUP_NAME_BY_LANGUAGE = {
 };
 
 /**
+ * ⭐ 页面标题映射（用于更新英文版本的 MDX 文件中的 title）
+ * key = 中文标题
+ * value = 英文标题
+ */
+const PAGE_TITLE_MAPPING = {
+  // Agent Middleware
+  "智能体中间件": "Agent Middleware",
+  "内置中间件": "Built-in Middleware",
+  "自定义中间件": "Custom Middleware",
+  
+  // Digital Expert
+  "对话日志": "Conversation Logs",
+  "开发接口": "Development API",
+  "数字专家": "Digital Expert",
+  "嵌入网页": "Embed Webpage",
+  "增强功能": "Enhanced Features",
+  "环境变量": "Environment Variables",
+  "专家配置": "Expert Configuration",
+  "人机协同": "Human-AI Collaboration",
+  "长期记忆": "Long-term Memory",
+  "监测仪表盘": "Monitoring Dashboard",
+  "多智能体架构": "Multi-Agent Architecture",
+  "发布版本": "Release Version",
+  "监督型架构": "Supervised Architecture",
+  "蜂群型架构": "Swarm Architecture",
+  
+  // AI Assistant
+  "AI 助手": "AI Assistant",
+  "命令": "Commands",
+  "配置 AI 提供商": "Configure AI Provider",
+  "角色": "Role",
+  
+  // Conversation
+  "对话": "Conversation",
+  "项目": "Projects",
+  
+  // Knowledge Base
+  "知识库": "Knowledge Base",
+  "API": "API",
+  "连接外部知识库": "Connect External Knowledge Base",
+  "知识库功能": "Knowledge Base Features",
+  "维护文档": "Maintain Documents",
+  "召回测试": "Recall Test",
+  "知识库使用方式": "Ways to Use Knowledge Base",
+  "通过流水线创建知识库": "Create Knowledge Base Via Pipeline",
+  
+  // Plugin Development
+  "插件开发": "Plugin Development",
+  "核心概念": "Core Concepts",
+  "开发步骤": "Development Steps",
+  "概述": "Overview",
+  "权限设计指南": "Permission Design Guide",
+  "发布和使用": "Publish and Use",
+  "Schema UI 扩展": "Schema UI Extension",
+  "飞书文档示例": "Feishu Document Example",
+  
+  // Toolset
+  "工具集": "Toolset",
+  "内置工具集": "Built-in Toolset",
+  "自定义工具集": "Custom Toolset",
+  "飞书": "Feishu",
+  "规划任务": "Planning Tasks",
+  "定时任务": "Scheduled Tasks",
+  "BI 工具集": "BI Toolset",
+  "ChatBI 工具集": "ChatBI Toolset",
+  "MCP 工具": "MCP Tools",
+  "虚拟环境": "Virtual Environment",
+  
+  // Troubleshooting
+  "故障排查": "Troubleshooting",
+  "错误": "Errors",
+  
+  // Tutorial
+  "教程": "Tutorial",
+  
+  // Workflow
+  "工作流": "Workflow",
+};
+
+/**
  * ⭐ 多语言展示名映射（核心）
  * key = 目录名（slug）
  * value = 在对应语言下的展示名
@@ -36,6 +116,13 @@ const DISPLAY_NAME_OVERRIDES = {
     troubleshooting: "Troubleshooting",
     tutorial: "Tutorial",
     workflow: "Workflow",
+    // Bi 产品
+    bi: "Bi",
+    "indicator-management": "Indicator Management",
+    "semantic-model": "Semantic Model",
+    "story-dashboard": "Story Dashboard",
+    "website-features": "Website Features",
+    widget: "Widget",
   },
 
   "zh-Hans": {
@@ -50,6 +137,25 @@ const DISPLAY_NAME_OVERRIDES = {
     troubleshooting: "故障排查",
     tutorial: "教程",
     workflow: "工作流",
+    // Bi 产品
+    bi: "Bi",
+    "indicator-management": "指标管理",
+    "semantic-model": "语义模型",
+    "story-dashboard": "故事看板",
+    "website-features": "网站功能",
+    widget: "组件",
+    // Group 名称映射（目录名）
+    "create-knowledge-base-via-pipeline": "通过流水线创建知识库",
+    "bi-toolset": "BI 工具集",
+    "chatbi-toolset": "ChatBI 工具集",
+    "mcp-tools": "MCP 工具",
+    "virtual-environment": "虚拟环境",
+    "feishu-document-example": "飞书文档示例",
+    errors: "错误",
+    "analysis-card": "分析卡片",
+    "analysis-table": "分析表格",
+    "filter-bar": "筛选栏",
+    "input-controller": "输入控制器",
   },
 };
 
@@ -104,12 +210,17 @@ function parseArgs(argv) {
     contentRoot: ".",
     languages: null,
     dryRun: false,
+    updateTitles: false,
   };
 
   for (let i = 0; i < argv.length; i++) {
     const t = argv[i];
     if (t === "--dry-run") {
       args.dryRun = true;
+      continue;
+    }
+    if (t === "--update-titles") {
+      args.updateTitles = true;
       continue;
     }
     const next = argv[i + 1];
@@ -129,6 +240,100 @@ function toPosix(p) {
 function pagePathFromFile(contentRootAbs, fileAbs) {
   const rel = path.relative(contentRootAbs, fileAbs);
   return toPosix(rel.slice(0, -path.extname(rel).length));
+}
+
+/**
+ * 检测文本中是否包含中文
+ */
+function containsChinese(text) {
+  return /[\u4e00-\u9fa5]/.test(text);
+}
+
+/**
+ * 解析 frontmatter 中的 title
+ */
+function parseFrontmatterTitle(content) {
+  if (!content.startsWith("---")) {
+    return null;
+  }
+
+  const endIndex = content.indexOf("---", 3);
+  if (endIndex === -1) {
+    return null;
+  }
+
+  const frontmatterText = content.slice(3, endIndex).trim();
+  const titleMatch = frontmatterText.match(/^title:\s*(.+)$/m);
+  return titleMatch ? titleMatch[1].trim().replace(/^["']|["']$/g, "") : null;
+}
+
+/**
+ * 根据文件名生成英文标题
+ */
+function generateEnglishTitleFromFilename(filePath) {
+  const basename = path.basename(filePath, path.extname(filePath));
+  return basename
+    .split(/[-_]/)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+/**
+ * 更新 frontmatter 中的 title
+ */
+function updateFrontmatterTitle(content, newTitle) {
+  if (!content.startsWith("---")) {
+    return `---\ntitle: ${newTitle}\n---\n\n${content}`;
+  }
+
+  const endIndex = content.indexOf("---", 3);
+  if (endIndex === -1) {
+    return content;
+  }
+
+  const frontmatterText = content.slice(3, endIndex).trim();
+  const body = content.slice(endIndex + 3).trimStart();
+
+  const updatedFrontmatter = frontmatterText.replace(
+    /^title:\s*.+$/m,
+    `title: ${newTitle}`
+  );
+
+  return `---\n${updatedFrontmatter}\n---\n${body}`;
+}
+
+/**
+ * 更新英文版本的 MDX 文件中的 title（如果包含中文）
+ */
+async function updateEnglishPageTitle(filePath, updateTitles) {
+  if (!updateTitles || !filePath.includes("/en/")) {
+    return { updated: false };
+  }
+
+  try {
+    const content = await fs.readFile(filePath, "utf8");
+    const currentTitle = parseFrontmatterTitle(content);
+
+    if (!currentTitle || !containsChinese(currentTitle)) {
+      return { updated: false };
+    }
+
+    // 查找映射表
+    let newTitle = PAGE_TITLE_MAPPING[currentTitle];
+
+    // 如果映射表中没有，根据文件名生成
+    if (!newTitle) {
+      newTitle = generateEnglishTitleFromFilename(filePath);
+    }
+
+    const updatedContent = updateFrontmatterTitle(content, newTitle);
+    await fs.writeFile(filePath, updatedContent, "utf8");
+
+    return { updated: true, oldTitle: currentTitle, newTitle };
+  } catch (error) {
+    console.warn(`⚠️  更新文件标题失败: ${filePath}`, error.message);
+    return { updated: false, error: error.message };
+  }
 }
 
 /**
@@ -168,7 +373,7 @@ function sortPages(pages) {
   });
 }
 
-async function collectPagesRecursively(dirAbs, contentRootAbs) {
+async function collectPagesRecursively(dirAbs, contentRootAbs, updateTitles = false) {
   const pages = [];
   const stack = [dirAbs];
 
@@ -183,7 +388,13 @@ async function collectPagesRecursively(dirAbs, contentRootAbs) {
         e.isFile() &&
         MARKDOWN_EXTS.has(path.extname(e.name).toLowerCase())
       ) {
-        pages.push(pagePathFromFile(contentRootAbs, full));
+        const pagePath = pagePathFromFile(contentRootAbs, full);
+        pages.push(pagePath);
+        
+        // 如果启用了更新标题功能，更新英文版本的 title
+        if (updateTitles) {
+          await updateEnglishPageTitle(full, updateTitles);
+        }
       }
     }
   }
@@ -193,7 +404,7 @@ async function collectPagesRecursively(dirAbs, contentRootAbs) {
 
 /* ===================== 核心逻辑 ===================== */
 
-async function buildNavigationForLanguage(language, docs, contentRootAbs) {
+async function buildNavigationForLanguage(language, docs, contentRootAbs, updateTitles = false) {
   const langAbs = path.join(contentRootAbs, language);
   const products = [];
 
@@ -227,14 +438,21 @@ async function buildNavigationForLanguage(language, docs, contentRootAbs) {
           const groupName = toDisplayName(child.name, language);
           const pages = await collectPagesRecursively(
             childAbs,
-            contentRootAbs
+            contentRootAbs,
+            updateTitles
           );
           if (pages.length) groups.push({ group: groupName, pages });
         } else if (
           child.isFile() &&
           MARKDOWN_EXTS.has(path.extname(child.name).toLowerCase())
         ) {
-          defaultPages.push(pagePathFromFile(contentRootAbs, childAbs));
+          const filePath = pagePathFromFile(contentRootAbs, childAbs);
+          defaultPages.push(filePath);
+          
+          // 如果启用了更新标题功能，更新英文版本的 title
+          if (updateTitles) {
+            await updateEnglishPageTitle(childAbs, updateTitles);
+          }
         }
       }
 
@@ -267,13 +485,16 @@ async function buildNavigationForLanguage(language, docs, contentRootAbs) {
     }
   }
 
+  // 获取现有配置（如果有），但排除 products 和 navbar，这些由脚本生成
+  const existingConfig = docs.navigation?.languages?.find((l) => l.language === language) ?? {};
+  const { products: _, navbar: __, ...restConfig } = existingConfig;
+  
   return {
+    ...restConfig, // 保留其他配置（如 default）
     language,
-    ...(docs.navigation?.languages?.find((l) => l.language === language) ??
-      {}),
     // 为每个语言添加对应的 navbar（数组格式）
     navbar: NAVBAR_ARRAY_BY_LANGUAGE[language] ?? NAVBAR_ARRAY_BY_LANGUAGE.en,
-    products,
+    products, // 新生成的 products，确保使用最新的显示名
   };
 }
 
@@ -312,7 +533,7 @@ async function main() {
     if (!stat?.isDirectory()) continue;
 
     languageNodes.push(
-      await buildNavigationForLanguage(lang, docs, contentRootAbs)
+      await buildNavigationForLanguage(lang, docs, contentRootAbs, args.updateTitles)
     );
   }
 
@@ -339,6 +560,10 @@ async function main() {
     JSON.stringify(docs, null, 2) + "\n"
   );
   console.log(`✅ docs.json navigation updated`);
+  
+  if (args.updateTitles) {
+    console.log(`✅ English page titles updated`);
+  }
 }
 
 main().catch((err) => {

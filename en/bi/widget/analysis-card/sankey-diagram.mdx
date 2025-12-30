@@ -1,74 +1,53 @@
 ---
-title: "桑基图"
-description: "桑基图用于展示流量和流向，适合展示数据流动过程。"
+title: Sankey Diagram
+sidebar_position: 9
+tags:
+    - Hierarchy
 ---
 
+**Sankey Diagram** is a specific type of flow diagram used to describe the flow from one set of values to another.
 
-# 桑基图
+Characteristics of Sankey diagrams:
 
-## Overview
+* Starting flow and ending flow are the same, the sum of all main branch widths equals the sum of all outgoing branch widths, maintaining energy balance;
+* Internally, different lines represent different flow distribution situations, and their widths proportionally display the flow occupied by this branch;
+* Different node widths represent flow magnitudes in specific states.
 
-桑基图用于展示流量和流向，适合展示数据流动过程。
+There are two data display methods for creating Sankey diagrams:
 
-## 适用场景
+* Flow relationships between multiple dimensions.
+* Flow relationships of a dimension hierarchy.
 
-### 数据特点
+## Between Multiple Dimensions
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+Select the chart type as Sankey Diagram (Sankey), and set one measure and multiple dimensions.
 
-### 使用场景
+![Small](./sankey-dimensions-attributes.png)
 
-- 典型应用场景
-- 业务场景示例
+This method displays measure relationships between different dimension members.
 
-## 配置选项
+![Middle Shadow](./sankey-dimensions.png)
 
-### 数据配置
+### Chart Direction
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
+You can set the chart's direction property to change the Sankey diagram's horizontal or vertical display.
 
-### 样式配置
+## Single Dimension Hierarchy
 
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
+You can also set only one hierarchical measure for the Sankey diagram display.
 
-### 交互配置
+Select a dimension, select the finest level to display and set its property **Include Parent Levels**, and the data will calculate hierarchical data for this level and all its parent members.
 
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
+![Small](./sankey-hierarchy-attributes.png)
 
-## 使用示例
+Sankey diagram displaying hierarchy:
 
-### 基本示例
+![](./sankey-hierarchy.png)
 
-```json
-{
-  "type": "桑基图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
+<!-- ### 包含 All 成员
 
-## 最佳实践
+判断层次结构是否已经包含有 **All 成员**, 如果有 All 成员可以设置桑基图的 **系列样式** 中的 **有 All 成员** 属性, 那么桑基图不在新增一个 All 节点. 否则桑基图会自动为数据添加一个 All 节点. -->
 
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
+## 示例
 
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/7c440106-a90e-4014-8279-698ff9c2d239" width="100%" height="1000px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

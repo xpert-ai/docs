@@ -1,30 +1,132 @@
 ---
-title: "模版转换"
-description: "模版转换节点使用指南"
+title: 模版转换
+sidebar_position: 23
 ---
 
-# 模版转换
+模板节点用于动态格式化和组合前序节点中的变量，生成结构化的文本输出。它支持 [Handlebars](https://handlebarsjs.com/) 模板语法，适用于将多个数据源整合为符合后续节点处理要求的文本结构。
 
-## 概述
+这种方式特别适合：
 
-模版转换节点用于将数据转换为指定格式的模版，支持多种模版格式和数据转换。
+* 将多个字段组合成自然语言、Markdown、HTML 等格式
+* 构造动态表格或列表内容
+* 生成 AI 回复前的中间态提示信息
 
-## 功能特性
+---
 
-- **模版选择**: 选择转换模版
-- **数据转换**: 将数据转换为模版格式
-- **格式支持**: 支持多种模版格式
-- **自定义模版**: 支持自定义模版
+## 🔧 使用示例：拼接文章内容
 
-## 使用方法
+```handlebars
+# {{ title }}
 
-1. 添加模版转换节点
-2. 选择模版类型
-3. 配置数据源
-4. 设置转换规则
-5. 执行转换
+> 作者：{{ author }}  
+> 日期：{{ date }}
 
-## 相关文档
+## 摘要
 
-- [文档转换器](/zh-cn/智能体AI 平台/工作流/文档转换器)
-- [变量赋值](/zh-cn/智能体AI 平台/工作流/变量赋值)
+{{ summary }}
+
+## 正文
+
+{{#each sections}}
+### {{ this.heading }}
+
+{{ this.content }}
+
+---
+{{/each}}
+```
+
+此模板将从上游节点传入的数据，如文章标题、作者、日期和各段落内容，统一输出为结构化的 Markdown 文档。
+
+📦 输入示例：
+
+```json
+{
+  "title": "如何构建 AI Copilot",
+  "author": "XpertAI",
+  "date": "2025-05-29",
+  "summary": "本文介绍了如何在企业系统中构建面向业务场景的 AI 助手。",
+  "sections": [
+    { "heading": "背景", "content": "企业对智能化分析需求日益增长..." },
+    { "heading": "实现方式", "content": "可以结合 LLM、流程编排、数据索引..." }
+  ]
+}
+```
+
+![Template transform](/public/img/ai/workflow/workflow-template.png)
+
+**输入参数**
+- 变量名：将此状态变量值以变量名用在模版上下文中；
+- 变量名为空：将此变量值作为模版全局上下文；
+
+---
+
+## 💡 进阶用法
+
+### 条件判断：
+
+```text
+{{#if user.vip}}
+欢迎尊贵的 VIP 用户 {{ user.name }}！
+{{else}}
+欢迎 {{ user.name }}！
+{{/if}}
+```
+
+### 循环列表：
+
+```text
+{{#each items}}
+- {{ this }}
+{{/each}}
+```
+
+### 表格构造：
+
+```text
+| 指标 | 数值 |
+|------|------|
+{{#each metrics}}
+| {{ name }} | {{ value }} |
+{{/each}}
+```
+
+---
+
+## 🧠 应用场景
+
+* **知识检索格式化**：将来自文档检索的内容块统一输出
+* **Markdown 消息输出**：为飞书、Slack 等平台准备结构化响应
+* **表单构造**：输出 HTML 格式的交互表单内容
+* **AI 回复前信息引导**：输出中间提示语，引导用户进一步操作
+
+---
+
+## 🧪 示例：输出 HTML 表单
+
+```html
+<form>
+  <label for="username">用户名:</label>
+  <input type="text" name="username" />
+
+  <label for="email">邮箱:</label>
+  <input type="email" name="email" />
+
+  <button>提交</button>
+</form>
+```
+
+该 HTML 可以通过模板节点动态生成并在下游平台展示，支持自定义字段与提示信息。
+
+---
+
+## 📌 小贴士
+
+* 模板中变量来自上游节点的 JSON 输出。
+* 支持嵌套访问，例如：`user.name`、`item.metadata.score`。
+
+---
+
+> 模板节点通常用于流程中的中间位置，格式化输出结果用于展示或传递给下一个工具节点或模型调用。
+
+如需参考 Handlebars 的语法文档，请访问 [Handlebars 官方文档](https://handlebarsjs.com/guide/)

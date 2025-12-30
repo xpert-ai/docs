@@ -1,0 +1,81 @@
+---
+title: 🧑🏼‍🚀 Xpert
+sidebar_position: 1
+tags:
+  - AI
+  - Xpert
+  - Agent
+---
+## What is Xpert?
+
+Xpert is a system that uses large language models as its foundation to simulate human social behaviors by combining intelligent agents. It applies the best practices of human society to AI agent behavior, enhancing and standardizing AI's capability to serve real-world scenarios effectively.
+
+Xpert is categorized into two types: **Agent** and **Copilot**:
+
+- **Agent Xpert**: These are expert agents designed to coordinate multiple agents working together to accomplish tasks. They simulate organizational structures found in human societies, maximizing the use of available human resources (via toolsets) and experiences (through organizational strategies) to better serve humanity.
+
+- **Copilot Xpert**: These are expert assistant agents that use large language models to collaborate with humans in utilizing tools to complete tasks. This represents a best practice in human-machine collaboration.
+
+
+## Where to Build Xpert?
+
+Xpert and its related toolsets are developed within a workspace. This workspace organizes Xperts, toolsets, and access permissions, allowing workspace members to collaboratively edit and use the resources within it.
+
+![Xpert workspace](/public/img/ai/xpert-workspace.png)
+
+
+## How to Orchestrate Xpert Agents?
+
+Once an Agent Xpert is created, you can orchestrate agents on the **Agents** page in Xpert Studio. The orchestration process mirrors hierarchical structures in human society: higher-level agents plan, divide, and assign tasks to lower-level agents. The lower-level agents solve problems using toolsets or knowledge bases and report back to their higher-level agents, who integrate the results to make further decisions.
+
+Agent operation follows this principle, and the orchestration adheres to the same methodology.  
+
+Each agent node can have unique toolsets and knowledge bases based on its responsibilities and may utilize different capabilities of large language models.
+
+![Xpert studio](/public/img/ai/xpert-studio.png)
+
+
+## How to Use Tools?
+
+The use of tools marks a significant milestone in human evolution, and large language models that can utilize tools are a key step toward achieving AGI (Artificial General Intelligence).  
+
+To enable an agent to use tools:
+1. **Authorize the tools**: This includes configuring authorization for built-in tools or creating custom toolsets via APIs.  
+2. **Assign toolsets to agents**: After authorization, the toolset instances can be added to agent nodes for use.  
+
+Additionally, if an Xpert agent needs to access an enterprise's proprietary systems, custom toolsets can be configured for this purpose.
+
+![Xpert toolset](/public/img/ai/xpert-toolset-builtin-auth.png)
+
+
+## How to Retrieve Knowledge Bases?
+
+The [🎓Knowledge Base](../knowledge/) is the core support for AI agents. It provides background knowledge and domain-specific data, enabling agents to:
+- Better understand user intent
+- Solve problems effectively
+- Optimize decision-making
+- Enhance contextual comprehension
+- Reduce generation bias  
+
+Dynamic updates to the knowledge base ensure that agents are always equipped with the latest information, significantly improving dialogue accuracy and intelligence.
+
+To use a knowledge base, add it to Xpert Studio and link the knowledge base node to an agent node. The agent will then have access to the information within this knowledge base.
+
+![Xpert with knowledgebase](/public/img/ai/xpert-agent-run-with-kb.png)
+
+
+## What is Copilot?
+
+**Copilot Xpert** helps users quickly operate interface functions, improving their expertise and work efficiency.
+
+To set up a Copilot Xpert:
+1. Create a Copilot Xpert in Xpert Studio.  
+2. Upload knowledge examples related to the expert's role. These examples are stored in a vector database, allowing the Copilot to retrieve relevant answers based on user queries.  
+
+Once created, the Copilot Xpert can be selected as a business role in the Copilot. During execution, the Copilot retrieves example answers based on commands and roles to operate interface functions more accurately.  
+
+For example, Xpert **Financial BP** can retrieve answers and create dimension objects based on the command `/dimension`.  
+
+![Xpert Copilot](/public/img/ai/xpert-copilot-example-testing.png)
+
+![Copilot command](/public/img/ai/copilot-command-dimension-result.png)

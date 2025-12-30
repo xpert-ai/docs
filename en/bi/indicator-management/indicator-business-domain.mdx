@@ -1,117 +1,18 @@
 ---
-title: "指标业务域"
-description: "指标业务域分类和管理"
+title: 💼 Business Area
+sidebar_position: 2
 ---
 
+In the Indicator Management System, a business area refers to the division and organization of business domains or functions. It represents different business departments, processes, or functions within an enterprise, such as sales, procurement, production, human resources, etc. Each business area typically includes a set of related indicators and models used to measure and monitor the performance of that business area.
 
-# 指标业务域
+Its functions are as follows:
 
-## Overview
+1. **Organization and Classification**: Business areas organize and classify the enterprise's operations into different areas, helping users better understand and manage various business departments or functions. It provides a clear structure that allows the indicator management system to organize and display data according to business areas.
 
-指标业务域用于对指标进行分类管理，便于组织和查找指标。通过业务域的分类，可以将相关的指标组织在一起，提高指标管理的效率和可维护性。
+2. **Fine-grained Indicator Management**: By dividing indicators into business areas, fine-grained indicator management for different business areas can be achieved. Each business area can define specific indicators and metrics applicable to that area to better measure and monitor key performance indicators in that business area.
 
-## 业务域分类
+3. **Business-Driven Decision Making**: The establishment of business areas enables the indicator management system to support business-driven decision-making. By associating relevant indicators and metrics with specific business areas, decision-makers can quickly understand and analyze the performance of various business areas, enabling targeted decision-making and strategic adjustments.
 
-### 常见业务域
+4. **Configurability and Flexibility**: The presence of business areas provides configurability and flexibility to the indicator management system. Different business areas can be customized according to the enterprise's needs, including the definition of indicators, calculation rules, and display methods. This allows the system to flexibly adjust and expand according to different business requirements.
 
-- **销售域**: 销售额、订单量、客户数、客单价等销售相关指标
-- **财务域**: 收入、成本、利润、利润率等财务相关指标
-- **运营域**: 用户活跃度、留存率、转化率等运营相关指标
-- **产品域**: 功能使用率、性能指标、用户体验指标等产品相关指标
-- **市场域**: 市场占有率、品牌知名度、营销效果等市场相关指标
-- **客服域**: 响应时间、解决率、满意度等客服相关指标
-
-## 创建业务域
-
-### 创建步骤
-
-1. 进入指标业务域管理页面
-2. 点击"新建业务域"按钮
-3. 填写业务域信息
-   - **业务域名称**: 清晰描述业务域的名称
-   - **业务域描述**: 详细说明业务域的涵盖范围
-   - **上级业务域**: 选择父级业务域（可选，用于创建层级结构）
-   - **负责人**: 指定业务域的管理负责人
-4. 设置业务域属性
-   - **可见范围**: 设置业务域的可见性
-   - **权限设置**: 设置访问和编辑权限
-5. 保存业务域
-
-### 业务域命名规范
-
-- 使用清晰、描述性的名称
-- 遵循统一的命名规范
-- 避免使用缩写，除非是通用缩写
-- 名称应该反映业务域的实质内容
-
-## 分配指标到业务域
-
-### 分配方式
-
-#### 方式一：注册时分配
-在注册指标时直接选择所属业务域。
-
-#### 方式二：批量分配
-1. 在指标列表中选择要分配的指标（支持多选）
-2. 点击"分配到业务域"按钮
-3. 选择目标业务域
-4. 确认分配操作
-
-#### 方式三：编辑指标
-1. 打开指标详情页面
-2. 编辑指标信息
-3. 修改业务域字段
-4. 保存更改
-
-## 业务域层级
-
-支持多级业务域结构，可以创建子业务域，形成树形结构：
-
-```
-销售域
-  ├── 销售额域
-  │   ├── 月度销售额
-  │   ├── 季度销售额
-  │   └── 年度销售额
-  ├── 订单域
-  │   ├── 订单量
-  │   ├── 订单金额
-  │   └── 平均订单金额
-  └── 客户域
-      ├── 新客户数
-      ├── 活跃客户数
-      └── 客户留存率
-```
-
-### 层级管理
-
-- **创建子业务域**: 在父业务域下创建子业务域
-- **移动业务域**: 可以将业务域移动到其他父业务域下
-- **合并业务域**: 可以将多个业务域合并为一个
-- **删除业务域**: 删除业务域前需要先移除或重新分配其中的指标
-
-## 业务域权限
-
-### 权限设置
-
-- **查看权限**: 谁可以查看该业务域下的指标
-- **编辑权限**: 谁可以编辑该业务域下的指标
-- **管理权限**: 谁可以管理业务域本身
-
-### 权限继承
-
-子业务域可以继承父业务域的权限设置，也可以单独设置权限。
-
-## 最佳实践
-
-1. **合理分类**: 根据业务实际情况合理划分业务域
-2. **层级适度**: 避免创建过深的层级结构，建议不超过3-4层
-3. **命名规范**: 遵循统一的命名规范，便于管理
-4. **定期整理**: 定期审查和整理业务域，合并重复的业务域
-5. **文档说明**: 为每个业务域添加详细的说明文档
-
-## 相关功能
-
-- [指标注册](/en/数据分析平台/指标管理/指标注册)
-- [指标认证](/en/数据分析平台/指标管理/指标认证)
-- [指标应用](/en/数据分析平台/指标管理/指标应用)
+For instructions on how to create business areas in the system, please refer to the documentation [Organizing Business areas](../../server/organization/business-area).

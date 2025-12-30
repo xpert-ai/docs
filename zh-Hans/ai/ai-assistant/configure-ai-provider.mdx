@@ -1,80 +1,58 @@
 ---
-title: "配置AI供应商"
-description: "AI供应商配置指南"
+title: 配置 AI 提供商
+sidebar_position: 2
+tags:
+  - AI
+  - Copilot
 ---
 
-# 配置AI供应商
+以下是 Xpert AI 系统中 AI 智能助理的基础配置：
 
-## 概述
+| 配置项              | 描述                                        |
+|-------------------|-------------------------------------------|
+| **AI Model 提供商**   | 支持的 AI 供应商，如 OpenAI、Azure OpenAI 等。|
+| **Default Model**    | 默认选择的 AI 模型，用于处理常规任务。          |
+| **Token limit/User**| 每个账号的初始 token 使用限制，控制 API 使用量。|
 
-配置AI供应商功能用于配置和管理AI服务提供商，支持多种AI服务提供商，如OpenAI、Anthropic等。
+这个表格简洁明了地列出了 AI 智能助理的基础配置，便于用户快速理解和设置。
 
-## 支持的供应商
+## AI 提供商
 
-### OpenAI
+Xpert 平台支持主流的 AI 模型提供商。
 
-- GPT-3.5
-- GPT-4
-- GPT-4 Turbo
+![Ai Providers](/public/img/copilot/copilot-ai-providers.png)
 
-### Anthropic
 
-- Claude 3 Opus
-- Claude 3 Sonnet
-- Claude 3 Haiku
+### 支持的模型提供商
 
-### 其他供应商
+Xpert AI 支持多种 AI 供应商，以增强灵活性和任务处理能力：
 
-- Google Gemini
-- 百度文心一言
-- 阿里通义千问
-- 自定义供应商
+| AI Provider           | 官网地址                       |
+|-----------------------|----------------------------|
+| OpenAI                | https://openai.com          |
+| Azure OpenAI          | https://azure.microsoft.com |
+| Ollama                | https://ollama.com           |
+| DeepSeek              | https://deepseek.com        |
+| Anthropic             | https://anthropic.com       |
+| Alibaba Tongyi        | https://bailian.console.aliyun.com/  |
+| Zhipu AI              | https://zhipu.ai            |
+| Together AI           | https://together.ai         |
+| Moonshot AI           | https://moonshot.ai         |
+| Groq AI               | https://groq.com            |
+| Mistral AI            | https://mistral.ai          |
+| Cohere AI             | https://cohere.ai           |
 
-## 配置步骤
+:::info 排名不分先后
+[添加更多供应商](https://github.com/xpert-ai/xpert/tree/main/packages/server-ai/src/ai-model/model_providers)
+:::
 
-### 添加供应商
+Xpert AI 的多供应商支持使其能够适应各种业务场景，并根据需求动态选择最佳模型来应对特定任务。
 
-1. 进入AI智能助理页面
-2. 点击"配置AI供应商"菜单
-3. 点击"新建供应商"按钮
-4. 选择供应商类型
-5. 填写配置信息
-   - API密钥
-   - API端点
-   - 模型选择
-6. 测试连接
-7. 保存配置
 
-## 配置选项
+## 智能助理角色
 
-### API配置
+Xpert AI 系统的智能助理分为三个角色，每个角色承担不同的任务，未来可能会增加更多不同用途的角色。
 
-- **API密钥**: 供应商的API密钥
-- **API端点**: API服务端点地址
-- **超时设置**: 请求超时时间
-
-### 模型配置
-
-- **模型选择**: 选择使用的模型
-- **参数设置**: 设置模型参数
-- **成本控制**: 设置成本限制
-
-## 供应商管理
-
-### 供应商列表
-
-- 查看所有供应商
-- 启用/禁用供应商
-- 编辑供应商配置
-- 删除供应商
-
-### 负载均衡
-
-- 配置多个供应商
-- 设置负载均衡策略
-- 故障转移配置
-
-## 相关文档
-
-- [智能体中间件](/zh-cn/智能体AI 平台/智能体中间件/内置中间件 )
-- [问题排查](/zh-cn/智能体AI 平台/问题排查/错误排查)
+1. **Primary**：这是主力推理助手，负责核心任务的推理和解决方案生成。主要用于用户复杂问题的解决和深度对话。
+2. **Secondary**：作为用户对话的辅助角色，能够协助用户在对话中提供背景信息、快速回答或建议，提升交互效率。
+3. **Embedding**：专注于将文件和文本向量化，以便于进行语义搜索和深度信息检索，特别适用于大规模文档处理与分析。

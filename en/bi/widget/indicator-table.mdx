@@ -1,55 +1,52 @@
 ---
-title: "指标表格"
-description: "指标表格微件使用指南"
+title: Indicator Table
+sidebar_position: 22
 ---
 
+The indicator table is a table component type that displays indicators. It can display one or more indicators.
 
-# 指标表格
+## Creating the Component
 
-## Overview
+In story editing mode, click "Insert More" in the toolbar and select the **Indicator Table** menu to insert a new widget into the current page.
 
-指标表格微件用于以表格形式展示多个指标，支持指标对比和分析。
+The indicator table depends on indicator configuration. First, users need to create indicators in indicator management, and then use them in this component.
 
-## Features
+![Middle Shadow](./indicator-table.png)
 
-- **多指标展示**: 支持展示多个指标
-- **表格格式**: 清晰的表格格式展示
-- **排序功能**: 支持按指标值排序
-- **筛选功能**: 支持指标筛选
+## Properties
 
-## Usage
+| Name | Description | Details |
+| ------------ | -------------------------------------- | ---------------------------------------------------------- |
+| Data Source | Semantic model configuration | |
+| Model | Multidimensional dataset in the semantic model | |
+| Table Name | Title of the indicator table | |
+| Scale Factor | Scale the values in the indicator table to reduce number size | For example: scale 1000000.0 to 100.0万 (million) |
+| Scaled Unit | Unit of the scaled number | For example: scale 1000000.0 to 100.0万 (million) |
+| Number Format | Formatting method for numbers displayed in the table | Format: `0.1-2` represents minimum 0 integer digits, minimum 1 and maximum 2 decimal places |
+| Measure Settings | Configuration of measure columns in the indicator table | |
+| Indicator List Settings | | |
 
-### 添加指标表格
+### Measure Settings
 
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"指标表格"
-3. 选择要展示的指标
-4. 配置表格列
-5. 设置排序和筛选
-6. 自定义样式
-7. 保存配置
+| Name | Description | Details |
+| ------------ | -------------------------- | ------------------------ |
+| Measure | Measure of the indicator, will be displayed as a table column | |
+| Alias | Measure alias, will be displayed as column name | |
+| Ratio | Whether the measure is a ratio type | Ratios will be displayed as percentages |
+| Semantic Color | Display semantic color for measure values | Positive: green; Negative: red; |
+| Reverse Semantic Color | Reverse semantic color | Positive: red; Negative: green; |
+| Actions | Delete button, delete current row configuration | |
 
-## 配置选项
+### Indicator List
 
-### 指标配置
-
-- **指标选择**: 选择要展示的指标（可多选）
-- **指标顺序**: 设置指标显示顺序
-- **指标名称**: 自定义指标显示名称
-
-### 表格配置
-
-- **列配置**: 配置表格列（指标名称、当前值、对比值等）
-- **排序**: 启用列排序功能
-- **筛选**: 启用筛选功能
-
-### 样式配置
-
-- **表格样式**: 选择表格样式
-- **行样式**: 设置行样式（斑马纹等）
-- **字体样式**: 设置字体大小和颜色
-
-## Related Documentation
-
-- [指标卡片](/en/数据分析平台/微件/指标卡片)
-- [分析表格](/en/数据分析平台/微件/分析表格)
+| Name | Description | Details |
+| -------- | ---------------------------- | -------- |
+| Indicator | Indicator configuration, will be displayed as a table row | |
+| Alias | Indicator alias, replaces indicator source name | |
+| Group Name | Add a group name column before the current indicator row | |
+| Number Format | Format for displaying indicator values | |
+| Number Unit | Unit of indicator values | |
+| Italic | Display indicator row in italic font | |
+| Underline | Display indicator row with bold underline | |
+| Reverse Color | Reverse semantic color of current indicator row values | |
+| Actions | Delete button, delete current indicator row | |

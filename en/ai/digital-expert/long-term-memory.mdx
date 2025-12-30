@@ -1,21 +1,56 @@
 ---
-title: "长期记忆"
-description: "长期记忆功能说明"
+title: Long-Term Memory  
+sidebar_position: 5  
 ---
+## What is Memory?
 
+AI memory refers to the ability to process, store, and effectively recall past interactions. This allows intelligent systems to learn from feedback and adapt to user preferences. Memory can be categorized into two types: short-term memory and long-term memory.  
 
-# 长期记忆
+- **Short-Term Memory** (memory within the scope of a session thread): The system can access short-term memory within a single session thread. This memory is managed as part of the agent's state and is persisted in a database through a checkpoint mechanism, allowing sessions to be resumed at any time. Short-term memory updates during process execution or after step completion and is read at the start of each step.  
 
-## Overview
+- **Long-Term Memory** (memory shared across threads): Long-term memory applies across multiple session threads and can be accessed in any thread at any time. It is not restricted to a single thread ID but can be stored and retrieved using custom namespaces. Xpert AI provides storage functionality to save and retrieve this long-term memory.  
 
-长期记忆是数字专家功能的重要组成部分。
+Currently, most AI applications are like "goldfish," unable to retain information between conversations. This short-sightedness is not only inefficient but also limits the capabilities of AI.  
 
-## 功能说明
+## Cross-thread Memory  
 
-此功能正在完善中，更多详细信息即将推出。
+Cross-session memory enables AI agents to store and retrieve information across different conversation threads. This allows the agent to retain context, user preferences, and historical information across multiple interactions, delivering smarter and more personalized experiences.  
 
-## Related Documentation
+## Configuring Long-Term Memory  
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+This configuration controls how information is extracted from conversations and stored in long-term memory.  
+
+**Memory Types** include *User Profiles*, *Q&A*, and *Custom*.  
+
+### User Profile
+
+- **Interval (seconds)**: Sets the delay in seconds before extracting information after a conversation ends. The default is 10 seconds, meaning the system will create a background task for information extraction 10 seconds after the user and Xpert stop interacting.  
+- **Prompt**: Guides the system on how to extract information from conversations. If no prompt is provided, the system uses a default one.  
+
+![Config Long-term memory](/public/img/ai/feature-long-term-memory.png)  
+
+### Q&A  
+
+In **Q&A** mode, summarized memories are created by extracting questions and answers when the user likes a response.  
+
+### Custom Memory  
+
+**Custom** memory allows users to define their own rules for extracting information.  
+
+:::warning 🚧  
+Under Development  
+:::  
+
+## Managing Memory  
+
+The management page serves as a centralized interface for managing and maintaining Xpert memory data.  
+
+- **Score**: Represents the degree of similarity during semantic searches (0–1).  
+- **Creator**: Indicates the owner of the memory.  
+- **Value**: Stores the memory content in JSON format.  
+
+![Manage xpert memory](/public/img/ai/xpert-long-term-memory.png)  
+
+On this page, users can delete individual memories or clear all memories for a specific expert.  
+
+**Semantic Search Testing** allows users to test the retrieval of memories related to specific queries.  

@@ -1,74 +1,34 @@
 ---
-title: "热力图"
-description: "热力图用于展示数据的密度和分布，通过颜色深浅表示数据大小。"
+title: Heatmap
+sidebar_position: 6
 ---
 
+**Heat map** is a data visualization technique that displays the absolute magnitude of a phenomenon in two-dimensional space in the form of colors. Color changes may be through hue or intensity, providing readers with obvious visual cues about how phenomena cluster or change spatially. Heat maps have two completely different categories: clustered heat maps and spatial heat maps. In clustered heat maps, magnitudes are arranged in a matrix of fixed cell sizes, with rows and columns being discrete phenomena and categories. The ordering of rows and columns is intentional and somewhat arbitrary, aiming to suggest clustering or depict clusters discovered through statistical analysis. Cell sizes are arbitrary but large enough to be clearly visible. In contrast, in spatial heat maps, the position of a magnitude is determined by the position of that magnitude in space, with no concept of cells, and phenomena are considered continuously varying.
 
-# 热力图
+## Clustered Heatmap
 
-## Overview
+Calculate and display heatmap data by setting two dimensions and one measure.
 
-热力图用于展示数据的密度和分布，通过颜色深浅表示数据大小。
+![Small](./heatmap-attributes.png)
 
-## 适用场景
+The two dimensions will be displayed as the horizontal and vertical axes respectively, and measure values will be used as heat values to calculate cell colors.
 
-### 数据特点
+![Middle Shadow](./heatmap.png)
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+Users can switch heatmap colors by setting a color palette for measures.
 
-### 使用场景
+![Small](./heatmap-measure-palette.png)
 
-- 典型应用场景
-- 业务场景示例
+## Calendar Heatmap
 
-## 配置选项
+Calendar heatmaps use color mapping to display daily data changes over an annual time span.
 
-### 数据配置
+To set the heatmap as calendar type, simply select the heatmap subtype as **Calendar**, and provide a dimension with calendar semantic type.
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
+![Small](./heatmap-calendar-attributes.png)
 
-### 样式配置
+![Middle Shadow](./heatmap-calendar.png)
 
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
+## 示例
 
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "热力图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
-
-## 最佳实践
-
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/777a3389-7ddc-4d71-a4cb-292d6d4f4eab" width="100%" height="1000px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

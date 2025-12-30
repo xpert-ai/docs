@@ -1,0 +1,38 @@
+---
+title: BI 工具集
+sidebar_position: 2
+---
+
+Xpert 数据分析类工具集提供了与 Xpert 数据分析平台无缝衔接的用于商业智能分析的工具组合。
+
+## 如何配置要分析的模型？
+
+要使用 ChatBI 工具集对数据分析平台的模型进行分析，需要为工具集授权相应的模型（一个或多个）。如下图所示，除了名称和描述属性外， Chat Models
+属性选择要分析的模型，保存授权后开启三个工具并保存。
+
+![ChatBI Toolset authorization](/public/img/ai/builtin-tool-chatbi-auth.png)
+
+## 为什么我没有 Chat Models 可选？
+
+Chat Models 列表需要在 Xpert 数据分析平台的 Chat BI 系统配置页面进行创建，选择语义模型和其中的一个模型实体，填写实体描述和详细介绍后便可创建成功。
+
+![ChatBI Toolset authorization](/public/img/ai/chatbi-model.png)
+
+关于语义模型的详细说明见 [语义模型](/docs/models/).
+
+## 如何使用 ChatBI 工具集?
+
+在 Xpert Studio 中编排智能体时，右键添加工具集，找到授权后的 ChatBI 工具集添加到 Studio 面板上，将智能体节点与此工具集节点连接，此智能体便可以使用该 ChatBI 工具集中的工具来解答用户的数据分析类问题。
+
+![ChatBI Toolset use](/public/img/ai/chatbi-toolset-usein-xpert.png)
+
+## 最终使用
+
+在最终的用户对话界面，通过该 Xpert 专家用户便可以询问与数据模型相关的分析问题，Xpert 会根据需要查询模型信息，并且结合图形组件的方式给出答案。
+
+![ChatBI Toolset use in chat](/public/img/ai/chatbi-toolset-in-chat-xpert.png)
+
+## ChatDB 工具集
+
+ChatDB 工具集包含了直接与数据库对话的工具，可以将用户的自然语言转换成 SQL 来查询数据库以找到对应的答案。
+使用过程与 ChatBI 类似。

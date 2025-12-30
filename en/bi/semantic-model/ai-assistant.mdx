@@ -1,20 +1,206 @@
 ---
-title: "AI智能助理"
-description: "AI智能助理功能说明"
+title: 🤖 AI Assistant
+sidebar_position: 10
+tags:
+  - AI
+  - Copilot
+  - MDX
+  - SQL
 ---
 
+For general AI Assistant functionality, please refer to [🤖 AI Assistant](../../ai/copilot/).
 
-# AI智能助理
+Semantic Model Copilot Command List:
 
-## Overview
+| Command | Description |
+| --- | --- |
+| [`/table`](#table) | Create physical table |
+| [`/dimension`](#dimension) | Create shared dimension |
+| [`/hierarchy`](#hierarchy) | Create hierarchy |
+| [`/cube`](#cube) | Create multidimensional dataset |
+| [`/query`](#query) | Create query statement |
+| [`/calculated`](#calculated) | Create calculated member command |
+| [`/modeler`](#modeler) | Modeler command |
 
-AI智能助理是语义模型功能的重要组成部分。
+## Model Global Commands
 
-## 功能说明
+In the semantic model interface, the AI Assistant has the following commands available:
 
-此功能正在完善中，更多详细信息即将推出。
+- `/table` `/t` [🦜️🔗][🦜️🔗] Create physical table
+- `/dimension` `/d` [🦜️🔗][🦜️🔗] Create dimension
+- `/cube` `/c` [🦜️🔗][🦜️🔗] Create cube
 
-## Related Documentation
+### /table
 
-- [多维模型介绍](/en/数据分析平台/语义模型/多维模型介绍)
-- [管理语义模型](/en/数据分析平台/语义模型/管理语义模型)
+The `/table` or `/t` [🦜️🔗][🦜️🔗] command is used to create physical tables.
+
+### /dimension
+
+The `/dimension` `/d` [🦜️🔗][🦜️🔗] command is used to create shared dimensions based on table information and questions.
+
+:::tip
+Users need to provide necessary dimension table information. You can drag table names from the data table area into the copilot to insert metadata into the conversation.
+:::
+
+Example:
+
+```bash
+/d create dimension call 'product_category' includes product category and model levels.
+```
+
+### /cube
+
+The `/cube` `/c` [🦜️🔗][🦜️🔗] command is used to create cubes based on table information and questions.
+
+:::tip
+Users need to provide necessary cube information. You can drag table names from the data table area into the copilot to insert metadata into the conversation.
+:::
+
+Example:
+
+```bash
+/cube create cube call 'sales_cube' that includes shared dimensions: product and customer, and measures: sales amount, product cost, sales profit
+```
+
+## Query Lab Commands
+
+In the Query Lab interface, the AI Assistant has the following commands available:
+
+- `/query` [🦜️🔗][🦜️🔗] Execute data queries based on user descriptions;
+
+Copilot conversation content in this interface can be saved in query records. When users reopen a query, the copilot conversation content will be restored. For more Query Lab functionality, please refer to [Query Lab](../query-lab/)
+
+### /query
+
+The `/query` `/q` [🦜️🔗][🦜️🔗] command is used to execute data queries based on user descriptions. Users need to provide necessary query logic information and table information.
+
+:::tip
+Users can drag table names from the table area to the **Table Structure** area to provide necessary table information.
+:::
+
+```sql
+/query Customer sales by country and year
+
+SELECT
+    c.country_region,
+    SUBSTRING(s.order_date_key, 1, 4) AS year,
+    SUM(s.sales_amount) AS total_sales_amount
+FROM
+    adv_sales s
+    JOIN adv_customer c ON s.customer_key = c.customer_key
+GROUP BY
+    c.country_region,
+    year
+ORDER BY
+    c.country_region,
+    year;
+```
+
+The query will be automatically executed and results returned when the command completes.
+
+Modify query statement:
+
+```bash
+/query Change the country field to city field
+```
+
+### Querying Multidimensional Data Sources
+
+If the semantic model's corresponding data source is a multidimensional data source (such as SAP BW, Microsoft Analysis Services, and other systems supporting Xmla interface services), the Query command automatically uses MDX syntax statements for queries.
+
+```sql
+/query sum SignData for every entity where category is [/CPMB/OUDV1E2].[Actual]
+
+SELECT
+  {[Measures].[/CPMB/SDATA]} ON COLUMNS,
+  {[/CPMB/OUDMS0O].[LEVEL01].Members} ON ROWS
+FROM [$/CPMB/OUMFJWF]
+WHERE {[/CPMB/OUDV1E2].[Actual]}
+```
+
+## Dimension Interface Commands
+
+The following commands are available:
+
+- `/hierarchy` `/h` [🦜️🔗][🦜️🔗] Create new hierarchy based on user description
+
+### /hierarchy
+
+The `/hierarchy` `/h` [🦜️🔗][🦜️🔗] command is used to create new hierarchies
+
+:::tip
+Users need to drag the tables to be used from the data table area into the AI dialog box to provide necessary dimension table information. If table information is not provided, the copilot will only create hierarchies based on table information used in the current dimension.
+:::
+
+Example:
+
+```bash
+/h Create hierarchy including product and category
+```
+
+## Dataset Commands
+
+The following commands are available:
+
+- `/calculated` `/calc` [🦜️🔗][🦜️🔗] Create new calculated member;
+
+Query Interface
+
+- `/query` `/q` [🦜️🔗][🦜️🔗] Execute data queries based on user description
+
+Calculation Interface
+
+- `/formula` `/f` [🦜️🔗][🦜️🔗] Modify the current calculation formula based on user description.
+
+### /query
+
+The `/query` `/q` [🦜️🔗][🦜️🔗] command is used to execute data queries based on user descriptions.
+
+```bash
+/query Create a statement to query the data: the most sales reseller
+```
+
+The `/query` command can also modify query statements in the current editor:
+
+```bash
+/query Edit current statement refer to the error message: MDX object '[Reseller].[Reseller].[Not Applicable].[Not Applicable]' not found in cube 'Sales'
+```
+
+### /calculated
+
+The `calculated` `/calc` [🦜️🔗][🦜️🔗] command is used to create new calculated members. Users need to provide necessary calculation logic information.
+
+```bash
+/calc Create calculated member
+Name: Profit Margin
+Formula: (Sales Amount - Cost) / Sales Amount * 100
+Description: Calculate product profit margin
+```
+
+### /formula
+
+The `/formula` `/f` [🦜️🔗][🦜️🔗] command is used to edit the current calculated measure formula. Users need to provide necessary calculation logic information.
+
+## Access Control Interface Commands
+
+The following commands are available:
+
+- `/role` Create role based on user description
+
+## Virtual Cube Page Commands
+
+### /formula
+  
+  The `/formula` command is used to create suggestions for virtual cube calculation formulas. Users can enter commands and requirements in the copilot dialog box, and the copilot will generate corresponding calculation formulas for you.
+  
+```bash
+/formula Create a calculation for sales profit margin
+```
+
+## /modeler
+
+`/modeler` or `/m` The data modeler can create shared dimensions and multidimensional datasets based on user prompts and table information, referencing business role examples. This command makes the data modeling process more automated and efficient, allowing users to focus on data analysis and decision-making.
+
+![Modeler Command](/public/img/copilot/command-modeler.png)
+
+[🦜️🔗]: ../../ai/copilot/#langchain

@@ -1,138 +1,34 @@
 ---
-title: "Create Story"
-description: "创建数据故事和仪表盘的完整指南"
+title: 📃 Create Story
+sidebar_position: 1
 ---
 
+In addition to creating a story dashboard using the [semantic model to create a new story dashboard](../models/modeling-workspace/#create-new-story-dashboard), you can also create it in the [project](./project/) homepage using three different methods:
 
-# Create Story
+1. Create a blank story dashboard.
+2. Create a story dashboard from a story template.
+3. Upload a story file to create a story dashboard.
 
-## Overview
+![Create Story in Project](/public/img/project/project-create-story.png)
 
-Create Story功能允许您将数据分析结果以可视化的方式呈现，构建数据驱动的故事叙述，帮助用户更好地理解数据背后的故事。
+Each method requires the following story attributes to be set:
+* Story Name
+* Story Description (optional)
+* Select the workspace within the project (optional)
+* Choose the model to use (the semantic model associated with the project)
 
-## Create Story
+![Create Story Dashboard](/public/img/project/project-create-story-dialog.png)
 
-### 基本步骤
 
-1. 进入故事仪表盘页面
-2. 点击"Create Story"按钮
-3. 选择项目（或创建新项目）
-4. 填写故事基本信息
-   - **Story Title**: 清晰描述故事的主题
-   - **Story Description**: 说明故事的目的和内容
-5. 添加数据源
-   - 选择数据源连接
-   - 选择要分析的数据表或视图
-6. 创建图表
-   - 选择图表类型
-   - 配置数据字段
-   - 设置图表样式
-7. 添加故事说明
-   - 为每个图表添加标题和说明
-   - 添加章节标题
-   - 编写故事叙述文字
-8. 保存并发布故事
+### New Story Page
 
-## 图表类型
+When entering the story editing interface, if the story is in its initial state, a wizard interface will appear. You can choose to create different types of story pages or create them based on a template.
 
-### 基础图表
+[Create New Canvas Page](./workspace/#new-canvas-page)
 
-- **折线图**: 展示趋势变化，适合时间序列数据
-- **柱状图**: 对比不同类别数据，适合分类对比
-- **饼图**: 展示占比关系，适合比例分析
-- **散点图**: 分析相关性，适合两个变量的关系分析
+### Property Configuration Bar
 
-### 高级图表
+The property configuration bar for stories and widgets is generally divided into two sections: **Build** and **Style**.
 
-- **热力图**: 展示数据密度和分布
-- **地图**: 地理数据可视化
-- **仪表盘**: 展示关键指标
-- **漏斗图**: 展示转化流程
-- **树状图**: 展示层级结构
-
-## 故事结构
-
-### 章节组织
-
-故事可以包含多个章节，每个章节可以包含多个图表：
-
-```
-Story Title: 2024年销售趋势分析
-
-第一章: 总体销售情况
-- 图表1: 年度销售趋势折线图
-- 说明: 2024年销售额较去年增长15%
-
-第二章: 区域销售对比
-- 图表2: 各区域销售额柱状图
-- 说明: 华东地区销售额最高
-
-第三章: 产品类别分析
-- 图表3: 产品类别占比饼图
-- 说明: 电子产品占比最大
-```
-
-## 设计技巧
-
-### 颜色搭配
-
-- 使用统一的配色方案
-- 保持视觉一致性
-- 考虑色盲友好性
-
-### 布局设计
-
-- 合理安排图表位置
-- 引导用户阅读顺序
-- 保持页面整洁
-
-### 文字说明
-
-- 为每个图表添加清晰的标题
-- 添加必要的说明文字
-- 使用简洁明了的语言
-
-## 交互式探索
-
-故事仪表盘支持丰富的交互功能：
-
-- **点击交互**: 点击图表元素查看详细信息
-- **筛选功能**: 使用切片器筛选数据
-- **钻取功能**: 从汇总数据钻取到明细数据
-- **联动分析**: 多个图表之间可以联动分析
-
-## Share和协作
-
-### Share链接
-
-生成Share链接，方便团队成员查看：
-- 公开链接：任何人都可以访问
-- 私有链接：需要权限验证
-- 密码保护：设置访问密码
-
-### 权限控制
-
-设置不同的Access Permission，保护敏感数据：
-- **公开**: 所有用户都可以访问
-- **私有**: 仅Creator可以访问
-- **指定用户**: 指定特定用户或用户组可以访问
-
-### 评论功能
-
-团队成员可以在故事中添加评论和反馈，促进协作。
-
-## 最佳实践
-
-1. **明确目标**: 在创建故事前，明确故事的目标和受众
-2. **数据准备**: 确保数据源可靠且数据质量良好
-3. **视觉设计**: 使用统一的视觉风格，保持一致性
-4. **故事叙述**: 编写清晰的故事叙述，引导用户理解数据
-5. **测试验证**: 发布前进行测试，确保图表和交互正常
-
-## 相关功能
-
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
-- [Story Details](/en/数据分析平台/故事仪表盘/故事详情)
-- [页面布局](/en/数据分析平台/故事仪表盘/页面布局)
-- [Share](/en/数据分析平台/故事仪表盘/分享)
+- **Build**: Different widgets have different build property settings. Most of them include data source and model configurations, as well as the associated dimensions and measures settings.
+- **Style**: The style settings for most widgets are similar, primarily involving CSS property settings for the widget elements.

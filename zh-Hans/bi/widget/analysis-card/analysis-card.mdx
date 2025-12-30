@@ -1,0 +1,377 @@
+---
+title: 分析卡片
+sidebar_position: 1
+---
+
+import {useState} from 'react';
+
+export const ChartImgs = ({children, cols, types}) => {
+  return (<div class="grid grid-cols-3 gap-4" style={{gridTemplateColumns: 'repeat('+cols+', minmax(0, 1fr))'}}>
+  {types.map((chart) => (
+<a style={{gridColumn: 'span '+(chart.cols || 1)+' / span '+(chart.cols || 1)+''}}
+  href={chart.href}>
+  <figure style={{width: '100%'}}>
+    <img src={chart.imgsrc} alt={chart.caption} />
+    <figcaption>{chart.caption}</figcaption>
+  </figure>
+</a>
+  ))}
+  </div>
+  )
+};
+
+
+分析图形组件是以绘制可视化图形进行展示的一种组件, 作为通用的图形绘制容器它可以支持不同的 JavaScript 图形绘制库如 ECharts, AntG2, 目前以 Echarts 库为主.
+
+## 通用功能
+
+* 标题
+* 数据配置: 像其他数据相关组件一样, 数据配置说明了此组件如何进行取数和基本的展示配置.
+  * 数据源: 对应故事仪表板指定的语义模型
+  * 模型: 语义模型中的一个多维模型
+  * [_图形类型_](#图形类型): 图形类型配置, 具体见上面图形列表
+  * 度量: 一个或多个度量字段配置, 其中包含更详细的配置
+  * 维度: 一个或多个维度配置, 其中包含更详细的配置
+  * 选择条件: 对数据进行一定的过滤条件
+  * 展示变式: 包括 Top 多少, 排序条件, 下钻联动
+* 分析卡片选项
+  * 显示密度
+  * 实时联动分析
+  * 显示数据按钮
+* 图形配置
+  * 最大数据限制
+  * 数字显示格式
+  * 格子横向个数
+  * 全局过渡动画
+  * 自定义逻辑, 参考[自定义图形](./custom)
+
+## 格子
+
+格子功能是分析卡片微件在一个容器里将某个维度的不同成员以格子的形式展示成独立的图形的方式。
+
+通过设置第二维度的角色为 [_**格子**_](#维度) 可以将此维度的成员作为划分格子成员的依据。
+
+参考 [_柱形图#格子_](./bar/#格子) 。
+
+## 数据缩放
+
+数据缩放设置是在图形轴对应的维度或度量上进行, 例如某图形的 x 轴对应日历维度, 想要对 x 轴进行数据缩放则需要在日历 **维度** -> **图形属性** -> **数据缩放** 开启并设置详细配置.
+
+再比如图形 y 轴对应销售额度量, 如果要对 y 轴进行数据缩放则需要在销售额 **度量** -> **图形属性** -> **数据缩放** 开启并设置详细配置.
+
+## 图形变体
+
+**图形变体** 允许用户在同一个图形组件中展现不同的图形变形，以便用户可以根据需要自行选择查看的图形类型。在同一个图形组件中预先定义多个图表变体，这些变体可以是不同类型的图表，例如折线图、柱状图、饼图等，或自定义图形类型，也可以是同一类型图表的不同展示形式，如堆叠柱状图和分组柱状图。
+
+![图形变体](/public/img/story/chart-variants.png)
+
+在图形配置属性区添加图形变体后将与图形本身的类型一起展示在图形微件的工具栏中，用户可以切换不同的图形变体，查看不同的图形展示效果。
+
+:::tip
+切换图形不涉及数据变化，所以不会重复查询数据。
+:::
+
+## 度量
+
+[_度量选择器_](/docs/stories/dimension-selector/#度量选择器) 使用户可以选择和查看模型的特定度量。它可以用于显示一些统计数据或者图形展示数据。图形微件的度量属性设置组件包含了通用的度量选择器功能和针对图形的度量属性设置。
+
+**通用功能**
+
+这个功能支持用户根据需要选择度量，例如普通度量、计算度量和指标等。用户可以根据具体需求来选择需要展示的度量，或者创建计算成员度量进行本地计算（不影响模型本身）。 具体度量选择器的功能请参考 [度量选择器](/docs/stories/dimension-selector/#度量选择器)。
+
+**图形相关属性**
+
+- **角色**：这是制定度量在图形中的角色或者说职责。比如图中的轴、图例、尺寸或颜色等等。
+- **形状**：这是定义图形数据系列的形状的设置，如 Bar、Line、Scatter等。在部分图形类型中，如散点图，数据点具体的形状类型可以通过 Series 中的 [*Symbol*](https://echarts.apache.org/en/option.html#series-scatter.symbol) 属性定义。
+- **模式**：这是定义图形的模式的设置。例如，通过设置图形条状图的填充模式（斜线填充、点状填充等）。
+- **调色板**：颜色选择器允许您为数据图中的不同部分指定颜色。用户可以选择一种预设的色板，也可以创建自己的自定义色板。
+- **ECharts 属性**：这包含了度量在 ECharts 中对应的属性设置，如 Series、 Axis、 Visual Map、 Data Zoom 等。
+
+![图形的度量](/public/img/widgets/analytical-card/chart-measures.png)
+
+这样的度量选择器设置，则让用户可以高度自定义他们的度量展示方式，使得数据以更好、更直观的方式在图表中展现出来。
+
+## 维度
+
+[_维度选择器_](/docs/stories/dimension-selector/) 允许用户选择和查看模型不同的维度，可以显示例如类别的统计数据或是图形化的数据展示。功能包括通用维度选择功能和维度相关的图形属性配置等。
+
+**通用功能**
+
+通用维度选择功能支持用户根据需求来选择并查看数据的各种维度，例如商品类型、地理位置、时间段等。根据具体需求，可以选择相应的维度进行数据分析和展示。更多的详细功能可以参看通用的[_维度选择器_](/docs/stories/dimension-selector/)功能。
+
+**图形相关属性**
+
+- **角色**：维度在图表中所扮演的角色的配置。可选值有：
+  - **类别**：数据的类别。比方说，如果你的数据集包括一种商品和销售额，那么商品就是类别。
+  - **类别2**：数据的类别2。部分图形可能会使用两个类别维度。
+  - **堆叠**：堆叠的数据。在柱状或者线状图中，可以表示不同类别的数据堆叠在一起的效果。
+  - **分组**：分组的数据。在柱状或者线状图等图形中，可以表示不同类别的数据并列在一起的效果。
+  - **格子**：在[_格子图_](#格子)（Trellis Chart）中，不同的格子代表了不同类别的数据集。
+
+- **ECharts 配置属性**：这包含了维度在 ECharts 中的一些配置属性，例如：
+  - **Axis**：坐标轴设置。这决定了数据在图表中的位置及展示格式。
+  - **Data Zoom**：数据缩放和滑动。这个功能允许对某一区域的数据进行放大或者缩小来进行更详细的查看。
+
+![图形的维度](/public/img/widgets/analytical-card/chart-dimensions.png)
+
+上述的维度选择器设置，允许用户可以根据自己的需求来配置维度的展示方式，使得数据可以以最直观，最清晰，同时满足个性化需求的方式在图表中展示。
+
+## 图形类型
+
+支持丰富的图形类型和图形变形.
+
+<div class="flex justify-center gap-2">
+![Chart Type](/public/en/img/widgets/analytical-card/chart-type.png)
+
+![Chart Custom](/public/en/img/widgets/analytical-card/chart-custom.png)
+</div>
+
+* 图形类型选择
+* 自定义图形名称
+* 方向：横向、纵向
+* 变形：不同的图形类型可能存在不同的字类型变形，如柱形图的堆积、分组、极坐标等，树图的反向、雷达等。
+* 图形配置：针对 ECharts 图形属性的统一配置
+  * 网格: Grid 组件配置, 参考 [ECharts Grid](https://echarts.apache.org/en/option.html#grid)
+  * 系列统一属性: 会覆盖所有 ECharts series 配置, 参考 [ECharts Series](https://echarts.apache.org/en/option.html#series)
+  * 提示框: Tooltip, 参考 [ECharts Tooltip](https://echarts.apache.org/en/option.html#tooltip)
+  * 图例: Legend, 参考 [ECharts Legend](https://echarts.apache.org/en/option.html#legend)
+  * 数据缩放: DataZoom, 参考 [ECharts DataZoom](https://echarts.apache.org/en/option.html#dataZoom)
+  * 全局颜色: 设置全局的颜色序列, 参考 [ECharts Color](https://echarts.apache.org/en/option.html#color)
+  * 辅助增强: , 参考 [ECharts Aria](https://echarts.apache.org/en/option.html#aria)
+* [_自定义图形脚本_](./custom/) 让用户通过编写图形绘制脚本代码进行自定义图形展示。
+
+### 对比图形
+
+Comparison Chart（对比图表类型）是用于比较两个或多个数据系列之间差异或相似性的一类图表类型。
+
+#### 柱形图
+
+<ChartImgs cols={4} types={[
+    {
+      href: './bar/#基本柱形图',
+      imgsrc: '/assets/images/basic-381ec690e77de9423903354e6665ef05.png',
+      caption: '柱形图'
+    },
+    {
+      href: './bar/#柱形方向',
+      imgsrc: '/assets/images/h-7dac1a775e0ee0dbbbc8e8d877a54cc8.png',
+      caption: '横向柱形图'
+    },
+    {
+      href: './bar/#分组',
+      imgsrc: '/assets/images/multi-dimensions-group-af8afbd253727b4a9ed8aeda1c0579b6.png',
+      caption: '分组柱形图'
+    },
+    {
+      href: './bar/#堆积',
+      imgsrc: '/assets/images/multi-dimensions-stacked-e8c77c6d98788e024bb8eec077520d35.png',
+      caption: '堆积柱形图'
+    },
+     {
+      href: './bar/#格子',
+      imgsrc: '/assets/images/multi-dimensions-trellis-3dfc8420af7213738e7b52ca68b93603.png',
+      caption: '格子柱形图'
+    },
+    {
+      href: './bar/#多度量柱形图',
+      imgsrc: '/assets/images/multi-measures-6718f9ae813e0ea898d9c156c21e9f74.png',
+      caption: '多度量柱形图'
+    },
+     {
+      href: './bar/#多度量柱形图',
+      imgsrc: '/assets/images/multi-meausres-combine-20a32ffeae381e01d3347f0f65aa1e58.png',
+      caption: '组合柱形图'
+    },
+    {
+      href: './bar/#多维度多度量柱形图',
+      imgsrc: '/assets/images/multi-dim-measures-3f4d1c45cd2756c835002b318b2d8767.png',
+      caption: '多维度多度量柱形图'
+    },
+    {
+      href: './bar/#极坐标',
+      imgsrc: '/assets/images/polar-66326a7f4d340933a0fc6c1a6392421c.png',
+      caption: '极坐标柱形图'
+    },
+    {
+      href: './bar/#极坐标',
+      imgsrc: '/assets/images/radar-fe7f5e219a09ce1351a182454a6d1481.png',
+      caption: '极坐标柱形图'
+    }
+  ]}></ChartImgs>
+
+#### 饼图
+
+<ChartImgs cols={4} types={[
+  {
+      href: './pie/#饼图',
+      imgsrc: '/assets/images/pie-83186f7f5b376be9f0d3af1f41766a2e.png',
+      caption: '饼图'
+  },
+  {
+      href: './bar/#环形图',
+      imgsrc: '/assets/images/doughnut-6cf6e1bfa05edbe201da34e87b1afca8.png',
+      caption: '环形图'
+    },
+  {
+      href: './bar/#南丁格尔图',
+      imgsrc: '/assets/images/nightingale-3666d5d85e97481eca66e8228037874b.png',
+      caption: '南丁格尔图'
+    },
+    {
+      href: './bar/#格子',
+      imgsrc: '/assets/images/trellis-bcfdb8e75ad0441b9aac75b7fd790780.png',
+      caption: '格子饼图',
+      cols: 3
+    }
+]}></ChartImgs>
+
+### 趋势图形
+
+Trend chart 用于表示数据趋势的一种图表类型。它们是用于显示数据随时间变化的趋势，并且可以提供有关数据的信息，例如是否存在趋势、周期性和季节性。
+
+#### 线图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './line/#线图',
+      imgsrc: '/assets/images/lines-85351cd1c1b5c6b265d3a3fdaf1334a9.png',
+      caption: '线图'
+  },
+  {
+      href: './line/#面积图',
+      imgsrc: '/assets/images/area-stacked-861e1dec38a3371a5d4b85401fed6c38.png',
+      caption: '面积图'
+    }
+]}></ChartImgs>
+
+#### 主题河流图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './theme-river/',
+      imgsrc: '/assets/images/theme-river-23c150a54d040aeefa4ff88e8c360f77.png',
+      caption: '河流图'
+  }
+]}></ChartImgs>
+
+### 相关图形
+
+Correlation chart （相关图表类型）是一种显示两个变量之间关系的可视化工具。
+
+#### 散点图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './scatter/',
+      imgsrc: '/assets/images/scatter-21006c1029a269dcf1cedd78d38fcf63.png',
+      caption: '散点图'
+  },
+  {
+      href: './scatter/',
+      imgsrc: '/assets/images/scatter-21006c1029a269dcf1cedd78d38fcf63.png',
+      caption: 'Bubble'
+  }
+]}></ChartImgs>
+
+### 分布图形
+
+分布图形（Distribution chart）是用来显示数据分布的一种可视化工具。分布图表可以帮助用户更好地理解数据集的分布情况，从而进行更准确的分析和决策。
+
+#### 热力图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './heatmap/#聚集热图',
+      imgsrc: '/assets/images/heatmap-a00d086fd9e1d884ad1eec6f1c135689.png',
+      caption: '聚集热图'
+  },
+  {
+      href: './scatter/#日历热图',
+      imgsrc: '/assets/images/heatmap-calendar-97e9fd19c1a79db040c8fae7ead5f03e.png',
+      caption: '日历热图',
+      cols: 2
+  }
+]}></ChartImgs>
+
+#### 树图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './tree/#树图',
+      imgsrc: '/assets/images/tree-ecc64bd450592e1b90fb9d58d5d4047c.png',
+      caption: '树图'
+  },
+  {
+      href: './tree/#图形子类型',
+      imgsrc: '/assets/images/tree-radial-208ae095a0eb20d0f6fe8c9385305afc.png',
+      caption: '雷达树图',
+      cols: 1
+  }
+]}></ChartImgs>
+
+#### 矩阵树图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './treemap/#层次结构的矩阵树图',
+      imgsrc: '/assets/images/treemap-1c4e35084b5015006ff2182ac807d6b7.png',
+      caption: '层次结构的矩阵树图'
+  },
+  {
+      href: './treemap/#多维度矩阵树图',
+      imgsrc: '/assets/images/treemap-dimensions-fa7ec3a076b7a51178d6cc82a74268a8.png',
+      caption: '多维度矩阵树图'
+  }
+]}></ChartImgs>
+
+#### 旭日图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './sunburst/',
+      imgsrc: '/assets/images/sunburst-aca38acdac9fcbfe48504b881ba0b08d.png',
+      caption: '旭日图'
+  }
+]}></ChartImgs>
+
+#### 桑基图
+
+<ChartImgs cols={4} types={[
+  {
+      href: './sankey/#多维度之间',
+      imgsrc: '/assets/images/sankey-dimensions-d30ec6b9d66c037492f7a8986fb70c21.png',
+      caption: '桑基图'
+  },
+  {
+      href: './sankey/#一个维度层次结构',
+      imgsrc: '/assets/images/sankey-hierarchy-ee42f8fef1e16eb080f7c58c736a1c0f.png',
+      caption: '纵向桑基图',
+      cols: 3
+  }
+]}></ChartImgs>
+
+#### 漏斗图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './funnel/',
+      imgsrc: '/assets/images/funnel-5883a3fe3e39d223c7c56cb95166d832.png',
+      caption: '漏斗图'
+  }
+]}></ChartImgs>
+
+#### 盒须图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './boxplot/',
+      imgsrc: '/assets/images/boxplot-077eb51af13a2ef2ff702bcff795a719.png',
+      caption: '盒须图'
+  }
+]}></ChartImgs>
+
+### 地理图
+
+<video controls width="550" autoplay="true" loop="true">
+  <source src="/img/geomap-chart-types.webm" type="video/webm"/>
+</video>

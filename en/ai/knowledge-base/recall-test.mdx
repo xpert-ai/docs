@@ -1,48 +1,82 @@
 ---
-title: "召回测试"
-description: "知识库召回测试指南"
+title: Recall Test
+sidebar_position: 6
+---
+The **XpertAI Knowledge Base** comes with a powerful **recall testing feature** that simulates real user query scenarios. By entering keywords or questions, you can evaluate the recall quality of the knowledge base.
+The system automatically retrieves indexed content chunks and sorts them by similarity score. Generally, the higher the match between the question and the content chunk, the closer the AI model's answer will be to the original document's meaning, reflecting better "knowledge recall" performance.
+
+You can freely switch between different retrieval methods and parameter configurations to intuitively assess the relevance and coverage of recall results.
+XpertAI's knowledge base uses a **unified chunk tree structure**, so all tests are based on parent-child hierarchical semantic recall logic.
+
 ---
 
+## General Testing Mode
 
-# 召回测试
+Enter common user questions or keywords in the **source text input box** and click the **Test** button to view the matched content chunks in the **Recall Results Area** on the right.
 
-## Overview
+* Each content chunk displays a similarity score in the upper right corner, indicating how well it matches the question.
+* Higher scores mean stronger semantic relevance between the chunk and the question.
+* Click a content chunk to view its details and source in the document.
 
-召回测试用于测试知识库的检索效果，评估知识检索的准确性和相关性。
+Document source information is shown below each recall result, helping you judge whether the chunking is reasonable and the semantic boundaries are clear.
 
-## Features
+---
 
-- **测试查询**: 执行测试查询
-- **结果评估**: 评估检索结果
-- **性能分析**: 分析检索性能
-- **优化建议**: 提供优化建议
+## Parent-Child Structure Testing Mode
 
-## 测试方法
+XpertAI's knowledge base uses a **tree-structured chunking** approach. When recalling a child chunk, its parent context is also brought in to provide the AI model with more complete semantic information.
 
-### 创建测试用例
+During testing:
 
-1. 进入召回测试页面
-2. 点击"新建测试用例"
-3. 输入测试查询
-4. 设置期望结果
-5. 保存测试用例
+* After the user enters a question, the system first matches the most relevant child chunk;
+* Then it automatically traces back to its parent chunk, integrating the context for display;
+* The match score is shown in the upper right corner to measure how well the hit segment matches the question.
 
-### 执行测试
+Clicking the source in the recall result lets you view the original content directly.
+On the details page, the left side shows the parent chunk information, and the right side shows the matched child chunk. The system may hit multiple child nodes, each with its own match score, making it easy for developers to analyze chunking rationality and recall performance.
 
-1. 选择测试用例
-2. 点击"执行测试"
-3. 查看测试结果
-4. 分析结果质量
+---
 
-## 评估指标
+## Query Records and Application Calls
 
-### 准确率
+In the **Records** panel, you can view the history of recall test queries.
+If the knowledge base is linked to a digital expert or other AI application, queries triggered within the application will also be displayed here, making it easy to track recall logs and effectiveness in one place.
 
-- **精确率**: 检索结果中相关结果的比例
-- **召回率**: 检索到的相关结果占所有相关结果的比例
-- **F1分数**: 精确率和召回率的调和平均
+---
 
-## Related Documentation
+## Adjusting Text Retrieval Methods
 
-- [知识库功能介绍](/en/智能体AI 平台/知识库/知识库功能介绍)
-- [使用知识库的方式](/en/智能体AI 平台/知识库/使用知识库的方式)
+Click the **retrieval configuration icon** in the upper right corner of the input box to switch the retrieval method and parameters for the current knowledge base.
+The modified settings only apply to the current recall test, allowing developers to compare the effects of different retrieval strategies.
+To make global changes, go to **"Knowledge Base Settings > Retrieval Settings"** to save.
+
+---
+
+## Recommended Steps for Recall Testing
+
+1. **Prepare a test set**: Design a set of test questions covering common user scenarios to ensure diversity.
+2. **Choose a retrieval strategy**: Select the appropriate retrieval mode based on content characteristics and application scenarios (e.g., Q&A, multilingual corpus, etc.).
+3. **Tune parameters**: Adjust the number of recalls (TopK) and similarity threshold (Score) to balance recall relevance and completeness.
+
+---
+
+## Explanation of TopK and Score Parameters
+
+* **TopK**: The maximum number of content chunks to recall, sorted by similarity score in descending order.
+
+  * Smaller values: More concise recall, but may miss some relevant segments.
+  * Larger values: More comprehensive recall, but may include less relevant segments, affecting final answer quality.
+
+* **Score (Recall Threshold)**: Sets the minimum similarity score allowed for recall.
+
+  * Lower values: Looser recall, including more low-relevance content.
+  * Higher values: Stricter recall, retaining only highly relevant segments, but may miss marginal information.
+
+By dynamically adjusting these two parameters, you can quickly find the best retrieval configuration for the specific content and business semantics of your knowledge base.
+
+---
+
+✅ **Summary**
+
+Recall testing in XpertAI is not only a key tool for verifying knowledge base quality, but also an important means to optimize the knowledge pipeline and improve AI answer accuracy.
+With recall logs, parent-child hierarchical structure, and retrieval parameter tuning, teams can iteratively improve knowledge base quality in a visual and verifiable way, making every answer closer to real business semantics.

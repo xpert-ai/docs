@@ -1,74 +1,22 @@
 ---
-title: "漏斗图"
-description: "漏斗图用于展示转化流程，适合展示阶段性的数据变化。"
+title: Funnel Chart
+sidebar_position: 11
 ---
 
+**Funnel Chart** is a graphical representation used to visualize data changes in processes. In funnel charts, the values of dependent variables decrease in subsequent stages of the process. Funnel charts are widely used to represent sales funnels, recruitment, and order fulfillment processes.
 
-# 漏斗图
+Funnel charts are suitable for single-process, unidirectional analysis with standardized business processes, long cycles, and multiple stages. By comparing business data across funnel stages, problems can be intuitively identified and explained, leading to decision-making. Funnel charts use trapezoidal areas to represent the difference between a stage's business volume and the previous stage. Funnel charts flow from top to bottom with logical sequential relationships, showing how business objectives are completed as business processes advance.
 
-## Overview
+Funnel charts always start with a 100% quantity and end with a smaller quantity. Between start and end, there are N process stages. Each stage is represented by a trapezoid, where the upper base width represents the input of the current stage, the lower base width represents the output of the current stage, and the difference between upper and lower bases visually represents the reduction in business volume at the current stage. The slope of the trapezoid edge represents the reduction rate of the current stage. By labeling different stages with different colors, users can better distinguish differences between stages. All stages in a funnel chart should use the same measure.
 
-漏斗图用于展示转化流程，适合展示阶段性的数据变化。
+Select the chart type as **Funnel Chart**, and add multiple measure fields.
 
-## 适用场景
+![Small](./funnel-attributes.png)
 
-### 数据特点
+Funnel chart display effect:
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+![Small Shadow](./funnel.png)
 
-### 使用场景
+## 示例
 
-- 典型应用场景
-- 业务场景示例
-
-## 配置选项
-
-### 数据配置
-
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
-
-### 样式配置
-
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
-
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "漏斗图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
-
-## 最佳实践
-
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/d0010932-e712-4e62-bffa-86a47d15c179" width="100%" height="1000px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

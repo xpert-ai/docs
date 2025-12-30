@@ -1,20 +1,56 @@
 ---
-title: "衍生指标"
-description: "衍生指标功能说明"
+title: 📈 Derivative Indicator
+sidebar_position: 4
+tags:
+  - SQL
+  - MDX
+  - Formula
 ---
 
+In indicator management, **derivative indicators** refer to indicators derivative from the calculation of original indicator values. Derivative indicators are typically obtained through operations or combinations of original indicators, providing a deeper understanding of the original indicators.
 
-# 衍生指标
+For example, if there is an original indicator called sales revenue, then the growth rate of sales revenue can be calculated as a derivative indicator, which can help us understand the growth of sales revenue.
 
-## Overview
+Derivative indicators can use different units or calculation methods such as ratios to measure original indicators. For example, in sales data, the performance of salespersons can be measured by calculating the ratio of each salesperson's sales revenue to the total sales revenue, which is a derivative indicator.
 
-衍生指标是指标管理功能的重要组成部分。
+## Derivative Indicators
 
-## 功能说明
+Once a indicator is set as a derivative indicator, its content can be expressed through two attributes: **calculation formula** and **aggregation type**.
 
-此功能正在完善中，更多详细信息即将推出。
+The calculation formula can be entered directly into the input box or written using the pop-up formula editing window.
 
-## Related Documentation
+## Calculation Formulas for SQL Models
 
-- [指标注册](/en/数据分析平台/指标管理/指标注册)
-- [指标业务域](/en/数据分析平台/指标管理/指标业务域)
+Calculation formulas for indicators based on SQL multidimensional models support the use of **Measures** indicators for calculation. You can open the entity type list on the right side of the formula editing window to drag measures into the editor:
+
+![Middle Shadow](./sql-formula.png)
+
+The **aggregation type** determines whether the indicator in the indicator calculation formula is aggregated after calculation or aggregated before calculation. If the derivative indicator has an aggregation type set, the formula is aggregated after calculation. If no aggregation type is set, then the indicator in the formula is aggregated according to its own aggregation type before calculation.
+
+For example, in the above formula, if the derivative indicator has an aggregation type of **SUM**, then the generated SQL fragment at runtime would be:
+
+```sql
+SUM("sales_fact"."Sales Amount" - "sales_fact"."Cost")
+```
+
+If this derivative indicator does not have an aggregation type set, then the generated SQL fragment would be:
+
+```sql
+SUM("sales_fact"."Sales Amount") - SUM("sales_fact"."Cost")
+```
+
+This situation is practical for calculating ratios.
+
+## Calculation Formulas for MDX Models
+
+Derivative indicators based on MDX models can use the MDX language to write calculation formulas for indicators. Since MDX language can implement complex data queries and analysis, derivative indicators based on MDX calculation formulas can achieve complex indicator calculations.
+
+For example, if creating a *US Sales Profit Growth Rate* indicator, add the *US region* slicer to the indicator's constraints, and then write the MDX calculation formula as follows:
+
+`( Measures.[Profit] - CoalesceEmpty( (Measures.[Profit], [Time].PrevMember), Measures.[Profit] ) ) / CoalesceEmpty( (Measures.[Profit], [Time].PrevMember), Measures.[Profit] )`
+
+![Derivative Indicator Calculation Formula](/public/img/indicator/indicator-formula.png)
+
+## Conclusion
+
+Derivative indicators are crucial in data analysis and management because they help us better understand data and make decisions. For example, derivative indicators can be used to monitor business operations, such as sales revenue growth rates, customer satisfaction, etc., and they can also be used to evaluate employee performance, such as the gap between sales revenue and sales targets.

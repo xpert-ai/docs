@@ -1,20 +1,131 @@
 ---
-title: "如何分析 SAP BW 数据模型"
-description: "SAP BW数据模型分析教程"
+title: How to Analyze SAP BW Data Model
+sidebar_position: 3
+tags:
+  - MDX
 ---
 
+SAP BW (SAP Business Warehouse) is an enterprise data warehouse system developed by SAP, designed to support data analysis and decision-making in businesses. It is an integrated, enterprise-level solution that consolidates data from different systems into a single data repository. The data model of SAP BW adopts a star schema, where data is stored in a central repository and can be efficiently queried and analyzed. Data can be collected from multiple sources, including SAP applications and other external systems. SAP BW also supports multidimensional analysis and data mining capabilities, enabling efficient data analysis using OLAP (Online Analytical Processing) technology.
 
-# 如何分析 SAP BW 数据模型
+Meta Analysis Cloud enhances the semantic model of SAP BW by connecting to the SAP BW system using the XMLA (XML for Analysis) protocol, enabling more powerful data analysis capabilities. Meta Analysis Cloud can directly access data cubes or queries in the SAP BW system and enhance the semantic model of the SAP BW system. During the process of enhancing the semantic model, users can create new measures and calculated members, modify dimension and measure descriptions, and extend the functionality of data analysis.
 
-## Overview
+In this tutorial, we will introduce how to connect to the SAP BW system using Meta Analysis Cloud and create a semantic model for data analysis.
 
-本教程介绍如何分析SAP BW数据模型，包括数据提取、模型理解和分析方法。
+## Data Source
 
-## 内容
+Refer to the document [SAP BW Data Sources](../../../server/datasources/sap-bw/) to create a data source.
 
-此教程正在完善中，更多详细信息即将推出。
+## Semantic Model
 
-## Related Documentation
+The semantic model is a core feature in Meta Analysis Cloud that provides various functionalities to enhance data analysis capabilities, including:
 
-- [SAP BPC](/en/智能体AI 平台/教程/SAP/SAP BPC)
-- [SAP BW 日历维度](/en/智能体AI 平台/教程/SAP/SAP BW 日历维度)
+1. Query Lab
+
+The Query Lab helps users quickly create and test MDX query statements. In the Query Lab, users can use AI Copilot to generate query statements for data retrieval using natural language. Session records can be saved and query results can be exported.
+
+2. Model Semantic Enhancement
+
+The semantic model provides a simple way to enhance the semantics of the data model. It allows for the calculation of new measures and dimension members for BW Cubes or Queries, modification of label descriptions, setting measure number formats, and assigning semantic types to dimensions, among other enhancement capabilities.
+
+3. Caching
+
+The semantic model allows for the configuration of caching for querying BW data, including enabling caching and setting cache expiration time, to improve query efficiency.
+
+For more details, refer to the document [Semantic Enhancement for Third-Party OLAP Cube](../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube).
+
+### Creating a Semantic Model
+
+Click on "New" in the semantic model management page to open the creation wizard. Enter a name, select the SAP BW data source that has been created, and wait for the system to retrieve all service catalogs. After selecting a desired service catalog, click on "Apply".
+
+![SAP BW Cube Semantic Model](/public/en/img/data-sources/bw-catalogs.png)
+
+After successful creation, users can use this model space to enhance and analyze SAP BW model data.
+
+### Query Lab
+
+MDX (Multidimensional Expressions) language is a query language for OLAP data sources, which helps users efficiently extract desired information from multidimensional data. In the Query Lab, users can use MDX query language to analyze data in SAP BW Cubes or Queries.
+
+By dragging the model to the **Table Structure** area, users can view the dimension and measure structure information of the model and drag the structure information to the editor to assist in writing MDX query statements.
+
+<div className="flex justify-center">
+  <figure class="">
+    <video controls width="550" autoplay="true" loop="true" alt="SAP BW Query Lab"
+    poster="/en/img/models/semantic-model-query-lab.png">
+      <source src="/en/img/models/semantic-model-query-lab-exec.webm" type="video/webm"/>
+    </video>
+    <figcaption>SAP BW Query Lab</figcaption>
+  </figure>
+</div>
+
+For more general functionalities, refer to the document [🧪Query Lab](../../../models/query-lab/).
+
+### Cube Semantic Enhancement
+
+For SAP BW Cubes or Queries, model enhancement can include the calculation of new measures and dimension members, modification of label descriptions, setting measure number formats, and assigning semantic types to dimensions, among other enhancement capabilities.
+
+![SAP BW Cube Semantic Enhancement](/public/en/img/models/semantic-model-cube.png)
+
+### Adding Calculated Members
+
+Calculated Members are new members calculated from existing dimensions and measures. They are not actual data stored in the Cube, but dynamically calculated during queries. Calculated Members can be used to process, integrate, and supplement raw data for better data understanding and decision-making.
+
+The reasons why we need calculated members are as follows:
+1. Data Complexity: Data in the model is usually complex and requires certain calculations and processing to better understand the data and make decisions.
+2. Real-time Data: In some cases, data needs to be calculated and analyzed based on real-time business needs, rather than relying solely on predefined indicators and measures.
+3. Business Flexibility: Models often need to be adjusted and customized based on different business needs and scenarios to better support business decisions and data analysis.
+
+![SAP BW Cube Calculated Members](/public/en/img/models/semantic-model-calculated-member.png)
+
+## Story Dashboard
+
+The Story Dashboard in Meta Analysis Cloud is an interactive data visualization tool that helps users present data in the form of charts, graphs, tables, and more, and supports data exploration and interactive analysis. The Story Dashboard provides a variety of data visualization components, including bar charts, line charts, pie charts, maps, etc. Users can simply drag and drop different data visualization components into the dashboard and configure and customize them.
+
+The Story Dashboard provides rich associative analysis features, including Input Controls, Filter Bars, and Slicers.
+
+Input Controls allow users to change the results of data analysis by selecting options or entering values. For example, users can use input controls to select a time range or product type for better data analysis. Input controls can take the form of dropdown menus, radio buttons, checkboxes, etc.
+
+Filter Bars and Slicers are tools used to filter and select data. They allow users to choose data based on different dimensions to better analyze the data. Filter Bars are usually displayed at the top or left side of the dashboard and can filter multiple dimensions simultaneously, while Input Controls are usually displayed next to specific data visualization components and can filter based on a single dimension. When using Filter Bars or Slicers, users can select one or more values or use the search function to find specific values.
+
+<div className="flex justify-center">
+  <figure class="">
+    <video controls width="550" autoplay="true" loop="true" alt="Story Dashboard with Direct SAP BW Model Connection">
+      <source src="/en/img/story/story-query-by-input-control.webm" type="video/webm"/>
+    </video>
+    <figcaption>Story Dashboard with Direct SAP BW Model Connection</figcaption>
+  </figure>
+</div>
+
+### Custom Chart Logic
+
+The Story Dashboard in Meta Analysis Cloud provides the ability to customize chart logic using JavaScript code, allowing users to implement additional functionality for their chart display requirements.
+
+Users can create their own chart logic script by selecting the **Custom** chart type.
+
+![Story Custom Chart Logic](/public/en/img/story/story-dashboard-custom-chart-code.png)
+
+For more details on custom chart types, refer to the document [Custom Chart](../../../widgets/analytical-card/custom/).
+
+### Calculations
+
+In the Story Dashboard, you can also create calculated members. Unlike the [calculated members in the semantic model](#adding-calculated-members), calculated members in the Story Dashboard are only valid within the current story. Various types of calculated members can be created in the Story Dashboard:
+
+* **Calculated Formula**: Calculate the value of a measure using MDX formulas, such as calculating percentages, growth rates, etc.
+* **Conditional Aggregation**: Aggregate data based on conditions, such as aggregating sales by region, time, product, etc.
+* **Restricted Measure**: Limit the calculation scope of a measure based on filtering conditions, such as calculating sales only within a certain time period or for a certain product.
+* **Difference From**: Calculate the difference between the current period measure value and another period measure value, such as calculating the difference or ratio between sales this month and sales last month.
+
+In addition to creating different types of calculated members separately, users can create another calculated member using an already created calculated measure, allowing for nested calculations to achieve complex logic calculations.
+
+Furthermore, when creating calculated members, users can use [parameters](../../../stories/parameter/) to control the input of calculation formulas and dynamically change the parameter values using input controls in the Story Dashboard for dynamic calculations.
+
+For more details, refer to the document [Calculated Measures](../../../stories/calculations/).
+
+## Summary
+
+In summary, using Meta Analysis Cloud to directly connect to SAP BW models for data analysis has the following advantages:
+
+* Fast Connection: By connecting to SAP BW using the XMLA protocol, the process of data integration and transformation is avoided, and data is directly retrieved from the SAP BW system, greatly reducing the time for users to analyze and retrieve data.
+* Flexible Querying: Using the MDX language for querying allows for flexible cross-dimensional analysis, complex calculations, and data aggregation, while also supporting advanced analysis features such as multidimensional analysis and associative analysis.
+* Fine-grained Access Control: Meta Analysis Cloud supports access control for semantic models, allowing for different levels of data access restrictions for different users or user groups, ensuring data security and privacy.
+* Diverse Presentations: Meta Analysis Cloud supports various data visualization methods, including bar charts, pie charts, line charts, tables, etc., and also allows for custom JavaScript code to extend and customize data visualization functionality and effects.
+

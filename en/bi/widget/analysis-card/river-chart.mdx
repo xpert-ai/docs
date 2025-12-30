@@ -1,74 +1,27 @@
 ---
-title: "河流图"
-description: "河流图用于展示数据随时间的变化，通过流动的图形展示趋势。"
+title: River Chart
+sidebar_position: 10
+tags:
+    - Time
 ---
 
+**River Chart** (Streamgraph), sometimes also called "**Theme River**", is a variation of stacked area charts that displays data changes over time for different categories through a "flowing" shape. Unlike stacked area charts, river charts do not plot data on a fixed, straight axis (the baseline of stacked charts is the x-axis), but instead distribute data to a changing central baseline (this baseline is not necessarily straight).
 
-# 河流图
+As can be seen from the composition of river charts, river charts use colors to distinguish different categories or additional quantitative values for each category, with the flow direction parallel to the X-axis representing time. The corresponding values for each category are displayed through the width of the "river". Changes in values for each category form streams of varying thickness that converge and intertwine, hence the name "river chart".
 
-## Overview
+## Creating a River Chart
 
-河流图用于展示数据随时间的变化，通过流动的图形展示趋势。
+Select the chart type as **River Chart**, and add one measure and two dimensions:
 
-## 适用场景
+1. The primary dimension should be a dimension with calendar semantic type. Calendar dimension members will be converted to standard time objects.
+2. The secondary dimension selects the dimension for member comparison.
 
-### 数据特点
+![Small](./theme-river-attributes.png)
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+The river chart display effect is as follows:
 
-### 使用场景
+![Middle Shadow](./theme-river.png)
 
-- 典型应用场景
-- 业务场景示例
+## 示例
 
-## 配置选项
-
-### 数据配置
-
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
-
-### 样式配置
-
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
-
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "河流图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
-
-## 最佳实践
-
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/point/9e67546d-b764-4a00-b4fe-a956c2095fa1" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

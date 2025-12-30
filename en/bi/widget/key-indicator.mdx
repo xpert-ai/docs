@@ -1,55 +1,29 @@
 ---
-title: "关键指标"
-description: "关键指标微件使用指南"
+title: Key Indicator
+sidebar_position: 5
 ---
 
+The **Key Indicator** component is typically used to display important business data, such as sales revenue, customer count, conversion rate, etc. They are usually presented in a concise form, including numbers and icons, to facilitate quick reading and understanding of information.
 
-# 关键指标
+Key indicators can obtain indicator values through the **Value** field, and can also add a **Target Value** field to compare the difference between the value and the target value.
 
-## Overview
+The key indicator component consists of one primary indicator and multiple other data indicators. If you want to list detailed multiple indicators, you can set other data indicators.
 
-关键指标微件用于展示重要的业务指标，以卡片形式突出显示关键数据，帮助用户快速了解业务状况。
-
-## Features
-
-- **指标展示**: 清晰展示关键业务指标
-- **趋势显示**: 显示指标变化趋势
-- **对比功能**: 支持与上期、去年同期对比
-- **样式定制**: 支持自定义卡片样式
-
-## Usage
-
-### 添加关键指标
-
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"关键指标"
-3. 选择要展示的指标
-4. 配置指标计算方式
-5. 设置对比基准
-6. 自定义样式
-7. 保存配置
-
-## 配置选项
-
-### 指标配置
-
-- **指标选择**: 选择要展示的指标
-- **计算方式**: 设置指标的计算方式
-- **时间范围**: 设置指标的时间范围
-
-### 对比配置
-
-- **对比类型**: 选择对比类型（环比、同比等）
-- **对比基准**: 设置对比基准期
-- **显示方式**: 设置对比结果的显示方式
-
-### 样式配置
-
-- **卡片样式**: 选择卡片样式
-- **颜色配置**: 设置指标颜色
-- **图标配置**: 设置指标图标
-
-## Related Documentation
-
-- [指标卡片](/en/数据分析平台/微件/指标卡片)
-- [指标表格](/en/数据分析平台/微件/指标表格)
+| Property | Description |
+| ----------- | ----------- |
+| Language Model | Select language model |
+| Model Entity | Select an entity "Multidimensional Dataset" from the language model |
+| Title | Title displayed for the indicator |
+| Value | Measure field of the indicator |
+| Target Value | Target value measure field of the indicator |
+| Other Data Indicators | Add multiple other data indicators with the same properties as the primary indicator |
+| **Properties** | |
+| Abbreviate Numbers | Whether to abbreviate indicator value number format |
+| Number Format | Indicator number display format, e.g., 0.0-2 represents a number format with thousand separators, minimum 0 decimal places, maximum 2 decimal places |
+| Unit | Unit of the indicator |
+| Unit Semantic | Semantic type of indicator unit: currency code, unit of measure... |
+| Show Deviation | Whether to show the deviation percentage between indicator value and target value |
+| Deviation Text | Text description of the displayed indicator deviation |
+| **Navigation** | |
+| Navigation Type | Story Point: Navigate to another story point page |
+| Page | Story point page selection |

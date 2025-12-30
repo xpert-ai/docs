@@ -1,21 +1,50 @@
 ---
-title: "高级切片器"
-description: "高级切片器功能说明"
+title: Advanced Slicer
+sidebar_position: 17
 ---
+The advanced slicer can perform complex slicing functions, typically calculating the corresponding dimension members based on contextual dimensions and measures. As shown in the figure below, it calculates the top 10 product dimension members by profit.
+
+:::tip
+
+Currently only supports **MDX model**
+
+:::
+
+## Advanced Slicer
+
+In actual operation, the advanced slicer will be merged into the runtime query context dimensions. As shown in the figure below, two dimensions are used: **Calendar Dimension** and **Product Dimension**. The calendar dimension is set to the **Quarter** level, and the product dimension is set to the **Brand** level. The advanced slicer settings for the **Product Dimension** at runtime will be merged into the product dimension, resulting in a query that calculates the top 10 brands by product profit for each quarter.
 
 
-# 高级切片器
+Combining with various forms of charts, you can perform various conditional analyses on multidimensional datasets.
 
-## Overview
+- **Context Dimension**: Which dimensions in the query context to perform advanced slicing operations on;
+- **Operator**: The function to operate on the context dimension, see the list below for details;
+- **Aggregate Other Items**: Aggregate all members outside the operator's calculation result into one dimension member, named `Other` as the technical name;
+- **Value**: The parameter limit value for the operator, some operators have a range (two values);
+- **Measure**: The measure through which the operator compares with the value to calculate the result set;
 
-高级切片器是故事仪表盘功能的重要组成部分。
+List of optional operators:
 
-## 功能说明
+| Name        | English Name  | Aggregate Other Items | Description                              |
+| ----------- | ------------- | --------------------- | ---------------------------------------- |
+| Equal       | Equal         |                       | Members with measure values equal to     |
+| Not Equal   | NotEqual      |                       | Members with measure values not equal to |
+| Less Than   | LessThan      |                       | Members with measure values less than    |
+| Greater Than| GreaterThan   |                       | Members with measure values greater than |
+| Less Equal  | LessEqual     |                       | Members with measure values less or equal|
+| Greater Equal| GreaterEqual |                       | Members with measure values greater or equal|
+| Between     | Between       |                       | Members with measure values between      |
+| Not Between | NotBetween    |                       | Members with measure values not between  |
+| Top N       | TopCount      | ✔️                    | Top N members by descending measure value|
+| Bottom N    | BottomCount   | ✔️                    | Bottom N members by descending measure value|
+| Top Percent | TopPercent    | ✔️                    | Top percentage of members by descending measure value|
+| Bottom Percent| BottomPercent| ✔️                   | Bottom percentage of members by descending measure value|
+| Top Sum     | TopSum        | ✔️                    | Members whose sum of descending measure values is not more than|
+| Bottom Sum  | BottomSum     | ✔️                    | Members whose sum of descending measure values is not more than|
 
-此功能正在完善中，更多详细信息即将推出。
+## Value Parameters
 
-## Related Documentation
+To more flexibly control the values of advanced slicer operation functions, **parameters** can be used to control their values, allowing users to freely and flexibly choose the conditions to query.
 
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+
+For more details on parameters, please refer to [Parameters](../parameter/).

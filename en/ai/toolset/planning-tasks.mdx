@@ -1,32 +1,47 @@
 ---
-title: "规划任务"
-description: "规划任务管理指南"
+title: Planning Tasks
+sidebar_position: 7
 ---
 
+## Toolkit Introduction
 
-# 规划任务
+The planning toolkit provides AI agent teams with task planning and execution capabilities. By invoking the following four tool methods, agents can create, manage, update, and delete task plans, executing them step-by-step to achieve more efficient and intelligent automated workflows.
 
-## Overview
+## 1. create_plan
 
-规划任务功能用于规划和管理任务的执行计划，支持复杂的任务规划逻辑。
+* **Function:** Create a new task plan.
+* **Parameters:** 
+    * `title` (string): The title of the plan.
+    * `steps` (list): A list of plan steps, each containing information such as step descriptions.
+* **Return Value:** Returns the plan ID on success, or an error message on failure.
 
-## Features
+## 2. list_plans
 
-- **任务规划**: 规划任务执行计划
-- **依赖管理**: 管理任务之间的依赖关系
-- **资源分配**: 分配任务资源
-- **进度跟踪**: 跟踪任务执行进度
+* **Function:** List all created task plans.
+* **Parameters:** None
+* **Return Value:** Returns a list of all plans, including plan ID, name, creation time, and other details.
 
-## 创建规划任务
+## 3. update_plan_step
 
-1. 进入规划任务页面
-2. 创建任务计划
-3. 添加任务节点
-4. 配置任务依赖
-5. 设置执行条件
-6. 保存规划
+* **Function:** Update a specific step in a task plan.
+* **Parameters:** 
+    * `step_index` (number): The index of the step to update.
+    * `new_step_info` (dictionary): The new step information, such as step description.
+* **Return Value:** Returns the updated step information on success, or an error message on failure.
 
-## Related Documentation
+## 4. delete_plan_step
 
-- [定时任务](/en/智能体AI 平台/工具集/定时任务)
-- [工作流](/en/智能体AI 平台/工作流/智能体)
+* **Function:** Delete a specific step from a task plan.
+* **Parameters:** 
+    * `step_index` (number): The index of the step to delete.
+* **Return Value:** Returns the ID of the deleted step on success, or an error message on failure.
+
+## Use Cases
+
+* **Project Management:** Agents can create task plans based on project requirements, assign them to different agents for execution, and monitor project progress in real-time.
+* **Process Automation:** Automate highly repetitive and rule-based workflows, such as data cleaning, report generation, etc.
+* **Intelligent Decision-Making:** Combine with other AI tools, such as data analysis or predictive models, for smarter decision-making and planning.
+
+## Summary
+
+The planning toolkit enhances the Xpert AI platform with robust task planning and execution capabilities, empowering your AI agent team to achieve more efficient and intelligent automated workflows.

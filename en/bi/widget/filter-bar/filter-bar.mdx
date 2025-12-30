@@ -1,0 +1,70 @@
+---
+title: Filter Bar
+sidebar_position: 3
+---
+
+The **Filter Bar** is an important part of BI reports, allowing users to filter and screen report data. Typically, the filter bar is located at the top or sidebar of the report and can use different conditions and parameters to filter data, such as date ranges, regions, product types, etc. The filter bar allows users to more easily view the data they need and reduce noise in reports. Filter bars can control different levels of filtering conditions depending on their location:
+
+* [Global Filter Bar](#global-filter-bar)
+* [Page Filter Bar](#page-filter-bar)
+
+## Global Filter Bar
+
+Each story dashboard has a global filter bar, but without configuration, there are no filtering conditions. On the left edge of the story dashboard page, click the expand button to open the global filter bar. Click the filter bar to set detailed properties in the property settings panel on the right. Specific property configuration is the same as [Page Filter Bar](#page-filter-bar).
+
+*Hide Global Filter*: Open story **Preferences** -> **Details** => Check **Hide Global Filter**.
+
+## Page Filter Bar
+
+Adding a filter bar component within a page can filter only the current page.
+
+Click "**Filter Bar**" in the toolbar's insert area to create a filter bar component on the current page. Select the filter bar component, choose data source and model in the property editing panel on the right, then add dimensions.
+Added dimensions have the following types:
+
+* **Member Dimension**
+* **Calendar Dimension**
+
+After adding dimensions, corresponding dimension member selection components will appear in the filter bar component, and the program will automatically determine which member selection component to use. If you want to change the member selection component for a dimension, select this component, then change **Controller Type** in the property editing panel to the following types:
+
+* Tree Selector
+* Member Selector
+* Dropdown Selector
+* Calendar Selector
+
+### Tree Selector
+
+The [Tree Selector](./tree-select/) displays dimension members as a tree-structured list for user selection.
+
+![Tiny Shadow](./tree-select.png)
+
+### Member Selector
+
+The [Member Selector](./member-select/) displays dimension members as a dropdown list for user selection, and can also select dimension members through a search help window.
+
+### Dropdown Selector
+
+The [Dropdown Selector](./dropdown-select/) displays dimension members or user-defined members as a dropdown list for user selection. Users can select one or more members.
+
+### Calendar Selector
+
+The [Calendar Selector](./calendar-select/) component uses a calendar selector to input time or time range, then converts it to corresponding dimension member key values.
+
+## Filter Bar Settings
+
+Property settings for the filter bar component:
+
+* **Real-time Query**: Perform real-time query immediately after selecting dimension members, no need to click the **Query** button;
+* **Cascade Linkage**: Enable cascading filtering between filter components within the filter bar;
+* **Cascade Type**: Linkage type between filters, can also individually set whether to enable cascade linkage for a filter
+  - **From Front to Back**: All filter conditions before the current filter serve as the current filter conditions;
+  - **All**: All filter conditions except the current filter serve as the current filter conditions;
+  - **Default**: No filtering by default;
+* **Current Time Input**: Enable current time input controller, can select time to modify the current time of the global context, which affects all filtering conditions that depend on the user's current time;
+* **Time Granularity**: Set the time granularity of the current time controller;
+* **Granularity Sequence**: Set the selectable time granularity sequence for the current time controller;
+* **Default Date Function**: Default time function;
+* **Default Date**: Default time function name or enter a fixed time in the format `yyyy-MM-dd`
+
+## 示例
+
+<iframe src="https://app.mtda.cloud/public/story/point/3585a992-a605-4da3-ba77-1c48ecfc3c19" width="100%" height="1000px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

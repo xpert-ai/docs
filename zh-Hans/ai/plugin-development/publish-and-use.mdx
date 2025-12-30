@@ -1,19 +1,44 @@
 ---
-title: "发布与使用"
-description: "发布与使用指南"
+sidebar_position: 5
+title: 发布与使用
 ---
 
-# 发布与使用
+插件开发完成后，最后一步是发布到 npm 并在宿主系统（Xpert AI）中启用。
 
-## 概述
+## 发布插件
 
-发布与使用是插件开发的重要组成部分。
+在 monorepo 根目录执行：
 
-## 内容
+```bash
+# 构建插件
+npx nx build my-plugin
 
-此文档正在完善中，更多详细信息即将推出。
+# 使用 monorepo 的 release 流程
+npx nx release
 
-## 相关文档
+# 或者手动发布到 npm
+npx nx run @xpert-ai/my-plugin:nx-release-publish --access public --otp=<one-time-password-if-needed>
+```
 
-- [概述](/zh-cn/智能体AI 平台/插件开发/概述)
-- [插件开发](/zh-cn/智能体AI 平台/插件开发)
+发布成功后，你会在 npm 上得到一个可安装的包，例如：
+
+```
+@xpert-ai/my-plugin
+```
+
+## 使用插件
+
+在 Xpert AI 宿主系统中，通过环境变量 `PLUGINS` 来声明启用的插件列表。多个插件用逗号分隔：
+
+```bash
+PLUGINS=@xpert-ai/my-plugin1,@xpert-ai/my-plugin2
+```
+
+当宿主启动时，会自动解析 `PLUGINS` 环境变量并按顺序加载这些插件。
+
+**注意事项**：
+
+* 宿主项目通过 npm/yarn/pnpm 安装（`npm install @xpert-ai/my-plugin`） 环境变量中配置插件包列表。
+* 插件的 `meta.name` 必须与 npm package name 保持一致。
+* 如果插件未能正确加载，请检查日志中是否有 `register` 或 `onPluginBootstrap` 的输出。
+* 在启动XpertAI系统后在系统设置[插件页面](https://app.mtda.cloud/settings/plugins)中查看已加载的插件列表。

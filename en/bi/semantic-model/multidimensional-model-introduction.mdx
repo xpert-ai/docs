@@ -1,72 +1,148 @@
 ---
-title: "多维模型介绍"
-description: "多维模型介绍和使用指南"
+title: Multidimensional Models
+sidebar_position: 1
 ---
 
+**Multidimensional models** are models that associate multiple dimension tables with a fact table as the basis, separating dimension data from fact data for enhanced analytical capabilities.
 
-# 多维模型介绍
+> Multidimensional models consist of cubes and dimensions, which can be annotated and extended to support complex query construction. Business Intelligence (BI) developers create cubes to support quick responses and provide a single data source for business reporting. Given the increasing importance of business intelligence across various levels of an organization, using a single analytical data source ensures minimizing differences (if differences cannot be completely eliminated).
 
-## Overview
+### Noun Explanations:
 
-语义模型是数据分析平台的核心功能之一，用于理解和处理自然语言查询，将用户的问题转换为可执行的数据分析任务。多维模型是语义模型的重要组成部分，用于构建和管理多维数据立方体，支持复杂的OLAP查询和分析。
+* Cube (多维数据集)
+* Dimension (维度)
+* Shared Dimension (共享维度)
+* Hierarchy (层次结构)
+* Level (层级)
+* Measure (度量)
+* Dimension Member (维度成员)
+* Calculated Member (计算成员)
+* Virtual Cube (虚拟数据集)
+* Role (角色)
 
-## 什么是多维模型
+## Dimensions
 
-多维模型是一种数据组织方式，将数据按照多个维度（如时间、地区、产品等）进行组织，形成一个数据立方体结构。这种结构使得数据分析更加直观和高效。
+> Database dimensions are collections of related objects (referred to as attributes) used to provide information about the fact data in one or more cubes. For example, typical attributes in a product dimension might include product name, product category, product line, product specifications, and product price. These objects are bound to one or more columns in one or more tables of the data source view. By default, these attributes, like attribute hierarchies, are visible and used to understand the fact data in cubes. Attributes can be organized into user-defined hierarchies to provide navigation paths to help users browse the data in cubes.
 
-### 核心概念
+> Cubes contain all the dimensions upon which users analyze fact data. An instance of a database dimension in a multidimensional dataset is called a multidimensional dataset dimension, and it is associated with one or more sets of measure values in the multidimensional dataset. Database dimensions can be used multiple times in a multidimensional dataset. For example, a fact data table might have multiple fact data related to time, and separate multidimensional dataset dimensions can be defined to analyze each fact data related to time. However, only one database dimension related to time needs to exist, which also means only one relationship database table related to time is required to support multiple time-based multidimensional dataset dimensions.
 
-- **维度（Dimension）**: 数据的观察角度，如时间、地区、产品类别等
-- **度量（Measure）**: 要分析的数值，如销售额、订单量等
-- **层次结构（Hierarchy）**: 维度内的层级关系，如年-季度-月-日
-- **数据立方体（Cube）**: 多维数据的存储结构
+### Hierarchy
 
-## 主要特性
+Hierarchies are used to organize dimension members into a hierarchical structure and provide navigation paths in cubes. For example, the table below defines the dimension table for the time dimension. The dimension table supports three attributes: year, quarter, and month.
 
-- **多维度分析**: 支持从多个维度同时分析数据
-- **快速查询**: 预计算的数据结构，查询速度快
-- **灵活钻取**: 支持上卷（Roll-up）、下钻（Drill-down）、切片（Slice）等操作
-- **可视化展示**: 支持多种图表展示方式
-- **自然语言理解**: 能够理解用户的自然语言查询
+| Year  | Quarter    | Month  |
+|-------|------------|--------|
+| 1999  | Q1         | January|
+| 1999  | Q1         | February|
+| 1999  | Q1         | March   |
+| 1999  | Q2         | April     |
+| 1999  | Q2         | May       |
+| 1999  | Q2         | June      |
+| 1999  | Q3         | July       |
+| 1999  | Q3         | August  |
+| 1999  | Q3         | September|
+| 1999  | Q4         | October |
+| 1999  | Q4         | November|
+| 1999  | Q4         | December|
 
-## 快速开始
+A user-defined hierarchy (calendar) is constructed using the attributes year, quarter, and month to form the time dimension. The relationships between levels and members of the "Calendar" dimension (regular dimension) are illustrated in the relationship diagram below:
 
-### 创建多维模型
+![Middle](https://docs.microsoft.com/zh-cn/analysis-services/multidimensional-models-olap-logical-dimension-objects/media/as-levelconcepts.png?view=sql-analysis-services-2022)
 
-1. 进入语义模型页面
-2. 点击"新建多维模型"按钮
-3. 选择数据源
-4. 定义维度和度量
-5. 设置层次结构
-6. 保存并发布模型
+### Parent-Child Hierarchy
 
-### 基本使用示例
+A dimension's parent-child hierarchy is defined by using a special attribute (called the parent attribute) to determine the relationships between members. The parent attribute is used to explain self-referencing relationships or self-joins within the main dimension table. Parent-child hierarchies are constructed based on a single parent attribute. The levels appearing in the hierarchy are formed by parent-child relationships between members associated with the parent attribute, thus only assigning one level to a parent-child hierarchy. The dimension architecture of a parent-child hierarchy relies on self-referencing relationships provided in the main dimension table.
 
+![Hierarchy](https://docs.microsoft.com/zh-cn/analysis-services/multidimensional-models/media/dimorganization.png?view=sql-analysis-services-2022)
+
+In this dimension table, the ParentOrganizationKey column is related to the OrganizationKey primary key column. In other words, each record in this table can be associated with other records in this table through parent-child relationships. This self-join is commonly used to represent hierarchical data within entities, such as employee management structures within a department.
+
+When creating a parent-child hierarchy, the two attributes representing columns must have the same data type and must be in the same table. By default, any member's parent key, whether equal to its own member key, empty, 0, or a value not appearing in the member key column, is considered a top-level member (excluding the "(All)" level).
+
+### Dimension Members
+
+Dimension members are points within a dimension determined by specific attribute values. For example, a gender hierarchy has two members, 'M' and 'F'. "San Francisco", "California", and "USA" are members of the store hierarchy.
+
+Note that entities like "San Francisco", "California", and "USA", although they have a hierarchical relationship, are all members within the store hierarchy, meaning they are statistically analyzed based on different levels of stores they belong to.
+
+## Cubes
+
+> Cubes are multidimensional structures containing information for analysis; they primarily consist of dimensions and measure values. Dimensions define the structure of the multidimensional dataset on which slicing operations are performed, while measure values provide aggregated numerical values of interest to end-users. As a logical structure, cubes allow client applications to retrieve values of measure values as if they were contained within the cells of the multidimensional dataset; a cell is defined for each possible summary value. Cells in cubes are defined by intersections of dimension members and contain aggregated values of measures at that specific intersection.
+
+> Cubes provide a single location to store all relevant data for analysis purposes.
+
+## Measures
+
+> Measures represent a column containing measurable data (usually numeric) that can be aggregated. Measures represent aspects of organizational activities expressed in monetary terms (such as revenue, profit, or cost), by count (inventory levels, number of employees, customers, or orders), or by more complex calculations based on business logic.
+
+> Each multidimensional dataset must have at least one measure, although most have many measures, sometimes reaching hundreds. Structurally, measures typically map to source columns in fact data tables, which provide values used to populate measures. Alternatively, you can define measures with MDX.
+
+> Measures are context-sensitive, operating on numerical data in the context determined by any dimension members coincidentally included in the query. For example, computing the "Distributor Sales" measure would be supported by the Sum operator and would aggregate sales for each dimension member included in the query. Whether the query specifies a single product, aggregates to a category, or slices by time or geography, the measure should produce operations relevant
+
+ to the dimensions included in the query.
+
+## Calculated Members
+
+Calculated members are measures whose values are calculated using a set calculation expression. Calculated members provide flexible calculation capabilities to multidimensional models, enabling rich functionality.
+
+## MDX
+
+### 1. Core Advantages of MDX Compared to SQL
+
+| Dimension        | MDX Advantages                                      | Compared to SQL                     |
+|------------------|--------------------------------------------------|-----------------------------|
+| Multidimensional Modeling | Designed for multidimensional data (OLAP Cube)     | SQL is for relational 2D tables, lacks native multidimensional support |
+| Time Intelligence | Native support for time hierarchies (e.g., YTD, QTD, Moving Avg) | SQL requires complex custom window functions or subqueries |
+| Dimension Hierarchies | Direct access to hierarchies (e.g., Year → Quarter → Month) | SQL requires manual hierarchy maintenance |
+| Aggregation Expressiveness | Supports complex dimension member aggregation (e.g., `Aggregate`, `YTD`, `PeriodToDate`) | SQL limited to `GROUP BY` aggregation |
+| Calculated Members | Dynamically creates calculated members with flexible logic | SQL calculated fields limited by table structure and aggregation |
+| Context Switching | Automatically adjusts context based on row/column coordinates (Slicer/Axis) | SQL lacks context concept, requires manual filter management |
+
+### 2. Example Comparison
+
+#### 🎯 Business Requirement:
+
+**Calculate yearly cumulative sales (YTD) for the "Mountain Bike" product category in the "West" region**
+
+#### 🔸 SQL Implementation (Simplified):
+
+```sql
+SELECT
+  YEAR(OrderDate) AS [Year],
+  SUM(SalesAmount) OVER (PARTITION BY YEAR(OrderDate) ORDER BY OrderDate ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS YTD_Sales
+FROM Sales
+WHERE Region = 'West' AND ProductCategory = 'Mountain Bike'
 ```
-用户输入: "显示上个月的销售额"
-语义模型解析: SELECT SUM(amount) FROM sales WHERE month = LAST_MONTH
+
+* SQL requires explicit time windows, filter fields, and grouping logic.
+* Not easily reusable or dimension-switchable.
+
+#### 🔹 MDX Implementation:
+
+```mdx
+WITH 
+MEMBER [Measures].[YTD Sales] AS 
+    YTD([Order Date].[Calendar].CurrentMember), [Measures].[Sales Amount]
+
+SELECT 
+  {[Measures].[YTD Sales]} ON COLUMNS,
+  {[Order Date].[Calendar].[Year].Members} ON ROWS
+FROM [Sales]
+WHERE (
+  [Product].[Category].[Mountain Bike],
+  [Geography].[Region].[West]
+)
 ```
 
-## 使用场景
+* Uses `YTD()` for direct time hierarchy accumulation, no window functions needed.
+* `WHERE` slicer automatically adjusts context.
+* Easily extensible to other dimensions or hierarchies (e.g., quarter, month).
 
-- **销售数据分析**: 按时间、地区、产品等维度分析销售数据
-- **财务数据分析**: 多维度财务指标分析
-- **运营数据分析**: 用户行为、业务指标等多维度分析
-- **业务指标监控**: 实时监控关键业务指标
+### 3. Use Case Comparison Summary:
 
-## 模型类型
-
-### SQL多维模型
-
-基于SQL查询的多维模型，适合关系型数据库。
-
-### MDX多维模型
-
-基于MDX（Multidimensional Expressions）的多维模型，提供更强大的多维查询能力。
-
-## 相关功能
-
-- [管理语义模型](/en/数据分析平台/语义模型/管理语义模型)
-- [语义建模Workspace](/en/数据分析平台/语义模型/语义建模工作空间)
-- [查询实验室](/en/数据分析平台/语义模型/查询实验室)
-- [维度设计器](/en/数据分析平台/语义模型/维度设计器)
+| Scenario                     | Recommended Language | Reason                     |
+|-----------------------------|--------------------|---------------------------|
+| Raw Transaction Data Operations | SQL               | Efficient for detailed data, transactional queries |
+| Multidimensional Analysis (e.g., Cube Reports, OLAP) | MDX               | Stronger in dimension navigation, hierarchy aggregation, calculated members |
+| Building BI Reports, Dashboard Indicators | MDX               | Easier for KPI expression, time intelligence analysis |
+| Data Warehouse ETL          | SQL               | Structured data processing, cleaning, merging |

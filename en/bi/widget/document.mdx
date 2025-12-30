@@ -1,61 +1,22 @@
 ---
-title: "文档"
-description: "文档微件使用指南"
+title: Document
+sidebar_position: 10
 ---
 
+The document component uses the [TinyMCE](https://github.com/tinymce/tinymce) library for editing and displaying rich text online.
 
-# 文档
+In the story editing interface, click "**Document**" in the toolbar's insert area to create a document (rich text) component on the current page. After selecting this component, edit its settings in the property editing panel on the right:
 
-## Overview
+## Data Configuration
 
-文档微件用于在故事仪表盘中展示文档内容，支持多种文档格式，如PDF、Word、Markdown等。
+Configure **data source** and **model** for calculating indicator results inserted into the document.
 
-## Features
+Insert indicators from the configured model into the document using the format `{{[#INDICATOR_CODE]}}`. When previewing or displaying, the system will automatically calculate the corresponding data results and display them in the appropriate location.
 
-- **多格式支持**: 支持PDF、Word、Markdown等格式
-- **文档预览**: 支持文档预览功能
-- **文档下载**: 支持文档下载功能
-- **搜索功能**: 支持文档内容搜索
+## Style
 
-## Usage
+Style configuration includes general component style settings.
 
-### 添加文档
+## 示例
 
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"文档"
-3. 上传或选择文档
-4. 配置文档选项
-5. 设置显示方式
-6. 保存配置
-
-## 支持的格式
-
-### PDF文档
-
-- 支持PDF文件预览
-- 支持PDF页面导航
-- 支持PDF缩放
-
-### Word文档
-
-- 支持Word文档预览
-- 支持文档格式保持
-
-### Markdown文档
-
-- 支持Markdown渲染
-- 支持代码高亮
-- 支持数学公式
-
-## 配置选项
-
-### 显示配置
-
-- **显示方式**: 选择显示方式（预览、下载链接等）
-- **预览大小**: 设置预览区域大小
-- **工具栏**: 显示/隐藏工具栏
-
-## Related Documentation
-
-- [文本](/en/数据分析平台/微件/文本)
-- [图片](/en/数据分析平台/微件/图片)
+<iframe src="https://app.mtda.cloud/public/story/point/3869d5fb-6ecb-4981-998b-60331a62ee0b" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

@@ -1,31 +1,287 @@
 ---
-title: "飞书文档源策略"
-description: "飞书文档源策略配置指南"
+sidebar_position: 5
+title: 飞书文档源策略
 ---
 
-# 飞书文档源策略
+`LarkSourceStrategy` 主要负责 **文档源加载逻辑**，即从飞书文档 API 获取文件夹、文档数据，并转化为统一的 `Document` 对象，供 **知识库 / AI 向量化** 使用。
 
-## 概述
+完整代码如下（省略 import 部分）：
 
-飞书文档源策略用于定义如何从飞书系统中获取文档，包括文档选择、过滤、排序等策略。
+```ts
+@DocumentSourceStrategy(LarkName)
+@Injectable()
+export class LarkSourceStrategy implements IDocumentSourceStrategy<LarkDocumentsParams> {
+  readonly permissions = [
+    {
+      type: 'integration',
+      service: LarkName,
+      description: 'Access to Lark system integrations'
+    } as IntegrationPermission
+  ]
 
-## 功能特性
+  readonly meta: IDocumentSourceProvider = {
+    name: LarkName,
+    category: DocumentSourceProviderCategoryEnum.OnlineDocument,
+    label: {
+      en_US: 'Lark Documents',
+      zh_Hans: '飞书文档'
+    } as I18nObject,
+    configSchema: {
+      type: 'object',
+      properties: {
+        folderToken: {
+          type: 'string',
+          title: { en_US: 'Folder Token', zh_Hans: '文件夹 Token' },
+          description: { en_US: 'The folder token to fetch documents from.', zh_Hans: '从中获取文档的文件夹 Token。' }
+        },
+        types: {
+          type: 'array',
+          title: { en_US: 'Document Types', zh_Hans: '文档类型' },
+          description: { en_US: 'The types of document to fetch.', zh_Hans: '要获取的文档类型。' },
+          default: ['docx'],
+          items: {
+            type: 'string',
+            enum: ['doc', 'sheet', 'mindnote', 'bitable', 'file', 'docx', 'folder', 'shortcut']
+          },
+          uniqueItems: true,
+          minItems: 0
+        }
+      },
+      required: ['folderToken']
+    },
+    icon: {
+      type: 'image',
+      value: iconImage,
+      color: '#4CAF50'
+    }
+  }
 
-- **文档选择**: 选择要获取的文档
-- **过滤策略**: 配置文档过滤规则
-- **排序策略**: 配置文档排序方式
-- **批量获取**: 支持批量获取文档
+  async validateConfig(config: LarkDocumentsParams): Promise<void> {
+    if (!config.folderToken) {
+      throw new Error('Folder Token is required')
+    }
+  }
 
-## 配置步骤
+  test(config: LarkDocumentsParams): Promise<any> {
+    throw new Error('Method not implemented.')
+  }
 
-1. 进入飞书文档源策略配置
-2. 选择文档来源
-3. 配置过滤条件
-4. 设置排序规则
-5. 配置获取参数
-6. 保存策略
+  async loadDocuments(config: LarkDocumentsParams, context?: { integration: IIntegration }): Promise<Document[]> {
+    const integration = context?.integration
+    if (!integration) {
+      throw new Error('Integration system is required')
+    }
 
-## 相关文档
+    await this.validateConfig(config)
 
-- [飞书系统集成](/zh-cn/智能体AI 平台/插件开发/插件示例: 飞书文档/飞书系统集成)
-- [飞书文档转换策略](/zh-cn/智能体AI 平台/插件开发/插件示例: 飞书文档/飞书文档转换策略)
+    const client = new LarkClient(integration)
+    const children = await client.listDriveFiles(config.folderToken)
+
+    const documents: Document[] = children
+      .filter((item) => config.types ? config.types.includes(item.type) : true)
+      .map((item) => {
+        return new Document({
+          id: item.token,
+          pageContent: `${item.name}\n${item.url}`,
+          metadata: {
+            ...item,
+            chunkId: item.token,
+            title: item.name,
+            url: item.url,
+            createdAt: item.created_time
+          }
+        })
+      })
+
+    return documents
+  }
+
+  async loadDocument?(document: Document, context: { integration?: IIntegration }): Promise<Document> {
+    const integration = context?.integration
+    if (!integration) {
+      throw new Error('Integration system is required')
+    }
+
+    const client = new LarkClient(integration)
+    const content = await client.getDocumentContent(document.id)
+
+    return new Document({
+      id: document.id,
+      pageContent: content,
+      metadata: {
+        id: document.id,
+        title: `Lark Document ${document.id}`
+      }
+    })
+  }
+}
+```
+
+---
+
+## 1. 类声明与装饰器
+
+```ts
+@DocumentSourceStrategy(LarkName)
+@Injectable()
+export class LarkSourceStrategy implements IDocumentSourceStrategy<LarkDocumentsParams>
+```
+
+* **`@DocumentSourceStrategy(LarkName)`**
+  将该类注册为 **文档源策略**，对应的 provider 名称是 `LarkName`（即 "lark"）。
+  Xpert AI 系统会自动识别并调用它。
+
+* **`@Injectable()`**
+  允许该类被依赖注入（NestJS 标准用法）。
+
+* **实现接口**：`IDocumentSourceStrategy<LarkDocumentsParams>`
+  确保类提供 `validateConfig`、`loadDocuments` 等必要方法。
+
+---
+
+## 2. 权限定义
+
+```ts
+readonly permissions = [
+  {
+    type: 'integration',
+    service: LarkName,
+    description: 'Access to Lark system integrations'
+  } as IntegrationPermission
+]
+```
+
+说明：
+
+* 插件在运行时需要 **访问飞书集成信息**（AppID、Secret 等）。
+* 系统会校验用户是否授权该插件访问飞书。
+
+---
+
+## 3. 元信息定义
+
+```ts
+readonly meta: IDocumentSourceProvider = {
+  name: LarkName,
+  category: DocumentSourceProviderCategoryEnum.OnlineDocument,
+  label: { en_US: 'Lark Documents', zh_Hans: '飞书文档' },
+  configSchema: { ... },
+  icon: { type: 'image', value: iconImage, color: '#4CAF50' }
+}
+```
+
+* **name/category**：标识这是一个 **在线文档类文档源**。
+* **label**：UI 显示名称（中英文）。
+* **configSchema**：定义用户需要配置的参数：
+
+  * `folderToken`：文件夹 Token（必填）。
+  * `types`：要加载的文档类型数组，默认 `docx`。
+* **icon**：在 UI 中显示的插件图标。
+
+---
+
+## 4. 配置校验
+
+```ts
+async validateConfig(config: LarkDocumentsParams): Promise<void> {
+  if (!config.folderToken) {
+    throw new Error('Folder Token is required')
+  }
+}
+```
+
+* 检查 `folderToken` 是否存在。
+* 如果用户没配置文件夹 Token，直接抛出错误。
+
+---
+
+## 5. 文档加载方法
+
+```ts
+async loadDocuments(config: LarkDocumentsParams, context?: { integration: IIntegration }): Promise<Document[]> {
+  const integration = context?.integration
+  if (!integration) {
+    throw new Error('Integration system is required')
+  }
+
+  await this.validateConfig(config)
+
+  const client = new LarkClient(integration)
+  const children = await client.listDriveFiles(config.folderToken)
+
+  const documents: Document[] = children
+    .filter((item) => config.types ? config.types.includes(item.type) : true)
+    .map((item) => {
+      return new Document({
+        id: item.token,
+        pageContent: `${item.name}\n${item.url}`,
+        metadata: {
+          ...item,
+          chunkId: item.token,
+          title: item.name,
+          url: item.url,
+          createdAt: item.created_time
+        }
+      })
+    })
+
+  return documents
+}
+```
+
+逻辑步骤：
+
+1. 检查是否有集成信息（integration），没有则报错。
+2. 校验配置（必须有 `folderToken`）。
+3. 初始化 `LarkClient`，调用 `listDriveFiles(folderToken)` 获取文件夹内容。
+4. 根据 `types` 过滤需要的文档类型。
+5. 把每个文档转化为 **LangChain 的 `Document` 对象**：
+
+   * `id`：文档 token
+   * `pageContent`：文档标题和 URL
+   * `metadata`：附加信息（token、title、url、创建时间）
+
+> ✅ 这里的输出是一个文档列表，每个文档仅包含 **基本信息和链接**。
+
+---
+
+## 6. 单文档加载
+
+```ts
+async loadDocument?(document: Document, context: { integration?: IIntegration }): Promise<Document> {
+  const integration = context?.integration
+  if (!integration) {
+    throw new Error('Integration system is required')
+  }
+
+  const client = new LarkClient(integration)
+  const content = await client.getDocumentContent(document.id)
+
+  return new Document({
+    id: document.id,
+    pageContent: content,
+    metadata: {
+      id: document.id,
+      title: `Lark Document ${document.id}`
+    }
+  })
+}
+```
+
+作用：
+
+* 在需要时，进一步 **加载单个文档的正文内容**。
+* 使用 `getDocumentContent(docToken)` 获取文档的完整内容。
+* 返回一个新的 `Document` 对象，`pageContent` 就是文档正文。
+
+---
+
+## 7. 设计思路总结
+
+* **`permissions`**：声明依赖于飞书集成权限。
+* **`meta`**：提供 UI 配置 Schema，定义如何输入 folderToken 和文档类型。
+* **`validateConfig`**：确保配置有效。
+* **`loadDocuments`**：获取文件夹下的文档列表，生成文档清单。
+* **`loadDocument`**：按需获取单个文档的正文内容。
+
+整个逻辑相当于把 **飞书 Drive API** 的数据结构，转化成 **LangChain 的 Document 对象**，为后续 AI 知识库处理做准备。

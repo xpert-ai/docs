@@ -1,106 +1,27 @@
 ---
-title: "Share"
-description: "故事Share和协作功能指南"
+title: 📤 Share
+sidebar_position: 18
 ---
+**Dashboard Sharing Feature** in Xpert Analysis Cloud allows users to share their created dashboards with other users so that others can view and interactively explore the content of the dashboard.
 
+The sharing feature provides the following methods:
 
-# Share
+* Share Link: Users can generate a share link and send it to others. These people can use the link to directly access the dashboard.
+* Embed Code: Users can obtain an embed code and embed it into their own web pages or applications to display the dashboard within their applications.
 
-## Overview
+There are three levels of content sharing for stories:
 
-Share功能允许您将创建的故事Share给团队成员或其他用户，支持多种Share方式和权限控制。
+* Story Level: Share the link 🔗 of the entire story, and the linked webpage will present the complete story content to the user.
+  * Click the share menu in the story designer toolbar, select share, and obtain the link and embed code in the pop-up share wizard window.
+* Story Point Level: Generate a link to share a single story point page, and the webpage will only display the content of the current story point page.
+  * Click the more button on the story point page tab to pop up the edit menu, click the share button to open the story point share wizard window, and obtain the link and embed code.
+* Story Widget Level: You can also share or embed a single story widget, and the webpage will only display the content of a single story widget.
+  * Click the share button in the menu of a single story widget to open the story widget share wizard window and obtain the link and embed code.
 
-## Share方式
+Permission settings:
 
-### 公开链接
+* Public: Anyone can access the shared content through a separate public link.
+* Internal: Users share with users who have permission to access.
+  * Key: Users can set a sharing key, and only those who know the key can access the shared content. The sharing key can be set to expire, after which the shared content will no longer be accessible.
 
-生成公开链接，任何人都可以通过链接访问故事：
-- 适合公开的数据分析报告
-- 无需登录即可访问
-- 可以设置访问密码
-
-### 私有链接
-
-生成私有链接，只有有权限的用户才能访问：
-- 需要登录验证
-- 可以设置Access Permission
-- 适合内部团队使用
-
-### 嵌入代码
-
-生成嵌入代码，可以将故事嵌入到其他网站或应用中：
-- 支持iframe嵌入
-- 可以自定义尺寸
-- 保持响应式布局
-
-## Share设置
-
-### Access Permission
-
-- **公开**: 所有用户都可以访问
-- **私有**: 仅指定用户可以访问
-- **密码保护**: 需要输入密码才能访问
-
-### Share范围
-
-- **所有人**: 任何人都可以访问
-- **组织内**: 仅组织内用户可以访问
-- **指定用户**: 指定特定用户或用户组
-
-### 有效期设置
-
-- **永久有效**: 链接永久有效
-- **限时有效**: 设置链接的有效期
-- **访问次数限制**: 限制链接的访问次数
-
-## 协作功能
-
-### 评论功能
-
-团队成员可以在故事中添加评论：
-- 针对特定图表添加评论
-- @提及其他用户
-- 回复评论
-
-### 协作编辑
-
-多人协作Edit Story：
-- 实时同步编辑
-- 查看其他协作者的操作
-- Version History记录
-
-### 通知设置
-
-设置Share和协作的通知：
-- 新评论通知
-- 编辑通知
-- 访问通知
-
-## Share统计
-
-### Access Statistics
-
-查看故事的Share和访问数据：
-- Shares
-- 访问次数
-- 访问来源
-- 访问时间分布
-
-### User Feedback
-
-- Comments
-- Likes
-- 收藏数量
-
-## 最佳实践
-
-1. **权限控制**: 根据数据敏感性设置合适的访问权限
-2. **链接管理**: 定期检查和管理分享链接
-3. **内容更新**: 更新故事后及时通知分享对象
-4. **安全考虑**: 避免分享包含敏感信息的故事
-
-## 相关功能
-
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Story Details](/en/数据分析平台/故事仪表盘/故事详情)
-- [Access Authorization](/en/数据分析平台/故事仪表盘/访问授权)
+![Story Sharing](/public/img/story/story-shares.png)

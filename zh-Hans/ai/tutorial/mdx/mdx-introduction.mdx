@@ -1,18 +1,69 @@
 ---
-title: "MDX 简介"
-description: "MDX简介教程"
+title: MDX 简介
+sidebar_position: 1
 ---
 
-# MDX 简介
+多维表达式（MDX，Multidimensional Expressions）是一种查询语言，用于从多维数据集中提取和操作数据，尤其是在 OLAP（联机分析处理）Cubes 中。MDX 在 Cube 中的重要性和实际用途体现在以下几个方面：
 
-## 概述
+### 1. 数据查询和分析
 
-MDX (Multidimensional Expressions) 是一种用于查询多维数据的查询语言。
+MDX 提供了强大的查询功能，允许用户对多维数据进行复杂的查询和分析。通过 MDX 查询，用户可以从 Cube 中提取出多维度和层次结构的数据，执行如切片（Slice）、切块（Dice）、钻取（Drill-Down）、旋转（Pivot）等操作。这些操作帮助用户快速获取所需的信息，从而支持决策和分析。
 
-## 内容
+### 2. 计算和聚合
 
-此教程正在完善中，更多详细信息即将推出。
+MDX 支持复杂的计算和聚合功能。用户可以使用 MDX 定义计算成员、KPI（关键绩效指标）、度量值等。例如，可以计算年度增长率、同比增长、累积总和等。这些计算和聚合功能使得用户能够更深入地分析数据趋势和绩效指标。
 
-## 相关文档
+### 3. 时间分析
 
-- [MDX](/zh-cn/智能体AI 平台/教程/MDX)
+MDX 非常适用于时间序列分析。通过 MDX，可以轻松实现时间维度的操作，如年同比（月同比）、滚动平均值、累积计算等。时间分析功能使企业能够更好地理解业务数据的时间动态，识别季节性趋势和长期变化。
+
+### 5. 优化性能
+
+MDX 查询可以优化数据访问性能。在处理大数据集时，MDX 可以通过预计算和聚合来提高查询速度和响应时间。合理编写和优化 MDX 查询，可以显著提升 Cube 的性能，提供更快速的数据访问体验。
+
+### 实际用途示例
+
+1. **销售分析**：使用 MDX 查询分析不同时间段的销售数据，如月度销售、季度销售和年度销售。可以计算每月的销售增长率和同比变化。
+   
+   ```mdx
+   WITH MEMBER [Measures].[Sales Growth] AS
+        ([Measures].[Sales], [Time].[2024]) / 
+        ([Measures].[Sales], [Time].[2023]) - 1
+   SELECT 
+        [Measures].[Sales Growth] ON COLUMNS,
+        [Product].[Product Categories].Members ON ROWS
+   FROM [Sales]
+   WHERE ([Time].[Year].&[2024])
+   ```
+
+2. **财务分析**：通过 MDX 计算不同财务期间的净利润、毛利率等关键绩效指标，帮助企业进行财务健康状况的监控和分析。
+
+   ```mdx
+   WITH MEMBER [Measures].[Gross Profit Margin] AS
+        ([Measures].[Gross Profit]) / 
+        ([Measures].[Revenue])
+   SELECT 
+        [Measures].[Gross Profit Margin] ON COLUMNS,
+        [Time].[Quarter].Members ON ROWS
+   FROM [Finance]
+   ```
+
+3. **库存管理**：使用 MDX 查询分析库存周转率、库存水平等，优化库存管理和供应链运作。
+
+   ```mdx
+   WITH MEMBER [Measures].[Inventory Turnover] AS
+        ([Measures].[Cost of Goods Sold]) / 
+        ([Measures].[Average Inventory])
+   SELECT 
+        [Measures].[Inventory Turnover] ON COLUMNS,
+        [Warehouse].[Warehouse Locations].Members ON ROWS
+   FROM [Inventory]
+   ```
+
+### 总结
+
+MDX 在 Cube 中扮演着至关重要的角色，通过其强大的查询和计算能力，帮助用户进行复杂的多维数据分析和报告。MDX 的应用不仅提升了数据分析的效率，还为企业决策提供了有力的支持，使其能够在竞争激烈的市场中保持领先地位。
+
+## 参考
+
+- [multidimensional expressions - microsoft](https://learn.microsoft.com/en-us/sql/mdx/multidimensional-expressions-mdx-reference)

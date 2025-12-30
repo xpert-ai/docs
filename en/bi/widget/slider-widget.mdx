@@ -1,50 +1,91 @@
 ---
-title: "滑动微件"
-description: "滑动微件使用指南"
+title: Slider Widget
+sidebar_position: 6
 ---
 
+The slider widget uses the [**Swiper**](https://swiperjs.com/) library to display scrolling effects for component cards.
 
-# 滑动微件
+In the story editing interface, click "**Slider Widget**" in the toolbar's insert area to create a slider widget on the current page. After selecting this component, edit its settings in the property editing panel on the right:
 
-## Overview
+## Slider Properties
 
-滑动微件用于创建可滑动的微件容器，可以在有限的空间内展示多个微件，支持横向或纵向滑动。
+The overall property settings of the slider widget correspond to the properties in the [**Swiper**](https://swiperjs.com/) library.
 
-## Features
+Property list:
 
-- **滑动展示**: 支持横向或纵向滑动
-- **多微件支持**: 可以在滑动容器中添加多个微件
-- **自动播放**: 支持自动滑动播放
-- **导航控制**: 支持导航按钮和指示器
+| Name | Property | Description |
+| ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Slides Per View | slidesPerView  | Number of slides per view (slides visible at the same time on slider's container). |
+| Space Between | spaceBetween   | Distance between slides in px. |
+| Centered | centeredSlides | Active slide will be centered, not always on the left side. |
+| Direction | direction      | 'horizontal' / 'vertical' |
+| Grab Cursor | grabCursor     | This option may a little improve desktop usability. If true, user will see the "grab" cursor when hover on Swiper |
+| Loop | loop | Set to true to enable continuous loop mode. |
+| Effect | effect | Transition effect. Can be 'slide', 'fade', 'cube', 'coverflow', 'flip' or 'creative' |
+| Creative Effect | creativeEffect | Object with Creative-effect parameters. |
 
-## Usage
 
-### 添加滑动微件
+## Slides
 
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"滑动微件"
-3. 选择滑动方向（横向/纵向）
-4. 添加要滑动的微件
-5. 配置滑动选项
-6. 设置导航控制
-7. 保存配置
+The slides table configuration is a table for configuring the slider widget. Click the **Add** button below the table to add a new row, which is a new slider widget. Each card row configuration properties are as follows:
 
-## 配置选项
+- **Component Type**: The component type used by the card. Currently supported:
+  - **Analysis Card**: Corresponds to the chart analysis component;
+  - **Indicator Card**: Corresponds to the indicator card component;
+- **Details**: Perform corresponding detailed configuration for the selected component type. Refer to the corresponding component type configuration for details;
+- **Actions**: Delete the current configuration row;
 
-### 滑动设置
+Slide property list:
 
-- **滑动方向**: 选择横向或纵向滑动
-- **滑动速度**: 设置滑动速度
-- **自动播放**: 启用自动播放
-- **播放间隔**: 设置自动播放间隔
+| Name | Description | Details |
+| -------- | ------------------------------ | ------------------------- |
+| Component Type |                                | 1. Indicator Card; 2. Analysis Card; |
+| Detail Configuration | Open the specific configuration interface for the specified component type |                           |
+| Actions | Delete button, delete current row slide configuration |                           |
 
-### 导航控制
+## Autoplay
 
-- **导航按钮**: 显示/隐藏导航按钮
-- **指示器**: 显示/隐藏滑动指示器
-- **触摸支持**: 启用触摸滑动支持
+Autoplay property list:
 
-## Related Documentation
+| Name | Property | Description |
+| ---- | ---- | -------- |
+| Delay | delay     | Delay time for each transition |
+| Disable on Interaction | disableOnInteraction     |  |
+| Pause on Mouse Enter | pauseOnMouseEnter     |  |
+| Reverse | reverseDirection     |  |
+| Stop on Last Slide | stopOnLastSlide     |  |
+| Wait for Transition | waitForTransition     |  |
 
-- [选项卡](/en/数据分析平台/微件/选项卡)
-- [页面布局](/en/数据分析平台/故事仪表盘/页面布局)
+## Pagination
+
+Pagination property list:
+
+| Name | Property | Description |
+| ---- | ---- | -------- |
+| Enabled | enabled     |  |
+| Type | type     | 'bullets' / 'fraction' / 'progressbar' |
+| Clickable | clickable     | Clicking on pagination button will cause transition to appropriate slide. Only for bullets pagination type |
+| Hide on Click | hideOnClick     |  |
+| Dynamic Bullets | dynamicBullets     |  |
+
+Corresponds to [Swiper Pagination Parameters](https://swiperjs.com/swiper-api#pagination) property configuration.
+
+## Responsive Breakpoints
+
+Responsive breakpoint properties allow setting different parameters for different responsive breakpoints (screen sizes). Not all parameters can be changed at breakpoints; only those that don't require different layouts and logic, such as slidesPerView, slidesPerGroup, spaceBetween, grid.rows. Parameters such as loop and effect will not take effect.
+
+Responsive breakpoint property list:
+
+| Name | Property | Description |
+| ---------- | ---- | ---- |
+| Size | size     | When window width is >= [size]px |
+| Slides Per View | slidesPerView     | Same as slider properties |
+| Space Between | spaceBetween     | Same as slider properties |
+| Touch Ratio | touchRatio     | Touch sensitivity |
+| Actions |      | Delete configuration |
+
+Corresponds to [Initialize Swiper breakpoints](https://swiperjs.com/swiper-api#param-breakpoints) property configuration.
+
+## 示例
+
+<iframe src="https://app.mtda.cloud/public/story/widget/73da3f53-4c61-4f60-bc1e-c95e51980a87" width="100%" height="350px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

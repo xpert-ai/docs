@@ -1,21 +1,186 @@
 ---
-title: "开发接口"
-description: "开发接口功能说明"
+title: Development SDK
+sidebar_position: 13
 ---
+Digital Xpert provides a set of APIs and an [SDK](https://github.com/xpert-ai/xpertai-sdk) for developers to interact with Xpert intelligent agents. These APIs allow you to create custom applications to communicate with Digital Xpert's intelligent agents.
 
+The Xpert agent interface follows the [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html) standard, which is a protocol for communication between agents. The Agent Protocol provides a universal way for agents to exchange messages, facilitating interoperability between agents.
 
-# 开发接口
+- First, create a Key for authentication to access the Xpert intelligent agent program.
 
-## Overview
+![Develop key](/public/img/ai/xpert-develop-key.png)
 
-开发接口是数字专家功能的重要组成部分。
+- Use the Key to access the Xpert intelligent agent's REST APIs or use the [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) to access the XpertAI platform.
 
-## 功能说明
+## Using the LangGraph SDK to Call the XpertAI Platform
 
-此功能正在完善中，更多详细信息即将推出。
+The XpertAI intelligent agent platform can be interacted with via the [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) (`@langchain/langgraph-sdk` (JS/TS SDK) / langgraph-sdk Python SDK). This SDK encapsulates the core capabilities for communicating with the LangGraph REST API, making it easy to manage core components such as assistants, threads, runs, and persistent storage (store).
 
-## Related Documentation
+:::info
+Reference code: [XpertAI SDK Examples](https://github.com/xpert-ai/xpertai-sdk)
+:::
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+### 1. Installation
+
+Ensure that the Node.js environment is installed, then install the SDK in your project:
+
+```bash
+# Install with yarn
+yarn add @langchain/langgraph-sdk
+# Or install with npm
+npm install @langchain/langgraph-sdk
+```
+
+By default, the SDK connects to `http://localhost:8123` (e.g., when started locally with `langgraph-cli`). Otherwise, you need to specify the API URL or `apiKey` during configuration ([npm][1]).
+
+### 2. Initialize the Client
+
+In JavaScript/TypeScript, you can create a `Client` instance as follows:
+
+```ts
+import { Client } from "@langchain/langgraph-sdk";
+
+const client = new Client({
+  apiUrl: "https://api.mtda.cloud/api/ai/", // Your baseUrl of XpertAI server.
+  apiKey: "your-api-key", // API Key of xpert
+})
+```
+
+If not explicitly configured, the SDK will connect to `http://localhost:8123` by default ([npm][2]).
+
+### 3. Managing Digital Xperts (Agents)
+
+#### List Existing Digital Xperts
+
+```ts
+import { Client, Assistant } from "@langchain/langgraph-sdk";
+
+// List all xperts
+const xperts: Assistant[] = await client.assistants.search({
+  metadata: null,
+  offset: 0,
+  limit: 10,
+})
+console.log("Experts:", xperts);
+```
+
+Each Digital Xpert is an assistant ([npm][2], [LangGraph][3]).
+
+#### Retrieve a Single Digital Xpert
+
+```ts
+const xpert = await client.assistants.get(xpertId);
+```
+
+### 4. Creating and Managing Threads
+
+#### Create a New Thread (Empty State)
+
+```ts
+const thread = await client.threads.create(); // Or pass threadId, metadata, etc., as initialization parameters
+console.log("New Thread:", thread);
+```
+
+In the example, it returns properties such as `thread_id`, `status`, etc. ([LangGraph][4]).
+
+#### Pre-fill State
+
+```ts
+const threadWithState = await client.threads.create({
+  threadId: "xxxxxxx",
+  ifExists: 'raise'
+});
+```
+
+This allows you to inject a thread ID during creation ([LangGraph][4]).
+
+#### Query Thread List & Retrieve State
+
+```ts
+const list = await client.threads.search({ limit: 10, offset: 0 });
+const singleThread = await client.threads.get(thread.thread_id);
+const history = await client.threads.getHistory(thread.thread_id, { limit: 50 });
+```
+
+### 5. Starting Runs
+
+You can initiate a run for a specific Digital Xpert within a thread, including support for streaming responses.
+
+#### Start a Streaming Run
+
+```ts
+const stream = client.runs.stream(thread.thread_id, assistant.assistant_id, {
+  input: { 
+    input: "Tell me a joke.", // more parameters 
+  },
+});
+for await (const chunk of streamResponse) {
+  const data = (<{ type: 'message', data: string | {type: 'text' | string; text?: string; data?: any} }>chunk.data)
+  // Output text messages only
+  if (data.type === 'message') {
+    if (typeof data.data === 'string') {
+      process.stdout.write(data.data)
+    } else if (data.data.type === 'text') {
+      process.stdout.write(data.data.text ?? '')
+    } else {
+      // console.log(`Component:`, data.data);
+    }
+  }
+}
+```
+
+This allows processing responses as they are generated, suitable for interactive scenarios ([npm][2]).
+
+#### Other Run Operation Examples
+
+```ts
+const run = await client.runs.create(thread.thread_id, assistant.assistant_id, { input: { ... } });
+const result = await client.runs.join(thread.thread_id, run.run_id);
+await client.runs.cancel(thread.thread_id, run.run_id);
+const runsList = await client.runs.list(thread.thread_id, { limit: 10 });
+```
+
+### 6. Using Store (Persistent Storage)
+
+Store data that needs to be saved across requests in sessions or tasks.
+
+```ts
+// Write
+await client.store.putItem([xpert_id], "key1", { value: 42 });
+
+// Read
+const item = await client.store.getItem([xpert_id], "key1");
+
+// List namespaces
+const namespaces = await client.store.listNamespaces({
+  prefix: [xpert_id],
+  maxDepth: 2,
+  limit: 10
+});
+
+// Search
+const found = await client.store.searchItems({ namespacePrefix: "my", query: "42" });
+```
+
+Detailed interfaces are defined in `StoreClient` ([LangGraph][3]).
+
+### 7. XpertAI Platform Integration Tips
+
+* **Configure Default API Address and Key**: The API address must be explicitly specified, and the key can be configured uniformly using the environment variable `LANGGRAPH_API_KEY`.
+* **Stream Output to Frontend**: Suitable for React and other frontends, you can use the SDK's streaming capabilities to build real-time conversational interfaces.
+* **Persistent Memory**: Use the Store feature to save key session data, enhancing the agent's memory capabilities.
+
+[1]: https://www.npmjs.com/package/%40langchain/langgraph-sdk "@langchain/langgraph-sdk - npm"
+[2]: https://www.npmjs.com/package/%40langchain/langgraph-sdk "@langchain/langgraph-sdk - npm"
+[3]: https://langgraph.com.cn/cloud/reference/sdk/js_ts_sdk_ref/index.html "SDK (JS/TS) - LangChain Framework"
+[4]: https://github.langchain.ac.cn/langgraph/cloud/how-tos/use_threads/ "Threads - LangChain Framework"
+[5]: https://github.langchain.ac.cn/langgraph/cloud/reference/sdk/js_ts_sdk_ref/ "Js ts sdk ref - LangChain Framework"
+
+## References
+
+- [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html)
+- [Agent Protocol: Interoperability for LLM agents](https://blog.langchain.dev/agent-protocol-interoperability-for-llm-agents/)
+
+## More Information
+
+The SDK is still being improved. If you encounter any issues or have suggestions, please add WeChat: xpertai to contact us for technical discussions.

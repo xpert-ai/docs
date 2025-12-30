@@ -1,21 +1,43 @@
 ---
-title: "监督型架构"
-description: "监督型架构功能说明"
+title: Supervisor Architecture  
+sidebar_position: 21  
 ---
+The core of the Supervisor architecture is a single supervisor that interacts with users and manages multiple specialized worker agents. These worker agents each have their own strengths, focusing on specific types of tasks. The supervisor acts like a conductor, receiving user requests, analyzing their needs, and assigning tasks to the appropriate specialized agents. Once the tasks are completed, the supervisor gathers the results from these agents, consolidates the information, and delivers the final answer to the user.
 
+To illustrate with a simple example: suppose you want to know the total number of employees across several companies in a given year. The supervisor would first assign the task of "finding employee data for each company" to a research expert. After the data is collected, it would then assign the task of "calculating the total" to a math expert, before finally combining the results and responding to you. This division of labor allows complex problems to be broken down and resolved efficiently.
 
-# 监督型架构
+![Supervisor Agent Architecture](/public/img/ai/xpert/supervisor-agents.png)
 
-## Overview
+:::info  
+Compare with [Swarm Architecture](/docs/ai/xpert/swarm/)  
+:::
 
-监督型架构是数字专家功能的重要组成部分。
+## Detailed Workflow  
 
-## 功能说明
+The workflow of the Supervisor architecture is clear and structured. Using the earlier example:  
 
-此功能正在完善中，更多详细信息即将推出。
+1. **Task Reception**: After the user poses a question, the supervisor first receives and interprets the request.  
+2. **Task Assignment**: The supervisor decides which specialized agent to assign the task to based on its nature. For instance, if data collection is involved, it selects the research expert.  
+3. **Specialized Processing**: The research expert uses its capabilities (e.g., search tools) to gather the required information and returns the results to the supervisor.  
+4. **Further Collaboration**: After reviewing the results, if calculations are needed, the supervisor hands the data to the math expert. The math expert computes the total and returns it.  
+5. **Result Integration**: The supervisor collects the outputs from all agents, organizes them into a final answer, and delivers it to the user.  
 
-## Related Documentation
+Throughout this process, the supervisor maintains overall control, ensuring tasks progress step-by-step, while each agent focuses on its area of expertise.
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+## Core Concepts: Agents and Handoffs  
+
+The Supervisor architecture relies on two key concepts:  
+
+- **Agents**: Each agent is an independent work unit with specific capabilities. They can range from simple data processors to more complex task executors. The supervisor itself is a special type of agent, responsible for coordination and decision-making.  
+- **Handoffs**: This is the mechanism for transferring control within the system. When the supervisor switches tasks between agents, it performs a handoff and decides what information to pass along. For example, it might choose to share only the final result or include the full processing history. This flexibility makes the system both efficient and controllable.  
+
+## Advantages and Scalability of the Architecture  
+
+The Supervisor architecture’s strengths lie in its modularity and collaboration. Each agent focuses on a single task, reducing system complexity, while the supervisor’s coordination ensures result accuracy. Moreover, this architecture is scalable: you can create multi-level agent hierarchies. For instance, multiple teams could each have their own supervisor for internal coordination, while a top-level supervisor oversees all teams, forming a more intricate collaborative network.
+
+## Conclusion  
+
+The Supervisor architecture offers an elegant and efficient solution for designing multi-agent systems. Through clear role division and flexible handoff mechanisms, it breaks down complex tasks into manageable parts, ultimately providing users with concise and accurate answers. Whether you’re a tech enthusiast or a developer, this architecture is worth exploring. Hopefully, it inspires further thought and experimentation with multi-agent systems!
+
+- Reference template: [Supervisor](https://app.mtda.cloud/explore?search=Supervisor).  
+- [LangGraph Multi-Agent Supervisor](https://github.com/langchain-ai/langgraphjs/tree/main/libs/langgraph-supervisor)

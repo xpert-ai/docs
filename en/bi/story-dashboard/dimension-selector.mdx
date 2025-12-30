@@ -1,21 +1,73 @@
 ---
-title: "维度选择器"
-description: "维度选择器功能说明"
+title: Dimension Selector
+sidebar_position: 12
 ---
 
+The dimension selector component helps users select dimensions and their detailed settings, such as hierarchical structures, in multidimensional models. Dimension selectors in special positions also have corresponding configuration options. For example, the dimension selector component in the graph settings position also includes properties settings for the graph.
 
-# 维度选择器
+### Dimension Selector
 
-## Overview
+The dimension selector component, as shown in the figure below, is divided into two parts: dimension selection and property settings buttons. The property settings button has multiple options corresponding to different categories of property settings.
 
-维度选择器是故事仪表盘功能的重要组成部分。
 
-## 功能说明
+### Hierarchy Settings
 
-此功能正在完善中，更多详细信息即将推出。
+Clicking the hierarchy button, as shown in the figure below, will display a list of hierarchy-related properties. The top-level hierarchy menu allows selection from multiple hierarchies. After selecting a hierarchy, the corresponding level list will appear, from which a specific level can be chosen. For example, in the figure below, the **Calendar** dimension's **Year** hierarchy within the **Calendar** hierarchy of the **Calendar** dimension is selected.
 
-## Related Documentation
 
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+### Dimension Member Selection
+
+Fixed members can be selected for dimensions. Clicking the **Member** menu in the hierarchy menu will bring up a window to assist in selecting dimension members.
+
+
+* **Hierarchy**: The hierarchy here should match the hierarchy of the dimension selector itself, so do not switch to other hierarchies.
+* **Exclude Selected Members**: Indicates excluding data corresponding to the selected members during data queries.
+* **Search**: Search for members by text or technical name.
+* **Member List**: Select one or more members.
+* **Selected Members**: Represents the selected members. If members are to be excluded, a strikethrough will appear on the members. Members can also be removed from this list.
+* **Selection Type**: Set to single or multiple selection.
+* **Presentation**: Set to tree or list format for displaying member data.
+* **Hierarchy Selection Mode**: Set the selection mode for the hierarchy tree according to the desired effect.
+
+### Parameters
+
+See [Parameters](../parameter) for dimension parameter settings.
+
+### Property List
+
+To be developed.
+
+### Include Parent Levels
+
+Indicates that the query results should include not only the selected level members but also all their ancestor members, forming a hierarchical tree structure in the results.
+
+### Display Settings
+
+Display settings include commonly used settings for how data is presented, including:
+
+- Display As: `Auto`, `Description and ID`, `Description Only`, `ID Only`.
+- [Member Labels](#member-labels)
+- Dimension Labels: Custom dimension labels.
+- Unknown Members: Display unknown members.
+- Compress Null Values: Whether to exclude null value members.
+- Sorting: Sort the dimension member list.
+
+#### Member Label
+
+**Member Label** refer to which field is used as the label for dimension members, which can be either attribute fields of dimension levels or inherent attribute fields of dimension members.
+
+![Member Label with Property](/public/img/story/dimension/member-label-with-auto.png)
+
+![Member Label with Property](/public/img/story/dimension/member-label-with-property.png)
+
+## Measure Selector
+
+The measure selector helps users select measures and set related properties.
+
+
+Clicking the dropdown button for measure selection will display a list of available measures, which are divided into three categories: measures, calculated measures, and indicators.
+
+
+- **Measures**: Measures originating from the multidimensional model itself.
+- **Calculated Measures**: Measures created by users on the client side through configuration or calculation formulas. These measures are queried in the form of user-defined formulas during data queries. For details on creating calculated measures, see [Calculations](../calculations/).
+- **Indicators**: Indicators created based on this model in the indicator management system.

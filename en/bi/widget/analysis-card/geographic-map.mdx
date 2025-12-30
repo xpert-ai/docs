@@ -1,74 +1,72 @@
 ---
-title: "地理图"
-description: "地理图用于展示地理数据，通过地图形式展示地理位置相关的数据。"
+title: Geographic Map
+sidebar_position: 21
 ---
 
+:::info
 
-# 地理图
+**Geographic Map** (also called **Geographic Chart**) is an ideal visualization tool for different data across states, countries, or regions. Geographic maps show readers a heat map of values distributed across various regions of the map. For example, on a U.S. map, areas with higher population density can be displayed in darker colors, while sparsely populated areas are displayed in lighter shades of the same hue.
 
-## Overview
+:::
 
-地理图用于展示地理数据，通过地图形式展示地理位置相关的数据。
+<iframe src="https://app.mtda.cloud/public/story/widget/1381f45a-ded7-44d1-8a44-31d0ef5b0a70" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>
 
-## 适用场景
+## Geographic Information
 
-### 数据特点
+Before creating geographic charts, you need to prepare the required geographic files. For example, U.S. geographic files can be found at [U.S. Atlas TopoJSON](https://github.com/topojson/us-atlas) for browser-downloadable geographic file links.
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+Select the chart type as **Geographic Map** (GeoMap), and click the map button on the right to set geographic information:
 
-### 使用场景
+![Small Shadow](./geomap-info.png)
 
-- 典型应用场景
-- 业务场景示例
+Enter map name: Keep it unique.
 
-## 配置选项
+Geographic file link: Enter the link address of the geographic file.
 
-### 数据配置
+Geographic data files support two standard formats:
 
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
+* [GeoJSON](https://en.wikipedia.org/wiki/GeoJSO) **used by default**, 
+* [TopoJSON](https://github.com/topojson/topojson) Check **Is TopoJSON Format** and enter the property names to use in the Feature object name input box, separated by `,`. Feature object names can be found under the `objects` property in the file content JSON.
 
-### 样式配置
+Map projection: If needed, you can specify a particular map projection algorithm. Algorithm list can be referenced at [d3-geo-projection](https://github.com/d3/d3-geo-projection).
 
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
+## Choropleth Map
 
-### 交互配置
+:::info
 
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
+A [Choropleth Map](https://en.wikipedia.org/wiki/Choropleth_map) displays divided geographical areas or regions that are coloured in relation to a numeric variable. It allows to study how a variable evolutes along a territory. It is a powerful and widely used data visualization technique. However, its downside is that regions with bigger sizes tend to have a bigger weight in the map interpretation, which includes a bias.
 
-## 使用示例
+:::
 
-### 基本示例
+### Data Mapping
 
-```json
-{
-  "type": "地理图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
+To display data distribution information on a geographic map, you need to correspond data dimensions with geographic information.
 
-## 最佳实践
+The primary dimension member name values correspond to the `name` property values in the Properties of Feature objects in geographic information.
 
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
+### Visual Mapping
 
-## Related Documentation
+Choropleth maps express differences in values within regions through different colors. In most cases, color gradients are used to express linear gradients of values.
 
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+To set the choropleth color sequence, open the measure's more button, select **Style**, select **Color Palette**, choose a color sequence, and the chart will display as a corresponding color choropleth map. The color sequence from left to right corresponds to measure values from small to large. Selecting **Reverse** can reverse the color sequence to correspond to measure values from large to small.
+
+![Middle Shadow](./color-schemes.png)
+
+More detailed settings about visual mapping can be set by enabling the **Visual Mapping** property group. For example, to eliminate the impact of maximum (or minimum) values that deviate significantly from the main values on overall color distribution, causing most colors to be too similar, you can normalize by setting the maximum (or minimum) value property of visual mapping.
+
+![Small Shadow](./visualMap.png)
+
+## Chart Transformation
+
+To better display data distribution, adding other chart displays on top of geographic charts can achieve different effects. Add chart types in **Chart Variants** under **Chart Configuration**, and chart type selection options will appear on the chart component.
+Click chart selection to switch between different chart displays.
+
+Enabling **Global Transition Animation** in chart configuration allows continuous transformation of elements between charts.
+
+<iframe src="https://app.mtda.cloud/public/story/widget/afae8fea-1a17-4d37-90bc-f908ef28fd15" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>
+
+
+参考:
+
+* https://github.com/deldersveld/topojson
+* https://github.com/tmcw/awesome-geojson

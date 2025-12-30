@@ -1,0 +1,377 @@
+---
+title: Analysis Card
+sidebar_position: 1
+---
+
+import {useState} from 'react';
+
+export const ChartImgs = ({children, cols, types}) => {
+  return (<div class="grid grid-cols-3 gap-4" style={{gridTemplateColumns: 'repeat('+cols+', minmax(0, 1fr))'}}>
+  {types.map((chart) => (
+<a style={{gridColumn: 'span '+(chart.cols || 1)+' / span '+(chart.cols || 1)+''}}
+  href={chart.href}>
+  <figure style={{width: '100%'}}>
+    <img src={chart.imgsrc} alt={chart.caption} />
+    <figcaption>{chart.caption}</figcaption>
+  </figure>
+</a>
+  ))}
+  </div>
+  )
+};
+
+
+Analysis chart components are components that display visual charts. As a universal chart rendering container, they can support different JavaScript chart rendering libraries such as ECharts, AntG2, currently mainly using the ECharts library.
+
+## Common Features
+
+* Title
+* Data Configuration: Like other data-related components, data configuration explains how this component fetches data and basic display configuration.
+  * Data Source: Corresponds to the semantic model specified by the story dashboard
+  * Model: A multidimensional model in the semantic model
+  * [_Chart Type_](#chart-types): Chart type configuration, see chart list above for details
+  * Measures: One or more measure field configurations, including more detailed configurations
+  * Dimensions: One or more dimension configurations, including more detailed configurations
+  * Selection Conditions: Certain filtering conditions for data
+  * Display Variants: Including Top N, sorting conditions, drill-down linkage
+* Analysis Card Options
+  * Display Density
+  * Real-time Linkage Analysis
+  * Show Data Button
+* Chart Configuration
+  * Maximum Data Limit
+  * Number Display Format
+  * Trellis Horizontal Count
+  * Global Transition Animation
+  * Custom Logic, refer to [Custom Chart](./custom)
+
+## Trellis
+
+The trellis feature is a way for analysis card widgets to display different members of a dimension as independent charts in grid form within a container.
+
+By setting the second dimension's role to [_**Trellis**_](#dimensions), members of this dimension can be used as the basis for dividing trellis members.
+
+Refer to [_Bar Chart#Trellis_](./bar/#trellis).
+
+## Data Zoom
+
+Data zoom settings are made on dimensions or measures corresponding to chart axes. For example, if a chart's x-axis corresponds to a calendar dimension, to perform data zoom on the x-axis, you need to enable and set detailed configuration in the calendar **Dimension** -> **Chart Properties** -> **Data Zoom**.
+
+Similarly, if a chart's y-axis corresponds to a sales measure, to perform data zoom on the y-axis, you need to enable and set detailed configuration in the sales **Measure** -> **Chart Properties** -> **Data Zoom**.
+
+## Chart Variants
+
+**Chart Variants** allow users to display different chart transformations in the same chart component, so users can choose the chart type to view as needed. Multiple chart variants are predefined in the same chart component. These variants can be different types of charts, such as line charts, bar charts, pie charts, etc., or custom chart types, or different display forms of the same type of chart, such as stacked bar charts and grouped bar charts.
+
+![Chart Variants](/public/img/story/chart-variants.png)
+
+After adding chart variants in the chart configuration property area, they will be displayed together with the chart's own type in the chart widget's toolbar. Users can switch between different chart variants to view different chart display effects.
+
+:::tip
+Switching charts does not involve data changes, so data will not be queried repeatedly.
+:::
+
+## Measures
+
+[_Measure Selector_](/docs/stories/dimension-selector/#measure-selector) allows users to select and view specific measures of the model. It can be used to display statistical data or chart display data. The measure property settings component of chart widgets includes common measure selector functionality and chart-specific measure property settings.
+
+**Common Features**
+
+This feature supports users in selecting measures as needed, such as regular measures, calculated measures, and indicators. Users can select measures to display according to specific needs, or create calculated member measures for local calculation (without affecting the model itself). For specific measure selector functionality, refer to [Measure Selector](/docs/stories/dimension-selector/#measure-selector).
+
+**Chart-related Properties**
+
+- **Role**: This defines the role or responsibility of the measure in the chart. For example, axes, legends, size, or color in the chart.
+- **Shape**: This defines the shape settings of chart data series, such as Bar, Line, Scatter, etc. In some chart types, such as scatter charts, specific shape types of data points can be defined through the [*Symbol*](https://echarts.apache.org/en/option.html#series-scatter.symbol) property in Series.
+- **Pattern**: This defines pattern settings for charts. For example, by setting fill patterns for bar charts (diagonal fill, dot fill, etc.).
+- **Color Palette**: Color selector allows you to specify colors for different parts of the data chart. Users can choose a preset color palette or create their own custom palette.
+- **ECharts Properties**: This includes corresponding property settings for measures in ECharts, such as Series, Axis, Visual Map, Data Zoom, etc.
+
+![Chart Measures](/public/img/widgets/analytical-card/chart-measures.png)
+
+Such measure selector settings allow users to highly customize their measure display methods, making data displayed in charts in a better and more intuitive way.
+
+## Dimensions
+
+[_Dimension Selector_](/docs/stories/dimension-selector/) allows users to select and view different dimensions of the model, which can display statistical data such as categories or graphical data displays. Features include common dimension selection functionality and dimension-related chart property configuration.
+
+**Common Features**
+
+Common dimension selection functionality supports users in selecting and viewing various dimensions of data according to needs, such as product types, geographic locations, time periods, etc. According to specific needs, corresponding dimensions can be selected for data analysis and display. For more detailed functionality, refer to the common [_Dimension Selector_](/docs/stories/dimension-selector/) functionality.
+
+**Chart-related Properties**
+
+- **Role**: Configuration of the role dimensions play in charts. Optional values include:
+  - **Category**: Category of data. For example, if your dataset includes a product and sales revenue, then product is the category.
+  - **Category2**: Category2 of data. Some charts may use two category dimensions.
+  - **Stacked**: Stacked data. In bar or line charts, this can represent the effect of different categories of data stacked together.
+  - **Group**: Grouped data. In charts such as bar or line charts, this can represent the effect of different categories of data displayed side by side.
+  - **Trellis**: In [_Trellis Charts_](#trellis) (Trellis Chart), different grids represent different categories of datasets.
+
+- **ECharts Configuration Properties**: This includes some configuration properties of dimensions in ECharts, such as:
+  - **Axis**: Axis settings. This determines the position and display format of data in charts.
+  - **Data Zoom**: Data zoom and sliding. This feature allows zooming in or out on data in a certain area for more detailed viewing.
+
+![Chart Dimensions](/public/img/widgets/analytical-card/chart-dimensions.png)
+
+The above dimension selector settings allow users to configure dimension display methods according to their own needs, making data displayed in charts in the most intuitive, clearest way while meeting personalized needs.
+
+## Chart Types
+
+Supports rich chart types and chart transformations.
+
+<div class="flex justify-center gap-2">
+![Chart Type](/public/en/img/widgets/analytical-card/chart-type.png)
+
+![Chart Custom](/public/en/img/widgets/analytical-card/chart-custom.png)
+</div>
+
+* Chart type selection
+* Custom chart name
+* Direction: Horizontal, Vertical
+* Variants: Different chart types may have different subtype variants, such as stacked, grouped, polar coordinates for bar charts, reverse, radial for tree charts, etc.
+* Chart Configuration: Unified configuration for ECharts chart properties
+  * Grid: Grid component configuration, refer to [ECharts Grid](https://echarts.apache.org/en/option.html#grid)
+  * Series Unified Properties: Will override all ECharts series configurations, refer to [ECharts Series](https://echarts.apache.org/en/option.html#series)
+  * Tooltip: Tooltip, refer to [ECharts Tooltip](https://echarts.apache.org/en/option.html#tooltip)
+  * Legend: Legend, refer to [ECharts Legend](https://echarts.apache.org/en/option.html#legend)
+  * Data Zoom: DataZoom, refer to [ECharts DataZoom](https://echarts.apache.org/en/option.html#dataZoom)
+  * Global Color: Set global color sequence, refer to [ECharts Color](https://echarts.apache.org/en/option.html#color)
+  * Auxiliary Enhancement: Refer to [ECharts Aria](https://echarts.apache.org/en/option.html#aria)
+* [_Custom Chart Script_](./custom/) allows users to create custom chart displays by writing chart rendering script code.
+
+### Comparison Charts
+
+Comparison Chart is a type of chart used to compare differences or similarities between two or more data series.
+
+#### 柱形图
+
+<ChartImgs cols={4} types={[
+    {
+      href: './bar/#基本柱形图',
+      imgsrc: '/assets/images/basic-381ec690e77de9423903354e6665ef05.png',
+      caption: '柱形图'
+    },
+    {
+      href: './bar/#柱形方向',
+      imgsrc: '/assets/images/h-7dac1a775e0ee0dbbbc8e8d877a54cc8.png',
+      caption: '横向柱形图'
+    },
+    {
+      href: './bar/#分组',
+      imgsrc: '/assets/images/multi-dimensions-group-af8afbd253727b4a9ed8aeda1c0579b6.png',
+      caption: '分组柱形图'
+    },
+    {
+      href: './bar/#堆积',
+      imgsrc: '/assets/images/multi-dimensions-stacked-e8c77c6d98788e024bb8eec077520d35.png',
+      caption: '堆积柱形图'
+    },
+     {
+      href: './bar/#格子',
+      imgsrc: '/assets/images/multi-dimensions-trellis-3dfc8420af7213738e7b52ca68b93603.png',
+      caption: '格子柱形图'
+    },
+    {
+      href: './bar/#多度量柱形图',
+      imgsrc: '/assets/images/multi-measures-6718f9ae813e0ea898d9c156c21e9f74.png',
+      caption: '多度量柱形图'
+    },
+     {
+      href: './bar/#多度量柱形图',
+      imgsrc: '/assets/images/multi-meausres-combine-20a32ffeae381e01d3347f0f65aa1e58.png',
+      caption: '组合柱形图'
+    },
+    {
+      href: './bar/#多维度多度量柱形图',
+      imgsrc: '/assets/images/multi-dim-measures-3f4d1c45cd2756c835002b318b2d8767.png',
+      caption: '多维度多度量柱形图'
+    },
+    {
+      href: './bar/#极坐标',
+      imgsrc: '/assets/images/polar-66326a7f4d340933a0fc6c1a6392421c.png',
+      caption: '极坐标柱形图'
+    },
+    {
+      href: './bar/#极坐标',
+      imgsrc: '/assets/images/radar-fe7f5e219a09ce1351a182454a6d1481.png',
+      caption: '极坐标柱形图'
+    }
+  ]}></ChartImgs>
+
+#### 饼图
+
+<ChartImgs cols={4} types={[
+  {
+      href: './pie/#饼图',
+      imgsrc: '/assets/images/pie-83186f7f5b376be9f0d3af1f41766a2e.png',
+      caption: '饼图'
+  },
+  {
+      href: './bar/#环形图',
+      imgsrc: '/assets/images/doughnut-6cf6e1bfa05edbe201da34e87b1afca8.png',
+      caption: '环形图'
+    },
+  {
+      href: './bar/#南丁格尔图',
+      imgsrc: '/assets/images/nightingale-3666d5d85e97481eca66e8228037874b.png',
+      caption: '南丁格尔图'
+    },
+    {
+      href: './bar/#格子',
+      imgsrc: '/assets/images/trellis-bcfdb8e75ad0441b9aac75b7fd790780.png',
+      caption: '格子饼图',
+      cols: 3
+    }
+]}></ChartImgs>
+
+### 趋势图形
+
+Trend chart 用于表示数据趋势的一种图表类型。它们是用于显示数据随时间变化的趋势，并且可以提供有关数据的信息，例如是否存在趋势、周期性和季节性。
+
+#### 线图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './line/#线图',
+      imgsrc: '/assets/images/lines-85351cd1c1b5c6b265d3a3fdaf1334a9.png',
+      caption: '线图'
+  },
+  {
+      href: './line/#面积图',
+      imgsrc: '/assets/images/area-stacked-861e1dec38a3371a5d4b85401fed6c38.png',
+      caption: '面积图'
+    }
+]}></ChartImgs>
+
+#### 主题河流图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './theme-river/',
+      imgsrc: '/assets/images/theme-river-23c150a54d040aeefa4ff88e8c360f77.png',
+      caption: '河流图'
+  }
+]}></ChartImgs>
+
+### 相关图形
+
+Correlation chart （相关图表类型）是一种显示两个变量之间关系的可视化工具。
+
+#### 散点图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './scatter/',
+      imgsrc: '/assets/images/scatter-21006c1029a269dcf1cedd78d38fcf63.png',
+      caption: '散点图'
+  },
+  {
+      href: './scatter/',
+      imgsrc: '/assets/images/scatter-21006c1029a269dcf1cedd78d38fcf63.png',
+      caption: 'Bubble'
+  }
+]}></ChartImgs>
+
+### 分布图形
+
+分布图形（Distribution chart）是用来显示数据分布的一种可视化工具。分布图表可以帮助用户更好地理解数据集的分布情况，从而进行更准确的分析和决策。
+
+#### 热力图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './heatmap/#聚集热图',
+      imgsrc: '/assets/images/heatmap-a00d086fd9e1d884ad1eec6f1c135689.png',
+      caption: '聚集热图'
+  },
+  {
+      href: './scatter/#日历热图',
+      imgsrc: '/assets/images/heatmap-calendar-97e9fd19c1a79db040c8fae7ead5f03e.png',
+      caption: '日历热图',
+      cols: 2
+  }
+]}></ChartImgs>
+
+#### 树图
+
+<ChartImgs cols={3} types={[
+  {
+      href: './tree/#树图',
+      imgsrc: '/assets/images/tree-ecc64bd450592e1b90fb9d58d5d4047c.png',
+      caption: '树图'
+  },
+  {
+      href: './tree/#图形子类型',
+      imgsrc: '/assets/images/tree-radial-208ae095a0eb20d0f6fe8c9385305afc.png',
+      caption: '雷达树图',
+      cols: 1
+  }
+]}></ChartImgs>
+
+#### 矩阵树图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './treemap/#层次结构的矩阵树图',
+      imgsrc: '/assets/images/treemap-1c4e35084b5015006ff2182ac807d6b7.png',
+      caption: '层次结构的矩阵树图'
+  },
+  {
+      href: './treemap/#多维度矩阵树图',
+      imgsrc: '/assets/images/treemap-dimensions-fa7ec3a076b7a51178d6cc82a74268a8.png',
+      caption: '多维度矩阵树图'
+  }
+]}></ChartImgs>
+
+#### 旭日图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './sunburst/',
+      imgsrc: '/assets/images/sunburst-aca38acdac9fcbfe48504b881ba0b08d.png',
+      caption: '旭日图'
+  }
+]}></ChartImgs>
+
+#### 桑基图
+
+<ChartImgs cols={4} types={[
+  {
+      href: './sankey/#多维度之间',
+      imgsrc: '/assets/images/sankey-dimensions-d30ec6b9d66c037492f7a8986fb70c21.png',
+      caption: '桑基图'
+  },
+  {
+      href: './sankey/#一个维度层次结构',
+      imgsrc: '/assets/images/sankey-hierarchy-ee42f8fef1e16eb080f7c58c736a1c0f.png',
+      caption: '纵向桑基图',
+      cols: 3
+  }
+]}></ChartImgs>
+
+#### 漏斗图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './funnel/',
+      imgsrc: '/assets/images/funnel-5883a3fe3e39d223c7c56cb95166d832.png',
+      caption: '漏斗图'
+  }
+]}></ChartImgs>
+
+#### 盒须图
+
+<ChartImgs cols={2} types={[
+  {
+      href: './boxplot/',
+      imgsrc: '/assets/images/boxplot-077eb51af13a2ef2ff702bcff795a719.png',
+      caption: '盒须图'
+  }
+]}></ChartImgs>
+
+### 地理图
+
+<video controls width="550" autoplay="true" loop="true">
+  <source src="/img/geomap-chart-types.webm" type="video/webm"/>
+</video>

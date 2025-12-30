@@ -1,20 +1,83 @@
 ---
-title: "维度成员检索"
-description: "维度成员检索功能说明"
+title: 🔍 Dimension Member Retrieval
+sidebar_position: 8
 ---
 
+In the XpertAI platform, **Dimension Member Retrieval** is a key capability module in the ChatBI agent orchestration system.
+By **dynamically synchronizing and vectorizing dimension member information in semantic models**, it provides agents with more precise context awareness and intent recognition support, greatly improving the accuracy and user experience of conversational data analysis.
 
-# 维度成员检索
+In short, dimension member retrieval enables agents to "know what possible dimension values exist" and "understand the semantic meanings of these dimension members in different business contexts."
 
-## Overview
+## I. Synchronization and Vectorization of Dimension Member Information
 
-维度成员检索是语义模型功能的重要组成部分。
+To enable dimension member retrieval functionality, you need to complete the synchronization and vectorization of dimension data in semantic models first. The entire process is as follows:
 
-## 功能说明
+### 1. Dimension Member Synchronization (Sync)
 
-此功能正在完善中，更多详细信息即将推出。
+After creating or updating a semantic model, manually trigger the synchronization task for dimension members. The process includes:
 
-## Related Documentation
+* Refreshing the member list of dimensions.
+* Uploading and embedding dimension members for subsequent processing and retrieval.
 
-- [多维模型介绍](/en/数据分析平台/语义模型/多维模型介绍)
-- [管理语义模型](/en/数据分析平台/语义模型/管理语义模型)
+### 2. Vectorization Processing (Embedding)
+
+After synchronization is complete, the platform will perform semantic vectorization processing on dimension members. The steps include:
+
+* Using built-in or user-defined vector models (such as OpenAI Embedding, Tongyi embedding, etc.)
+* Converting each dimension member (and its aliases, business labels) into semantic vectors
+* Storing vectorization results in the platform's embedded vector database (supports (in development) FAISS / Qdrant / Milvus, etc.)
+
+---
+
+## II. How to Use in ChatBI Toolset
+
+After vectorization is complete, this dimension member information will be integrated into the ChatBI agent's toolchain through the **Dimension Member Retriever tool**, with the following specific functions:
+
+### Agent Call Flow:
+
+1. **Intent Recognition Phase**: The agent determines whether the user's query contains vague dimension descriptions (such as "East China", "xx customer", "holidays")
+2. **Retrieval Call Phase**: Through Dimension Member Retriever, perform semantic vector comparison to find the closest matching items from the dimension member library
+3. **Result Lookup Phase**: Use matched dimension values as filter conditions to participate in query construction and chart generation
+
+### Application Examples:
+
+* User asks: "How are sales in East China this month?"
+
+  * Agent matches "East China" through Retriever → `region = 'East China'`
+* User asks: "Which products sold well during holidays?"
+
+  * Matches "holidays" dimension members → Automatically incorporates the corresponding time periods for holidays in the analysis
+
+> 🧠 ChatBI performs fuzzy recognition and contextual reasoning based on dimension business labels, pinyin, English aliases, etc.
+
+---
+
+## III. Business Value and Advantages
+
+| Function | Business Advantage |
+| -------- | --------------------- |
+| Dynamic Synchronization of Dimension Members | Ensures real-time updates of dimension member information, reducing missed queries |
+| Vectorized Recognition | Improves natural language recognition accuracy, supports fuzzy matching |
+| Multi-language Understanding | Covers international scenarios, recognizes dimension names in multiple languages |
+| Business Semantic Awareness | Intelligently understands business aliases, abbreviations, and classification labels |
+| No Rule Maintenance Required | Compared to traditional keyword matching solutions, no manual maintenance of mapping tables needed |
+
+---
+
+## IV. Usage Notes
+
+1. **Data Source Access Permissions**: Ensure that data tables from which dimension members originate have complete read permissions;
+2. **Data Volume and Performance**: For million-level dimension member data, it is recommended to configure vector extraction frequency and index partitioning as needed;
+3. **Language Consistency**: If there are scenarios with mixed Chinese and English, please set member multi-language labels or alias fields in the semantic model;
+4. **Regular Update Mechanism**: For business dimensions (such as customers, products), it is recommended to set up regular synchronization schedules (such as daily or hourly);
+5. **Privacy Compliance**: If dimensions contain sensitive information such as customers and users, proper desensitization and permission isolation controls must be implemented;
+
+---
+
+## V. Future Plans
+
+We plan to include the following in future versions:
+
+* Support for user-defined dimension member semantic labels
+* Introduction of dimension member weights and popularity metrics to enhance matching accuracy
+* Provide a dimension member management backend supporting manual editing and review

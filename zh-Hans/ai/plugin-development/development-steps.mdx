@@ -1,19 +1,375 @@
 ---
-title: "插件的开发步骤"
-description: "插件的开发步骤指南"
+sidebar_position: 4
+title: 插件的开发步骤
 ---
 
-# 插件的开发步骤
+本篇提供一套从样例模板开发到发布插件的详细实践教程，样例项目是基于 `nx` monorepo 的模板（见下方目录结构）。内容涵盖初始化、代码实现、配置 schema、测试、构建、发布以及常见问题排查。
 
-## 概述
+:::tip 插件开发模版
+git clone https://github.com/xpert-ai/xpert-plugins-starter
+:::
 
-插件的开发步骤是插件开发的重要组成部分。
+## 1. 先决条件
 
-## 内容
+在开始之前，请确保环境满足：
 
-此文档正在完善中，更多详细信息即将推出。
+* Node.js（推荐 LTS >= 18）
+* npm 或 pnpm
+* nx 工具（无需全局安装：通过 `npx nx` 使用）
+* TypeScript
+* 已配置 monorepo（[项目模板](https://github.com/xpert-ai/xpert-plugins-starter)已具备）
 
-## 相关文档
+开发前建议安装依赖：
 
-- [概述](/zh-cn/智能体AI 平台/插件开发/概述)
-- [插件开发](/zh-cn/智能体AI 平台/插件开发)
+```bash
+npm install
+# 或
+pnpm install
+```
+
+---
+
+## 2. 模板项目结构说明
+
+你提供的模板目录如下（摘录）：
+
+```
+.
+├── AGENTS.md
+├── CHANGELOG.md
+├── CLAUDE.md
+├── README.md
+├── TREE.txt
+├── jest.config.ts
+├── jest.preset.js
+├── nx.json
+├── package-lock.json
+├── package.json
+├── packages
+│   └── my-plugin
+│       ├── README.md
+│       ├── jest.config.js
+│       ├── package.json
+│       ├── src
+│       │   ├── index.ts
+│       │   └── lib
+│       │       ├── my-plugin.spec.ts
+│       │       ├── my-plugin.ts
+│       │       ├── tool.ts
+│       │       ├── toolset.strategy.ts
+│       │       └── types.ts
+│       ├── tsconfig.json
+│       └── tsconfig.lib.json
+├── tsconfig.base.json
+├── tsconfig.json
+└── tsconfig.spec.json
+```
+
+说明：模板把每个插件放在 `packages/<name>` 下，使用 `@nx/js:lib` 生成的 `--publishable` 库可以单独构建并发布到 npm。
+
+---
+
+## 3. 快速起步（用 Nx 新建插件）
+
+在项目根目录下运行创建新插件：
+
+```bash
+npx nx g @nx/js:lib packages/my-plugin --publishable --importPath=@my-org/my-plugin
+```
+
+常用构建与发布命令：
+
+```bash
+# build library
+npx nx build my-plugin
+
+# 使用 monorepo 的 release 流程（由模板提供）
+npx nx release
+
+# 手动发布 npm（可传 otp）
+npx nx run @my-org/my-plugin:nx-release-publish --access public --otp=<one-time-password-if-needed>
+```
+
+注意：`--importPath` 与 `package.json` 的 `name` 字段应一致，便于外部依赖导入。
+
+### 3.1 创建多个插件
+
+```bash
+# 创建第一个插件
+npx nx g @nx/js:lib packages/plugin-a --publishable --importPath=@xpert-ai/plugin-a
+
+# 创建第二个插件  
+npx nx g @nx/js:lib packages/plugin-b --publishable --importPath=@xpert-ai/plugin-b
+
+# 创建第三个插件
+npx nx g @nx/js:lib packages/plugin-c --publishable --importPath=@xpert-ai/plugin-c
+```
+
+### 3.2 项目结构示例
+
+```
+packages/
+├── my-plugin/           # 现有示例插件
+├── weather-plugin/      # 天气插件
+├── calculator-plugin/   # 计算器插件
+├── file-processor/      # 文件处理插件
+└── ai-assistant/        # AI助手插件
+```
+
+---
+
+## 4. 编写插件入口（`index.ts`）
+
+插件入口是宿主装载插件的第一站。通常导出一个 `default` 的 `XpertPlugin` 对象。
+
+要点：
+
+* 使用 `zod` 定义插件的 `config` schema（用于校验与 UI 自动生成表单）
+* `meta` 包含插件元数据（name/version/category/icon/displayName/description/keywords）
+* `register(ctx)` 返回插件的模块类（用于注入到 NestJS 应用）
+* 可选实现 `onStart`/`onStop` 生命周期钩子
+
+在模板中 `index.ts` 示例已经给出：它定义了 `ConfigSchema`、`meta`、`register`、`onStart`、`onStop`。
+
+**建议**：
+
+* `meta.name` 使用 scoped package 名称（例如 `@xpert-ai/my-plugin`），与 `package.json` 保持一致。
+* `icon` 建议使用 svg 字符串或数据 URL，便于前端渲染。
+
+---
+
+## 5. 实现插件模块（`MyPlugin`）与生命周期钩子
+
+插件的模块类使用 `@XpertServerPlugin` 装饰器声明：它会在宿主应用中被导入并注册。
+
+关键字段：
+
+* `imports`：其他模块（例如 `RouterModule.register([{ path: '/xxx', module: MyPlugin }])`）
+* `entities`：TypeORM/ORM 实体类数组（如果插件需要数据库持久化）
+* `providers`：注入到容器的服务/策略
+* `controllers`：暴露路由的 controllers
+
+生命周期接口：
+
+* `IOnPluginBootstrap`：`onPluginBootstrap()` 在插件被初始化时调用（适合做一次性注册/检查）
+* `IOnPluginDestroy`：`onPluginDestroy()` 在插件被卸载/销毁时调用
+
+**实现建议**：
+
+* 使用 `ctx.logger`（由宿主提供）记录启动/停止日志，不直接使用 `console.log`。
+* 避免在模块加载阶段做长时间阻塞操作；在 `onPluginBootstrap` 中以异步方式执行需要的初始化工作。
+
+---
+
+## 6. 实现 Strategy（Toolset / Integration / DocumentSource）
+
+Strategy 是插件扩展系统能力的核心。常见的类型有：
+
+* ToolsetStrategy（工具集合，例如计算器、转换工具）
+* IntegrationStrategy（外部系统集成，例如 Firecrawl、第三方 API）
+* DocumentSourceStrategy（文档数据源，例如 Web 爬取、S3、数据库）
+
+下面以 `Calculator`（toolset）和 `Firecrawl`（document source / integration）为示例说明。
+
+### 6.1 ToolsetStrategy（以 Calculator 为例）
+
+`@ToolsetStrategy(MyToolName)` 装饰器将该类标记为 toolset 提供者。主要职责：提供元信息、校验配置、创建工具集合。
+
+* `meta`：包含 name、label、description、icon、configSchema 等，用于 UI 列表和配置表单
+* `validateConfig(config)`：校验传入配置
+* `create(config)`：返回具体的 `BuiltinToolset` 实例（可复用的工具集合）
+* `createTools()`：若不使用 `BuiltinToolset`，也可以直接返回工具数组
+
+示例：`CalculatorStrategy` 中创建 `CalculatorToolset`，并依赖 `buildCalculatorTool()` 构建单个工具。
+
+### 6.2 IntegrationStrategy
+
+用于将外部服务建模为宿主可以配置的集成项。主要职责：
+
+* 提供 `meta`（包括 schema 以在 UI 中展示集成配置字段）
+* 实现 `execute(integration, payload)` 来执行一次集成操作或触发任务
+
+**安全注意**：`meta.schema` 中用于显示 API Key 的字段，应使用 `ISchemaSecretField` 提示前端加密/掩码并允许持久化存储（`persist: true`）。
+
+### 6.3 DocumentSourceStrategy
+
+用于把外部文档/数据源转换为宿主可索引的 `Document[]`（例如 LangChain 的 `Document`）。核心方法：
+
+* `validateConfig(config)`：配置校验
+* `test(config)`：测试连接/连通性
+* `loadDocuments(config, context?)`：返回 `Document[]`，每个文档包含 `pageContent` 和 `metadata`（例如 source、title、description）
+
+示例中 `FirecrawlSourceStrategy.loadDocuments` 调用 `firecrawlService.crawlUrl(context.integration, config)` 并把结果映射为 `Document`。
+
+---
+
+## 7. 服务（Service）与控制器（Controller）
+
+插件通常需要在 NestJS 容器中注册服务与控制器：
+
+* `Service` 负责与外部 API 的通信（带重试/超时逻辑、限流）
+* `Controller` 暴露用于测试/调试的 HTTP 接口（例如 `POST /test`）
+
+示例：`FirecrawlController.connect` 接收 `IIntegration` payload 并调用 `firecrawlService.test`。
+
+实现注意事项：
+
+* 对外请求应设置合理超时并处理异常。
+* 对于长任务（爬取、批量导入），建议使用作业队列（Bull、Queue）处理并返回任务 id，而不是阻塞 HTTP 请求。
+* 使用 `@I18nLang()` 或其他国际化工具在 Service/Controller 中处理多语言提示。
+
+---
+
+## 8. 配置 Schema 与 UI 元数据（zod + JSON Schema）
+
+建议：插件入口使用 `zod` 定义配置（强类型且方便）。当需要在 UI 中渲染配置表单时，需把 `zod` schema 转换为 JSON Schema 或直接在 `meta.schema` 中维护一套 JSON Schema。
+
+示例：
+
+```ts
+const ConfigSchema = z.object({
+  apiUrl: z.string().url().optional(),
+  apiKey: z.string().optional()
+})
+```
+
+---
+
+## 9. 单元测试与集成测试
+
+模板中包含 `my-plugin.spec.ts`，推荐写法：
+
+* 使用 Jest 和 Nest 测试工具（`@nestjs/testing`）创建模块上下文
+* 对 Strategy 的 `validateConfig`、`create`、`createTools` 做单元测试
+* Mock 外部 HTTP 调用（nock / msw）来测试 Service
+* 对 Controller 编写 e2e 风格的请求测试（使用 `supertest`）
+
+运行测试：
+
+```bash
+npx nx test my-plugin
+```
+
+---
+
+## 10. 构建、发布与 npm 发布流程
+
+### 构建
+
+```bash
+npx nx build my-plugin
+```
+
+构建后，`packages/my-plugin/dist`（或模板配置的输出目录）会生成可发布文件。
+
+### 版本管理与发布
+
+模板中提供 `nx release` 流程（请参考 repo 中 `release` 脚本）。一般步骤：
+
+1. 更新 `package.json` 的 `version`（或使用 release 脚本自动 bump）
+2. `npx nx build my-plugin`
+3. `npx nx release`（如果项目配置了 release 插件，会基于 CHANGELOG/commit 自动创建发布）
+
+手动 publish：
+
+```bash
+npx nx run @my-org/my-plugin:nx-release-publish --access public --otp=<otp-if-needed>
+```
+
+**提示**：确保 `package.json` 中的 `files`, `main`, `types` 等字段正确指向构建输出；`publishConfig` 可设置访问权限。
+
+---
+
+## 11. 运行时行为与调试技巧
+
+插件加载与运行时要点：
+
+* 宿主会调用插件的 `register`，并把返回的 module 注入到 Nest 应用。确保 `register` 返回 `{ module: YourPluginModule, global: true|false }`。
+* `onStart/onStop` 可以放置插件运行时初始化与销毁操作。
+* `IOnPluginBootstrap` / `IOnPluginDestroy` 为插件内部的生命周期钩子（与宿主框架生命周期互补）。
+
+调试技巧：
+
+* 启用详细日志：在 `register` 或 `onStart` 中使用 `ctx.logger.debug/info/error` 能把日志写入宿主日志系统。
+* 检查 DI 错误：典型的 `Nest can't resolve dependencies` 通常是 provider 未在 `providers` 中声明。
+* 检查实体注册：如果 `entities` 未正确导出或重复注册，会导致 ORM 报错。
+
+---
+
+## 12. 安全性和最佳实践
+
+* 不要在源代码中硬编码密钥或凭证。
+* 使用 `ISchemaSecretField` 标记密钥字段，并让宿主对其加密/受控存储。
+* 插件内部对外调用应有重试、超时和熔断策略。
+* 将长任务放入队列，避免在请求生命周期内阻塞。
+* 使用 Typescript 严格模式，明确类型（尤其是 `IIntegration<T>` 等泛型）。
+* 单一职责：每个插件尽量只实现一类功能（例如只做集成或只做数据源），更利于维护与权限控制。
+
+---
+
+## 13. 常见问题与排查指南
+
+* **问题：插件无法加载，抛出 `Cannot find module`**
+
+  * 检查 `package.json` 的 `name`/`main` 字段是否正确。
+  * 构建输出路径是否包含 `index.js`。
+
+* **问题：Nest DI 注入失败**
+
+  * 检查是否在 `@XpertServerPlugin.providers` 中注册了对应的 provider。
+  * 检查构造函数参数是否正确使用 `@Inject()` 或类型注解。
+
+* **问题：实体重复注册或数据库迁移异常**
+
+  * 确认 `entities` 中没有重复类，且命名空间/路径一致。
+
+* **问题：API Key 在 UI 中无法明文显示或保存**
+
+  * 检查 `meta.schema` 中是否使用了 `ISchemaSecretField` 并设置 `persist: true`。
+
+---
+
+## 14. 附录：示例文件与常用命令
+
+### 14.1 关键示例命令
+
+```bash
+# 初始化插件库
+npx nx g @nx/js:lib packages/my-plugin --publishable --importPath=@xpert-ai/my-plugin
+
+# 构建
+npx nx build my-plugin
+
+# 测试
+npx nx test my-plugin
+
+# 发布（release 脚本）
+npx nx release
+
+# 手动 publish
+npx nx run @xpert-ai/my-plugin:nx-release-publish --access public --otp=<otp>
+```
+
+### 14.2 常用代码片段（概览）
+
+* `index.ts`：导出 `XpertPlugin` 对象
+* `my-plugin.ts`：使用 `@XpertServerPlugin` 的模块类
+* `toolset.strategy.ts`：实现 `ToolsetStrategy` 的类
+* `tool.ts`：实际构建工具（`buildCalculatorTool()`）
+* `types.ts`：插件相关常量和类型
+
+（模板中的具体实现已包含在你的示例代码里，可按需修改。）
+
+---
+
+## 小结
+
+本章节提供了从创建插件骨架到发布的全流程指南，并覆盖了实现 Strategy、Service、Controller、配置 schema、安全性、测试、构建与发布等环节。你可以基于仓库里的模板快速开始，并根据上文的 "最佳实践" 与 "排查指南" 对插件做健壮化改进。
+
+如果你愿意，我可以：
+
+* 把 `Calculator` 工具的 `buildCalculatorTool()` 的完整实现补全为可运行代码；
+* 或者把 `Firecrawl` 插件的 `Service`（HTTP 调用、错误处理、重试）实现为一个完整的样例；
+* 也可逐段把上面的章节展开为更长的教程或示例文件（例如直接生成 `src/lib/tool.ts`、`service.ts` 等文件）。
+
+请告诉我你希望我接着做哪项（例如：生成可运行的 `tool.ts`、生成 `FirecrawlService` 实现、或把文档转为中文/英文 README）。

@@ -1,77 +1,87 @@
 ---
-title: "数据源授权"
-description: "数据源授权配置指南"
+title: Document Source Authorization
+sidebar_position: 6
+---
+XpertAI supports connecting to various external document sources. To ensure data security and access control, the system provides a flexible authorization mechanism, allowing knowledge pipelines to securely access and import data.
+In XpertAI, document source authorization can be achieved through **system integration** or **default environment variables**, supporting multiple authorization methods including **API Key** and **OAuth**.
+
 ---
 
+## Overview of Document Source Authorization Mechanisms
 
-# 数据源授权
+The XpertAI authorization system consists of two parts:
 
-## Overview
+1. **Default Environment Variable Authorization**  
+  During system deployment or in the workspace environment, various API Keys can be preset via environment variables. The knowledge pipeline will automatically use these credentials for authorization at runtime, without manual binding.
 
-数据源授权用于配置知识流水线访问数据源的权限，确保数据安全访问。
+2. **System Integration Authorization**  
+  XpertAI provides a unified system integration entry point where administrators or developers can configure API Key or OAuth (in development) authorization information for external services.  
+  System integration supports multiple authentication modes, including enterprise API Key, OAuth Client, and, in the future, service accounts and signed tokens.
 
-## 授权类型
+![pipeline integrations](/public/en/img/ai/pipeline/pipeline-plugin-system-integration.png)
 
-### API授权
+---
 
-- **API密钥**: 使用API密钥授权
-- **OAuth授权**: 使用OAuth协议授权
-- **Token授权**: 使用Token授权
+## Data Source Authorization Entry Points
 
-### 数据库授权
+In XpertAI, you can configure data source authorization in the following two ways:
 
-- **用户名密码**: 使用用户名密码授权
-- **证书授权**: 使用证书授权
-- **连接字符串**: 使用连接字符串授权
+### Method 1: Through the Knowledge Pipeline Orchestration Interface
 
-## 配置步骤
+Enter the knowledge pipeline orchestration interface and add the required data source node.  
+Click **Bind** in the right panel, and the system will automatically detect whether the data source has valid authorization:
 
-### 1. 选择数据源
+* If system integration or environment variables are configured, it will connect automatically;
+* If no authorization information is found, you will be prompted to go to the system integration page for authorization.
 
-1. 进入数据源授权页面
-2. 选择要授权的数据源
-3. 选择授权类型
+---
 
-### 2. 配置授权信息
+### Method 2: Through the System Settings Interface
 
-- **授权凭证**: 填写授权凭证
-- **权限范围**: 设置权限范围
-- **有效期**: 设置授权有效期
+Click the settings icon in the lower left corner and select **System Integration** to enter the system integration configuration page.  
+Select the system you want to authorize, click **Configure**, and you can add or update authorization credentials for that system.
 
-### 3. 测试授权
+---
 
-- **测试连接**: 测试授权连接
-- **验证权限**: 验证Access Permission
-- **保存授权**: 保存授权配置
+## Supported Data Sources and Authorization Methods
 
-## 授权管理
+| Data Source      | Default Env Variable | API Key | OAuth |
+| ---------------- | ------------------- | ------- | ----- |
+| Firecrawl        | ✅                   | ✅      |       |
+| Lark Docs        | ✅                   | ✅      | ✅    |
 
-### 查看授权
+> More third-party data sources (such as OneDrive, Notion, Google Drive) will be supported in future versions.
 
-- **授权列表**: 查看所有授权
-- **授权详情**: 查看授权详细信息
-- **授权状态**: 查看授权状态
+---
 
-### 更新授权
+## Authorization Methods Explained
 
-- **更新凭证**: 更新授权凭证
-- **更新权限**: 更新权限范围
-- **续期授权**: 续期授权有效期
+### 1. API Key Authorization
 
-### 撤销授权
+API Key is the most common authorization method, suitable for integrated services that require direct calls to external APIs.  
+Users can generate API Keys on the corresponding service platform and configure them in two ways:
 
-- **撤销授权**: 撤销不需要的授权
-- **批量撤销**: 批量撤销授权
+* **Method A: Environment Variable Authorization**  
+  Write the API Key into the system environment variable (e.g., `LARK_APP_ID`, `LARK_APP_SECRET`). The pipeline will automatically detect and use it at runtime.
 
-## 安全建议
+* **Method B: System Integration Configuration**  
+  Go to **System Settings → System Integration**, select the corresponding system, and click **Add API Key**.  
+  Enter the key and click **Save**. The authorization information will be securely encrypted and stored, and the status will show as **Connected**.
 
-1. **定期更新**: 定期更新授权凭证
-2. **最小权限**: 使用最小权限原则
-3. **安全存储**: 安全存储授权信息
-4. **访问监控**: 监控授权访问情况
+---
 
-## Related Documentation
+### 2. OAuth Authorization (In Development)
 
-- [步骤一: 创建知识流水线](/en/智能体AI 平台/知识库/通过知识流水线创建知识库/步骤一: 创建知识流水线)
-- [步骤五: 管理和使用知识库](/en/智能体AI 平台/知识库/通过知识流水线创建知识库/步骤五: 管理和使用知识库)
-- [连接外部知识库](/en/智能体AI 平台/知识库/连接外部知识库)
+OAuth is a standardized authorization protocol suitable for scenarios where users need to access cloud documents or enterprise resources via login.  
+XpertAI supports two OAuth authorization modes:
+
+#### Mode A: Default Client (Built-in)
+
+For the SaaS version of XpertAI, some mainstream data sources (such as Lark Docs) have official built-in OAuth client configurations.  
+Users only need to click authorize and confirm the permission scope to complete authorization in one click.
+
+#### Mode B: Custom Client
+
+For self-hosted deployments or data sources without built-in configurations, you can register and obtain OAuth Client parameters (`Client ID` and `Client Secret`) on the third-party platform.  
+Then, fill in and save these on the **System Settings → System Integration → Add OAuth** page to complete authorization.
+

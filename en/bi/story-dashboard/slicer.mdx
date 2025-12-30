@@ -1,21 +1,63 @@
 ---
-title: "切片器"
-description: "切片器功能说明"
+title: Slicer
+sidebar_position: 15
 ---
 
+**Slicer** is a tool used in multidimensional datasets for filtering data. It allows users to dissect and filter data of specified dimensions for a more detailed view and comparison. Specifically, in a multidimensional data model, data is stored in the form of cubes. If data analysts need to observe data of one dimension or a specific dimension, they can use a slicer to perform slicing operations, which means cutting the data from one dimension to study only the data situation on that dimension.
 
-# 切片器
 
-## Overview
+In the property settings of various widgets in Xpert Analysis Cloud, you can add filter settings in the selection condition area to query slicers, as shown in the figure below. Click the **✏️Add** button and select a dimension from the pop-up menu, which is divided into:
 
-切片器是故事仪表盘功能的重要组成部分。
+* Regular Dimension
+* Time Dimension
+* Combination Slicer
+* Advanced Slicer
 
-## 功能说明
 
-此功能正在完善中，更多详细信息即将推出。
+## Regular Dimension
 
-## Related Documentation
+After selecting the regular dimension menu item, a dimension member selection help window pops up, where you can select dimension members and set properties.
 
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+
+* **Display Form** of selectable members: The display behavior of selected members, which is a combination of member text description and technical ID;
+* **Hierarchy**: From which hierarchy of the dimension to select members;
+* **Exclude Selected Members**: The slicer will exclude the selected members from the result set;
+* **Selection Type**: Single or multiple selection;
+* Right-side **Display Form**: Whether dimension members are displayed in a tree structure or flat display;
+* **Hierarchy Selection Mode**: User selection behavior mode in the tree display form of dimension members, whether to select the tree node itself or select the node and all its child nodes or all descendant nodes, etc.
+
+## Time Dimension
+
+For time dimensions, users can choose to use inherent dimension members or set them as system-defined time functions, which will be replaced with actual time results during runtime queries.
+
+
+After selecting the time function menu item, a time interval setting window will pop up.
+
+
+* **Current Time**:
+  * **System Time**: The time interval will be calculated based on the system time;
+  * **User Current Time**: The time interval will be calculated based on the user's custom current time;
+* **Hierarchy**: For time dimensions with multiple hierarchies, choose one to use, mainly to keep consistent with the time hierarchy on other axes in the query, as a single query cannot use different hierarchies under the same dimension;
+* **Interval Type**:
+  * **Standard**: Use the current time to calculate the time interval;
+    * **Granularity**: The time granularity for calculating the time interval, such as year, month, day, etc.;
+    * **Review**: How much to extend in the past time direction;
+    * Current Time: Display the result of the current time interval;
+    * **Outlook**: How much to extend in the future time direction;
+    * **Format**: How to format the time into a format string of the technical name of the time dimension member (technology based on the [date-fns](https://date-fns.org/) time library, detailed format can be referenced), if not set, the system will look for the format setting on the corresponding level of the time dimension's hierarchy according to the time granularity, if not found, the default formatting behavior will be used.
+  * **Offset**: The offset type is to perform standard calculations on the basis of offsetting a certain period forward or backward;
+    * **Offset Direction**
+      * **Review**: Offset in the past time direction;
+      * **Outlook**: Offset in the future time direction;
+    * **Time Granularity**: The time granularity of the offset is consistent with the standard time granularity;
+    * **Offset Amount**: The number of offsets for the time interval;
+
+In the title line of the time interval, you can preview the calculation result of the time.
+
+## Combination Slicer
+
+For the use of combination slicers, refer to [Combination Slicer](../combination-slicer)
+
+## Advanced Slicer
+
+For the use of advanced slicers, refer to [Advanced Slicer](../advanced-slicer)

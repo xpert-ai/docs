@@ -1,0 +1,38 @@
+---
+title: Agent Middleware
+sidebar_position: 30
+---
+## Overview
+
+Control and customize agent execution at every step.
+
+Middleware provides a more fine-grained way to control the internal operations of agents. Middleware is suitable for the following scenarios:
+
+- Track agent behavior through logging, analytics, and debugging.
+- Transform prompts, tool selection, and output formats.
+- Add retry, fallback, and early termination logic.
+- Apply rate limiting, guardrails, and PII detection.
+
+## Agent Loop
+
+The core agent loop involves calling the model, having the model choose which tools to execute, and then ending when no more tools need to be called:
+
+![Core agent loop diagram](/public/img/ai/xpert/core_agent_loop.avif)
+
+Middleware exposes hooks before and after each step:
+
+![Middleware flow diagram](/public/img/ai/xpert/middleware_final.avif)
+
+## Middleware Nodes
+
+In XpertAI, agent nodes support attaching multiple middleware to an Agent in a visual way. Users can manage the order and configuration of middleware in a unified manner in the right panel, achieving the same pluggable Middleware architecture as LangChain.
+
+![Middleware node config](/public/img/ai/xpert/agent-middleware-nodes.png)
+
+Each middleware has its own independent configuration panel, where you can adjust its execution parameters and behavior, forming a visual, configurable, and extensible agent execution pipeline.
+
+![Middleware node config](/public/img/ai/xpert/middleware-node-config.png)
+
+Click the graph button to open the digital expert agent, and you can see the execution order and循环 relationship between middleware and agents:
+
+![Middleware graph](/public/img/ai/xpert/agent-middleware-graph.png)

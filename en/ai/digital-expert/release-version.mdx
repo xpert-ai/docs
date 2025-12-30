@@ -1,21 +1,46 @@
 ---
-title: "发布版本"
-description: "发布版本功能说明"
+title: Release Version
+sidebar_position: 11
 ---
+Xpert Agents allow users to easily release new versions to meet the needs of continuous optimization and expansion.
 
+- **Version Iteration Management**: Supports adjusting the features or logic of existing agents based on user needs and releasing updates through versioning.
+- **Draft and Publish Separation**: Before releasing a new version, users can test and adjust the agent in draft mode to ensure stability and functional accuracy.
+- **Version Release Logs**: Records changes made in each release, making it easy to trace and understand the context of version updates.
 
-# 发布版本
+![Publish new version](/public/img/ai/publish.png)
 
-## Overview
+## Version Management Features
 
-发布版本是数字专家功能的重要组成部分。
+Version management features are designed to ensure the transparent and controllable evolution of Xpert Agents and help users efficiently manage multiple versions.
 
-## 功能说明
+![Publish new version](/public/img/ai/xpert/publish-version.png)
 
-此功能正在完善中，更多详细信息即将推出。
+- **View Version History**: Users can view all historical versions of the agent, including release dates and version numbers.
+- **Version Rollback**: If a new version encounters issues, users can quickly revert to an older version, ensuring business continuity and stability.
+- **Multi-environment Support**: Supports managing multiple versions across different environments, such as testing and production environments (coming soon).
 
-## Related Documentation
+## Publish to Third-party Platforms
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+The Xpert AI platform supports publishing Xpert Agents to multiple major third-party platforms such as Feishu Bots, WeChat, DingTalk, etc. By integrating with these platforms, users can extend their intelligent assistants and automated tasks into everyday enterprise communication and workflows, enhancing work efficiency and user experience.
+
+Xpert AI provides a graphical configuration interface that allows users to quickly configure their agents for target platforms by simply providing the necessary API keys and authentication information. The system will automatically handle connections to each platform.
+
+![Publish to third-party platforms](/public/img/ai/publish-3-platforms.png)
+
+Xpert Agent is optimized for the characteristics of different platforms, such as supporting rich media messages and button interactions in WeChat and DingTalk, while taking advantage of Feishu's stronger bot features for integration and diversified interactions.
+
+### Publish to Feishu Bot
+
+To publish to Feishu, you need to create an enterprise self-built application and configure the following conditions:
+
+:::tip Prerequisites
+- **Add bot capabilities**
+- **Send events to the developer server**
+- Add event `im.message.receive_v1`
+- **Send callbacks to the developer server**
+- Add callback `card.action.trigger`
+- Enable permissions `im:message.p2p_msg:readonly`, `im:message.group_at_msg:readonly`, `im:message`, `im:message:send_as_bot`
+:::
+
+**Developer server** uses the `Webhook URL` generated during deployment.

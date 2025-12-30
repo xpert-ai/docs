@@ -1,42 +1,99 @@
 ---
-title: "自建应用配置"
-description: "自建应用配置指南"
+title: 自建应用配置
+sidebar_position: 1
 ---
 
-# 自建应用配置
+客户可以通过飞书的 **企业自建应用** 里的 **机器人**，将 ChatBI 的能力无缝展现给用户，实现对话式 BI 的 **实时数据** 分析。
+在飞书客户端内，用户可以直接与 ChatBI 进行自然语言交互，查询和分析 SAP 系统或数仓中的数据。
+用户无需切换应用，就能在熟悉的飞书环境中轻松实现 **协同式** 数据查询和业务分析，大幅提高工作效率和决策速度。
 
-## 概述
+## 企业自建应用
 
-自建应用配置用于配置自定义的ChatBI应用，包括应用信息、功能设置、权限配置等。
+**飞书企业自建应用** 是指企业利用飞书平台提供的开放接口和开发工具，自行开发和部署的应用程序。这些应用程序可以根据企业的特定需求进行定制，以满足内部业务流程、团队协作、信息管理等方面的需求。
 
-## 功能特性
+打开飞书开放平台的开发者后台：
+https://open.feishu.cn/app
 
-- **应用创建**: 创建自定义应用
-- **功能配置**: 配置应用功能
-- **权限管理**: 管理应用权限
-- **应用发布**: 发布应用供使用
+点击 **创建企业自建应用**，输入应用名称和信息创建成功后，在 **添加应用能力** 里添加 **机器人** 能力，转到机器人配置页面：
 
-## 配置步骤
+## 机器人设置
 
-### 1. 创建应用
+输入“如何开始使用”等基础信息。
+点击前往 **事件与回调** 添加卡片的“卡片回传交互”回调。
 
-1. 进入自建应用配置页面
-2. 点击"新建应用"
-3. 填写应用基本信息
-   - 应用名称
-   - 应用描述
-   - 应用图标
-4. 保存应用
+### 事件配置
 
-### 2. 配置功能
+为了接收飞书发来的消息事件，首先需要配置事件请求地址：
 
-- **数据源配置**: 配置应用使用的数据源
-- **对话配置**: 配置对话能力
-- **界面配置**: 配置应用界面
-- **集成配置**: 配置第三方集成
+`<Your server>/api/lark/webhook/<id>`
 
-## 相关文档
+![Webhook](/public/img/chatbi/webhook.png)
 
-- [对话模型](/zh-cn/智能体AI 平台/工具集/ChatBI 工具集/对话模型)
-- [对话机器人](/zh-cn/智能体AI 平台/工具集/ChatBI 工具集/对话机器人)
-- [快捷应用](/zh-cn/智能体AI 平台/工具集/ChatBI 工具集/快捷应用)
+- 参考 [系统集成 - 飞书集成配置](/docs/server/organization/integration) 中的“回调地址”属性。
+
+添加事件并开通对应权限：
+
+- `im.message.receive_v1` 接收消息 v2.0
+- `application.bot.menu_v6` 机器人自定义菜单事件 v2.0
+
+### 回调配置
+
+请求地址（同事件配置的请求地址）：
+`<Your server>/api/lark/webhook/<id>`
+
+订阅的回调：
+
+- `card.action.trigger` 卡片回传交互
+
+### 权限管理
+
+需要为本自建应用开通以下权限：
+
+- `im:message:send_as_bot`
+- `contact:contact.base:readonly`
+- `contact:user.email:readonly`
+- `contact:user.phone:readonly`
+- `contact:user.employee_id:readonly`
+
+### 机器人自定义菜单
+
+如果要在机器人自定义菜单中配置模型的切换功能，按如下规则添加菜单：
+
+`select_model:e7dc6846-c893-411a-90a2-0885a45fd5f1`
+
+将 uuid 替换为对应对话模型的 id
+
+## 系统设置
+
+### 环境配置
+
+安装部署系统时，配置角色名称是系统为飞书自动创建的用户初始分配的角色。
+
+```ini title="文件 .env"
+LARK_ROLE_NAME=VIEWER
+```
+
+### 数据源
+
+我们以 SAP 系统为例，创建一个连接 S/4HANA 系统的数据源。
+
+![SAP S/4HANA Data Source](/public/img/chatbi/sap-s4hana-data-source.png)
+
+### 语义模型
+
+通过连接 S/4HANA 系统的数据源，为 SAP 系统中的 cubes 或者单个 query 创建语义模型，进行语义增强后对接到 ChatBI 。
+
+![SAP S/4HANA Semantic Model](/public/img/chatbi/sap-s4hana-semantic-model.png)
+
+![SAP S/4HANA Cube](/public/img/chatbi/sap-cube-semantic-enhance.png)
+
+
+### 为 ChatBI 机器人配置模型
+
+将增强后的 SAP Cube 语义模型，或者自研数仓的语义模型配置到 ChatBI 服务中，这样飞书机器人便可以对其进行查看和分析。
+
+参见 [对话模型](../models/)
+
+
+参考：
+- https://open.feishu.cn/document/home/qr-code-scanning-login-for-web-app/introduction

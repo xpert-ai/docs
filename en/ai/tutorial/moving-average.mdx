@@ -1,19 +1,80 @@
 ---
-title: "移动平均值"
-description: "移动平均值教程"
+title: Moving Average
+sidebar_position: 15
+tags:
+  - MDX
 ---
 
+Moving Average (MA) is a tool used in technical analysis to analyze time series data. It is commonly used to calculate the average of variables such as stock prices, returns, or trading volumes. The moving average can reflect long-term trends or cycles, and mathematically, it is also known as a rolling average or convolution.
 
-# 移动平均值
+There is another concept called Simple Moving Average (SMA), which refers to the average of a variable over a specified number of previous values. For example, the 10-day simple moving average of closing prices represents the average of the closing prices of the previous 10 days, and it can be denoted as SMA 10.
 
-## Overview
+Let's first take a look at the monthly sales figures -
 
-移动平均值教程将帮助您了解如何使用相关功能。
+Set up the following graph conditions:
 
-## 内容
+* Data source: `Demo - FoodMart Model`
+* Model: `Sales`
+* Graph type: `Line`
+* Measure: `Sales`
+* Dimension: `Time - Month Level`
 
-此教程正在完善中，更多详细信息即将推出。
+You will then see a trend chart of the total sales amount for each month. Next, we will create the moving average of the sales amount.
 
-## Related Documentation
+## Creating the "Moving Average" Calculated Measure
 
-- [教程](/en/智能体AI 平台/教程)
+Based on the measure `Sales`, create a moving average for the last 3 months. Click on "Add Measure" to open the measure selection menu, then click on the "Create Calculated" button to open the create calculated measure dialog.
+
+* Select the type as "Calculated Formula"
+* Enter the name as "Sales_MA"
+* Enter the formula as `AVG(LastPeriods(3, [Time].CurrentMember), [Measures].[Sales])`
+* Click "Apply" to return to the measure selection list
+* Select the newly created calculated measure "Sales_MA"
+
+You will see a new line in the graph representing the trend of the 3-month moving average of the sales amount.
+
+## Creating the Moving Window Size Parameter
+
+If users want to manually adjust the window size of the moving average during runtime, we can add a parameter to the calculated formula.
+
+* Click on "Edit Formula" to open the "Calculated Editor" window's sidebar, and switch to the "Parameters" tab
+* Click on the "Add Parameter" button to open the "Create Parameter" window
+* Select the type as "Input", enter the name as "Sales_MA_Periods", and set the default value as "3"
+* Click "Apply" to return to the parameter list interface
+* In the editor, type `@` at the position of 3 to bring up the available parameter options, select the parameter "Sales_MA_Periods" by pressing Tab or clicking on it
+* Alternatively, you can manually enter the format as `[@ParameterName]`, such as `[@Sales_MA_Periods]`, into the editor
+* Click "Apply" to return to the storybook page
+* Click "Refresh Graph" to re-execute the query and see the same line
+
+To change the parameter value, we need to create an input component for the parameter. Click on the "Create Input Controller" button in the menu bar and add an input controller component to the layout.
+
+Select the input controller component and enter the following information in the right-side property editing window:
+
+* Title: "Moving Average Window Size"
+* Data source: `Demo - FoodMart Model`
+* Model: `Sales`
+* Dimension/Measure: Parameter `Sales_MA_Periods`
+
+The input controller component will display an input box with the default value. You can change the moving average window size in real-time by modifying this input box.
+
+## Moving Average for Previous and Future Windows
+
+If you want to calculate the moving average for a certain number of intervals after the current time, you can set the parameter of the `LastPeriods` function to a negative value.
+
+If you want to calculate the moving average for both previous and future intervals, you can use the union of sets in the formula as follows:
+
+`AVG({LastPeriods([@Sales_MA_Periods], [Time].CurrentMember), LastPeriods(-[@Sales_MA_Periods], [Time].CurrentMember)}, [Measures].[Sales])`
+
+## Displaying the Start Period Attribute
+
+To facilitate viewing, we can display the start period of the moving window in the tooltip of the graph. Follow these steps:
+
+* Add a measure, open the list, and click on "Create Calculated Member"
+* Select the type as "Calculated Formula", enter the name as "Sales_MA_Start"
+* Enter the formula as `LastPeriods([@Sales_MA_Periods], [Time].CurrentMember).Item(0).Caption`
+* Click "Apply" and select the created calculated measure
+* Set its role as "Tooltip" in the measure properties menu
+
+Now, the value of Sales_MA_Start, representing the start period of the moving window, will be displayed in the tooltip.
+
+Refer to the **Demo - Calculation** / Moving Average page in the storybook for the dashboard.

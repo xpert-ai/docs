@@ -1,48 +1,45 @@
 ---
-title: "选项卡"
-description: "选项卡微件使用指南"
+title: Tabs
+sidebar_position: 6
 ---
 
+The tabs component is a component based on TabGroup that can combine multiple other components for display in a tabbed manner.
 
-# 选项卡
+In the story editing interface, click "**Tabs**" in the toolbar's insert area to create a tabs component on the current page. After selecting this component, edit its settings in the property editing panel on the right:
 
-## Overview
+Click the **Add** button in the tabs configuration table area to add a new tabs configuration row. Configuration properties are as follows:
 
-选项卡微件用于创建选项卡式的内容组织方式，可以在同一区域内切换显示不同的内容。
+- **Component Type**: The component type used within a single tab. Currently supported:
+  - **Analysis Card**: Corresponds to chart analysis component;
+  - **Analysis Table**: Corresponds to analysis table component;
+  - **Indicator Card**: Corresponds to indicator card component;
+  - **Financial Report**: Corresponds to financial report component;
 
-## Features
+Style configuration:
 
-- **多标签页**: 支持多个标签页
-- **内容切换**: 支持点击标签切换内容
-- **样式定制**: 支持自定义选项卡样式
-- **响应式布局**: 支持响应式布局
+Style configuration includes general component style settings.
 
-## Usage
+Detailed tabs configuration:
 
-### 添加选项卡
+| Name | Description | Details |
+| -------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Disable Ripple | Disable ripple effect on tab labels | |
+| Keep Content | Keep tab content components | By default, tabs remove content from the DOM when it's not on screen. Setting this to true will keep it in the DOM, which prevents elements like iframes and videos from reloading when they return to view. |
+| Color | Theme color of the component | |
+| Animation Duration | Duration of label animation | If no unit is set, it will be normalized to milliseconds. |
+| Alignment | Alignment of labels | |
+| Header Position | Position of tab headers | |
+| Disable Pagination | Whether pagination should be disabled | If pagination is known to be unnecessary, this can be used to avoid unnecessary layout recalculations |
 
-1. 在故事仪表盘中，点击"添加微件"
-2. 选择"选项卡"
-3. 添加标签页
-4. 为每个标签页添加内容
-5. 配置选项卡样式
-6. 保存配置
+Component detailed configuration:
 
-## 配置选项
+| Name | Description | Details |
+| -------- | ---------------------- | -------- |
+| Title | Tab title | |
+| Component Type | Component type displayed in the tab | |
+| Details | Detailed configuration for the corresponding component type | Configure in detail according to the selected component type. Refer to the corresponding component type configuration for specific settings. Remember to click the **Submit** button at the bottom after editing. |
+| Disabled | Disable this tab | |
 
-### 标签页配置
+## 示例
 
-- **标签名称**: 设置标签页名称
-- **标签图标**: 添加标签图标（可选）
-- **标签内容**: 添加标签页内容
-
-### 样式配置
-
-- **选项卡样式**: 选择选项卡样式（顶部、底部、左侧、右侧）
-- **标签样式**: 自定义标签样式
-- **激活样式**: 设置激活标签的样式
-
-## Related Documentation
-
-- [滑动微件](/en/数据分析平台/微件/滑动微件)
-- [页面布局](/en/数据分析平台/故事仪表盘/页面布局)
+<iframe src="https://app.mtda.cloud/public/story/widget/4920d09c-ae30-4e65-b4c8-c6311538493d" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

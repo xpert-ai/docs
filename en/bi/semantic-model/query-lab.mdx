@@ -1,20 +1,51 @@
 ---
-title: "查询实验室"
-description: "查询实验室功能说明"
+title: 🧪 Query Laboratory
+sidebar_position: 5
+tags:
+  - MDX
+  - SQL
 ---
 
+Query Laboratory provides the functionality to flexibly manipulate data source entities (physical table views or multidimensional datasets) using query statements, assisting users in their daily data operation and maintenance work.
 
-# 查询实验室
+Query Laboratory supports three types of query scenarios using statement queries:
 
-## Overview
+* Source database tables of SQL models;
+* Source database tables of MDX models;
+* Source multidimensional datasets (Cubes) of XMLA data sources;
 
-查询实验室是语义模型功能的重要组成部分。
+In other words, queries can only be performed on data source entities within the **Data Tables** area of the model interface, and not on models within the **Model** area.
 
-## 功能说明
+## Common Operations
 
-此功能正在完善中，更多详细信息即将推出。
+Open the semantic model, click the **Query** menu button on the toolbar, to navigate to the Query Laboratory interface. Initially, the system will create an empty query, and users can also click on *New Query* to add one.
 
-## Related Documentation
+Dragging a data table to the table structure area allows querying its detailed field information and member composition. Dragging a table, field, or member to the code editing area allows inserting the corresponding names. After writing the query statement, clicking *Execute* will execute the query statement and view the data results.
+Dragging tables or fields from the table structure area to the query result area allows querying the corresponding data results directly. Dragging the table name will query data for all fields in the table, while dragging the field name will query member data for that field.
 
-- [多维模型介绍](/en/数据分析平台/语义模型/多维模型介绍)
-- [管理语义模型](/en/数据分析平台/语义模型/管理语义模型)
+Clicking the more button on the left side of the result toolbar allows closing all result sets or clicking to download the current result set.
+
+### Save as Model
+
+If in an SQL semantic model, after editing the statement, the current statement can be saved as an SQL model for subsequent modeling work. (To be completed)
+
+## SQL Data Source Table Query
+
+When the semantic model uses an SQL data source for an MDX multidimensional model or an SQL multidimensional model, the Query Laboratory can query the tables/views in the data source. To query MDX statements for the created MDX multidimensional dataset, you can go to the query interface in the multidimensional dataset designer.
+
+Dragging the table name from the data table area to the table structure area of the query, clicking the expand button of the table to pull the table fields, continuing to expand fields of type `D` can pull their field value lists.
+
+All information can be dragged to the right editor to assist users in writing SQL statements.
+
+
+## Multidimensional Dataset Query of XMLA Data Source
+
+When the semantic model is connected to an XMLA data source, Query Laboratory uses MDX statements for data querying.
+
+In this scenario, the entities in the data table area are lists of multidimensional datasets from the XMLA data source.
+
+Create a new query and drag the multidimensional dataset from the data table area to the table structure area of the query. Then click the expand button to pull the dimensions and measures of the multidimensional dataset.
+
+Expanding downwards can pull **dimensions/hierarchies/levels/members/members...**
+
+All these information nodes can be dragged to the right editor to assist users in writing MDX statements.

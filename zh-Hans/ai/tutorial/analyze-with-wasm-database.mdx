@@ -1,18 +1,86 @@
 ---
-title: "使用 WASM 数据库做分析"
-description: "使用 WASM 数据库做分析教程"
+title: 使用 WASM 数据库做分析
+sidebar_position: 20
 ---
 
-# 使用 WASM 数据库做分析
+ Xpert 分析云支持使用 WASM 技术运行的浏览器内存数据库做数据分析，使得用户可以使用浏览器分析在线存储任何地方的数据文件，包括 **Excel**, **CSV**, **JSON** 和 **Parquet** 类型的文件。
 
-## 概述
+> **WASM** 是 WebAssembly 的缩写，它是一种用于在 Web 浏览器中运行高性能代码的二进制格式。WebAssembly 的目标是提供一种与 JavaScript 并行使用的通用Web应用程序语言，以支持更快，更强大的Web 应用程序和游戏。与 JavaScript 不同，WebAssembly 可以直接在浏览器中运行，而无需解释器或编译器的参与，从而提高了性能。WASM 可以使用多种编程语言进行编写，包括 C++，Rust 和 Go 等。除了 Web 浏览器，WebAssembly 还可以在其他环境中运行，例如操作系统内核，物联网设备和服务器。
 
-使用 WASM 数据库做分析教程将帮助您了解如何使用相关功能。
+## 新建 WASM 模型
 
-## 内容
+无需数据源配置， 直接在语义模型管理界面点击 [新建 WASM 模型](../../models/sql-modeling/wasm-model/) 按钮， 输入名称即可进行创建。
 
-此教程正在完善中，更多详细信息即将推出。
+假设你已经拿到了可以访问的数据文件链接（如 https://app.mtda.cloud/assets/data/topSubscribed.csv 数据来源于 [Most Subscribed 1000 Youtube Channels](https://www.kaggle.com/datasets/themrityunjaypathak/most-subscribed-1000-youtube-channels) ）, 点击新建表参考下图方式创建表
 
-## 相关文档
+![Middle Shadow](./create-table.png)
 
-- [教程](/zh-cn/智能体AI 平台/教程)
+点下一步转到数据预览步骤，这里可以更改自动识别出来的字段类型，点击应用完成配置。
+
+![Middle Shadow](./preview.png)
+
+:::caution
+
+由于这个文件里的  'Subscribers' 'Video Views' 'Video Count' 三个字段值是以千分位的方式存储的数字，目前 WASM DB 导入这样的数字无法自动识别，所以需要将字段类型改成 String。
+或者在源文件中改成纯数字格式。 也可以使用[数据库初始化脚本](../../models/sql-modeling/wasm-model/#初始化脚本)进行处理。
+
+:::
+
+### 初始化脚本
+
+也可以使用数据库初始化脚本的方式加载为数据表，使用如下 sql 脚本
+
+```sql
+-- create table manually
+CREATE TABLE topSubscribed (Rank INTEGER, "Youtube Channel" VARCHAR, Subscribers DOUBLE, "Video Views" DOUBLE, "Video Count" DOUBLE, Category VARCHAR, Started VARCHAR);
+-- insert table from converted file data
+INSERT INTO topSubscribed SELECT Rank, "Youtube Channel",
+    TRY_CAST(REPLACE("Subscribers", ',', '') AS decimal(20, 0)) AS Subscribers,
+    TRY_CAST(REPLACE("Video Views", ',', '') AS decimal(20, 0)) AS "Video Views",
+    TRY_CAST(REPLACE("Video Count", ',', '') AS decimal(20, 0)) AS "Video Count",
+    Category,
+    Started
+FROM 'https://app.mtda.cloud/assets/data/topSubscribed.csv';
+```
+
+可以执行上述脚本验证逻辑正确性，点击数据表区域的刷新元数据获取物理表可验证。
+
+![](./save-as-db-init.jpg)
+
+### 创建多维数据集
+
+[创建多维数据集](../../models/cube-designer/) 使用表 `topSubscribed` 创建多维数据集 `TopSubscribed` 标签说明为 “Top Subscribed Channels” 点击应用创建。
+
+![创建多维数据集](/public/img/tutorials/wasm/create-cube.png)
+
+这里 `topSubscribed` 就是多维数据集的事实表，目前一个多维数据集中支持一个事实表和多个维度表。这里勾选度量或关联维度后创建多维数据集，会自动创建度量和维度结构。也可以不勾选，手动创建。手动创建模式，在源字段区域是事实表的物理表字段，被自动根据字段类型划分为维度和度量，需要调整的可以相互拖动。
+
+选择需要生成维度和度量的字段后，点击**一键生成**按钮将字段生成多维数据集维度和度量。 
+目前基础模型就创建完成，可以用来查询数据了。
+
+![](./one-key.jpg)
+
+为了更好分析 Youtube Channel 维度的层次结构， 我们增强一下 Youtube Channel 维度层次结构和层级。 为现有 Youtube Channel 层级增加一个 Category 上级层级， 再新增一个 Started 层次结构，此层次结构中以 Started Year 开始往下细分为 Category 和 Youtube Channel。
+
+![Small](./cube-dimension.jpg)
+
+## 创建故事
+
+有了模型之后让我们来创建一个关于 Youtube Channel Top Subscribers 的故事。点击模型工作空间 -> 常规菜单 -> 故事 -> 创建故事，即根据当前模型创建一个故事，也可以转到故事管理页面点击 **新建** 选择此模型然后创建。
+
+打开[故事的设计器](../../stories/)后可以创建一个或多个故事点页面，一个故事点页面通常代表一个主题或分析领域。接下来就是添加各种组件
+
+* 创建图形请参考组件[分析卡片](../../widgets/analytical-card/)
+* 创建过滤器请参考组件[输入控制器](../../widgets/input-control/)
+
+### 分享&嵌入
+
+创建好故事仪表板后便可以分享链接并嵌入到其他网页，点击故事工具栏中的分享菜单，打开分享窗口，将故事 **可见度** 设置为 **公开**。使用应用链接即可公网访问此故事，也可以转到嵌入并预览故事嵌入到页面中的效果：
+
+![分享故事仪表板链接嵌入页面](/public/img/tutorials/wasm/share-story.png)
+
+也可以使用分享菜单中的导出功能将故事到出为文件以分享给同事。
+
+## 示例
+
+<iframe src="https://app.mtda.cloud/public/story/96ad959f-75b7-4792-80f0-30ea3101d970" width="100%" height="700px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

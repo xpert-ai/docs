@@ -1,20 +1,100 @@
 ---
-title: "语义建模工作空间"
-description: "语义建模Workspace功能说明"
+title: 🛠️ Modeling Workspace
+sidebar_position: 3
 ---
 
+The Semantic Modeling Workspace is a dedicated environment for modeling data using a semantic layer, enabling different teams within the organization to form a common shared understanding of data. The semantic layer is used to define dimensions, hierarchies, and multidimensional datasets, and it transforms raw data into meaningful business terms. The Semantic Modeling Workspace helps simplify complex relationships between data elements, making it easier for organizations to perform data analysis and queries, and provides a more intuitive way of understanding data.
 
-# 语义建模Workspace
+The functionality of the Semantic Modeling Interface is divided into the following areas:
 
-## Overview
+* Model Entity List;
+* Data Source Entity List;
+* Query Lab;
+  * Table Structure List
+  * Query Statement Editor
+  * Query Results Preview
+* Dimension Designer;
+  * Hierarchy List;
+  * Data Table Structure List;
+  * Data Preview Table;
+  * Dimension Table Relationship Building Area;
+* Multidimensional Dataset Designer;
+  * Dimension List
+  * Measure List
+  * Calculated Member List
+  * Structure Preview Area
+  * Calculation Editor
+  * Query Editor
 
-语义建模Workspace是语义模型功能的重要组成部分。
+## Model Entities
 
-## 功能说明
+The Model Entities list area is used to create various semantic model entities, including: Shared Dimensions, Multidimensional Datasets, and Virtual Cubes.
 
-此功能正在完善中，更多详细信息即将推出。
+![Semantic Model Entities](/public/img/models/semantic-model-entities.png)
 
-## Related Documentation
+* Shared Dimension: A dimension shared between multiple datasets to avoid data redundancy and duplicate definitions.
+* Multidimensional Dataset: Used to store and organize data, consisting of Dimensions and Measures.
+* Virtual Cube: A virtual data model created based on one or more existing datasets.
 
-- [多维模型介绍](/en/数据分析平台/语义模型/多维模型介绍)
-- [管理语义模型](/en/数据分析平台/语义模型/管理语义模型)
+## Data Tables
+
+The list in the **Data Tables** area contains metadata information about entities from the data source, such as tables from relational databases or multidimensional datasets from multidimensional data sources.
+
+### Refresh Metadata
+
+The **Refresh Metadata** button can manually retrieve entity information from the data source.
+
+### Upload Data
+
+The **Upload Table** button can upload data files to create tables and save data to the database.
+
+![Upload Data](/public/img/models/upload-data-file.png)
+
+1. In the upload window, after adding a data file, proceed to the **Preview** step.
+2. Each selection represents a data file or Excel sheet.
+   1. The title in each selection will be used as the table name for creating the database table and can be modified.
+   2. The preview table header represents the column configuration of this table, and selecting **Key** will set this column as the primary key. You can also change the column type, field length, and column name.
+3. Proceed to the import step.
+   1. **Overwrite**, **Append**, or **Merge**: Indicates whether the data will recreate the database table or append it to an existing table.
+   2. The delete button can remove tables that do not need to be imported.
+   3. Click Import to upload and wait for successful upload.
+
+After completion, the Data Tables area will refresh with information about the newly created tables.
+
+### Search Data Tables
+
+You can filter the list based on key values or descriptions.
+
+## Query Lab
+
+After creating a semantic model using a data source, users can use the Query Lab feature to query and manage database objects in the data source. It can be used as a daily data operation function for users or as a data organization and preview function when modeling data.
+
+For detailed functionality, see [🧪Query Lab](../query-lab).
+
+## Dimension Designer
+
+The Dimension Designer function helps users create shared dimensions publicly. Shared dimensions are uniformly created and managed and can be used in different multidimensional datasets to minimize differences between different models.
+
+The hierarchy in dimensions allows users to analyze the results of the same dataset from different perspectives.
+
+For detailed functionality, see [❄️Dimension Designer](../dimension-designer).
+
+## Multidimensional Dataset Designer
+
+[🧊Multidimensional Dataset Designer](../cube-designer/) helps users analyze fact table data by associating different dimension data.
+
+## Virtual Dataset Designer
+
+[🔗Virtual Dataset Designer](../mdx-modeling/virtual-cube/)
+
+## Create New Story Dashboard
+
+From the Semantic Model interface menu bar **General** -> **Story** -> **Create Story**, creating a story will default to using the current semantic model as the data source model.
+
+## Shortcuts
+
+| Shortcut | Description |
+| --- | --- |
+| `Ctrl + S` | Save the current model |
+| `Ctrl + Z` | Undo |
+| `Ctrl + Shift + Z` | Redo |

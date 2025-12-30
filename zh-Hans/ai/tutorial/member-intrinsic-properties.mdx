@@ -1,18 +1,87 @@
 ---
-title: "成员固有属性"
-description: "成员固有属性教程"
+title: 成员固有属性
+sidebar_position: 100
+tags:
+  - MDX
 ---
 
-# 成员固有属性
+import CodeBlock from '@theme/CodeBlock';
 
-## 概述
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-成员固有属性教程将帮助您了解如何使用相关功能。
+MDX（多维表达式）是一种查询多维数据的语言，它使用一种称为“成员”的概念来引用数据。成员是多维数据中的元素，如维度成员或度量成员。
 
-## 内容
+:::info
 
-此教程正在完善中，更多详细信息即将推出。
+**成员属性**是维度成员的属性，提供额外的信息，而您不想在其中进行分析。换句话说，成员属性是不适合作为维度理想候选项但仍包含有价值信息的属性。例如，以标准地址为例：您可能想将国家、州、城市，甚至邮政编码作为一个维度，但在维度值中具体地址（例如1 Meadow Drive）没有太多意义，因为它只是过于精细。地址适合作为属性的理想候选项。这些属性仍然存储在维度表中，与标准维度值并列。成员属性必须与成员具有一对一的关系。
 
-## 相关文档
+:::
 
-- [教程](/zh-cn/智能体AI 平台/教程)
+在 MDX 中，成员具有许多固有属性，这些属性称为 **Intrinsic Member Properties**。其中最常见的属性是成员名称（Member Name），成员的唯一标识符。还有父成员（Parent Member），它表示该成员所属的父级成员。成员的深度（Depth）也是一个重要的属性，它表示成员所在维度的层次级别。此外，还有子成员（Child Members），它包含与当前成员相关的所有子成员。
+
+除此之外，还有许多其他的 Intrinsic Member Properties，如 Level、Hierarchy、Member_Ordinal、Parent_Level 等等。这些属性对于查询多维数据非常重要，可以使用它们来创建自定义计算、筛选和排序。例如，可以使用 Level 属性来获取成员所在层次结构的层次结构对象，并在查询中使用它来过滤数据。使用 Hierarchy 属性，可以在查询中指定使用哪个层次结构。
+
+下面显示的所有属性都可以通过以下方式进行查询：
+
+```mdx-code-block
+<Tabs>
+  <TabItem value="Property" label="Property" default>
+```
+```sql
+CurrentMember.Properties("PARENT_UNIQUE_NAME")
+```
+```mdx-code-block
+  </TabItem>
+  <TabItem value="Function" label="Function">
+```
+```sql
+CurrentMember.Parent.UniqueName	
+```
+```mdx-code-block
+  </TabItem>
+</Tabs>
+```
+
+固有属性列表
+
+| Function                             | Property                | Description                                                                                                                                                                                                                                                                                               |
+| ------------------------------------ | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N/A                                  | `CATALOG_NAME`          | 该成员所属立方体的名                                                                                                                                                                                                                                                                                      |
+| `CurrentMember.Children.Count`       | `CHILDREN_CARDINALITY`  | 成员的子级数量。这可能是一个估计值，因此您不应依赖它作为精确计数。提供程序应返回可能的最佳估计值                                                                                                                                                                                                          |
+| N/A                                  | `DESCRIPTION`           | 成员的可读描述。                                                                                                                                                                                                                                                                                          |
+| `CurrentMember.Dimension.UniqueName` | `DIMENSION_UNIQUE_NAME` | 该成员所属维度的唯一名称。对于通过限定生成唯一名称的提供程序，该名称的每个组件都是分隔符。                                                                                                                                                                                                                |
+| `CurrentMember.Hierarchy.UniqueName` | `HIERARCHY_UNIQUE_NAME` | 层次结构的唯一名称。如果成员属于多个层次结构，则每个层次结构都有一行。对于通过限定生成唯一名称的提供程序，该名称的每个组件都是分隔符。                                                                                                                                                                    |
+| `CurrentMember.Level.Ordinal`        | `LEVEL_NUMBER`          | 成员距离层次结构根部的距离。根级别为零。                                                                                                                                                                                                                                                                  |
+| `CurrentMember.Level.UniqueName`     | `LEVEL_UNIQUE_NAME`     | 该成员所属级别的唯一名称。对于通过限定生成唯一名称的提供程序，该名称的每个组件都是分隔符。                                                                                                                                                                                                                |
+| `CurrentMember.Caption`              | `MEMBER_CAPTION`        | 与成员关联的标签或标题。标题主要用于显示目的。如果不存在标题，则查询返回 MEMBER_NAME                                                                                                                                                                                                                      |
+| N/A                                  | `MEMBER_KEY`            | 原始数据类型中成员键的值。MEMBER_KEY用于向后兼容。对于非组合键，MEMBER_KEY与KEY0具有相同的值，对于组合键，MEMBER_KEY属性为null。                                                                                                                                                                          |
+| `CurrentMember.Name`                 | `MEMBER_NAME`           | 成员的名称。                                                                                                                                                                                                                                                                                              |
+| N/A                                  | `MEMBER_TYPE`           | 成员的类型。此属性可以具有以下值：MDMEMBER_TYPE_REGULAR、MDMEMBER_TYPE_ALL、MDMEMBER_TYPE_FORMULA、MDMEMBER_TYPE_MEASURE、MDMEMBER_TYPE_UNKNOWN。注意：MDMEMBER_TYPE_FORMULA优先于MDMEMBER_TYPE_MEASURE。因此，如果在度量维度上有一个公式(计算)成员，则计算成员的MEMBER_TYPE属性为MDMEMBER_TYPE_FORMULA。 |
+|`CurrentMember.Ordinal`|`MEMBER_ORDINAL`| Problem: two different values returned: 2 for shortcut and -1 property |
+| `CurrentMember.UniqueName`           | `MEMBER_UNIQUE_NAME`    | 成员的唯一名称。对于通过限定生成唯一名称的提供程序，该名称的每个组件都是分隔符。                                                                                                                                                                                                                          |
+| `CurrentMember.Parent.Count`         | `PARENT_COUNT`          | 此成员具有的父级数。                                                                                                                                                                                                                                                                                      |
+| `CurrentMember.Parent.Level.Ordinal` | `PARENT_LEVEL`          | 成员的父级距层次结构根级别的距离。根级别为零。                                                                                                                                                                                                                                                            |
+| `CurrentMember.Parent.UniqueName`    | `PARENT_UNIQUE_NAME`    | 成员父级的唯一名称。对于根级别的任何成员，返回NULL。对于通过限定生成唯一名称的提供程序，该名称的每个组件都是分隔符。                                                                                                                                                                                      |
+
+## 例子
+
+以下示例返回每个产品类别的父级ID、键和名称。请注意，这些属性被自定义为度量。这使得您在运行查询时可以在单元格集中查看属性，而无需在成员属性对话框中查看。您可以运行此类查询来从已部署的立方体中检索成员元数据。
+
+```sql
+WITH  
+MEMBER [Measures].[Parent Member ID] AS  
+ [Product].[Product Categories].CurrentMember.Parent.PROPERTIES("ID")  
+MEMBER [Measures].[Parent Member Key] AS  
+ [Product].[Product Categories].CurrentMember.Parent.PROPERTIES("KEY")  
+MEMBER [Measures].[Parent Member Name] AS  
+ [Product].[Product Categories].CurrentMember.Parent.PROPERTIES("Name")  
+SELECT  
+ {[Measures].[Parent Member ID], [Measures].[Parent Member Key], [Measures].[Parent Member Name] } on COLUMNS,   
+ [Product].[Product Categories].AllMembers on ROWS  
+FROM [Adventure Works]  
+```
+
+## 总结
+
+总之，Intrinsic Member Properties 是 MDX 中非常重要的概念，它们允许我们轻松访问多维数据的元素，并使用这些元素来创建高级查询。了解这些属性将使您能够更好地理解 MDX，并在使用MDX查询数据时更加灵活和高效。

@@ -1,21 +1,57 @@
 ---
-title: "环境变量"
-description: "环境变量功能说明"
+title: Environment Variables
+sidebar_position: 6
+---
+To further enhance the platform's flexibility and maintainability, the Xpert AI Multi-Agent Platform officially launches the **Env Environment Management Function**. With this feature, users can define multiple runtime environments within a workspace and configure environment variables for use in agents, workflows, and toolsets. It supports critical capabilities such as sensitive information isolation, configuration reuse, and environment separation.
+
 ---
 
+## 🧩 Feature Highlights
 
-# 环境变量
+### ✅ Multi-Environment Definition and Switching  
+Each agent workspace supports creating multiple named environments (e.g., `dev`, `test`, `prod`), enabling independent configuration management for different business stages or runtime needs.
 
-## Overview
+### ✅ Unified Environment Variable Management  
+Each environment can define multiple key-value pair variables, accessible across the platform using the unified syntax `{{env.variable_name}}`. These can be applied to agent model parameters, tool configurations, API calls, and more.
 
-环境变量是数字专家功能的重要组成部分。
+### ✅ Global Injection Mechanism  
+Environment variables can be dynamically resolved and injected into:
+- Agent configurations (e.g., prompts)
+- Workflow node parameters (e.g., HTTP params)
+- Toolset connection configurations (e.g., API Key)
 
-## 功能说明
+### ✅ Environment Binding for Digital Expert Publishing  
+When publishing a digital expert, you can **bind a specific environment**, which will automatically take effect during end-user interactions. This ensures digital experts use different prompts, APIs, or tool resources at various stages for consistent and controlled behavior.
 
-此功能正在完善中，更多详细信息即将推出。
+### ✅ Runtime Environment Selection  
+When running or testing agents or workflow tasks, you can manually select an environment, and the platform will automatically load the corresponding variable set, improving testing efficiency and scenario flexibility.
 
-## Related Documentation
+---
 
-- [多智能体架构](/en/智能体AI 平台/数字专家/多智能体架构)
-- [专家配置](/en/智能体AI 平台/数字专家/专家配置)
-- [对话](/en/智能体AI 平台/对话/项目)
+## 🛠 How to Use
+
+### 1. Create an Environment  
+Go to the workspace → Click the “Env” tab → Create an environment → Define the variable set:
+
+For example:
+
+![Environment Management](/public/img/ai/xpert/envs.png)
+
+### 2. Reference Variables  
+Use the `{{env.variable_name}}` syntax in agent, workflow, or tool configurations. For example:
+
+![Prompt Referencing Environment Variables](/public/img/ai/xpert/use-env-in-agent.png)
+
+### 3. Bind Default Environment for Digital Expert  
+In the “Digital Expert” publishing interface, select the default environment to bind. Once bound, all end-user conversation requests will run with that environment’s variables, ensuring response consistency and security.
+
+![Publish with Bound Environment](/public/img/ai/xpert/publish-with-env.png)
+
+### 4. Manually Switch Environments for Testing  
+During development or debugging, flexibly select environments to simulate behavior differences across scenarios.
+
+![Manage Environment Variables](/public/img/ai/xpert/env-variables.png)
+
+---
+
+The **release of the Env feature** marks a significant step forward for the XpertAI platform in configuration management, security control, and enterprise-grade multi-scenario deployment capabilities. Try it now and build your exclusive AI system with greater professionalism!

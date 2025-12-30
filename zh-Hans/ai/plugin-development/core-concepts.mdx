@@ -1,19 +1,177 @@
 ---
-title: "插件系统的核心概念"
-description: "插件系统的核心概念指南"
+sidebar_position: 2
+title: 插件系统的核心概念
 ---
 
-# 插件系统的核心概念
+在 Xpert AI 插件系统中，所有插件均遵循统一的接口规范与生命周期管理。通过一组核心概念，开发者可以轻松扩展宿主系统的能力，而无需修改核心代码。
 
-## 概述
+---
 
-插件系统的核心概念是插件开发的重要组成部分。
+### 2.1 XpertPlugin
 
-## 内容
+`XpertPlugin` 是插件的核心入口接口，定义了插件的元信息（`meta`）、配置（`config`）、生命周期方法和模块注册逻辑。
 
-此文档正在完善中，更多详细信息即将推出。
+```ts
+export interface XpertPlugin<TConfig extends object = any> 
+  extends PluginLifecycle, PluginHealth {
+  meta: PluginMeta;                       // 插件元信息
+  config?: PluginConfigSpec<TConfig>;     // 插件配置
+  register(ctx: PluginContext<TConfig>): DynamicModule; // 注册插件模块
+}
+```
 
-## 相关文档
+* **meta**：插件的基本元信息，包括 `name`、`version`、`category`、`icon`、`description` 等。
+* **config**：定义插件所需的配置 Schema（基于 `zod`），支持默认值与 UI 表单渲染。
+* **register**：返回 `DynamicModule`，用于将插件挂载到主应用（可选择设为全局）。
 
-- [概述](/zh-cn/智能体AI 平台/插件开发/概述)
-- [插件开发](/zh-cn/智能体AI 平台/插件开发)
+---
+
+### 2.2 插件生命周期（PluginLifecycle）
+
+插件系统为每个插件提供完整的生命周期钩子，方便开发者在不同阶段执行初始化或清理逻辑。
+
+```ts
+export interface PluginLifecycle {
+  onInit?(ctx: PluginContext): Promise<void> | void;   // 模块注册完成后调用
+  onStart?(ctx: PluginContext): Promise<void> | void;  // 应用启动后调用（对外服务可用）
+  onStop?(ctx: PluginContext): Promise<void> | void;   // 应用优雅停机时调用
+}
+```
+
+* **onInit**：适合做资源初始化（如加载配置、注册资源池）。
+* **onStart**：适合启动后台任务、开启服务监听。
+* **onStop**：适合清理资源、关闭连接、释放缓存。
+
+---
+
+### 2.3 插件健康检查（PluginHealth）
+
+插件可实现 `checkHealth` 方法，用于报告自身的运行状态，便于宿主系统进行统一的健康监控。
+
+```ts
+export interface PluginHealth {
+  checkHealth?(ctx: PluginContext): Promise<{ status: 'up' | 'down'; details?: any }> 
+}
+```
+
+* **status**：运行状态（`up` 或 `down`）
+* **details**：可选的依赖检查详情，如 API 连通性、数据库状态
+
+---
+
+### 2.4 插件上下文（PluginContext）
+
+`PluginContext` 提供了插件在运行时访问宿主系统的能力，包括应用上下文、日志服务和配置。
+
+```ts
+export interface PluginContext<TConfig extends object = any> {
+  app: INestApplicationContext;   // Nest 运行时上下文
+  logger: PluginLogger;           // SDK 提供的日志包装
+  config: TConfig;                // 校验合并后的最终配置
+  resolve<TInput, TResult>(token: any): TResult; // 依赖注入解析
+}
+```
+
+* **app**：NestJS 的 `INestApplicationContext`，允许访问依赖注入容器。
+* **logger**：统一日志接口，支持 `debug`、`log`、`warn`、`error`。
+* **config**：经过 zod 校验和合并默认值后的最终配置对象。
+* **resolve**：从 NestJS 容器中获取其他 Provider。
+
+---
+
+### 2.5 插件配置（PluginConfigSpec）
+
+每个插件可定义一份配置规范，用于约束和校验配置参数，通常通过 `zod` Schema 实现：
+
+```ts
+export interface PluginConfigSpec<T extends object = any> {
+  schema?: ZodSchema<T>;       // 配置校验 Schema
+  defaults?: Partial<T>;       // 默认配置
+}
+```
+
+* 支持 **类型安全**（zod 类型推导）
+* 支持 **默认值** 与 **安全输入**（如 API Key 的密钥输入）
+* 宿主系统会根据该 Schema 自动渲染配置 UI
+
+---
+
+### 2.6 XpertServerPlugin 装饰器
+
+`@XpertServerPlugin` 是一个增强的 [Nestjs Module](https://docs.nestjs.com/modules) 类装饰器，用于将插件注册为 NestJS 模块，并为其附加插件元数据。
+
+```ts
+@XpertServerPlugin({
+  imports: [ /* 子模块 */ ],
+  providers: [ /* 服务、策略 */ ],
+  controllers: [ /* 控制器 */ ],
+  entities: [ /* 数据库实体 */ ],
+})
+export class FirecrawlPlugin { ... }
+```
+
+* 实际上基于 NestJS 的 `@Module` 装饰器扩展而来
+* 支持注册子模块、服务、控制器、实体等
+* 插件因此成为一个完整的 NestJS 动态模块
+
+---
+
+### 2.7 增强出口点（Enhancement Points）
+
+增强出口点是插件扩展宿主系统的关键机制。宿主系统会定义一系列策略接口（Strategy），插件通过实现这些接口并打上装饰器，就能被系统自动发现并注册。
+
+#### IntegrationStrategy（系统集成策略）
+
+用于对接外部系统或 API 服务，例如 Firecrawl、OpenAI 等。
+
+```ts
+export interface IntegrationStrategy<T = unknown> {
+  meta: TIntegrationProvider;  
+  execute(integration: IIntegration<T>, payload: TIntegrationStrategyParams): Promise<any>;
+}
+```
+
+* **meta**：集成提供者的元信息（名称、描述、icon 等）
+* **execute**：执行具体的集成逻辑（例如调用外部 API）
+
+装饰器：
+
+```ts
+@IntegrationStrategyKey('Firecrawl')
+@Injectable()
+export class FirecrawlIntegrationStrategy implements IntegrationStrategy<FirecrawlOptions> { ... }
+```
+
+#### DocumentSourceStrategy（文档数据源策略）
+
+用于接入新的数据源，例如网页爬虫、文件解析、数据库。插件只需实现对应接口，即可让智能体/BI 使用该数据源。
+
+---
+
+### 2.8 策略注册中心
+
+所有策略类（Integration、DocumentSource 等）通过 **装饰器 + NestJS 依赖注入** 的方式注册到 **策略注册中心**（Registry）。
+
+以 IntegrationStrategy 为例：
+
+```ts
+@Injectable()
+export class IntegrationStrategyRegistry 
+  extends BaseStrategyRegistry<IntegrationStrategy> {
+  constructor(discoveryService: DiscoveryService, reflector: Reflector) {
+    super(INTEGRATION_STRATEGY, discoveryService, reflector);
+  }
+}
+```
+
+* `IntegrationStrategyRegistry` 会自动发现打上 `@IntegrationStrategyKey` 的类
+* 插件无需手动注册策略，只要实现接口并装饰即可被系统识别
+
+---
+
+📌 小结：
+
+* `XpertPlugin` 定义了插件的**元信息、配置与生命周期**
+* `XpertServerPlugin` 将插件注册为 **NestJS 模块**
+* **增强出口点（Strategy）** 是插件扩展宿主系统功能的核心
+* 所有插件都通过 **生命周期 + 策略接口 + 配置 Schema** 形成可扩展、可维护的模块

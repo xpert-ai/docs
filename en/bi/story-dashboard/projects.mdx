@@ -1,56 +1,74 @@
 ---
-title: "项目"
-description: "故事仪表盘项目管理功能"
+title: 🧰 Project
+sidebar_position: 0
 ---
 
+**Project** in the Xpert cloud is a collection designed for managing models, story dashboards, and indicators. Projects are typically used by teams or departments, serving as a central hub where team members can collaboratively develop, manage, and share business intelligence solutions.
 
-# 项目
+## Key Features of Project Management:
 
-## Overview
+1. **Favorites**: Allows users to add frequently used story dashboards for quick access.
+2. **Workspaces**: Lets users create and organize collections of story dashboards. These workspaces can be shared with others to facilitate team collaboration and communication.
+3. **Story Dashboards**: View and edit all story dashboards within a project.
+4. **Semantic Models**: Manage the semantic models included in the project, which can be utilized in stories or indicators. Users can add or remove these models as needed.
+5. **Indicators Management**: Enables users to create, edit, and delete indicators. These indicators can be used for building story dashboards, published in the indicators marketplace, and provide better insights into business performance.
+6. **Project Management**: Allows administrators to manage project members and control their access. This ensures that only authorized users can view and edit the project’s content, protecting sensitive data.
+7. **Files**: Users can upload and manage files such as images or data files to support the development and management of story dashboards.
 
-项目是故事仪表盘的组织单位，用于管理和组织多个故事。通过项目，可以将相关的故事分组管理，便于团队协作和权限控制。
+Each account with access to project features has a default project for storing non-shared digital assets. Users can also create new projects from the project menu in the website header for further development.
 
-## 创建项目
 
-### 步骤
+## **Favorites**
 
-1. 进入故事仪表盘页面
-2. 点击"新建项目"按钮
-3. 填写项目信息
-   - **项目名称**: 清晰描述项目的名称
-   - **项目描述**: 详细说明项目的用途和范围
-   - **项目图标**: 选择项目图标（可选）
-4. 设置项目属性
-   - **可见性**: 设置项目的可见范围
-   - **权限设置**: 设置项目成员的访问和编辑权限
-5. 保存项目
+**Favorites** allow users to save frequently accessed story dashboards in a convenient location, enabling faster and more efficient usage without needing to search every time.
 
-## 项目管理
 
-### 项目列表
+## **Workspaces**
 
-在项目列表中，您可以：
-- 查看所有项目
-- 按名称、Created At等排序
-- 搜索项目
-- 筛选项目
+**Workspaces** are tools for managing collections of story dashboards, akin to folders. They help users organize their work and collaborate with others.
 
-### 项目设置
+1. **Hierarchical Organization**: Workspaces enable users to structure story dashboards hierarchically. Users can create parent workspaces and add child workspaces or dashboards to build a layered structure.
+2. **Thematic Organization**: Workspaces allow users to group related dashboards based on themes or functionalities, making management and retrieval easier.
 
-- **基本信息**: 修改项目名称、描述等
-- **成员管理**: 添加或移除项目成员
-- **权限设置**: 配置项目权限
-- **删除项目**: 删除项目及其所有故事
 
-## 项目权限
+## **Story Dashboards**
 
-### 权限级别
+Story dashboards in projects are organized within workspaces, making them easier to navigate. Users can arrange dashboards in different workspaces according to their needs. Each story dashboard has the following options in its context menu:
 
-- **查看者**: 只能查看项目中的故事
-- **编辑者**: 可以创建和Edit Story
-- **管理员**: 可以管理项目设置和成员
+- **Publish/Republish**: Publish or republish dashboards to internal business domains or publicly.
+  - **Internal**: Publish within internal business domains, accessible to users with the corresponding [business domain](../../server/organization/business-area/) permissions.
+  - **Public**: Publish publicly for all organization members to view (use with caution).
+- **Unpublish**: Remove a published dashboard from visibility by other users.
+- **Edit**: Open the dashboard workspace for editing.
+- **Duplicate**: Create a copy of the dashboard within the project.
+- **Move to**: Move the dashboard to a different workspace within the project.
+- **Delete**: Remove the dashboard from the project.
 
-## 相关功能
+## Semantic Model
 
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+In each user's default project, only the semantic models they created can be seen. By accessing a specific project, you can view a list of all semantic models added within that project.
+
+Project owners can add more semantic models to the project for use.
+
+## **Indicators Management**
+
+The **Indicators Management** feature is designed for managing and tracking business indicators. Key functionalities include:
+
+- **Indicators List**: Users can view, search, sort, and filter indicators. Detailed information such as indicator definitions, formulas, and units is available. Users can also download templates and bulk-upload indicator definitions.
+- **Indicator Approval Management**: Manage the approval, rejection, or modification of indicator access requests.
+- **Indicator Registration Page**: Allows users to create new indicators by providing details like name, definition, formula, and units. Once registered, indicators are added to the list and can be used in story dashboards or browsed in the indicators marketplace. For more details, see [Indicator Registration](../../indicators/register).
+
+
+## **Project Members**
+
+The **Project Members Management** feature allows administrators and owners to manage project members effectively, including adding, removing, and transferring project ownership.
+
+- **Transfer Ownership**: If the project owner needs to leave or no longer oversees the project, ownership can be transferred to another member to ensure continuity.
+- **Add Members**: Administrators and owners can add new members to involve them in project development and management, enhancing collaboration and efficiency.
+- **Remove Members**: Administrators and owners can remove members who no longer need access to the project to maintain security and confidentiality.
+- **Manage Member Permissions**: Administrators and owners can assign and control permissions to ensure project security. They can set different access levels to restrict member actions and access scope.
+
+
+## **Files**
+
+The **Files** feature allows users to upload and manage files within a project. These files, such as images or data files, support the development and management of story dashboards.

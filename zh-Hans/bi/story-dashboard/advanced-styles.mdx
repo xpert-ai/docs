@@ -1,20 +1,38 @@
 ---
-title: "高级样式"
-description: "高级样式功能说明"
+title: 高级样式
+sidebar_position: 11
 ---
 
-# 高级样式
+故事 **高级样式** 是通过编写 `css` 代码为故事设置任意样式.
 
-## 概述
+具有基础的前端编程知识的用户可以使用高级样式功能修改故事样式, 以达到专业展示的效果. 如以下代码可以将故事展示为 **黑红** 主题的样式:
 
-高级样式是故事仪表盘功能的重要组成部分。
+```css
+.ngm-analytical-card .mat-button-toggle-group {
+  border: 2px solid red;
+}
+.ngm-analytical-card
+  .mat-button-toggle-group.mat-button-toggle-group-appearance-standard.mat-primary
+  .mat-button-toggle.mat-button-toggle-checked {
+  background-color: black;
+}
+.ngm-analytical-card
+  .mat-button-toggle-group.mat-button-toggle-group-appearance-standard.mat-primary
+  .mat-button-toggle.mat-button-toggle-checked
+  .mat-button-toggle-button {
+  font-weight: 600;
+}
 
-## 功能说明
+.ngm-analytical-grid .cdk-cell {
+  border-bottom-color: black;
+  border-bottom-width: 2px;
+}
 
-此功能正在完善中，更多详细信息即将推出。
-
-## 相关文档
-
-- [项目](/zh-cn/数据分析平台/故事仪表盘/项目)
-- [创建故事](/zh-cn/数据分析平台/故事仪表盘/创建故事)
-- [工作空间](/zh-cn/数据分析平台/故事仪表盘/工作空间)
+.ngm-analytical-grid.cdk-focused .cdk-row.selected .cdk-cell.selected-cell {
+  background-color: black;
+  border-right: 1px solid red;
+  border-bottom: 1px solid red;
+  box-shadow: inset 1px 1px red;
+  color: white;
+}
+```

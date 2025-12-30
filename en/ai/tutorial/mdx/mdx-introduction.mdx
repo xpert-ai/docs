@@ -1,19 +1,69 @@
 ---
-title: "MDX 简介"
-description: "MDX简介教程"
+title: Introduction to MDX
+sidebar_position: 1
 ---
 
+Multidimensional Expressions (MDX) is a query language used to extract and manipulate data from multidimensional datasets, especially in Online Analytical Processing (OLAP) Cubes. The importance and practical use of MDX in Cubes are reflected in the following aspects:
 
-# MDX 简介
+### 1. Data Query and Analysis
 
-## Overview
+MDX provides powerful querying capabilities, allowing users to perform complex queries and analysis on multidimensional data. Through MDX queries, users can extract data with multiple dimensions and hierarchies from Cubes and perform operations such as slicing, dicing, drilling down, and pivoting. These operations help users quickly obtain the desired information, supporting decision-making and analysis.
 
-MDX (Multidimensional Expressions) 是一种用于查询多维数据的查询语言。
+### 2. Calculation and Aggregation
 
-## 内容
+MDX supports complex calculation and aggregation capabilities. Users can use MDX to define calculated members, Key Performance Indicators (KPIs), measures, and more. For example, it is possible to calculate annual growth rate, year-over-year growth, cumulative totals, and so on. These calculation and aggregation capabilities enable users to analyze data trends and performance indicators in depth.
 
-此教程正在完善中，更多详细信息即将推出。
+### 3. Time Analysis
 
-## Related Documentation
+MDX is particularly suitable for time series analysis. Through MDX, it is easy to perform operations on time dimensions, such as year-over-year comparisons, rolling averages, cumulative calculations, and more. Time analysis functionality allows businesses to better understand the temporal dynamics of their data, identify seasonal trends, and long-term changes.
 
-- [MDX](/en/智能体AI 平台/教程/MDX)
+### 5. Performance Optimization
+
+MDX queries can optimize data access performance. When dealing with large datasets, MDX can improve query speed and response time through precomputation and aggregation. Writing and optimizing MDX queries properly can significantly enhance the performance of Cubes, providing a faster data access experience.
+
+### Practical Use Cases
+
+1. **Sales Analysis**: Use MDX queries to analyze sales data for different time periods, such as monthly, quarterly, and yearly sales. It is possible to calculate monthly sales growth rate and year-over-year changes.
+
+     ```mdx
+     WITH MEMBER [Measures].[Sales Growth] AS
+            ([Measures].[Sales], [Time].[2024]) / 
+            ([Measures].[Sales], [Time].[2023]) - 1
+     SELECT 
+            [Measures].[Sales Growth] ON COLUMNS,
+            [Product].[Product Categories].Members ON ROWS
+     FROM [Sales]
+     WHERE ([Time].[Year].&[2024])
+     ```
+
+2. **Financial Analysis**: Use MDX to calculate key performance indicators such as net profit, gross profit margin for different financial periods, helping businesses monitor and analyze their financial health.
+
+     ```mdx
+     WITH MEMBER [Measures].[Gross Profit Margin] AS
+            ([Measures].[Gross Profit]) / 
+            ([Measures].[Revenue])
+     SELECT 
+            [Measures].[Gross Profit Margin] ON COLUMNS,
+            [Time].[Quarter].Members ON ROWS
+     FROM [Finance]
+     ```
+
+3. **Inventory Management**: Use MDX queries to analyze inventory turnover, inventory levels, and optimize inventory management and supply chain operations.
+
+     ```mdx
+     WITH MEMBER [Measures].[Inventory Turnover] AS
+            ([Measures].[Cost of Goods Sold]) / 
+            ([Measures].[Average Inventory])
+     SELECT 
+            [Measures].[Inventory Turnover] ON COLUMNS,
+            [Warehouse].[Warehouse Locations].Members ON ROWS
+     FROM [Inventory]
+     ```
+
+### Summary
+
+MDX plays a crucial role in Cubes, helping users perform complex multidimensional data analysis and reporting through its powerful querying and calculation capabilities. The application of MDX not only enhances the efficiency of data analysis but also provides strong support for business decision-making, enabling businesses to maintain a leading position in a competitive market.
+
+## References
+
+- [Multidimensional Expressions - Microsoft](https://learn.microsoft.com/en-us/sql/mdx/multidimensional-expressions-mdx-reference)

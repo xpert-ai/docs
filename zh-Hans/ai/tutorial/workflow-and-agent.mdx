@@ -1,18 +1,156 @@
 ---
-title: "工作流和智能体"
-description: "工作流和智能体教程"
+title: 工作流和智能体
+sidebar_position: 1
+tags:
+  - Workflow
+  - Agent
 ---
 
-# 工作流和智能体
+本指南回顾了智能体系统的常见模式。在描述这些系统时，区分“工作流”和“智能体”可能会有所帮助。Anthropic 在这里很好地解释了这种区别的一种思考方式：
 
-## 概述
+> 工作流是通过预定义的代码路径编排大语言模型（LLM）和工具的系统。而智能体则是大语言模型动态地指导自身过程和工具使用的系统，保持对任务完成方式的控制。
 
-工作流和智能体教程将帮助您了解如何使用相关功能。
+你可以使用任何支持结构化输出和工具调用的聊天模型。下面，我们展示了在 Xpert AI 平台上如何实现智能体系统的常见模式。
 
-## 内容
+## 构建模块：增强型 LLM
 
-此教程正在完善中，更多详细信息即将推出。
+LLM具有支持构建工作流程和智能体的增强功能。这些包括结构化输出和工具调用，如 [Anthropic 博客](https://www.anthropic.com/research/building-effective-agents) 中的这张图片所示：
 
-## 相关文档
+![The augmented LLM](/public/img/ai/workflow/effective-agents-augmented-llm.webp)
 
-- [教程](/zh-cn/智能体AI 平台/教程)
+![Augmented LLM node](/public/img/ai/workflow/xpert-augmented-llm.png)
+
+## 提示链
+
+在提示链中，每个LLM调用都会处理前一个调用的输出。
+
+正如 [Anthropic 博客](https://www.anthropic.com/research/building-effective-agents) 中所提到的：
+
+> 提示链将一个任务分解成一系列步骤，其中每个LLM调用处理前一个调用的输出。你可以在任何中间步骤上添加程序检查（见下图中的“门”），以确保过程仍然在正轨上。
+>
+> 何时使用此工作流程：此工作流程适用于任务可以轻松且清晰地分解成固定子任务的情况。主要目标是通过使每个LLM调用变得更简单来换取更高的准确性，从而牺牲一些延迟。
+
+![Prompt chaining](/public/img/ai/workflow/effective-agents-prompt-chaining.webp)
+
+在 Xpert AI 平台上实现提示链，由智能体节点、路由和回答组成。需要注意的是如果路由执行提示链到最后智能体节点，可以将最后一个智能体的流式输出返回给用户，
+如果是路由到退出路径是通过回答节点将指定变量或内容返回给用户。
+
+![Prompt chaining](/public/img/ai/workflow/xpert-prompt-chaining.png)
+
+参考模版 [Workflow Prompt Chaining](https://app.mtda.cloud/explore?search=Workflow%20Prompt%20Chaining) 。
+
+## 并行化
+
+通过并行化，大语言模型可以同时处理一个任务：
+
+> 大语言模型有时可以同时处理一个任务，并通过程序聚合它们的输出。这种工作流，即并行化，体现为两种关键变体：分段：将任务分解为独立子任务并行运行。投票：多次运行相同任务以获得多样化的输出。
+>
+> 何时使用此工作流：当分解的子任务可以并行处理以提高速度，或者当需要多种视角或多次尝试以获得更高置信度的结果时，并行化是有效的。对于涉及多方面考虑的复杂任务，大语言模型通常在每个考虑因素由单独的模型调用处理时表现更好，这样可以专注于每个具体方面。
+
+![Parallelization](/public/img/ai/workflow/effective-agents-parallelization.webp)
+
+在 Xpert AI 平台上实现并行化智能体工作流，可以通过直接将多个节点添加为智能体节点的后续节点即可，除了智能体节点支持并行后续基点外 **迭代** 节点也支持并行化后续节点。
+
+![Parallelization agents](/public/img/ai/workflow/xpert-parallelization.png)
+
+参考模版 [Workflow Parallelization](https://app.mtda.cloud/explore?search=Workflow%20Parallelization) 。
+
+## 路由
+
+路由对输入进行分类并将其引导至后续任务。正如 [Anthropic 博客](https://www.anthropic.com/research/building-effective-agents) 中提到的：
+
+> 路由对输入进行分类，并将其引导至专门的后续任务。这种工作流允许关注点的分离，并构建更专业的提示。没有这种工作流，优化某一种输入可能会损害对其他输入的性能。
+>
+> 何时使用此工作流：路由适用于复杂任务，其中存在明显不同的类别，最好分开处理，并且分类可以由大语言模型或更传统的分类模型/算法准确处理。
+
+![Routing](/public/img/ai/workflow/effective-agents-routing.webp)
+
+在 Xpert AI 平台上实现路由工作流，要使用 [**条件分支**](/docs/ai/workflow/if-else) 节点实现，添加多个判断条件并为条件添加后续节点。
+
+![Routing agents](/public/img/ai/workflow/xpert-routing.png)
+
+参考模版 [Workflow Routing](https://app.mtda.cloud/explore?search=Workflow%20Routing) 。
+
+## 协调者-工作者
+
+在 **协调者-工作者** 模式中，一个协调者将任务分解并将每个子任务委派给工作者。正如 [Anthropic 博客](https://www.anthropic.com/research/building-effective-agents) 中提到的：
+
+> 在协调者-工作者工作流中，一个中央大语言模型动态地分解任务，将其委派给工作者大语言模型，并整合它们的结果。
+>
+> 何时使用此工作流：此工作流非常适合复杂的任务，在这些任务中无法预测所需的子任务（例如，在编码中，需要更改的文件数量以及每个文件的更改性质很可能取决于任务）。虽然它在拓扑结构上与并行化相似，但关键区别在于其灵活性——子任务不是预先定义的，而是由协调者根据具体输入决定的。
+
+![Orchestrator-Worker](/public/img/ai/workflow/effective-agents-orchestrator-worker.webp)
+
+在 Xpert AI 平台上实现协调者-工作者智能体工作流，可以使用 [**迭代**](/docs/ai/workflow/iterating) 逻辑节点来实现。
+迭代节点可以对一个数组的每个元素调用子智能体工作流进行处理，可以按顺序执行也可以并发执行（可以设定限量）每个子处理。当所有元素都处理完成后将结果数组返回，并执行后续节点。
+
+![Orchestrator-Worker agents](/public/img/ai/workflow/xpert-orchestrator-worker.png)
+
+参考模版 [Workflow Orchestrator-Worker](https://app.mtda.cloud/explore?search=Workflow%20Orchestrator-Worker) 。
+
+## 评估优化器
+
+在评估优化器工作流程中，一个大语言模型（LLM）调用生成响应，而另一个则在循环中提供评估和反馈：
+
+> 在评估优化器工作流程中，一个大语言模型（LLM）调用生成响应，而另一个则在循环中提供评估和反馈。
+>
+> 何时使用此工作流程：当我们有明确的评估标准，并且迭代优化能够提供可衡量的价值时，此工作流程尤为有效。适合此流程的两个标志是：首先，当人类表达他们的反馈时，大语言模型的响应能够得到显著改进；其次，大语言模型能够提供这样的反馈。这类似于人类作家在创作一份精炼文档时可能经历的迭代写作过程。
+
+![Evaluator-optimizer](/public/img/ai/workflow/effective-agents-evaluator-optimizer.webp)
+
+在 Xpert AI 平台上实现评估优化器智能体工作流，可以使用智能体的 [结构化输出](/docs/ai/workflow/agent#结构化输出) 加上 [路由](/docs/ai/workflow/if-else) 判断实现。
+
+![Evaluator-optimizer](/public/img/ai/workflow/xpert-evaluator-optimizer.png)
+
+参考模版 [Workflow Evaluator-optimizer](https://app.mtda.cloud/explore?search=Workflow%20Evaluator-optimizer) 。
+
+## 智能体
+
+**智能体** 通常被实现为基于环境反馈在一个循环中执行动作（通过工具调用）的大型语言模型（LLM）。正如在 [Anthropic 博客](https://www.anthropic.com/research/building-effective-agents) 中所指出的：
+
+> 智能体可以处理复杂的任务，但它们的实现通常很简单。它们通常只是基于环境反馈在一个循环中使用工具的大型语言模型。因此，清晰且深思熟虑地设计工具集及其文档至关重要。
+>
+> 何时使用智能体：智能体可用于开放性问题，在这些问题中很难或不可能预测所需的步骤数量，并且无法硬编码固定的路径。大型语言模型可能会运行多个回合，你必须对其决策有一定程度的信任。智能体的自主性使它们成为在可信环境中扩展任务的理想选择。
+
+![Evaluator-optimizer](/public/img/ai/workflow/effective-agents-agent.webp)
+
+### 多智能体
+
+多智能体架构是一种系统设计，其中多个智能体（agent）相互交互并协作，以完成共同目标或解决复杂问题。为什么需要多智能体写作，如 [Langchain 所说](https://langchain-ai.github.io/langgraphjs/concepts/multi_agent/)
+
+> 一个智能体是一个使用大语言模型（LLM）来决定应用程序控制流的系统。随着你开发这些系统，它们可能会随着时间的推移变得越来越复杂，使得管理和扩展变得更加困难。例如，你可能会遇到以下问题：
+> - 智能体拥有太多的工具，并且在决定下一步调用哪个工具时做出糟糕的决策
+> - 上下文变得过于复杂，以至于一个单一的智能体无法跟踪
+> - 系统需要多个专业领域（例如规划者、研究者、数学专家等）
+> 
+> 为了解决这些问题，你可以考虑将你的应用程序分解成多个较小的、独立的智能体，并将它们组合成一个多智能体系统。这些独立的智能体可以简单到只是一个提示和一个大语言模型调用，也可以复杂到像ReAct智能体（甚至更多！）。
+> 使用多智能体系统的主要好处包括：
+> - 模块化：独立的智能体使得开发、测试和维护智能体系统变得更加容易。
+> - 专业化：你可以创建专注于特定领域的专家智能体，这有助于提高整体系统性能。
+> - 控制：你可以明确地控制智能体之间的通信方式（而不是依赖函数调用）。
+
+如下图所示，在 Xpert AI 平台上构建多智能体非常容易，不仅仅可以将工具集和知识库添加给智能体节点， 还可以将其他智能体节点添加为该智能体的子节点，那么该智能体将自主地在工具集、知识库和子智能体节点之间选择调用并得到反馈，然后做出后续决定或回复。
+
+![Multi-agents](/public/img/ai/workflow/xpert-multi-agents.png)
+
+参考模版 [OpenAI Tasks](https://app.mtda.cloud/explore?search=OpenAI%20Tasks) 。
+
+## 组合和定制这些模式
+
+这些构建模块并非规定性的。它们是开发人员可以塑造和组合以适应不同用例的常见模式。与任何大语言模型功能一样，成功的关键在于衡量性能并迭代实现。重复一遍：你应该只在复杂度明显改善结果时才考虑增加复杂度。
+
+如下图所示，我们在 Xpert AI 平台中将智能体自主节点与工作流结合以做到既保持问答的智能和灵活，又做到了处理固定模式的问题时的高效流程。
+
+![Multi-agents](/public/img/ai/workflow/xpert-workflow-hybrid-arch.png)
+
+参考模版 [Deep Research with Deepseek r1](https://app.mtda.cloud/explore?search=Deep%20Research%20with%20Deepseek%20r1) 。
+
+## 结语
+
+在大语言模型领域中的成功并不是要构建最复杂的系统，而是要为你需求构建合适的系统。从简单的提示开始，通过全面的评估优化它们，只有在更简单的解决方案不足以应对时，才添加多步骤的智能体系统。
+
+在实现智能体时，我们尝试遵循三个核心原则：
+
+- 保持智能体设计的简单性。
+- 通过明确展示智能体的计划步骤来优先考虑透明度。
+- 通过彻底的工具文档和测试，精心设计你的智能体-[工具集](/docs/ai/tool/)。

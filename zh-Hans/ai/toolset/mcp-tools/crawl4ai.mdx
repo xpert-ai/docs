@@ -1,40 +1,90 @@
 ---
-title: "Crawl4AI"
-description: "Crawl4AI工具使用指南"
+title: Crawl4AI
+sidebar_position: 2
 ---
 
-# Crawl4AI
+[Crawl4AI](https://docs.crawl4ai.com/): 开源 LLM 友好型网络爬虫和抓取工具。
 
-## 概述
+## 配置 Crawl4AI MCP 工具实例
 
-Crawl4AI是一个强大的网页爬取工具，支持从网页中提取结构化数据，适用于数据采集和信息提取场景。
+在 XpertAI 平台上，可以直接将内置部署好的 Crawl4AI MCP 服务配置为一个 **SSE 类型的 MCP 工具实例**，供智能体和工作流调用。
 
-## 功能特性
+:::info
+你还可以在 MCP 工具模版市场中找到 Crawl4AI 并一键创建。
+:::
 
-- **网页爬取**: 爬取网页内容
-- **数据提取**: 提取结构化数据
-- **JavaScript渲染**: 支持JavaScript渲染的网页
-- **数据清洗**: 自动清洗提取的数据
+配置方法如下：
 
-## 使用方法
+* **配置示例**
+  在 XpertAI 平台添加 MCP 工具时，设置：
 
-### 配置Crawl4AI
+  ```yaml
+  type: sse
+  url: "http://crawl4ai:11235/mcp/sse"
+  name: crawl4ai
+  ```
 
-1. 进入MCP工具页面
-2. 选择Crawl4AI工具
-3. 配置工具参数
-4. 测试工具连接
-5. 保存配置
+* **使用方式**
+  配置完成后，智能体或工作流在编排时即可直接调用 `crawl4ai` MCP 工具提供的能力（如 `md`, `html`, `screenshot`, `pdf`, `crawl`, `ask` 等）。
 
-### 使用示例
+## 使用场景
 
-```python
-# 爬取网页内容
-result = crawl4ai.crawl(url="https://example.com")
-print(result.content)
+### 场景一：自动化网页内容采集智能体（「资料摘要机器人」）
+
+**目标**：帮助用户通过一个智能代理提交网页链接，自动获取页面的 Markdown 文本摘要。
+
+#### 步骤要点
+
+1. 用户输入链接 → 智能体触发 MCP 的 `md` 工具，将目标网页转换为 Markdown 文本。
+2. 智能体接收并展示摘要，同时可根据用户需要进一步提取重点内容。
+
+#### 总结示意
+
+```text
+用户：请帮我总结 https://example.com 的主要内容。
+智能体 → 调用 MCP 工具 `md` 获取 Markdown 格式内容
+智能体 → 将摘要返回给用户
 ```
 
-## 相关文档
+### 场景二：多媒体内容捕捉与分析流程（「报告生成器」）
 
-- [虚拟环境](/zh-cn/智能体AI 平台/工具集/虚拟环境)
-- [内置工具集](/zh-cn/智能体AI 平台/工具集/内置工具集)
+**目标**：用户输入目标 URL 后，智能体自动抓取网页截图与 PDF，并在 XpertAI 平台生成最终报告。
+
+#### 实现步骤
+
+1. 用户输入链接 → 智能体依次调用：
+
+   * `screenshot`：生成网页截图
+   * `pdf`：导出网页 PDF
+   * 可选：`ask` 或 `html` → 提取结构化文本内容
+2. 智能体将截图、PDF 与文本整合为一份可分享的报告。
+
+#### 流程示意
+
+```text
+用户：请帮我抓取 https://example.com 页面并生成报告。
+→ 智能体调用 MCP:
+   1⃣ 调用 `screenshot` 获取页面截图
+   2⃣ 调用 `pdf` 获取页面 PDF
+   3⃣ 可选：调用 `ask`/`html` 获取结构化文本或 Markdown
+
+智能体：下面是页面截图和 PDF 文件，提取到的摘要如下...（展示内容）
+```
+
+## 跨场景共通配置说明
+
+* **MCP 工具列表**
+
+  | 工具名称         | 功能简述                    |
+  | ------------ | ----------------------- |
+  | `md`         | 将页面内容生成 Markdown        |
+  | `html`       | 提取已预处理的 HTML            |
+  | `screenshot` | 捕捉完整页面截图（PNG）           |
+  | `pdf`        | 导出页面为 PDF 文档            |
+  | `execute_js` | 在页面上下文中执行自定义 JavaScript |
+  | `crawl`      | 多链接爬取多个 URL             |
+  | `ask`        | 查询索引的库上下文               |
+
+* 更多工具参数与用法，可访问：
+
+  [https://docs.crawl4ai.com/core/docker-deployment/#mcp-model-context-protocol-support](https://docs.crawl4ai.com/core/docker-deployment/#mcp-model-context-protocol-support)

@@ -1,19 +1,29 @@
 ---
-title: "使用 WASM 数据库做分析"
-description: "使用 WASM 数据库做分析教程"
+title: Using WASM Database for Analysis
+sidebar_position: 20
 ---
 
+Meta Analysis Cloud supports data analysis using a browser-based in-memory database powered by WASM technology. This allows users to analyze data files stored anywhere online, including **Excel**, **CSV**, **JSON**, and **Parquet** files.
 
-# 使用 WASM 数据库做分析
+> **WASM** stands for WebAssembly, which is a binary format used for running high-performance code in web browsers. The goal of WebAssembly is to provide a universal web application language that can be used in parallel with JavaScript to support faster and more powerful web applications and games. Unlike JavaScript, WebAssembly can run directly in the browser without the need for an interpreter or compiler, resulting in improved performance. WebAssembly can be written in various programming languages, including C++, Rust, and Go, among others. In addition to web browsers, WebAssembly can also run in other environments such as operating system kernels, IoT devices, and servers.
 
-## Overview
+## Creating a WASM Model
 
-使用 WASM 数据库做分析教程将帮助您了解如何使用相关功能。
+To create a WASM model, simply click the [New WASM Model](../../models/sql-modeling/wasm-model/) button in the semantic model management interface and enter a name.
 
-## 内容
+Assuming you have obtained a link to the data file you can access (e.g., https://app.mtda.cloud/assets/data/topSubscribed.csv sourced from [Most Subscribed 1000 Youtube Channels](https://www.kaggle.com/datasets/themrityunjaypathak/most-subscribed-1000-youtube-channels)), click on the "New Table" button as shown in the following image to create a table:
 
-此教程正在完善中，更多详细信息即将推出。
 
-## Related Documentation
+Click "Next" to proceed to the data preview step, where you can modify the automatically recognized field types. Click "Apply" to complete the configuration.
 
-- [教程](/en/智能体AI 平台/教程)
+
+:::caution
+
+In this file, the values of the 'Subscribers', 'Video Views', and 'Video Count' fields are stored as numbers with thousands separators. Currently, WASM DB cannot automatically recognize such numbers, so you need to change the field types to String. Alternatively, you can modify the source file to use plain number formats. You can also use the [database initialization script](../../models/sql-modeling/wasm-model/#initialization-script) to handle this.
+
+:::
+
+### Initialization Script
+
+You can also load the data into a table using a database initialization script. Use the following SQL script:
+

@@ -1,19 +1,31 @@
 ---
-title: "AI智能助理"
-description: "AI智能助理功能说明"
+title: 🤖 AI 智能助理
+sidebar_position: 8
+tags:
+  - AI
+  - Copilot
 ---
 
-# AI智能助理
+关于 AI 智能助理的通用功能请参考 [🤖 AI 智能助理](../../ai/copilot/)
 
-## 概述
+指标副驾驶命令列表：
 
-AI智能助理是指标管理功能的重要组成部分。
+| 命令 | 说明 |
+| --- | --- |
+| [`/indicator`](#indicator) | 创建指标 |
+| [`/iformula`](#iformula) | 创建衍生指标公式 |
+| [`/indicator-architect`](#indicator-architect) | 指标体系架构师命令 |
 
-## 功能说明
+## /indicator
 
-此功能正在完善中，更多详细信息即将推出。
+`/indicator` 或 `/i` 创建指标命令，Copilot 会根据命令中的需求描述自动创建指标。
 
-## 相关文档
+## /iformula
 
-- [指标注册](/zh-cn/数据分析平台/指标管理/指标注册)
-- [指标业务域](/zh-cn/数据分析平台/指标管理/指标业务域)
+`iformula` 或 `/if` 创建衍生指标公式命令时，需要尽量清楚的描述公式的含义，以便 Copilot 能更好地理解。
+
+## /indicator-architect
+
+`/indicator-architect` 或 `/ia` 指标体系架构师命令，根据用户提示和模型信息，参考业务角色示例，可以构建分析的指标体系，并逐个创建指标。用户可以轻松定义和管理关键业务指标，实现对业务绩效的全面监控和分析。
+
+![Indicator Architect Command](/public/img/copilot/command-indicator-architect.png)

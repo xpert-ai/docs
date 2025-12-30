@@ -1,20 +1,43 @@
 ---
-title: "指标度量"
-description: "指标度量功能说明"
+title: 📐 Indicator Measure
+sidebar_position: 8
+tags:
+  - MDX
+  - Measure
 ---
 
+**Indicator Measure** refers to the measured values limited by the conditions defined in the indicator management system. It can be used in various components just like regular measure fields. The conditions of indicators will not be overridden by the context in the calculation of indicator measures, so some components can only select dimensions from the free dimensions of indicators after selecting indicator measures (if defined).
 
-# 指标度量
+In the selection list of the measure selection component, there is a separate group for indicator measures.
 
-## Overview
+![Small](./measure-indicator.png)
 
-指标度量是指标管理功能的重要组成部分。
+## Using Indicator Measures in Chart Components
 
-## 功能说明
+When creating a new chart card component, after selecting the data source and model, add a measure in the measure area. Click on the measure selection list. If there are corresponding indicator definitions in the indicator system for this data source and model, the indicator measures will appear in the indicator area of the measure selection list.
 
-此功能正在完善中，更多详细信息即将推出。
+After selecting the indicator measure, if this indicator has defined free dimensions, you can only select dimensions from these free dimensions when selecting dimensions.
 
-## Related Documentation
+![Small](./chart-indicator-config.png)
 
-- [指标注册](/en/数据分析平台/指标管理/指标注册)
-- [指标业务域](/en/数据分析平台/指标管理/指标业务域)
+* The **Unit of Measure** defined in the indicator will be displayed as the unit for measures in the chart.
+* Chart data can also be sorted by indicator size.
+
+![Middle](./chart-indicator-measure.png)
+
+## Using Indicator Measures in Analytical Tables
+
+[Application of Indicators in Tables](../../widgets/analytical-grid/pivot-grid/#指标在表格中的应用)
+
+## Indicator Components
+
+There are also some component types specifically designed for indicators such as:
+
+* [Indicator Table](../../widgets/indicator-table/)
+* [Indicator Card](../../widgets/indicator-card/)
+
+These components can directly select the corresponding indicators for display in the configuration.
+
+## Example
+
+<iframe src="https://app.mtda.cloud/public/story/point/2c96a06d-be7f-4200-b9b8-54951fed686c" width="100%" height="800px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>

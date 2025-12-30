@@ -1,0 +1,69 @@
+---
+sidebar_position: 12
+title: 🧩插件开发
+---
+
+### [1. 概述](./overview)
+
+* 插件系统的目标与设计理念
+* 为什么需要插件化：灵活扩展、模块解耦、生态建设
+* 插件开发的适用场景
+
+### [2. 插件系统的核心概念](./concepts/)
+
+* **XpertPlugin**：插件的入口定义
+* **增强出口点（Enhancement Points）**：插件扩展系统功能的挂载点
+* **插件生命周期**：`register`、`onStart`、`onStop`、`onPluginBootstrap`、`onPluginDestroy`
+* **配置 Schema**：基于 `zod` 的插件配置定义
+* **Strategy 模式**：
+
+  * Integration Strategy（系统集成策略）
+  * Document Source Strategy（文档数据源策略）
+
+### 3. 插件目录结构
+
+* 插件 package.json 说明
+* 典型目录结构（`plugin.ts`、`*.strategy.ts`、`*.controller.ts`、`*.service.ts`）
+* 插件与宿主系统的依赖关系
+
+### [4. 插件的开发步骤](./develop/)
+
+1. **初始化插件**：定义插件元信息（`meta`）与配置（`config`）
+2. **注册插件模块**：使用 `@XpertServerPlugin` 装饰器
+3. **实现 Integration Strategy**：定义外部服务集成方式
+4. **实现 Document Source Strategy**：定义数据源接入方式
+5. **提供服务与控制器**：暴露 REST API / 服务方法
+6. **编写测试用例**
+
+### [5. 插件示例：飞书文档集成](./lark)
+
+* 飞书文档插件介绍
+* 配置示例
+* 代码分解（meta、IntegrationStrategy、DocumentSourceStrategy、Controller）
+* 加载文档数据的完整流程
+
+### 6. 插件生命周期与事件
+
+* 插件注册 → 启动 → 销毁
+* 日志与调试方法
+* 如何管理插件状态
+
+### 7. 开发最佳实践
+
+* 插件解耦与重用
+* 插件配置与安全（密钥、API Key 管理）
+* 错误处理与异常隔离
+* 日志与可观测性
+
+### [8. 发布与使用](./install/)
+
+* 插件打包与版本管理
+* 插件的安装与启用
+* 插件更新与卸载
+
+### 9. 常见问题（FAQ）
+
+* 插件和宿主服务的依赖如何管理？
+* 插件的数据库实体如何注册？
+* 如何在插件中调用外部 API？
+* 插件能否动态加载和卸载？

@@ -1,31 +1,293 @@
 ---
-title: "飞书文档转换策略"
-description: "飞书文档转换策略配置指南"
+sidebar_position: 6
+title: 飞书文档转换策略
 ---
 
-# 飞书文档转换策略
+## 代码回顾
 
-## 概述
+```ts
+import { Injectable } from '@nestjs/common'
+import { Document } from '@langchain/core/documents'
+import {
+  DocumentTransformerStrategy,
+  IDocumentTransformerStrategy,
+  IntegrationPermission,
+  TDocumentTransformerConfig,
+} from '@xpert-ai/plugin-sdk'
+import { IconType, IKnowledgeDocument } from '@metad/contracts'
+import { iconImage, LarkDocumentMetadata, LarkDocumentName, LarkName } from './types.js'
+import { LarkClient } from './lark.client.js'
 
-飞书文档转换策略用于定义如何将飞书文档转换为系统可用的格式，包括格式转换、内容提取等。
+@Injectable()
+@DocumentTransformerStrategy(LarkDocumentName)
+export class LarkDocTransformerStrategy implements IDocumentTransformerStrategy<TDocumentTransformerConfig> {
 
-## 功能特性
+  readonly permissions = [
+    {
+      type: 'integration',
+      service: LarkName,
+      description: 'Access to Lark system integrations'
+    } as IntegrationPermission,
+  ]
 
-- **格式转换**: 转换文档格式
-- **内容提取**: 提取文档内容
-- **结构化处理**: 处理文档结构
-- **质量保证**: 保证转换质量
+  readonly meta = {
+    name: LarkDocumentName,
+    label: {
+      en_US: 'Lark Document',
+      zh_Hans: '飞书文档'
+    },
+    description: {
+      en_US: 'Load content from Lark documents',
+      zh_Hans: '加载飞书文档内容'
+    },
+    icon: {
+      type: 'image' as IconType,
+      value: iconImage,
+      color: '#14b8a6'
+    },
+    helpUrl: 'https://open.feishu.cn/document/server-docs/docs/docs-overview',
+    configSchema: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  }
 
-## 配置步骤
+  validateConfig(config: any): Promise<void> {
+    throw new Error('Method not implemented.')
+  }
 
-1. 进入飞书文档转换策略配置
-2. 选择转换格式
-3. 配置转换规则
-4. 设置内容提取规则
-5. 配置质量检查
-6. 保存策略
+  async transformDocuments(
+    files: Partial<IKnowledgeDocument<LarkDocumentMetadata>>[],
+    config: TDocumentTransformerConfig
+  ): Promise<Partial<IKnowledgeDocument<LarkDocumentMetadata>>[]> {
+    const integration = config?.permissions?.integration
+    if (!integration) {
+      throw new Error('Integration system is required')
+    }
 
-## 相关文档
+    console.log('LarkDocTransformerStrategy transformDocuments', files, config)
 
-- [飞书系统集成](/zh-cn/智能体AI 平台/插件开发/插件示例: 飞书文档/飞书系统集成)
-- [飞书文档源策略](/zh-cn/智能体AI 平台/插件开发/插件示例: 飞书文档/飞书文档源策略)
+    const client = new LarkClient(integration)
+    
+    const results: Partial<IKnowledgeDocument<LarkDocumentMetadata>>[] = []
+    for await (const file of files) {
+      const content = await client.getDocumentContent(file.metadata.token)
+      results.push({
+        id: file.id,
+        chunks: [
+          new Document({
+            id: file.id,
+            pageContent: content,
+            metadata: {
+              chunkId: file.id,
+              source: LarkName,
+              sourceId: file.id
+            }
+          })
+        ],
+        metadata: {
+          assets: []
+        } as LarkDocumentMetadata
+      })
+    }
+    return results
+  }
+}
+```
+
+---
+
+## 逻辑拆解
+
+### 1. 装饰器与依赖注入
+
+```ts
+@Injectable()
+@DocumentTransformerStrategy(LarkDocumentName)
+```
+
+* `@Injectable()`：NestJS 的依赖注入装饰器，表明这是一个可注入的服务。
+* `@DocumentTransformerStrategy(LarkDocumentName)`：将当前类注册为 **文档转换策略**，并指定唯一的名字 `LarkDocumentName`。
+  👉 这样系统就能自动识别并使用该策略。
+
+---
+
+### 2. 权限定义
+
+```ts
+readonly permissions = [
+  {
+    type: 'integration',
+    service: LarkName,
+    description: 'Access to Lark system integrations'
+  } as IntegrationPermission,
+]
+```
+
+* 插件需要具备 **飞书集成的权限**，否则无法调用 API 获取文档。
+* `IntegrationPermission` 声明了依赖的服务，这里是 `LarkName`（飞书）。
+
+---
+
+### 3. 元信息（meta）
+
+```ts
+readonly meta = {
+  name: LarkDocumentName,
+  label: {
+    en_US: 'Lark Document',
+    zh_Hans: '飞书文档'
+  },
+  description: {
+    en_US: 'Load content from Lark documents',
+    zh_Hans: '加载飞书文档内容'
+  },
+  icon: {
+    type: 'image' as IconType,
+    value: iconImage,
+    color: '#14b8a6'
+  },
+  helpUrl: 'https://open.feishu.cn/document/server-docs/docs/docs-overview',
+  configSchema: { ... }
+}
+```
+
+* **插件 UI 展示信息**：名字、图标、描述、帮助文档链接。
+* `configSchema`：定义配置项（这里为空，表示无需额外参数）。
+
+---
+
+### 4. 配置校验
+
+```ts
+validateConfig(config: any): Promise<void> {
+  throw new Error('Method not implemented.')
+}
+```
+
+* 占位方法，用于未来对配置进行校验。
+* 例如：检查是否传入了文档 ID 或 Token。
+
+---
+
+### 5. 文档转换核心逻辑
+
+```ts
+async transformDocuments(
+  files: Partial<IKnowledgeDocument<LarkDocumentMetadata>>[],
+  config: TDocumentTransformerConfig
+): Promise<Partial<IKnowledgeDocument<LarkDocumentMetadata>>[]> {
+  const integration = config?.permissions?.integration
+  if (!integration) {
+    throw new Error('Integration system is required')
+  }
+
+  const client = new LarkClient(integration)
+  
+  const results: Partial<IKnowledgeDocument<LarkDocumentMetadata>>[] = []
+  for await (const file of files) {
+    const content = await client.getDocumentContent(file.metadata.token)
+    results.push({
+      id: file.id,
+      chunks: [
+        new Document({
+          id: file.id,
+          pageContent: content,
+          metadata: {
+            chunkId: file.id,
+            source: LarkName,
+            sourceId: file.id
+          }
+        })
+      ],
+      metadata: {
+        assets: []
+      } as LarkDocumentMetadata
+    })
+  }
+  return results
+}
+```
+
+逐行解析：
+
+1. **获取集成信息**
+
+   ```ts
+   const integration = config?.permissions?.integration
+   if (!integration) throw new Error('Integration system is required')
+   ```
+
+   * 从配置中取出飞书的集成凭证。
+   * 如果缺少凭证，则报错。
+
+2. **初始化客户端**
+
+   ```ts
+   const client = new LarkClient(integration)
+   ```
+
+   * 使用凭证构造 `LarkClient`，用来访问飞书 API。
+
+3. **循环处理文件**
+
+   ```ts
+   for await (const file of files) {
+     const content = await client.getDocumentContent(file.metadata.token)
+   }
+   ```
+
+   * 遍历待处理的文档列表。
+   * 调用 `client.getDocumentContent` 根据 `token` 拉取文档正文。
+
+4. **构建转换后的文档**
+
+   ```ts
+   results.push({
+     id: file.id,
+     chunks: [
+       new Document({
+         id: file.id,
+         pageContent: content,
+         metadata: {
+           chunkId: file.id,
+           source: LarkName,
+           sourceId: file.id
+         }
+       })
+     ],
+     metadata: {
+       assets: []
+     } as LarkDocumentMetadata
+   })
+   ```
+
+   * 每个飞书文档被转化为一个 `IKnowledgeDocument`。
+   * 核心内容放在 `chunks` 数组中。
+   * `metadata` 存储额外信息（这里暂时只有 `assets`）。
+
+---
+
+## 整体执行流程
+
+1. **输入**：一批飞书文档的元信息（文件 ID / Token）。
+2. **验证权限**：确保有飞书的集成配置。
+3. **API 调用**：使用 `LarkClient` 拉取每个文档的正文。
+4. **转化为知识库格式**：
+
+   * 包装为 `IKnowledgeDocument`
+   * 内容切分为 `Document`（便于后续向量化处理）
+5. **输出**：返回可被 Xpert AI 知识库使用的文档数组。
+
+---
+
+## 核心价值
+
+* **解耦**：策略类不直接调用 API，而是依赖 `LarkClient`。
+* **通用性**：所有文档最终被统一转化为 `IKnowledgeDocument`，与平台的知识库无缝对接。
+* **可扩展**：未来可以在 `transformDocuments` 中加入：
+
+  * 文本清理（去掉空行/格式）
+  * 内容切分（chunking）
+  * 元数据增强（作者、标签、更新时间）

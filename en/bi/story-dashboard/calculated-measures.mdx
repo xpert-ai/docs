@@ -1,21 +1,129 @@
 ---
-title: "计算度量"
-description: "计算度量功能说明"
+title: 🧮 Calculation Measures
+sidebar_position: 13
 ---
 
+Calculations in the story dashboard allow you to create calculations that are specific to the story without modifying the semantic model. There are several types of calculations you can create:
 
-# 计算度量
+- [1. Conditional Aggregation](#1-conditional-aggregation)
+- [2. Restricted Measure](#2-restricted-measure)
+  - [Constant Selection](#constant-selection)
+  - [Using Parameters for Constraints](#using-parameters-for-constraints)
+- [3. Calculated Measure](#3-calculated-measure)
+- [4. Measure Control](#4-measure-control)
+- [5. Difference Measure](#5-difference-measure)
+- [Managing Calculated Measures and Parameters](#managing-calculated-measures-and-parameters)
 
-## Overview
+To perform these operations, add a measure in the settings interface of the analysis graph component (or any other component that uses measures). Click on the empty measure and select "Create Calculation" from the selection list. In the pop-up window, you can create members of the following calculation types:
 
-计算度量是故事仪表盘功能的重要组成部分。
+## 1. Conditional Aggregation
 
-## 功能说明
+**Conditional Aggregation** allows you to calculate measures based on specific conditions and aggregation functions. You can choose from the following aggregation functions:
 
-此功能正在完善中，更多详细信息即将推出。
+| Aggregation Function           | Description                                  |
+| :----------------------------- | :------------------------------------------- |
+| Sum                            | Accumulates the values                        |
+| Count                          | Counts the selected dimension members         |
+| Min                            | Calculates the minimum value for the members  |
+| Max                            | Calculates the maximum value for the members  |
+| Average                        | Calculates the average value for the members  |
+| Standard Deviation             | Calculates the standard deviation            |
+| Population Standard Deviation  | Calculates the population standard deviation |
+| Median                         | Calculates the median value                   |
+| Top Percent                    | Calculates the sum of the top percentage      |
+| Top Count                      | Calculates the sum of the top count           |
+| Top Sum                        | Calculates the sum of the top sum             |
 
-## Related Documentation
+The following example calculates the sum of the profits for the top 3 products in all products.
 
-- [项目](/en/数据分析平台/故事仪表盘/项目)
-- [Create Story](/en/数据分析平台/故事仪表盘/创建故事)
-- [Workspace](/en/数据分析平台/故事仪表盘/工作空间)
+
+**Using Conditional Aggregation**: The aggregation function is applied based on the selected conditions at runtime (selection or exclusion).
+
+## 2. Restricted Measure
+
+**Restricted Measure** refers to the measure values under certain limiting conditions. These limiting conditions may include limiting the range of variables, the relationship between variables, or the values of variables. For example, for a multidimensional dataset, you may only consider data points where one dimension member is within a specific range or where two dimension members have a specific relationship. These restrictions can help researchers better understand the data and may improve the statistical significance of the analysis.
+
+To create a restricted measure, select the type "**Restricted Measure**" in the calculation editor:
+
+
+1. Select a **measure** field to be analyzed.
+2. Add one or more **dimensions** as limiting conditions and select the corresponding members or [create parameters for them](#using-parameters-for-constraints).
+3. **Enable Constant Selection**: When enabled, the limiting conditions will not be overridden by filters in the runtime context of the query.
+
+:::info
+
+**Indicator** is a special type of restricted measure.
+
+:::
+
+### Constant Selection
+
+**Constant Selection** refers to the measure values under constant conditions where the limiting conditions of the restricted measure are not overridden by filters in the context environment.
+
+On the other hand, if constant selection is not enabled, the limiting conditions of the restricted measure will be overridden by filters in the context environment.
+
+### Using Parameters for Constraints
+
+In addition to selecting fixed dimension members as limiting conditions, you can also use **parameters** on the limiting dimension to allow users to choose dimension members to restrict the measure values.
+
+See [Using Parameters for Restricted Measures](../parameter/#using-parameters-for-restricted-measures).
+
+## 3. Calculated Measure
+
+When the type is "Calculated Measure," it refers to creating a measure that calculates summary values using a custom formula. You can write formulas using `MDX` syntax for complex scenario calculations in the calculated measure interface.
+
+Click the open menu button on the right side of the editor toolbar to expand the various member panels on the right:
+
+1. **Dimension Members**: You can see all dimension members after selecting dimensions and hierarchies. Dragging dimension members into the editor will insert their unique codes into the editor.
+2. **Calculated Members**: This lists all existing calculated members. Dragging them into the editor will insert the existing calculated member measures into the formula.
+3. **Parameters**: In the parameter area, you can create new parameters or drag existing ones into the editor to insert them into the formula.
+
+For example, the following formula uses the parameter `Sales_MA_Windows` (referenced as `[@Sales_MA_Windows]`) and the measure `profit` (referenced as `[Measures].[profit]`):
+
+```sql
+AVG(LastPeriods([@Sales_MA_Windows], [Time].CurrentMember),[Measures].[profit])
+```
+
+![Calculated Measure](/public/img/story/calculated-measure.png)
+
+For more details on using parameters in calculated formulas, refer to [Using Parameters in Calculated Formulas](../parameter/#using-parameters-in-calculated-formulas).
+
+## 4. Measure Control
+
+**Measure Control**: This type of measure field aims to point to other measures, allowing users to dynamically select the measure they want to view at runtime. The process for creating a measure control involves creating a calculated measure, selecting the type as **Measure Control**, choosing the display behavior, and selecting the list of measures to choose from. As shown below:
+
+![Measure Control](/public/img/story/measure-control.png)
+
+Once the measure control is successfully created, you need to create a corresponding input controller widget for the measure to actually select it, as shown below. For a detailed process, see [Input Controller Widgets](../../widgets/input-control#measure-selector).
+
+
+## 5. Difference Measure
+
+**Difference Measure** is a type of calculation that measures the difference between one member of a dimension and another. It is commonly used to calculate differences or ratios, such as year-over-year or month-over-month comparisons. The difference can be based on time dimensions or other dimensions like versions.
+
+![Difference Measure](/public/img/story/calculation-variance.png)
+
+Time-based comparisons are common, such as calculating year-over-year or month-over-month changes.
+
+1. **Select the measure fields to compare**: You can choose any type of measure, such as regular measures, calculated measures, selected measures, or indicators.
+2. **For time-based comparisons, choose a time dimension as the base dimension.**
+3. **To compare differences, use a formula like `A - B`. For A, set the condition**: It can be the current member or a specific member of the base dimension.
+4. **For B, set the condition**:
+   1. Current member;
+   2. The member before the current one by N members, where N is a number, such as N=1 for month-over-month difference;
+   3. The member after the current one by N members, where N is a number;
+   4. Parallel member, which is the parallel member of the Nth member before the current one in the base dimension's hierarchy level. **Select a `level` for the base dimension**, and set N to a number, like N=1 for year-over-year difference;
+   5. Ancestor member, which is the ancestor member of the current one at a specified level in the base dimension, such as calculating the current month's proportion of the total year.
+5. **Calculate as a percentage**: This calculates the difference as a percentage. Choose to divide by A or B, expressed as `(A - B) / A` or `(A - B) / B`.
+6. **Direct division**: This uses A divided by B, expressed as `A / B`.
+7. **Absolute base value**: This calculates the ratio using the absolute value of the denominator, expressed as `(A - B) / abs(A)` or `(A - B) / abs(B)`.
+
+## Managing Calculated Measures and Parameters
+
+To edit or delete calculated measures and parameters already created in the story, go to the story toolbar menu and select `Preferences` -> `Calculated Members` to open the maintenance interface for calculated members and parameters, as shown below:
+
+![Managing Calculated Measures and Parameters in Stories](/public/img/story/manage-calculations.png)
+
+You can edit, delete, and add calculated members or parameters for multidimensional datasets.
+
+You can also use the AI Copilot [calculation command `/calculation`](../copilot/#calculation-command) to create and modify calculated measures.

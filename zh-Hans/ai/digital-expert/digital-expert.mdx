@@ -1,0 +1,66 @@
+---
+title: 数字专家
+sidebar_position: 1
+tags:
+  - AI
+  - Xpert
+  - Agent
+---
+
+## Xpert 是什么？
+
+Xpert 是一种利用大语言模型为基础，模拟人类社会行为的智能体组合。Xpert 将人类社会的最佳实践应用到 AI 智能体行为中，从而提升和规范 AI 服务于现实的的能力。
+
+Xpert 分为两种类型 Agent 与 Copilot：
+
+- Agent Xpert: 智能体专家，通过编排多个智能体协同完成任务，模拟人类社会运行的组织结构，最大化利用已有人类资源（通过工具集）和经验（通过组织方式），从而更好地服务于人类。
+- Copilot Xpert: 智能助理专家，利用大语言模型与人类配合使用工具，共同完成任务，人类与机器共同参与的最佳实践。
+
+## 在哪里构建 Xpert?
+
+构建 Xpert 以及相关的工具集是在一个工作空间中进行的，工作空间是组织 Xperts 与工具集和隔离权限的方式，工作空间成员可以共同编辑和使用其拥有的资源。
+
+![Xpert workspace](/public/img/ai/xpert-workspace.png)
+
+## 如何编排 Xpert Agents？
+
+新建 Agent Xpert 后可以到 Xpert Studio 中的 Agents 页面编排智能体。智能体的编排方式是人类社会中的上下级组织方式类同，上级通过计划、划分和分配任务到下级，下级通过调用工具集或知识库解决问题后回复给上级，上级通过综合所有的结果后做出下一步的判断。
+智能体的运行以这种方式进行，同样地编排也是相同的原则。
+
+每个智能体节点根据其负责的职责不同可以拥有不同的工具集和知识库，以及使用不同能力的大语言模型为基础。
+
+![Xpert studio](/public/img/ai/xpert-studio.png)
+
+## 如何使用工具？
+
+工具的使用是人类进化史上重要的一步，同样地会调用工具的大语言模型是通向 AGI 通用人工智能的重要标志。
+
+要让智能体使用工具，首先需要对工具进行授权，包括对内置工具的配置授权信息和通过接口创建自定义工具集。
+
+![Xpert toolset](/public/img/ai/xpert-toolset-builtin-auth.png)
+
+授权后的工具集实例便可以添加给智能体节点进行使用。
+
+另外如果需要 Xpert 智能体访问企业自有系统的接口，可以通过自定义工具集进行配置。
+
+## 如何检索知识库？
+
+[🎓知识库](../knowledge/) 是 AI Agent 的核心支持，提供背景知识和领域数据，帮助其理解用户意图、解答问题、优化决策、增强上下文理解，并减少生成偏差。
+同时，知识库的动态更新可确保 Agent 始终具备最新的信息，会显著提升对话的准确性和智能性。
+
+将创建好的知识库添加到 Xpert Studio 中，然后将智能体节点与知识库节点连接，此智能体将拥有访问此知识库的能力。
+
+![Xpert with knowledgebase](/public/img/ai/xpert-agent-run-with-kb.png)
+
+## 什么是 Copilot？
+
+Copilot Xpert 利用智能体帮助用户快速操作界面功能，以提高用户的专业度和工作效率。
+
+新建 Copilot 类型的 Xpert 后，Xpert Studio 的 copilot 中页面上传跟此专家职责相关的知识示例，示例将存储在向量数据库中，用户使用 Copilot 时将会根据问题检索相应的答案。
+
+![Xpert Copilot](/public/img/ai/xpert-copilot-example-testing.png)
+
+创建好 Copilot Xpert 后便可以在 Copilot 中选择此 Xpert 作为业务角色。执行时 Copilot 根据命令和角色去检索问题答案示例，以更准确操作界面功能。
+如下图所示， Xpert **Financial BP** 会根据命令 `/dimension` 检索问题答案并创建对应的维度对象。 
+
+![Copilot command](/public/img/ai/copilot-command-dimension-result.png)

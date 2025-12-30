@@ -1,122 +1,128 @@
 ---
-title: "指标注册"
-description: "指标注册功能使用指南"
+title: 📝 Indicator Registration
+sidebar_position: 1
+tags:
+  - MDX
 ---
 
+The Indicator Registration page is a functional page used to register individual new indicators or to bulk upload indicator definitions. Below are the main contents and functions of this page:
 
-# 指标注册
+1. **Basic Information**: Basic information about the indicator, such as indicator name, description, unit, etc. These information are the basic attributes of the indicator, used to help users better understand and use the indicator.
+2. **Model Information**: Model information related to the indicator, such as model name, model entity, dimensions, and measures, etc.
 
-## Overview
+## Creating Business Domains
 
-指标注册功能允许您将业务指标注册到数据分析平台，统一管理和使用。通过指标注册，可以确保指标定义的标准化和一致性，提高数据分析的准确性和效率。
+In the management of indicators, whether through business domains, product lines, or departments for classification and management of indicators, an organizational structure is needed to manage indicators of different attribute categories. We manage indicators by grouping them under business domains.
 
-## 注册指标
+Refer to [Business Domain Management](../server/organization/business-area)
 
-### 注册步骤
+1. First, open the **Business Domain** page, click on "Create Business Domain," and enter a name such as **Finance**.
+2. Click the add button on the Finance row to continue adding child business domains, such as **Management Reports**.
+3. Continue adding sub-sections of Management Reports: **Core Indicators**, **Revenue Indicators**, **Profit and Loss Indicators**, etc.
 
-1. 进入指标管理页面
-2. 点击"注册指标"按钮
-3. 填写指标基本信息
-   - **指标名称**: 业务指标的中文名称，要求清晰明确
-   - **指标代码**: 唯一的指标标识符，建议使用英文和数字
-   - **指标描述**: 指标的详细说明，包括业务含义、计算逻辑等
-   - **计算公式**: 指标的计算公式或SQL表达式
-   - **数据源**: 指标依赖的数据源
-4. 设置指标属性
-   - **指标类型**: 选择指标类型（聚合指标、计算指标等）
-   - **单位**: 指标的单位（元、个、百分比等）
-   - **精度**: 数值的精度设置
-   - **业务域**: 选择指标所属的业务域
-5. 设置指标权限
-   - 选择指标的可见范围
-   - 设置编辑权限
-6. 提交注册申请
+## Registering Indicators
 
-### 指标注册示例
+Next, create specific indicators.
 
-```json
-{
-  "name": "月销售额",
-  "code": "MONTHLY_SALES",
-  "description": "月度销售总额",
-  "formula": "SUM(sales.amount)",
-  "dataSource": "sales_db",
-  "type": "aggregate",
-  "unit": "元",
-  "precision": 2,
-  "category": "销售域"
-}
+:::tip Unique Code
+
+Indicator codes are only limited to uniqueness within the semantic model's multidimensional dataset; there are no restrictions at the business domain or global level, and users regulate them themselves.
+
+:::
+
+1. Open the indicator registration page and enter the following indicator information:
+
+- Basic Information
+
+| Name         | Description                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------------- |
+| Indicator Name | Language description of the indicator. From a management perspective, indicator names are unique, but the system itself does not enforce this uniqueness. |
+| Indicator Code | Unified indicator code, facilitating user memory and query of indicators.                       |
+| Business Domain | The business sector to which the indicator belongs (i.e., business domain). For example, we can put **Total Company Revenue** into the core indicator business domain. |
+| Authentication Process | The authentication process of the indicator in the indicator system.                       |
+| Creator | The creator of the indicator.                                                                              |
+| Responsible Person | The person responsible for the indicator in the business.                                                     |
+| Unit of Measure | The unit of measure for the indicator, such as **RMB**.                                                        |
+| Validity Period | The validity period of the indicator.                                                                |
+| Activation Status | Whether the indicator is in an active state.                                                               |
+| Indicator Application Availability | Whether the indicator is available for use in indicator applications.                                            |
+| Business Caliber | A language description of the indicator from a caliber perspective. The definition of indicator business caliber needs to be determined according to specific business scenarios and requirements, generally formulated jointly by business experts, data analysts, data managers, etc. At the same time, the indicator business caliber also needs to match the design of the data source to ensure the correctness, reliability, and repeatability of the indicator calculation results. |
+
+- Model Information
+
+| Name         | Description                                                                                   |
+| ------------ | --------------------------------------------------------------------------------------------- |
+| Semantic Model | The semantic model to which the indicator belongs.                                                      |
+| Model Entity | A specific multidimensional model in the semantic model where the indicator data comes from.                      |
+| Indicator Type | **Basic Indicator**: Select a measure from the existing measure fields in the semantic model for the indicator to use as the quantity value. <br/> [**Derived Indicator**](./derivative-indicator/): Data values obtained by combining existing measures and dimensions through calculation formulas. |
+| Visibility | Whether the indicator is visible to users when used in the frontend.                                                          |
+| Measure | When the indicator type is **Basic Indicator**, select a measure as the quantity value of the indicator.                                                                  |
+| Calculation Formula | When the indicator type is **Derived Indicator**, enter the calculation formula for the indicator measure value.                                                                      |
+| Aggregation Type | When the indicator type is **Derived Indicator**, specify an aggregation type for the calculation formula; defaults to using the aggregation type of the measure for **Basic Indicator**.                                          |
+| Free Dimensions | Dimensions on the multidimensional model unrestricted for this indicator. Will be selected or restricted when displayed.                                               |
+| Restrictive Conditions | Restrictions on other dimensions besides free dimensions on the multidimensional model for this indicator. See [Indicator Restrictive Conditions](./restrictive-condition/) for details.                                 |
+
+1. Submit to save.
+2. Download Template: You can download a template file for bulk upload, fill in indicator information in bulk, and then upload the file for bulk entry of indicators.
+3. Bulk Upload: Upload a template file format of the indicator file for bulk entry of indicators.
+
+After registration, you can view the indicators on the My Indicators page.
+
+## Preview
+
+On the indicator registration page, you can preview the data trends of indicators in real-time, so that users can better understand the source and trends of indicator data when entering indicators. After completing the indicator registration, click the **Data Preview** button to view the data trends of the indicator.
+
+![Preview of indicator](/public/img/indicator/indicator-register-preview.png)
+
+## Bulk Upload
+
+For initial indicator entry or bulk indicator creation, you can use the bulk upload feature.
+
+First, download the model file for bulk uploading indicator data. To facilitate manual organization of indicator data, you can download data similar to a particular indicator, then modify it by copying, open an existing indicator, or enter a new one, then click the **Download Template** button to download the current indicator data as a template. After organizing the indicator data, click the **Bulk Upload** button to upload.
+
+As shown in the figure below, during bulk import, users can modify the attribute configuration of indicators one by one, and then click the "Import" button to complete the bulk import of indicators.
+
+![Indicator Batch Import](/public/img/indicator/indicator-batch-import.png)
+
+Below is a YAML format template for an indicator:
+
+```yaml
+- name: ADJ Rosy Sunglasses Profit
+  code: 'Demo: ADJ-R-Sun Profit'
+  isActive: true
+  isApplication: true
+  visible: true
+  businessAreaId: 13ce2de2-a53f-4ad8-9c9d-8806291c77ec
+  authentication: ERP
+  business: |-
+    Profit of the product "ADJ Rosy Sunglasses" is the profit obtained by deducting the main business income from the main business cost and the main business taxes and surcharges.
+    Since the profit from the main business has not yet deducted period expenses such as sales expenses, management expenses, financial expenses, etc., it cannot fully reflect the profit status of the company's main business.
+  principal: Wang Tiwen
+  validity: '2023-04-29T16:00:00.000Z'
+  type: BASIC
+  modelId: a379cb26-19bd-4f82-84d7-db8a7c782385
+  entity: Sales
+  filters:
+    - members:
+        - value: '[ADJ].[ADJ Rosy Sunglasses]'
+          label: ADJ Rosy Sunglasses
+      dimension:
+        dimension: '[Product]'
+  dimensions:
+    - '[Time]'
+    - '[Store]'
+    - '[Promotions]'
+    - '[Customers]'
+  measure: Profit
+  formula: null
+  unit: RMB
+  tags:
+    - name: Sales
+      category: indicator
+      color: blue
+    -
+
+ name: Finance
+      category: indicator
+      color: blue
 ```
-
-## 指标信息
-
-### 基本信息
-
-- **指标名称**: 业务指标的中文名称，用于展示和识别
-- **指标代码**: 唯一的指标标识符，用于系统内部引用
-- **指标描述**: 指标的详细说明，帮助用户理解指标含义
-- **计算公式**: 指标的计算逻辑，支持SQL和自定义公式
-- **数据源**: 指标依赖的数据源连接
-
-### 计算公式
-
-支持多种计算方式：
-
-#### SQL表达式
-```sql
-SELECT SUM(amount) FROM sales WHERE month = '2024-01'
-```
-
-#### 聚合函数
-- **SUM**: 求和
-- **AVG**: 平均值
-- **COUNT**: 计数
-- **MAX**: 最大值
-- **MIN**: 最小值
-
-#### 自定义公式
-支持使用数学运算符和函数构建复杂公式：
-```
-(销售额 - 成本) / 销售额 * 100
-```
-
-## 指标审核
-
-注册的指标需要经过审核才能正式使用：
-
-### 审核流程
-
-1. **提交注册申请**: 填写完整的指标信息后提交
-2. **管理员审核**: 管理员检查指标定义的准确性和合理性
-3. **审核反馈**: 如有问题，管理员会反馈修改意见
-4. **修改完善**: 根据反馈修改指标定义
-5. **审核通过**: 审核通过后指标正式生效，可以在系统中使用
-
-### 审核要点
-
-- 指标定义的准确性
-- 计算公式的正确性
-- 数据源的可用性
-- 命名规范的符合性
-- 业务域的合理性
-
-## 指标类型
-
-### 聚合指标
-
-基于数据聚合的指标，如：
-- 总销售额
-- 平均订单金额
-- 客户总数
-
-### 计算指标
-
-基于其他指标计算得出的指标，如：
-- 销售增长率 = (本期销售额 - 上期销售额) / 上期销售额
-- 利润率 = (利润 / 收入) × 100%
-
-## 相关功能
-
-- [指标业务域](/en/数据分析平台/指标管理/指标业务域)
-- [指标认证](/en/数据分析平台/指标管理/指标认证)
-- [衍生指标](/en/数据分析平台/指标管理/衍生指标)

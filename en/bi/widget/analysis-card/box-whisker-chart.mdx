@@ -1,74 +1,19 @@
 ---
-title: "盒须图"
-description: "盒须图用于展示数据的分布情况，包括中位数、四分位数和异常值。"
+title: Box and Whisker Chart
+sidebar_position: 12
 ---
 
+**Box and Whisker Chart** (Box plot) is a commonly used data visualization chart for presenting statistical characteristics of datasets, including median, quartiles, maximum, minimum, and outliers. Box plots typically consist of a rectangle and two line segments, where the rectangle represents the quartiles of the data, the upper and lower line segments represent the maximum and minimum values, and the middle line segment represents the median. If outliers exist in the data, they will be separately represented as data points. Box plots can be used to compare distributions of multiple datasets and identify potential outliers and anomalies.
 
-# 盒须图
+Box plots are typically used to analyze differences in a single measure across different categories or groups. Within a single category and group, a secondary dimension (role needs to be set to **Category2** or **Group**) is needed to obtain members to be counted. Box plots will calculate the median, quartiles, maximum, minimum, and outliers for each group of data, then draw rectangles, lines, and outlier points.
 
-## Overview
+Create a chart component and select the **Box and Whisker Chart** type in the **Distribution** group, select a measure to be counted, then set two dimensions: one category dimension and one group dimension:
 
-盒须图用于展示数据的分布情况，包括中位数、四分位数和异常值。
+![Small](./boxplot-chartannotation.png)
 
-## 适用场景
 
-### 数据特点
+![Middle Shadow](./boxplot.png)
 
-- 适合展示的数据类型
-- 数据量要求
-- 数据格式要求
+## 示例
 
-### 使用场景
-
-- 典型应用场景
-- 业务场景示例
-
-## 配置选项
-
-### 数据配置
-
-- **数据源**: 选择数据源
-- **数据字段**: 选择要展示的数据字段
-- **数据筛选**: 设置数据筛选条件
-
-### 样式配置
-
-- **颜色配置**: 设置图表颜色
-- **标签配置**: 设置数据标签
-- **图例配置**: 设置图例显示
-
-### 交互配置
-
-- **点击交互**: 配置点击事件
-- **悬停效果**: 配置悬停提示
-- **钻取功能**: 配置数据钻取
-
-## 使用示例
-
-### 基本示例
-
-```json
-{
-  "type": "盒须图",
-  "data": {
-    "source": "data_source",
-    "fields": ["field1", "field2"]
-  },
-  "style": {
-    "colors": ["#1f77b4", "#ff7f0e"],
-    "showLegend": true
-  }
-}
-```
-
-## 最佳实践
-
-1. **数据准备**: 确保数据格式正确
-2. **样式设计**: 选择合适的颜色和样式
-3. **交互设计**: 合理配置交互功能
-4. **性能优化**: 注意大数据量的性能问题
-
-## Related Documentation
-
-- [分析卡片Overview](/en/数据分析平台/微件/分析卡片)
-- [其他图表类型](/en/数据分析平台/微件/分析卡片)
+<iframe src="https://app.mtda.cloud/public/story/widget/277a8e55-0728-49fe-bd2b-2f7828c6d6de" width="100%" height="500px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>
