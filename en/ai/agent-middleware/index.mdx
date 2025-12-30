@@ -1,0 +1,49 @@
+---
+title: 🔃 Agent Middleware
+sidebar_position: 30
+---
+
+## Overview
+
+Control and customize agent execution at every step.
+
+Middleware provides a more granular way to control the internal operations of agents. Middleware is suitable for the following scenarios:
+
+- Track agent behavior through logging, analysis, and debugging.
+- Transform prompts, tool selection, and output formats.
+- Add retry, fallback, and early termination logic.
+- Apply rate limiting, guardrails, and personally identifiable information detection.
+
+## Agent Loop
+
+The core agent loop includes calling the model, letting the model select tools to execute, and then ending when no more tools need to be called:
+
+<img src="/img/ai/xpert/core_agent_loop.avif" alt="Core agent loop diagram" style={{width: '300px', margin: '0 auto', display: 'block'}} />
+
+Middleware exposes hooks before and after each step:
+
+<img src="/img/ai/xpert/middleware_final.avif" alt="Middleware flow diagram" style={{width: '300px', margin: '0 auto', display: 'block'}} />
+
+## Middleware Nodes
+
+In XpertAI, agent nodes support mounting multiple middlewares for Agents in a visual way. Users can manage the order and configuration of middlewares in the right panel, achieving the same pluggable Middleware architecture as LangChain.
+
+<figure className="Large">
+  <img src="/img/ai/xpert/agent-middleware-nodes.png" alt="Middleware node config" className="rounded-xl shadow-md" />
+  <figcaption>Agent Middleware Nodes</figcaption>
+</figure>
+
+Each middleware has its own configuration panel where you can adjust execution parameters and behavior, forming a visual, configurable, and extensible agent execution pipeline.
+
+<figure className="Large">
+  <img src="/img/ai/xpert/middleware-node-config.png" alt="Middleware node config" className="rounded-xl shadow-md" />
+  <figcaption>Middleware Node Configuration</figcaption>
+</figure>
+
+Click the graph button of the Digital Expert agent to see the execution order and loop relationship between middleware and agents:
+
+<figure className="Large">
+  <img src="/img/ai/xpert/agent-middleware-graph.png" alt="Middleware graph" className="rounded-xl shadow-md" />
+  <figcaption>Middleware Node Graph</figcaption>
+</figure>
+

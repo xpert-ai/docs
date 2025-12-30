@@ -1,0 +1,89 @@
+---
+title: Custom Middleware
+sidebar_position: 3
+---
+
+This document introduces Xpert Agent middleware capabilities and its plugin-based implementation, comparable to LangChain Middleware (refer to official documentation: overview, built-in). Through middleware, you can insert cross-cutting logic (logging, caching, rate limiting, security, prompt governance, etc.) at key points in the Agent lifecycle without modifying core orchestration logic.
+
+## Core Concepts
+- **Strategy / Provider**: Each middleware implements an `IAgentMiddlewareStrategy`, marked with `@AgentMiddlewareStrategy('<provider>')` and registered in `AgentMiddlewareRegistry` (plugin-sdk).
+- **Middleware Instance**: The `AgentMiddleware` object returned by `createMiddleware`, containing state Schema, context Schema, optional tools, and lifecycle hooks.
+- **Node-based Integration**: Connect `WorkflowNodeTypeEnum.MIDDLEWARE` nodes to Agents in the workflow graph, loaded and executed in connection order at runtime via `getAgentMiddlewares`.
+- **Configuration and Metadata**: `TAgentMiddlewareMeta` describes name, internationalized labels, Icon, description, and configuration Schema, which the UI uses to render the configuration panel.
+
+## Lifecycle Hooks and Capabilities
+| Hook | Trigger Timing | Typical Use Cases |
+| --- | --- | --- |
+| `beforeAgent` | Before Agent starts, triggered only once | Initialize state, inject system prompts, fetch external context |
+| `beforeModel` | Before each model call | Dynamically assemble messages/tools, truncate or compress context early |
+| `afterModel` | After model returns, before tool execution | Adjust tool call parameters, record logs/metrics |
+| `afterAgent` | After Agent completes | Persist results, clean up resources |
+| `wrapModelCall` | Wrap model calls | Custom retry, caching, prompt protection, model switching |
+| `wrapToolCall` | Wrap tool calls | Authentication, rate limiting, result post-processing, return `Command` to control flow |
+
+Additionally, you can declare:
+- `stateSchema`: Persistable middleware state (Zod object/optional/default values).
+- `contextSchema`: Runtime-readable context only, not persisted.
+- `tools`: Dynamically injected `DynamicStructuredTool` list.
+- `JumpToTarget`: Return `jumpTo` in hooks to control jumps (e.g., `model`, `tools`, `end`).
+
+## Writing a Middleware
+1) **Define Strategy and Metadata**
+```ts
+@Injectable()
+@AgentMiddlewareStrategy('rateLimitMiddleware')
+export class RateLimitMiddleware implements IAgentMiddlewareStrategy<RateLimitOptions> {
+  readonly meta: TAgentMiddlewareMeta = {
+    name: 'rateLimitMiddleware',
+    label: { en_US: 'Rate Limit Middleware', zh_Hans: '限流中间件' },
+    description: { en_US: 'Protect LLM calls with quotas', zh_Hans: '为模型调用增加配额保护' },
+    configSchema: { /* JSON Schema for frontend form rendering */ }
+  };
+```
+
+2) **Implement `createMiddleware`**
+```ts
+  createMiddleware(options: RateLimitOptions, ctx: IAgentMiddlewareContext): AgentMiddleware {
+    const quota = options.quota ?? 100;
+    return {
+      name: 'rateLimitMiddleware',
+      stateSchema: z.object({ used: z.number().default(0) }),
+      beforeModel: async (state, runtime) => {
+        if ((state.used ?? 0) >= quota) {
+          return { jumpTo: 'end', messages: state.messages };
+        }
+        return { used: (state.used ?? 0) + 1 };
+      },
+      wrapToolCall: async (request, handler) => handler(request),
+    };
+  }
+}
+```
+
+3) **Register as Plugin Module**
+```ts
+@XpertServerPlugin({
+  imports: [CqrsModule],
+  providers: [RateLimitMiddleware],
+})
+export class MyAgentMiddlewareModule {}
+```
+
+4) **Integrate into Runtime**
+- Add the plugin to [plugin environment variables](/docs/plugin/install) during development/deployment.
+- Add middleware nodes to Agents in the workflow editor and configure order (supports adjusting execution order by arrangement).
+
+## Built-in Examples
+- **SummarizationMiddleware**  
+  Detects conversation length in `beforeModel`, triggers compression and replaces historical messages; supports triggering by token/message count or context ratio, and records compression in execution traces via `WrapWorkflowNodeExecutionCommand`.
+- **todoListMiddleware**
+  Injects `write_todos` tool and appends system prompts in `wrapModelCall` to guide LLM in planning complex tasks, with tools returning `Command` to update Agent state.
+
+## Best Practices
+- Only implement necessary hooks, maintain idempotency, avoid heavy blocking operations in hooks.
+- Use `stateSchema` to strictly declare persistent data, preventing state interference between different middlewares/Agents.
+- In `wrapModelCall`/`wrapToolCall`, prioritize calling the passed `handler` to ensure the default chain is available, then add custom logic.
+- Logic triggered by ratios needs to depend on model `profile.maxInputTokens`; fall back to absolute token limits when unavailable (see Summarization example).
+- Combine LangChain Middleware ideas: split cross-cutting concerns like logging, auditing, caching, rate limiting, and grayscale model switching into independent middlewares, combined in connection order.
+
+Through the above approach, you can seamlessly migrate LangChain's Middleware model to Xpert's plugin system, reusing existing orchestration, workflow, and UI configuration capabilities.

@@ -1,0 +1,93 @@
+---
+title: "Keycloak 登录"
+description: "Keycloak单点登录配置指南"
+---
+
+# Keycloak 登录
+
+## 概述
+
+Keycloak登录功能允许用户通过Keycloak身份认证服务器进行单点登录，支持SAML 2.0和OpenID Connect协议。
+
+## 功能特性
+
+- **SAML 2.0支持**: 支持SAML 2.0协议
+- **OpenID Connect支持**: 支持OpenID Connect协议
+- **统一认证**: 通过Keycloak实现统一身份认证
+- **用户同步**: 自动同步Keycloak用户信息
+
+## 配置步骤
+
+### 1. 在Keycloak中配置客户端
+
+1. 登录Keycloak管理控制台
+2. 选择或创建Realm
+3. 创建客户端（Client）
+4. 配置客户端设置
+   - Client ID
+   - Client Secret
+   - 重定向URI
+5. 配置协议映射
+
+### 2. 在平台中配置Keycloak登录
+
+1. 进入网站功能页面
+2. 点击"单点登录" -> "Keycloak 登录"
+3. 选择协议类型（SAML 2.0或OpenID Connect）
+4. 填写配置信息
+   - **Keycloak服务器地址**: Keycloak服务器URL
+   - **Realm名称**: Keycloak Realm名称
+   - **客户端ID**: Keycloak客户端ID
+   - **客户端密钥**: Keycloak客户端密钥
+5. 配置用户属性映射
+6. 测试连接
+7. 保存配置
+
+## 配置选项
+
+### SAML 2.0配置
+
+- **IdP实体ID**: Identity Provider的实体ID
+- **SSO服务URL**: Single Sign-On服务URL
+- **SLO服务URL**: Single Logout服务URL
+- **证书**: IdP的X.509证书
+- **属性映射**: SAML属性到用户属性的映射
+
+### OpenID Connect配置
+
+- **授权端点**: 授权端点URL
+- **Token端点**: Token端点URL
+- **用户信息端点**: 用户信息端点URL
+- **客户端ID**: OAuth客户端ID
+- **客户端密钥**: OAuth客户端密钥
+- **作用域**: 请求的权限作用域
+
+### 用户属性映射
+
+- **用户名**: 映射Keycloak用户名到系统用户名
+- **邮箱**: 映射Keycloak邮箱到系统邮箱
+- **显示名称**: 映射Keycloak显示名称
+- **角色**: 映射Keycloak角色到系统角色
+
+## 使用说明
+
+### 用户登录
+
+1. 用户点击"Keycloak登录"按钮
+2. 跳转到Keycloak登录页面
+3. 用户输入Keycloak账号密码
+4. 授权后跳转回平台
+5. 自动完成登录
+
+## 注意事项
+
+- 确保Keycloak服务器可访问
+- 正确配置重定向URI
+- 注意证书的有效期
+- 定期更新客户端密钥
+
+## 相关文档
+
+- [飞书登录](/zh-cn/数据分析平台/网站功能/单点登录/飞书登录)
+- [数据源](/zh-cn/数据分析平台/网站功能/数据源)
+- [企业租户](/zh-cn/数据分析平台/网站功能/企业租户)

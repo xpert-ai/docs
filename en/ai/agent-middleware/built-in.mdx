@@ -1,0 +1,24 @@
+---
+title: Built-in Middleware
+sidebar_position: 2
+---
+
+Pre-built middleware for common agent use cases
+
+XpertAI provides pre-built middleware for common use cases. Each middleware is production-tested and can be configured according to your specific needs.
+
+## Provider-Agnostic Middleware
+
+The following middleware works with any LLM provider:
+
+| Middleware                              | Description                                                                 |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| [Context Compression](#context-compression) | Automatically summarize conversation history when approaching the session limit. |
+
+### Context Compression
+
+Automatically summarizes conversation history when approaching token limits, preserving recent messages while compressing older context. Summarization is suitable for the following scenarios:
+
+* Long conversations that exceed the context window.
+* Multi-turn conversations with extensive history.
+* Applications that need to preserve complete conversation context.

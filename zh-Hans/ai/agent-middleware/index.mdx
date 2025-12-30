@@ -1,0 +1,48 @@
+---
+title: 🔃 智能体中间件
+sidebar_position: 30
+---
+
+## 概述
+
+在每一步控制和自定义智能体执行。
+
+中间件提供了一种更精细地控制智能体内部运行的方式。中间件适用于以下场景:
+
+- 通过日志记录、分析和调试来跟踪智能体行为。
+- 转换提示词、工具选择和输出格式。
+- 添加重试、降级和提前终止逻辑。
+- 应用速率限制、防护栏和个人身份信息检测。
+
+## 智能体循环
+
+核心智能体循环包括调用模型，让模型选择要执行的工具，然后在不再需要调用任何工具时结束：
+
+<img src="/img/ai/xpert/core_agent_loop.avif" alt="Core agent loop diagram" style={{width: '300px', margin: '0 auto', display: 'block'}} />
+
+中间件在每个步骤之前和之后都会暴露钩子：
+
+<img src="/img/ai/xpert/middleware_final.avif" alt="Middleware flow diagram" style={{width: '300px', margin: '0 auto', display: 'block'}} />
+
+## 中间件节点
+
+在 XpertAI 中，智能体节点支持以可视化方式为 Agent 挂载多个中间件，用户可在右侧面板统一管理中间件的顺序与配置，实现与 LangChain 相同的可插拔 Middleware 架构。
+
+<figure className="Large">
+  <img src="/img/ai/xpert/agent-middleware-nodes.png" alt="Middleware node config" className="rounded-xl shadow-md" />
+  <figcaption>智能体中间件节点</figcaption>
+</figure>
+
+每个中间件都拥有独立的配置面板，可进入后调整其执行参数与行为，形成一条可视化、可配置、可扩展的智能体执行流水线。
+
+<figure className="Large">
+  <img src="/img/ai/xpert/middleware-node-config.png" alt="Middleware node config" className="rounded-xl shadow-md" />
+  <figcaption>中间件节点配置</figcaption>
+</figure>
+
+点击打开数字专家智能体的图按钮，可以看到中间件与智能体的执行顺序与循环关系：
+
+<figure className="Large">
+  <img src="/img/ai/xpert/agent-middleware-graph.png" alt="Middleware graph" className="rounded-xl shadow-md" />
+  <figcaption>中间件节点图</figcaption>
+</figure>
