@@ -3,23 +3,6 @@ title: 分析卡片
 sidebar_position: 1
 ---
 
-import {useState} from 'react';
-
-export const ChartImgs = ({children, cols, types}) => {
-  return (<div class="grid grid-cols-3 gap-4" style={{gridTemplateColumns: 'repeat('+cols+', minmax(0, 1fr))'}}>
-  {types.map((chart) => (
-<a style={{gridColumn: 'span '+(chart.cols || 1)+' / span '+(chart.cols || 1)+''}}
-  href={chart.href}>
-  <figure style={{width: '100%'}}>
-    <img src={chart.imgsrc} alt={chart.caption} />
-    <figcaption>{chart.caption}</figcaption>
-  </figure>
-</a>
-  ))}
-  </div>
-  )
-};
-
 
 分析图形组件是以绘制可视化图形进行展示的一种组件, 作为通用的图形绘制容器它可以支持不同的 JavaScript 图形绘制库如 ECharts, AntG2, 目前以 Echarts 库为主.
 
@@ -63,7 +46,10 @@ export const ChartImgs = ({children, cols, types}) => {
 
 **图形变体** 允许用户在同一个图形组件中展现不同的图形变形，以便用户可以根据需要自行选择查看的图形类型。在同一个图形组件中预先定义多个图表变体，这些变体可以是不同类型的图表，例如折线图、柱状图、饼图等，或自定义图形类型，也可以是同一类型图表的不同展示形式，如堆叠柱状图和分组柱状图。
 
-![图形变体](/public/img/story/chart-variants.png)
+<figure className="Large">
+  <img src="/img/story/chart-variants.png" alt="图形变体" className="" />
+  <figcaption>图形变体</figcaption>
+</figure>
 
 在图形配置属性区添加图形变体后将与图形本身的类型一起展示在图形微件的工具栏中，用户可以切换不同的图形变体，查看不同的图形展示效果。
 
@@ -87,7 +73,10 @@ export const ChartImgs = ({children, cols, types}) => {
 - **调色板**：颜色选择器允许您为数据图中的不同部分指定颜色。用户可以选择一种预设的色板，也可以创建自己的自定义色板。
 - **ECharts 属性**：这包含了度量在 ECharts 中对应的属性设置，如 Series、 Axis、 Visual Map、 Data Zoom 等。
 
-![图形的度量](/public/img/widgets/analytical-card/chart-measures.png)
+<figure className="Small">
+  <img src="/img/widgets/analytical-card/chart-measures.png" alt="图形的度量" className="" />
+  <figcaption>图形的度量</figcaption>
+</figure>
 
 这样的度量选择器设置，则让用户可以高度自定义他们的度量展示方式，使得数据以更好、更直观的方式在图表中展现出来。
 
@@ -112,7 +101,10 @@ export const ChartImgs = ({children, cols, types}) => {
   - **Axis**：坐标轴设置。这决定了数据在图表中的位置及展示格式。
   - **Data Zoom**：数据缩放和滑动。这个功能允许对某一区域的数据进行放大或者缩小来进行更详细的查看。
 
-![图形的维度](/public/img/widgets/analytical-card/chart-dimensions.png)
+<figure className="Small">
+  <img src="/img/widgets/analytical-card/chart-dimensions.png" alt="图形的维度" className="" />
+  <figcaption>图形的维度</figcaption>
+</figure>
 
 上述的维度选择器设置，允许用户可以根据自己的需求来配置维度的展示方式，使得数据可以以最直观，最清晰，同时满足个性化需求的方式在图表中展示。
 
@@ -120,10 +112,16 @@ export const ChartImgs = ({children, cols, types}) => {
 
 支持丰富的图形类型和图形变形.
 
-<div class="flex justify-center gap-2">
-![Chart Type](/public/en/img/widgets/analytical-card/chart-type.png)
+<div className="flex justify-center gap-2">
+<figure className="Small">
+  <img src="/en/img/widgets/analytical-card/chart-type.png" alt="Chart Type" className="" />
+  <figcaption>Chart Type</figcaption>
+</figure>
 
-![Chart Custom](/public/en/img/widgets/analytical-card/chart-custom.png)
+<figure className="Small">
+  <img src="/en/img/widgets/analytical-card/chart-custom.png" alt="Chart Custom" className="" />
+  <figcaption>Chart Custom</figcaption>
+</figure>
 </div>
 
 * 图形类型选择

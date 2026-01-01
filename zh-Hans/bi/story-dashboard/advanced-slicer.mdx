@@ -6,7 +6,7 @@ sidebar_position: 17
 高级切片器可以实现复杂的切片功能, 一般会根据上下文维度和度量值去计算出相应的维度成员.
 如下图所示, 计算利润排名前 10 个产品维度成员.
 
-![Small Shadow](./advanced-slicer.png)
+![Small Shadow](/public/img/story/advanced-slicer/advanced-slicer.png)
 
 :::tip
 
@@ -18,7 +18,7 @@ sidebar_position: 17
 
 在实际运行中, 高级切片器会合并到运行时查询上下文维度中去. 如下图所示, 维度中使用了两个维度: **日历维度**和**产品维度**, 其中日历维度设置了**季度**层级, 产品维度设置了**品牌**层级, 运行时**产品维度**的高级切片器设置会合并到产品维度上去, 那么这样查询结果就是: _计算每个季度下的产品利润排名前 10 的品牌_
 
-![Small](./advanced-slicer-and-chart-dimensions.png)
+![Small](/public/img/story/advanced-slicer/advanced-slicer-and-chart-dimensions.png)
 
 再结合上图形的各种形式就能对多维数据集进行各种条件分析.
 
@@ -51,7 +51,7 @@ sidebar_position: 17
 
 为了更灵活地控制高级切片器操作函数的值, 可以使用 **参数** 来控制其值, 这样用户自由灵活地选择要查询的条件.
 
-![Small Shadow](./parameter.png)
+![Small Shadow](/public/img/story/advanced-slicer/parameter.png)
 
 关于参数的详细信息请参考 [参数](../parameter/).
 

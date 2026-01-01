@@ -36,7 +36,7 @@ sidebar_position: 13
 
 如下图所示, 计算的是所有产品中利润前 3 的产品利润汇总值.
 
-![Middle Shadow](./aggregation-measure.png)
+![aggregation-measure.png](/public/img/story/Calculate-metrics/aggregation-measure.png)
 
 **使用条件聚合**: 在运行时聚合函数计算要在选择的条件下进行(选取或排除).
 
@@ -46,7 +46,7 @@ sidebar_position: 13
 
 创建受限度量实在计算编辑器中选择类型为 "**受限度量**":
 
-![Middle Shadow](./restricted-measure.png)
+![restricted-measure.png](/public/img/story/Calculate-metrics/restricted-measure.png)
 
 1. 选择一个需要统计的 **度量** 字段.
 2. 然后添加一个或多个限定条件的 **维度**, 并选择相应的成员或者 [为其创建参数](#限定条件使用参数).
@@ -86,7 +86,7 @@ sidebar_position: 13
 AVG(LastPeriods([@Sales_MA_Windows], [Time].CurrentMember),[Measures].[profit])
 ```
 
-![计算度量](/public/img/story/calculated-measure.png)
+![计算度量](/public/img/story/Calculate-metrics/calculated-measure.png)
 
 关于在计算公式中使用参数请参考 [计算公式使用参数](../parameter/#计算公式使用参数).
 
@@ -94,17 +94,17 @@ AVG(LastPeriods([@Sales_MA_Windows], [Time].CurrentMember),[Measures].[profit])
 
 **度量控制**: 是指以指向其他度量为目的的度量字段, 可以让用户在运行时动态选择需要查看的度量. 度量控制创建过程: 创建计算度量, 选择类型为 **度量控制**, 选择展示行为并选中需要选择的度量列表. 如下图所示
 
-![度量控制](/public/img/story/measure-control.png)
+![度量控制](/public/img/story/Calculate-metrics/measure-control.png)
 
 应用后度量选择创建成功, 想要实际选择度量还要为此度量创建相应的输入控制器微件, 如下图所示, 详细过程可以参见 [输入控制器微件](../../widgets/input-control#度量选择器)
 
-![Small](./measures-control-widget.png)
+![measures-control-widget.png](/public/img/story/Calculate-metrics/measures-control-widget.png)
 
 ## 5. 差值度量 (Difference From)
 
 **差值度量** 是维度的一个成员与另一个成员的差异的计算类型, 常用来计算差值或者比率等类型, 如同比环比. 差异不仅可以是时间维度的, 还可以是如版本等其他维度上的.
 
-![差值度量](/public/img/story/calculation-variance.png)
+![差值度量](/public/img/story/Calculate-metrics/calculation-variance.png)
 
 基于时间的比较较常见, 如计算同比环比.
 
@@ -125,7 +125,7 @@ AVG(LastPeriods([@Sales_MA_Windows], [Time].CurrentMember),[Measures].[profit])
 
 需要编辑或删除故事中已创建的计算度量和参数时，可以从故事工具栏菜单中选择 `首选项` -> `计算成员` 打开计算成员和参数的维护界面, 如下图所示:
 
-![管理故事中的计算度量和参数](/public/img/story/manage-calculations.png)
+![管理故事中的计算度量和参数](/public/img/story/Calculate-metrics/manage-calculations.png)
 
 可以为多维数据集编辑、删除和新增计算成员或参数。
 

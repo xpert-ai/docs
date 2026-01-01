@@ -1,83 +1,101 @@
 ---
-title: 💼工作空间
+title: 💼 Story Workspace
 sidebar_position: 2
 ---
 
-故事仪表板工作空间是 Xpert 分析云中的一个功能模块， 它允许用户创建交互式的数据故事仪表板，并通过图表、可视化和文本来呈现数据分析结果。
+The Story Dashboard workspace is a functional module within the Xpert Analytics Cloud, allowing users to create interactive data story dashboards and present data analysis results through charts, visualizations, and text.
 
-在故事仪表板工作空间中，有三个主要部分：画布、悬浮的工具栏和属性编辑侧边栏。这些部分提供了用户创建和编辑故事仪表板所需的核心功能。
+Within the Story Dashboard workspace, there are three main sections: the canvas, the floating toolbar, and the property editing sidebar. These sections provide core functionality for users to create and edit story dashboards.
 
-![故事仪表板工作空间](/public/img/story/story-workspace.jpeg)
+1. Canvas:
+The canvas is the main area of the Story Dashboard workspace where users can create and layout their data visualizations and story content. Users can drag and drop various charts, visualization elements, and text boxes onto the canvas, adjust their size and position to achieve the desired layout and design. By interacting with components on the canvas, users can select, filter, and explore data and present it to their audience.
 
-1. 画布：
-画布是故事仪表板工作空间的主要区域，用户可以在其中创建和布局他们的数据可视化和故事内容。用户可以拖放各种图表、可视化元素和文本框到画布上，调整它们的大小和位置，以实现所需的布局和设计。通过与画布上的组件交互，用户可以选择、筛选和探索数据，并将其呈现给观众。
+2. Toolbar:
+The floating toolbar is a floating bar located above the canvas, containing some commonly used tools and operations to facilitate editing and modification within the story dashboard. The tools include adding charts, adding text boxes, adjusting layout, saving, previewing, etc. Users can click on these tools to perform corresponding actions quickly for editing and creation.
 
-2. 工具栏：
-悬浮的工具栏是位于画布上方的一个浮动栏，它包含了一些常用的工具和操作，方便用户在故事仪表板中进行编辑和修改。其中的工具包括添加图表、添加文本框、调整布局、保存、预览等。用户可以通过点击这些工具来执行相应的操作，以快速进行编辑和创建。
+3. Property Editing Sidebar:
+The property editing sidebar is a sidebar panel located on the right side of the canvas, providing functionality to edit the detailed settings and properties of selected components. When a user selects a component on the canvas, the property editing sidebar displays the properties and options of that component, such as data source, chart type, color, font style, etc. Users can adjust and customize these properties according to their needs to make charts and visualization elements meet their requirements.
 
-3. 属性编辑栏：
-属性编辑侧边栏是位于画布右侧的一个侧边栏面板，它提供了对选定组件的详细设置和属性进行编辑的功能。当用户选中画布上的一个组件时，属性编辑侧边栏会显示该组件的属性和选项，例如数据源、图表类型、颜色、字体样式等。用户可以根据自己的需求对这些属性进行调整和定制，以使图表和可视化元素符合他们的要求。
+## Toolbar
 
-## 工具栏
+**Toolbar** is a toolbar in the story designer that includes a series of commonly used functions. It can exist in the form of a floating window or be fixed to the sidebar. The toolbar contains the following sub-functional areas:
 
-**工具栏** 是故事设计器中包含了一系列常用功能的工具栏，它可以以浮动窗口的形式存在，也可以被固定到侧边栏。工具栏中包含以下子功能区域：
+- [Toolbar](#toolbar)
+- [New Canvas Page](#new-canvas-page)
+- [Preferences](#preferences)
+- [Global Styles](#global-styles)
+- [Devices](#devices)
+- [Preview/Edit](#previewedit)
+- [Fullscreen](#fullscreen)
+- [Widgets](#widgets)
+- [AI Copilot](#ai-copilot)
 
-- [工具栏](#工具栏)
-- [新画布页面](#新画布页面)
-- [首选项](#首选项)
-- [全局样式](#全局样式)
-- [设备](#设备)
-- [预览/编辑](#预览编辑)
-- [全屏](#全屏)
-- [微件](#微件)
-- [AI 智能助理](#ai-副驾驶)
+## New Canvas Page
 
-## 新画布页面
+In the Story Dashboard workspace, when you create an empty story dashboard, you have two options to start designing your dashboard layout:
 
-在故事仪表板工作空间中，当您创建了一个空的故事仪表板时，您有两种选择来开始设计您的仪表板布局。
+1. Add canvas pages with different layout types:
+In the Story Dashboard workspace, in the wizard, click "New Canvas Page" or in the toolbar, click "Preferences" -> "New Page" -> "Different Types of Pages", you can add multiple canvas pages and choose different layout types to meet your needs. The layout type defines how components on the canvas are arranged and sized. You can choose the appropriate layout type according to your data and visualization needs. Here are some common layout types:
+   - Responsive Layout: Components on the canvas automatically adjust their size to fit different screen sizes and resolutions.
+   - Fixed Size Layout: Components on the canvas maintain a fixed size and do not change with screen size and resolution.
+   - Fixed Height Layout: Components on the canvas maintain a fixed height, but the width changes with screen size and resolution.
 
-- 在故事工具栏中找到新建页面。
-- 在空页面导航中点击新建页面。
+2. Add dashboard quickly with story templates:
+The Story Dashboard workspace also provides pre-designed story templates to help you quickly create dashboards and start working. These templates contain common dashboard layouts and example charts, which can be directly applied to your blank story dashboard to quickly generate initial structures. You can modify and customize according to the examples in the template to fit your data and analysis goals. Using story templates can save you time designing dashboards while also providing inspiration and guidance for layout and visualization. See details [Story Templates](../template/)
 
-详情参考 [页面布局](../layout/)
+In addition to using predefined canvas types, users can also customize canvas settings. Open the story properties editing interface and click on the blank space of the page to bring up the grid layout property settings interface. The grid layout has the following properties:
+- Layout Type:
+  - **Fixed**: Fixed pixel layout, grid size is determined by **fixed column width** and **fixed row height**
+    - **Fixed Size** Not Set: The initial number of columns in the grid is calculated from the screen width, and the initial number of rows is determined by **minimum row count**;
+    - **Fixed Size** Set: The initial number of grids is determined by **minimum column count** and **minimum row count**, and can be expanded by dragging components beyond the existing area. The grid will be displayed centered.
+  - **Fit to Screen**: Adapt to screen size layout, the number of grids is determined by **minimum column count** and **minimum row count**, grid size is not fixed (fixed column width and fixed row height do not work) and fills the entire screen size;
+  - **Scroll Vertical**: Vertical scrolling layout, the initial number of grids is determined by **minimum column count** and **minimum row count**, and the grid size changes to adapt to fill the screen width, the grid height is the same as the width, and the grid layout scrolls vertically.
+  - **Scroll Horizontal**: Similar to vertical scrolling layout;
+  - **Vertical Fixed**: Vertical fixed size layout, vertical grid height is determined by **fixed row height**, and scrolls when exceeding the screen height on the basis of **minimum row count**. The horizontal changes the grid width to fill the screen width based on the **minimum column count**;
+  - **Horizontal Fixed**: Horizontal fixed size layout, similar to vertical fixed size layout;
+- Display Grid: When to display the grid, do not display, always display, display when dragging;
+- Compact Type: Automatic compact processing direction;
+- Margin: Grid margin size, including spacing between grids;
+- Outer Margin: Whether to retain the outer margin blank of the grid;
+- Multi-Layer: Allow overlapping of widget positions.
 
-## 首选项
+## Preferences
 
-故事首选项提供了对故事仪表板的详细信息、样式、计算成员以及分享和下载等功能的管理和常用设置。详情参考 [首选项](../preferences/)
+Story Preferences provide management and common settings for detailed information, styles, calculated members, sharing, and downloading functions of the story dashboard. See details [Preferences](../preferences/)
 
-## 全局样式
+## Global Styles
 
-故事全局样式功能允许您统一设置和调整故事仪表板的外观和样式，以保持一致性并呈现出专业和吸引人的数据可视化效果。详情参考 [全局样式](../global-styles/)
+Story Global Styles feature allows you to uniformly set and adjust the appearance and style of the story dashboard to maintain consistency and present professional and appealing data visualization effects. See details [Global Styles](../global-styles/)
 
-## 设备
+## Devices
 
-设备菜单里可以为故事仪表板目的设备型号进行模拟，以便您可以在不同的设备上查看故事仪表板的效果。详情参考 [设备](../mobile/)
+The Devices menu allows you to simulate the device models for the story dashboard so that you can view the effects of the story dashboard on different devices. See details [Devices](../mobile/)
 
-## 预览/编辑
+## Preview/Edit
 
-预览和编辑按钮可以切换故事仪表板的编辑状态，在预览情况下，您可以查看故事仪表板的最终效果，但是不能对其进行编辑。在编辑情况下，您可以对故事仪表板进行编辑。
+The Preview and Edit buttons can switch the editing state of the story dashboard. In preview mode, you can view the final effect of the story dashboard but cannot edit it. In edit mode, you can edit the story dashboard.
 
-## 全屏
+## Fullscreen
 
-全屏按钮可以将工作空间页面切换到全屏模式，浮动工具栏将会自动隐藏，以便您可以沉浸式编辑和查看故事仪表板。
+The Fullscreen button can switch the workspace page to full-screen mode, and the floating toolbar will automatically hide, allowing you to immerse in editing and viewing the story dashboard.
 
-## 微件
+## Widgets
 
-工具栏中微件部分是故事仪表板的核心功能，您可以通过微件部分添加和管理故事仪表板中的微件。每种微件详情请参考 [微件](../../widgets/)
+The widgets section in the toolbar is the core function of the story dashboard, where you can add and manage widgets in the story dashboard. For details of each widget, please refer to [Widgets](../../widgets/)
 
-添加微件到画布上有以下两种方式：
+There are two ways to add widgets to the canvas:
+* **Select and Add**: After selecting the add widget button, use the mouse to drag and draw a rectangular area on the canvas, you can add a widget to the story dashboard. After adding the widget, you can adjust its position and size by dragging, or
 
-* **选中添加** 选中微件按钮后使用鼠标在画布上拖动绘制一个矩形区域，即可添加一个微件到故事仪表板中。添加微件后，您可以通过拖动微件来调整其位置和大小，也可以通过拖动微件的边框来调整其大小。
-* **拖拽添加** 拖拽微件按钮可以将微件添加到故事仪表板中。添加微件后，您可以通过拖动微件来调整其位置和大小，也可以通过拖动微件的边框来调整其大小。
+ adjust its size by dragging the border of the widget.
+* **Drag and Drop to Add**: The drag-and-drop widget button can add the widget to the story dashboard. After adding the widget, you can adjust its position and size by dragging, or adjust its size by dragging the border of the widget.
 
 <figure class="Large">
-  <video controls autoplay="true" loop="true" alt="故事仪表板添加微件" className="Shadow w-full m-auto">
+  <video controls autoplay="true" loop="true" alt="Story Dashboard Adding Widgets" className="Shadow w-full m-auto">
     <source src="/img/story/story-add-widgets.webm" type="video/webm"/>
   </video>
-  <figcaption>故事仪表板添加微件</figcaption>
+  <figcaption>Story Dashboard Adding Widgets</figcaption>
 </figure>
 
-## AI 智能助理
+## AI Copilot
 
-AI副驾驶提供了自然语言控制仪表板设置的功能, 通过与 AI 智能助理进行对话，您可以使用自然语言命令和指令来定制和调整仪表板的外观、图表属性和组件样式等，
-从而更高效地进行故事仪表板的设计和配置。 详情参考 [AI副驾驶](../copilot/)
+The AI Copilot provides the functionality to control the dashboard settings with natural language. By conversing with the AI Copilot, you can customize and adjust the appearance, chart properties, and component styles of the dashboard efficiently, using natural language commands and instructions, thereby facilitating the design and configuration of the story dashboard. See details [AI Copilot](../copilot/)

@@ -20,17 +20,17 @@ sidebar_position: 2
 
 最基本的柱形图为一个维度和一个度量组成, 虽然选择的是柱形图类型, 你仍然可以更改度量组件的显示类型为: Bar, Line, Scatter 三种之一, 同理线图(Line)和散点图(Scatter)也可以改成另外两种显示类型.
 
-![Small](./basic-attributes.png)
+![Small](/public/img/widgets/bar/basic-attributes.png)
 
 图形展示如下
 
-![Small](./basic.png)
+![Small](/public/img/widgets/bar/basic.png)
 
 ## 多维度柱形图
 
 一般情况下多维度也就是两个维度, 再多的话图形也会比较混乱.
 
-![Small](./multi-dimensions-attributes.png)
+![Small](/public/img/widgets/bar/multi-dimensions-attributes.png)
 
 两个维度时, 一个维度作为默认的主维度, 另一个为次维度并可以设置其角色为 `Group`, `Stacked`, `Trellis`:
 
@@ -38,71 +38,71 @@ sidebar_position: 2
 * **堆积(Stacked)**: 次维度下的成员会在相同主维度成员下堆积显示.
 * **格子(Trellis)**: 按照此维度成员进行分组并分别显示在小格子中.
 
-![Small](./dimension-role.png)
+![Small](/public/img/widgets/bar/dimension-role.png)
 
 ### 分组
 
 次维度角色设置为 **分组** 时展示效果如下
 
-![Small](./multi-dimensions-group.png)
+![Small](/public/img/widgets/bar/multi-dimensions-group.png)
 
 ### 堆积
 
 次维度角色设置为 **堆积** 时展示效果如下
 
-![Small](./multi-dimensions-stacked.png)
+![Small](/public/img/widgets/bar/multi-dimensions-stacked.png)
 
 ### 格子
 
 次维度角色设置为 **格子** 时展示效果如下
 
-![Small](./multi-dimensions-trellis.png)
+![Small](/public/img/widgets/bar/multi-dimensions-trellis.png)
 
 可以在图形设置板块里, 设置 **格子横向个数**, 决定格子的横向分布个数, 纵向个数将自动计算得出:
 
-![Small](./trellis-h-number.png)
+![Small](/public/img/widgets/bar/trellis-h-number.png)
 
 ## 多度量柱形图
 
 多度量情况下, 度量组件会并排显示; 如果其中一个度量的单位与其他不同, 如增长率为百分比与其他的为金额不同, 那么可以将此度量的角色设置为 `Axis2`, 那么它会显示在不同值轴上, 就形成了双值轴组合图形.
 
-![Small](./multi-measures.png)
+![Small](/public/img/widgets/bar/multi-measures.png)
 
 如果将其中一个或多个度量组件的 **形状** 属性改成其他如 **线形**, **散点** 就形成了组合图形 (Combination Chart);
 
-![Small](./multi-meausres-combine.png)
+![Small](/public/img/widgets/bar/multi-meausres-combine.png)
 
 ## 多维度多度量柱形图
 
 多维度多度量柱形图是在多维度和多度量图形基础上合起来的, 多个维度显示逻辑和多维度图形一样, 多个度量组件会并排显示;
 
-![Small](./multi-dim-measures.png)
+![Small](/public/img/widgets/bar/multi-dim-measures.png)
 
 ## 柱形方向
 
 改变柱形图的方向属性, 图形坐标的 X 轴和 Y 轴会切换显示;
 
-![Small](./chart-orient.png)
+![Small](/public/img/widgets/bar/chart-orient.png)
 
 横向柱形图展示效果为
 
-![Small](./h.png)
+![Small](/public/img/widgets/bar/h.png)
 
 ## 极坐标
 
 将柱形图的变式设置为 **极坐标** 可以得到极坐标系下的柱形图
 
-![Small](./variant-polar.png)
+![Small](/public/img/widgets/bar/variant-polar.png)
 
 再加上方向属性的不同可以得到两种极坐标效果
 
 * 极坐标横向柱形图
 
-![Small](./polar.png)
+![Small](/public/img/widgets/bar/polar.png)
 
 * 极坐标纵向柱形图
 
-![Small](./radar.png)
+![Small](/public/img/widgets/bar/radar.png)
 
 ## 示例
 

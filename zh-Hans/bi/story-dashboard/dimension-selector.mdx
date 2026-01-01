@@ -9,23 +9,23 @@ sidebar_position: 12
 
 如下图所示维度选择器组件, 分为维度选择和属性设置按钮两个部分, 属性设置按钮有多个分别对应不同类别的属性设置
 
-![维度选择器](/public/img/story/dimension/dimension-selector.jpg)
+![维度选择器](/public/img/story/dimension-selector/dimension-selector.jpg)
 
 点击下拉选择, 弹出可选维度列表如下图, 选择其中一个维度, 每个维度根据其类型不同显示不同的图标, 文本名称在左边, 技术名称在右边
 
-![Small](./img/dimension-selector-panel.png "Dimension Selector Panel")
+![Small](/public/img/story/dimension-selector/dimension-selector-panel.png "Dimension Selector Panel")
 
 ### 层次结构设置
 
 层次结构相关属性, 点击下图所示层次结构按钮可以弹出其属性设置列表. 最上方的层次结构菜单可以从多个层次结构中选择一个使用, 选择层次结构后层次结构菜单中会出现相应的层级列表, 可以继续选择一个层级. 如下图选中了 **日历** 维度中的 **日历** 层次结构, 又选中的日历层次结构中的 **年** 层级.
 
-![Small](./img/hierarchy-selector-panel.png "Hierarchy Selector Panel")
+![Small](/public/img/story/dimension-selector/hierarchy-selector-panel.png "Hierarchy Selector Panel")
 
 ### 维度成员选择
 
 可以为维度选择固定的成员, 点击层次结构菜单中的 **成员** 菜单, 弹出维度成员选择帮助窗口.
 
-![Middle Shadow](./img/dimension-selector-value-help.png "Member Value Help")
+![Middle Shadow](/public/img/story/dimension-selector/dimension-selector-value-help.png "Member Value Help")
 
 * **层次结构**: 这里的层次结构要和维度选择器本身的层次结构保持一致, 所以不要换成其他的层次结构;
 * **排除选中成员**: 表示要在数据查询时排除掉选中的这些成员对应的数据;
@@ -63,19 +63,19 @@ sidebar_position: 12
 
 **成员标签** 指使用哪个字段作为维度成员的标签，可以是维度成员的属性字段或者维度成员的固有属性字段。
 
-![Member Label with Property](/public/img/story/dimension/member-label-with-auto.png)
+![Member Label with Property](/public/img/story/dimension-selector/member-label-with-auto.png)
 
-![Member Label with Property](/public/img/story/dimension/member-label-with-property.png)
+![Member Label with Property](/public/img/story/dimension-selector/member-label-with-property.png)
 
 ## 度量选择器
 
 度量选择器可以帮助用户选择度量和设置相关属性.
 
-![Small](./img/measure-selector.png "Measure Selector")
+![Small](/public/img/story/dimension-selector/measure-selector.png "Measure Selector")
 
 点击度量选择下单按钮, 弹出可选度量列表, 度量列表分为三类: 度量, 计算度量和指标.
 
-![Small](./img/measure-selector-panel.png "Measure Selector Panel")
+![Small](/public/img/story/dimension-selector/measure-selector-panel.png "Measure Selector Panel")
 
 * **度量**: 来源于多维模型本身的度量;
 * **计算度量**: 在客户端用户通过配置或者计算公式创建的度量, 会在查询时以用户自定义公式的形式进行数据查询. 创建计算度量详情参见 [计算成员](../calculations/);

@@ -1,45 +1,48 @@
 ---
-title: 查询日志
+title: Query Logs
 sidebar_position: 11
 tags:
   - MDX
   - SQL
 ---
 
-**查询日志** 功能，帮助用户更全面地监控和分析语义模型的查询情况。此功能记录所有查询的详细信息，包括查询状态、执行时间、查询参数及结果等。用户可以在界面上查看查询日志，以便优化查询性能、排查问题并提高系统稳定性。
+The **Query Logs** feature helps users more comprehensively monitor and analyze the query performance of semantic models. This feature records detailed information about all queries, including query status, execution time, query parameters, and results. Users can view the query logs through the interface to optimize query performance, troubleshoot issues, and improve system stability.
 
-## 功能特点
+## Feature Highlights
 
-1. **全局查询日志管理（开发中）**：记录所有查询请求，支持按模型、查询状态等条件筛选。
-2. **可视化日志界面**：在语义模型中新增查询日志页面，直观呈现查询执行情况。
-3. **性能监控**：提供 `executionTime` 和 `waitingTime` 指标，帮助用户分析查询响应速度。
-4. **错误追踪**：日志中包含 `error` 字段，方便开发者和管理员排查问题。
-5. **历史记录查询**：支持存储和查询历史日志，便于优化查询策略。
-6. **日志自动清理机制**：根据策略（30天限制）自动清理过期日志。
+1. **Global Query Log Management (In Development):** Records all query requests, with filtering support based on model, query status, and other conditions.  
+2. **Visualized Log Interface:** Adds a query log page within the semantic model, providing an intuitive display of query execution details.  
+3. **Performance Monitoring:** Offers `executionTime` and `waitingTime` metrics to help users analyze query response speed.  
+4. **Error Tracking:** Includes an `error` field in the logs, making it easy for developers and administrators to troubleshoot issues.  
+5. **Historical Log Retrieval:** Supports storing and querying historical logs to facilitate query strategy optimization.  
+6. **Automatic Log Cleanup Mechanism:** Automatically clears expired logs based on a policy (30-day limit).  
 
-![模型查询日志](/public/img/models/model-query-logs.png)
+<figure className="Large">  
+  <img src="/img/models/model-query-logs.png" alt="Model Query Logs" className="rounded-lg shadow-lg" />  
+  <figcaption>Model Query Logs</figcaption>  
+</figure>
 
-## 查询日志界面
+## Query Logs Interface
 
-在语义模型中的“管理”菜单中提供了一个专门的 **查询日志页面**，用户可以：
+A dedicated **Query Logs Page** is provided under the "Manage" menu in the semantic model, where users can:  
 
-- **筛选日志**：按语义模型、查询状态、执行时间等条件筛选。
-- **查看详情**：点击日志项，展开查看完整查询参数、执行结果和错误信息。
-- **复制日志**：复制日志中的查询信息，参数、查询语句以及结果以便进一步分析。
+- **Filter Logs:** Filter by semantic model, query status, execution time, and other conditions.  
+- **View Details:** Click a log entry to expand and view full query parameters, execution results, and error messages.  
+- **Copy Logs:** Copy query information from the logs, including parameters, query statements, and results, for further analysis.  
 
-## 使用场景
+## Use Cases
 
-1. **性能优化**：通过分析 `executionTime` 和 `waitingTime`，识别慢查询并优化模型。
-2. **问题排查**：遇到查询失败时，可查看 `error` 字段快速找到原因。
-3. **数据合规性审查**：查询日志可用于记录和审计数据访问情况。
+1. **Performance Optimization:** Analyze `executionTime` and `waitingTime` to identify slow queries and optimize the model.  
+2. **Troubleshooting:** When a query fails, check the `error` field to quickly pinpoint the cause.  
+3. **Data Compliance Review:** Query logs can be used to record and audit data access activities.  
 
-## 未来计划
+## Future Plans
 
-在后续版本中，我们计划进一步增强查询日志功能，包括：
+In future versions, we plan to further enhance the query logs feature, including:  
 
-- **实时监控面板**：提供查询统计和趋势分析。
-- **告警通知**：当查询失败率过高时，触发告警通知管理员。
+- **Real-Time Monitoring Dashboard:** Provide query statistics and trend analysis.  
+- **Alert Notifications:** Trigger alerts to notify administrators when the query failure rate exceeds a threshold.  
 
-## 结论
+## Conclusion
 
-XpertAI 的 **查询日志** 功能为用户提供了强大的查询监控和分析能力，能够帮助优化语义模型查询性能，提高系统稳定性，并增强故障排查能力。欢迎用户体验并提供反馈，以便我们不断改进和优化此功能。
+XpertAI’s **Query Logs** feature provides users with powerful query monitoring and analysis capabilities, helping to optimize semantic model query performance, enhance system stability, and improve troubleshooting efficiency. We welcome users to try it out and provide feedback so we can continuously improve and refine this feature.  

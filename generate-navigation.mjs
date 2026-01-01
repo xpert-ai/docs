@@ -143,7 +143,7 @@ const DISPLAY_NAME_OVERRIDES = {
     "semantic-model": "语义模型",
     "story-dashboard": "故事看板",
     "website-features": "网站功能",
-    widget: "组件",
+    widget: "微件",
     // Group 名称映射（目录名）
     "create-knowledge-base-via-pipeline": "通过流水线创建知识库",
     "bi-toolset": "BI 工具集",
@@ -156,7 +156,39 @@ const DISPLAY_NAME_OVERRIDES = {
     "analysis-table": "分析表格",
     "filter-bar": "筛选栏",
     "input-controller": "输入控制器",
+    "dimension-designer": "维度设计器",
+    "multidimensional-dataset-designer": "多维数据集设计器",
   },
+};
+
+/**
+ * ⭐ Tab 顺序配置（核心）
+ * key = 产品目录名（slug）
+ * value = tab 目录名（slug）数组，按显示顺序排列
+ * 
+ * 如果某个 tab 不在配置中，会按字母顺序排在最后
+ * 新增 tab 时，只需在此配置中添加即可控制顺序
+ */
+const TAB_ORDER_BY_PRODUCT = {
+  ai: [
+    "conversation",
+    "digital-expert",
+    "knowledge-base",
+    "toolset",
+    "workflow",
+    "ai-assistant",
+    "agent-middleware",
+    "troubleshooting",
+    "plugin-development",
+    "tutorial",
+  ],
+  bi: [
+    "semantic-model",
+    "indicator-management",
+    "story-dashboard",
+    "widget",
+    "website-features",
+  ],
 };
 
 /* ===================== Navbar 多语言映射 ===================== */
@@ -164,23 +196,23 @@ const DISPLAY_NAME_OVERRIDES = {
 // 语言节点内的 navbar（数组格式）
 const NAVBAR_ARRAY_BY_LANGUAGE = {
   en: [
-    { label: "GitHub", href: "https://github.com/zhezhiming/Mintlify" },
-    { label: "Support", href: "mailto:hi@mintlify.com" },
+    { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
+    { label: "Support", href: "mailto:service@xpertai.cn" },
     { label: "Try Chat-Kit", href: "https://xpertai.cn/docs/ai/" },
   ],
   "zh-Hans": [
-    { label: "GitHub", href: "https://github.com/zhezhiming/Mintlify" },
-    { label: "支持", href: "mailto:hi@mintlify.com" },
+    { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
+    { label: "支持", href: "mailto:service@xpertai.cn" },
     { label: "试用 Chat-Kit", href: "https://xpertai.cn/zh-Hans/docs/ai/" },
   ],
 };
 
-// 全局 navbar（对象格式，包含 links 和 primary）
+// 顶层 navbar（对象格式）——避免 main() 里引用未定义变量导致崩溃
 const NAVBAR_BY_LANGUAGE = {
   en: {
     links: [
-      { label: "GitHub", href: "https://github.com/zhezhiming/Mintlify" },
-      { label: "Support", href: "mailto:hi@mintlify.com" },
+      { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
+      { label: "Support", href: "mailto:service@xpertai.cn" },
     ],
     primary: {
       type: "button",
@@ -190,8 +222,8 @@ const NAVBAR_BY_LANGUAGE = {
   },
   "zh-Hans": {
     links: [
-      { label: "GitHub", href: "https://github.com/zhezhiming/Mintlify" },
-      { label: "支持", href: "mailto:hi@mintlify.com" },
+      { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
+      { label: "支持", href: "mailto:service@xpertai.cn" },
     ],
     primary: {
       type: "button",
@@ -200,6 +232,7 @@ const NAVBAR_BY_LANGUAGE = {
     },
   },
 };
+
 
 
 /* ===================== 工具函数 ===================== */
@@ -265,6 +298,29 @@ function parseFrontmatterTitle(content) {
   const frontmatterText = content.slice(3, endIndex).trim();
   const titleMatch = frontmatterText.match(/^title:\s*(.+)$/m);
   return titleMatch ? titleMatch[1].trim().replace(/^["']|["']$/g, "") : null;
+}
+
+/**
+ * 解析 frontmatter 中的 sidebar_position
+ */
+function parseFrontmatterSidebarPosition(content) {
+  if (!content.startsWith("---")) {
+    return null;
+  }
+
+  const endIndex = content.indexOf("---", 3);
+  if (endIndex === -1) {
+    return null;
+  }
+
+  const frontmatterText = content.slice(3, endIndex).trim();
+  const positionMatch = frontmatterText.match(/^sidebar_position:\s*(.+)$/m);
+  if (positionMatch) {
+    const value = positionMatch[1].trim();
+    const num = parseInt(value, 10);
+    return isNaN(num) ? null : num;
+  }
+  return null;
 }
 
 /**
@@ -364,11 +420,58 @@ async function listDir(dirAbs) {
   });
 }
 
-function sortPages(pages) {
+/**
+ * ⭐ 页面排序函数
+ * 排序规则（优先级从高到低）：
+ * 1. index 文件排在最前面
+ * 2. 有 sidebar_position 的按数值排序（数字越小越靠前）
+ * 3. 其他按路径字母顺序排序
+ */
+async function sortPages(pages, contentRootAbs) {
   const isIndex = (p) => p.endsWith("/index");
+  
+  // 读取每个页面的 sidebar_position
+  const pagePositions = new Map();
+  for (const pagePath of pages) {
+    const filePath = path.join(contentRootAbs, pagePath + ".mdx");
+    let altPath = path.join(contentRootAbs, pagePath + ".md");
+    
+    // 尝试读取 .mdx 或 .md 文件
+    let content = null;
+    try {
+      content = await fs.readFile(filePath, "utf8");
+    } catch {
+      try {
+        content = await fs.readFile(altPath, "utf8");
+      } catch {
+        // 文件不存在，跳过
+      }
+    }
+    
+    if (content) {
+      const position = parseFrontmatterSidebarPosition(content);
+      if (position !== null) {
+        pagePositions.set(pagePath, position);
+      }
+    }
+  }
+  
   return [...pages].sort((a, b) => {
+    // 1. index 文件优先
     if (isIndex(a) && !isIndex(b)) return -1;
     if (!isIndex(a) && isIndex(b)) return 1;
+    
+    // 2. 有 sidebar_position 的按数值排序
+    const posA = pagePositions.get(a);
+    const posB = pagePositions.get(b);
+    
+    if (posA !== undefined && posB !== undefined) {
+      return posA - posB;
+    }
+    if (posA !== undefined) return -1; // A 有 position，排在前面
+    if (posB !== undefined) return 1;  // B 有 position，排在前面
+    
+    // 3. 其他按字母顺序
     return a.localeCompare(b);
   });
 }
@@ -399,7 +502,7 @@ async function collectPagesRecursively(dirAbs, contentRootAbs, updateTitles = fa
     }
   }
 
-  return sortPages(pages);
+  return sortPages(pages, contentRootAbs);
 }
 
 /* ===================== 核心逻辑 ===================== */
@@ -458,13 +561,13 @@ async function buildNavigationForLanguage(language, docs, contentRootAbs, update
 
       if (!groups.length && !defaultPages.length) continue;
 
-      const tabNode = { tab: tabName, groups: [] };
+      const tabNode = { tab: tabName, tabSlug: tabSlug, groups: [] };
 
       if (defaultPages.length) {
         tabNode.groups.push({
           group:
             DEFAULT_GROUP_NAME_BY_LANGUAGE[language] ?? "Default",
-          pages: sortPages(defaultPages),
+          pages: await sortPages(defaultPages, contentRootAbs),
         });
       }
 
@@ -477,7 +580,39 @@ async function buildNavigationForLanguage(language, docs, contentRootAbs, update
       tabs.push(tabNode);
     }
 
+    // ⭐ 根据配置对 tabs 进行排序
     if (tabs.length) {
+      const tabOrder = TAB_ORDER_BY_PRODUCT[productSlug] || [];
+      
+      // 创建一个映射，将 tab slug 映射到其配置顺序
+      const tabOrderMap = new Map();
+      tabOrder.forEach((slug, index) => {
+        tabOrderMap.set(slug, index);
+      });
+
+      tabs.sort((a, b) => {
+        const orderA = tabOrderMap.get(a.tabSlug);
+        const orderB = tabOrderMap.get(b.tabSlug);
+        
+        // 如果两个都在配置中，按配置顺序排序
+        if (orderA !== undefined && orderB !== undefined) {
+          return orderA - orderB;
+        }
+        // 如果只有 A 在配置中，A 排在前面
+        if (orderA !== undefined) {
+          return -1;
+        }
+        // 如果只有 B 在配置中，B 排在前面
+        if (orderB !== undefined) {
+          return 1;
+        }
+        // 如果都不在配置中，按字母顺序排序
+        return a.tabSlug.localeCompare(b.tabSlug);
+      });
+      
+      // 排序后移除 tabSlug，只保留 tab（显示名）用于输出
+      tabs.forEach(tab => delete tab.tabSlug);
+
       products.push({
         product: productName,
         tabs,
@@ -548,6 +683,13 @@ async function main() {
       languageNodes[0]?.language ??
       "en";
     docs.navbar = NAVBAR_BY_LANGUAGE[defaultLang] ?? NAVBAR_BY_LANGUAGE.en;
+  }
+
+  // ⭐ 站点自定义样式入口（用于字体/侧边栏强调等）
+  // 如果 docs.json 已配置 css，则不覆盖
+  if (!docs.css) {
+    // 注意：本项目静态资源路径是 /public/xxx（例如 /public/styles.css）
+    docs.css = "/public/styles.css";
   }
 
   if (args.dryRun) {
