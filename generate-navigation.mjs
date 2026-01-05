@@ -117,7 +117,7 @@ const DISPLAY_NAME_OVERRIDES = {
     tutorial: "Tutorial",
     workflow: "Workflow",
     // Bi 产品
-    bi: "Bi",
+    bi: "BI",
     "indicator-management": "Indicator Management",
     "semantic-model": "Semantic Model",
     "story-dashboard": "Story Dashboard",
@@ -138,7 +138,7 @@ const DISPLAY_NAME_OVERRIDES = {
     tutorial: "教程",
     workflow: "工作流",
     // Bi 产品
-    bi: "Bi",
+    bi: "BI",
     "indicator-management": "指标管理",
     "semantic-model": "语义模型",
     "story-dashboard": "故事看板",
@@ -171,8 +171,8 @@ const DISPLAY_NAME_OVERRIDES = {
  */
 const TAB_ORDER_BY_PRODUCT = {
   ai: [
-    "conversation",
     "digital-expert",
+    "conversation",
     "knowledge-base",
     "toolset",
     "workflow",
@@ -198,12 +198,12 @@ const NAVBAR_ARRAY_BY_LANGUAGE = {
   en: [
     { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
     { label: "Support", href: "mailto:service@xpertai.cn" },
-    { label: "Try Chat-Kit", href: "https://xpertai.cn/docs/ai/" },
+    { label: "Try XpertAI", href: "https://app.xpertai.cn/" },
   ],
   "zh-Hans": [
     { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
     { label: "支持", href: "mailto:service@xpertai.cn" },
-    { label: "试用 Chat-Kit", href: "https://xpertai.cn/zh-Hans/docs/ai/" },
+    { label: "试用 XpertAI", href: "https://app.xpertai.cn/" },
   ],
 };
 
