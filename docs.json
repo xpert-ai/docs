@@ -14,6 +14,46 @@
     "family": "Inter"
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {
+    "socials": {
+      "x": "https://xpertai.cn/",
+      "github": "https://github.com/xpert-ai/xpert",
+      "linkedin": "https://linkedin.com/company/mintlify"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/xpert-ai/xpert"
+      },
+      {
+        "label": "Support",
+        "href": "mailto:service@xpertai.cn"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Try XpertAI",
+      "href": "https://app.xpertai.cn/"
+    }
+  },
   "navigation": {
     "languages": [
       {
@@ -1030,46 +1070,6 @@
           "icon": "newspaper"
         }
       ]
-    }
-  },
-  "logo": {
-    "light": "/logo/logo.png",
-    "dark": "/logo/logo.png"
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://xpertai.cn/",
-      "github": "https://github.com/xpert-ai/xpert",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "GitHub",
-        "href": "https://github.com/xpert-ai/xpert"
-      },
-      {
-        "label": "支持",
-        "href": "mailto:service@xpertai.cn"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "试用 Chat-Kit",
-      "href": "https://xpertai.cn/zh-Hans/docs/ai/"
     }
   },
   "css": "/public/styles.css"
