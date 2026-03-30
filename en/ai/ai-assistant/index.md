@@ -20,6 +20,8 @@ Currently, the AI Copilot supports two main types of large language model provid
 
 Go to [Enable AI Copilot Functionality](/docs/server/organization/copilot/) to activate the AI assistant for your organization.
 
+If you want to bind a digital expert as the Workspace Assistant or ChatBI Assistant, see [Configure Xpert AI Assistant](./configure-ai-assistant/).
+
 ## Chat Window
 
 Once Copilot is enabled, the AI assistant chat window can be used across the entire Xpert Analytics Cloud site, for example, a global chat window can serve as a general copilot for asking any questions.
