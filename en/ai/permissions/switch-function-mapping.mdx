@@ -1,0 +1,135 @@
+---
+title: Switch Function Mapping
+description: Functions controlled by feature and permission switches.
+---
+
+Use this page to look up the functions and entries controlled by each switch. A feature switch only enables the module or entry; the listed permission or role gate still has to pass.
+
+## Feature Switch Function Mapping
+
+Use this table as a reverse index from feature switch to user-visible function. The feature switch only decides whether the module or entry is enabled; the listed permission or role gate still has to pass.
+
+| Feature switch | Function / entry controlled | Main path or entry | Extra permission / role gate |
+| --- | --- | --- | --- |
+| `FEATURE_SETTING` | Settings root and settings module container | `/settings` | Child menus still use their own permissions. |
+| `FEATURE_HOME` | Home feature parent and home feature container | `home` | The current dashboard menu entry is commented out; Analytics children under Home are controlled separately by `FEATURE_HOME_CATALOG` and `FEATURE_HOME_TREND`. |
+| `FEATURE_DASHBOARD` | Dashboard child feature definition | Home / Dashboard | Enabled by default, but the current dashboard submenu entry is commented out. |
+| `FEATURE_ORGANIZATION` | Manage Organization feature definition | `organizations` | Organization list, details, create, edit, and delete still use `ALL_ORG_VIEW`, `ALL_ORG_EDIT`, `ORG_USERS_VIEW`, or `ORG_USERS_EDIT`. |
+| `FEATURE_USER` | Users page, user list, user search, user details, create/delete/update user actions | `/settings/users` | `ALL_ORG_VIEW`, `ALL_ORG_EDIT`, `ORG_USERS_VIEW`, or `ORG_USERS_EDIT`, depending on action. |
+| `FEATURE_USER` | Groups page and group maintenance | `/settings/groups` | View uses `ORG_USERS_VIEW`; maintenance uses `ORG_USERS_EDIT`. |
+| `FEATURE_USER` | Invite button, invite list, resend invite, delete invite | Users invite area | View uses `ORG_INVITE_VIEW` or `ORG_INVITE_EDIT`; maintenance uses `ORG_INVITE_EDIT`. |
+| `FEATURE_ROLES_PERMISSION` | Roles page and role-permission matrix | `/settings/roles` | `CHANGE_ROLES_PERMISSIONS`. |
+| `FEATURE_INTEGRATION` | System Integration page and integration maintenance | `/settings/integration` | `INTEGRATION_EDIT`. |
+| `FEATURE_EMAIL` | Email feature parent and email management entry | `settings/email-history` | Email Template is controlled by child switch `FEATURE_EMAIL_TEMPLATE` plus `VIEW_ALL_EMAIL_TEMPLATES`; email history maps to `VIEW_ALL_EMAILS`. |
+| `FEATURE_EMAIL_TEMPLATE` | Email Template page | `/settings/email-templates` | `VIEW_ALL_EMAIL_TEMPLATES`. |
+| `FEATURE_FILE_STORAGE` | File Storage child feature definition | `settings/file-storage` | `FILE_STORAGE_VIEW`; when the Settings menu does not expose a separate entry, confirm the concrete page entry before relying on it. |
+| `FEATURE_SMTP` | Custom SMTP page | `/settings/custom-smtp` | `CUSTOM_SMTP_VIEW`. |
+| `FEATURE_SMS_GATEWAY` | SMS Gateway child feature definition | `tasks/me` | The enum and environment toggle exist, but this child entry is commented out in the current default feature definition and has no default feature row. |
+| `FEATURE_COPILOT` | AI Copilot settings, Copilot create/update/enable-disable, Copilot statistics, Copilot provider, Copilot user management | `/settings/copilot` | `COPILOT_EDIT`; `COPILOT_VIEW` only covers read/use scenarios where applied separately. |
+| `FEATURE_COPILOT_KNOWLEDGEBASE` | Copilot knowledge base list and statistics | Knowledge base entry owned by Copilot | `KNOWLEDGEBASE_EDIT`. |
+| `FEATURE_COPILOT_CHAT` | Copilot chat child feature from the default feature definition | `chat` | Also depends on the actual chat entry and permission used by the page. |
+| `FEATURE_XPERT` | Chat main entry and Common Assistant | `/chat`, `/chat/x/common` | `CHAT_VIEW`. |
+| `FEATURE_XPERT` | Explore Xperts and Xpert Workspace entry | `/explore`, `/xpert` | `XPERT_EDIT`; workspace actions then use workspace capabilities. |
+| `FEATURE_XPERT` | Assistants settings for Common Assistant and Workspace Assistant | `/settings/assistants` | Page entry requires `SUPER_ADMIN` or `ADMIN`; tenant default edit requires `SUPER_ADMIN`. |
+| `FEATURE_XPERT` | Xpert list, select options, statistics, full workspace list, workspace read/run/write/manage, view extensions | Backend and workspace APIs | `XPERT_EDIT`, `CHAT_VIEW`, or computed `workspace.capabilities.*`, depending on action. |
+| `FEATURE_XPERT_CLAWXPERT` | ClawXpert chat entry and ClawXpert assistant binding | `/chat/clawxpert`, user-level ClawXpert binding | Requires parent `FEATURE_XPERT`; no extra enum permission for the chat entry. |
+| `FEATURE_XPERT_CHATBI` | ChatBI chat entry, Chat sidebar ChatBI, ChatBI assistant configuration, Chat BI settings | `/chat/chatbi`, `/settings/chatbi` | Requires parent `FEATURE_XPERT`; settings also use `MODELS_EDIT` and may require `FEATURE_MODEL`. |
+| `FEATURE_XPERT_CODEXPERT` | Chat sidebar CodeXpert external entry | Chat sidebar | Requires parent chat access; no extra enum permission in this matrix. |
+| `FEATURE_XPERT_DEEP_RESEARCH` | Chat sidebar DeepResearch external entry | Chat sidebar | Requires parent chat access; no extra enum permission in this matrix. |
+| `FEATURE_MODEL` | Data / Semantic Model entry and semantic model operations | `/data/models` | `MODELS_EDIT` for entry/edit, `MODELS_VIEW` for XMLA query, `ADMIN` for backend list API. |
+| `FEATURE_MODEL` | Data Sources page and data source operations | `/settings/data-sources` | `DATA_SOURCE_VIEW` or `DATA_SOURCE_EDIT`. |
+| `FEATURE_MODEL` | Chat BI settings | `/settings/chatbi` | Used together with `FEATURE_XPERT`; permission gate is `MODELS_EDIT`. |
+| `FEATURE_PROJECT` | Data / Project entry and BI project/story editing capability | `/data/project` | `STORIES_EDIT`. |
+| `FEATURE_STORY` | Story feature definition | `/story` | Current matrix uses `STORIES_VIEW` for page access; no explicit main-navigation switch is listed for `/story`. |
+| `FEATURE_BUSINESS_AREA` | Business Area settings | `/settings/business-area` | `BUSINESS_AREA_EDIT`. |
+| `FEATURE_INDICATOR` | Indicator app base feature and indicator view/edit functions | `/indicator-app`, indicator areas | `INDICATOR_VIEW`, `INDICATOR_EDIT`, or `INDICATOR_MARTKET_VIEW`. |
+| `FEATURE_INDICATOR_APP` | Indicator App entry | `/indicator-app` | Requires parent `FEATURE_INDICATOR` and `INDICATOR_MARTKET_VIEW`. |
+| `FEATURE_INDICATOR_MARKET` | Indicator Market child feature from the analytics default feature definition | `indicator/market` | Use indicator permissions for concrete actions. |
+| `FEATURE_INDICATOR_REGISTER` | Indicator Creation child feature from the analytics default feature definition | `indicator/create` | Use indicator permissions for concrete actions. |
+| `FEATURE_HOME_CATALOG` | Home Catalog child feature from the analytics default feature definition | `catalog` | Concrete page permissions are not listed separately in this matrix. |
+| `FEATURE_HOME_TREND` | Home Trend child feature from the analytics default feature definition | `trend` | Concrete page permissions are not listed separately in this matrix. |
+| `FEATURE_DATA_FACTORY` | Data Factory feature enum and data factory permissions | Data Factory area | Default feature definition is currently not seeded; concrete entry usage should be confirmed before relying on the switch. |
+
+## Enum-Only Or Currently Unseeded Features
+
+These feature enums exist in contracts or environment toggles, but they are not present in the current platform, AI, or Analytics default feature seed lists. By default, they do not create switchable Settings / Feature rows unless another migration or module later adds them.
+
+| Feature enum | Current status |
+| --- | --- |
+| `FEATURE_JOB` | Platform enum exists; not used by the current default feature seed. |
+| `FEATURE_EMPLOYEES` | Platform enum exists; not used by the current default feature seed. |
+| `FEATURE_MANAGE_INVITE` | Platform enum exists; not used by the current default feature seed. |
+| `FEATURE_ORGANIZATION_TAG` | Platform enum and environment toggle exist; the matching default feature child is commented out. |
+| `FEATURE_ORGANIZATION_PROJECT` | Platform enum and environment toggle exist; not used by the current default feature seed. |
+| `FEATURE_CONTACT` | Platform enum exists; not used by the current default feature seed. |
+| `FEATURE_ORGANIZATIONS` | Platform enum and environment toggle exist; this is different from the currently seeded `FEATURE_ORGANIZATION`. |
+| `FEATURE_EMAIL_HISTORY` | Platform enum and environment toggle exist; the current default feature uses parent `FEATURE_EMAIL` and does not seed this code. |
+| `FEATURE_MODEL_CREATION` | Analytics enum exists; not used by the current Analytics default feature seed. |
+| `FEATURE_MODEL_VIEWER` | Analytics enum exists; not used by the current Analytics default feature seed. |
+| `FEATURE_STORY_CREATION` | Analytics enum exists; not used by the current Analytics default feature seed. |
+| `FEATURE_STORY_VIEWER` | Analytics enum exists; not used by the current Analytics default feature seed. |
+| `FEATURE_STORY_MARKET` | Analytics enum exists; not used by the current Analytics default feature seed. |
+| `FEATURE_SUBSCRIPTION` | Analytics enum exists; not used by the current Analytics default feature seed. |
+
+## Permission Switch Function Mapping
+
+Use this table as a reverse index from role permission switch to controlled function. Default enabled roles come from the platform, AI, and Analytics default role-permission definitions. `No default enabled role` means the enum or guard exists, but default seeding does not create an enabled row for any role.
+
+| Permission switch | Function / entry controlled | Common feature / path | Enabled by default for |
+| --- | --- | --- | --- |
+| `PROFILE_EDIT` | Edit profile; update the current user's own profile | `/settings/account`, user update API | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `ADMIN_DASHBOARD_VIEW` | Admin dashboard viewing capability | Admin dashboard area | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER` |
+| `ORG_EMPLOYEES_VIEW` | View organization employees | Organization employee / contact areas | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_EMPLOYEES_EDIT` | Edit organization employees; update organization contacts by employee | Organization contact API | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_TAGS_EDIT` | Create / maintain organization tags | Tags API | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_USERS_VIEW` | View users, organization details, and groups | `FEATURE_USER`, `/settings/users`, `/settings/groups`, `/settings/organizations` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `ORG_USERS_EDIT` | Maintain groups and organization members | `FEATURE_USER`, `/settings/groups`, Organizations Members | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_INVITE_VIEW` | Show invite button and view invite list | `FEATURE_USER`, Users invite area | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `ORG_INVITE_EDIT` | Create, resend, and delete invites | `FEATURE_USER`, Users invite area | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ALL_ORG_VIEW` | Query tenant / organization features; organization list; user list; cross-organization view scope | Feature query, Organizations, Users | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ALL_ORG_EDIT` | Update tenant / organization features; create / edit / delete organizations; create / delete users; manage other users' profiles | Feature update, Organizations, Users | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `APPROVALS_POLICY_VIEW` | Approval policy read APIs; enum member in code is `APPROVAL_POLICY_VIEW` | Approval Policy API | No default enabled role |
+| `APPROVALS_POLICY_EDIT` | Approval policy create / update / maintenance; enum member in code is `APPROVAL_POLICY_EDIT` | Approval Policy API | No default enabled role |
+| `CHANGE_SELECTED_ORGANIZATION` | Switch the current organization context | Organization switcher | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `CHANGE_ROLES_PERMISSIONS` | Roles page, role maintenance, role-permission enable/disable, and Feature page entry | `FEATURE_ROLES_PERMISSION`, `/settings/roles`, `/settings/features/tenant`, `/settings/features/organization` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `SUPER_ADMIN_EDIT` | Edit protected super admin users | User update / password reset protection | `SUPER_ADMIN` |
+| `PUBLIC_PAGE_EDIT` | Edit organization public page | Organization public page | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `VIEW_ALL_EMAILS` | View email history / email records | `FEATURE_EMAIL`, `settings/email-history` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `VIEW_ALL_EMAIL_TEMPLATES` | Email Template page and template maintenance | `FEATURE_EMAIL_TEMPLATE`, `/settings/email-templates` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_HELP_CENTER_EDIT` | Edit organization help center | Organization Help Center | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_CONTACT_EDIT` | Create / edit contacts | Organization contacts | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ORG_CONTACT_VIEW` | View contacts | Organization contacts | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `ORG_DEMO_EDIT` | Organization demo button visibility and maintenance capability | Home dashboard, Organizations Generate Demo | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `INTEGRATION_VIEW` | View integrations and integration view extensions | `FEATURE_INTEGRATION`, `/settings/integration` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `INTEGRATION_EDIT` | Create / edit / maintain integrations | `FEATURE_INTEGRATION`, `/settings/integration` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `FILE_STORAGE_VIEW` | View file storage configuration | `FEATURE_FILE_STORAGE`, `settings/file-storage` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `SMS_GATEWAY_VIEW` | View SMS Gateway | `FEATURE_SMS_GATEWAY` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `CUSTOM_SMTP_VIEW` | Custom SMTP page | `FEATURE_SMTP`, `/settings/custom-smtp` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `VIEW_ALL_ACCOUNTING_TEMPLATES` | View accounting templates | Accounting templates | `SUPER_ADMIN`, `ADMIN`, `TRIAL` |
+| `ACCESS_DELETE_ACCOUNT` | Delete account entry / capability | High-risk user operation | `SUPER_ADMIN` |
+| `ACCESS_DELETE_ALL_DATA` | Delete all user data | High-risk user operation API | `SUPER_ADMIN` |
+| `KNOWLEDGEBASE_EDIT` | Knowledge base editing, statistics, and knowledge-base view extension | `FEATURE_COPILOT_KNOWLEDGEBASE` or the feature that owns the knowledge-base entry | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `COPILOT_VIEW` | Copilot read / use capability | `FEATURE_COPILOT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `COPILOT_EDIT` | Copilot settings, create / update / enable-disable, statistics, provider, and Copilot User management | `FEATURE_COPILOT`, `/settings/copilot` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` |
+| `XPERT_EDIT` | Explore Xperts, Xpert Workspace, Xpert list / statistics, and administrative workspace queries | `FEATURE_XPERT`, `/explore`, `/xpert` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER` |
+| `CHAT_VIEW` | Chat main entry, Common Assistant, and some project view extensions | `FEATURE_XPERT`, `/chat`, `/chat/x/common` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `CERTIFICATION_EDIT` | Certification entry visibility / maintenance capability | `/settings/certification` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `DATA_SOURCE_VIEW` | View data source list | `FEATURE_MODEL`, `/settings/data-sources` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `DATA_SOURCE_EDIT` | Create / edit / delete data sources | `FEATURE_MODEL`, `/settings/data-sources` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `NOTIFICATION_DESTINATION_VIEW` | View notification destinations | Notification Destinations; current settings route is commented out and controller has no dedicated permission guard | `SUPER_ADMIN`, `ADMIN` |
+| `NOTIFICATION_DESTINATION_EDIT` | Create / edit notification destinations | Notification Destinations; current settings route is commented out and controller has no dedicated permission guard | `SUPER_ADMIN`, `ADMIN` |
+| `SUBSCRIPTION_VIEW` | Story subscription view enum | Subscription API / Story toolbar | No default enabled role |
+| `SUBSCRIPTION_EDIT` | Story subscription edit enum | Subscription API / Story toolbar | No default enabled role |
+| `MODELS_VIEW` | View semantic models, XMLA query, and read-only model access for AI Builder / Viewer | `FEATURE_MODEL`, `/data/models` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `MODELS_EDIT` | Semantic model entry, modeling, model cache clearing, and Chat BI settings | `FEATURE_MODEL`, `/data/models`, `/settings/chatbi` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `STORIES_VIEW` | View Story page and read-only story access for AI Builder / Viewer | `/story` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `STORIES_EDIT` | Data / Project entry and Story / Project editing | `FEATURE_PROJECT`, `/data/project` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `BUSINESS_AREA_VIEW` | View Business Area | `FEATURE_BUSINESS_AREA` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `BUSINESS_AREA_EDIT` | Business Area settings; Certification page access also needs attention for this permission | `FEATURE_BUSINESS_AREA`, `/settings/business-area`, `/settings/certification` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `INDICATOR_VIEW` | View indicators | `FEATURE_INDICATOR` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `INDICATOR_MARTKET_VIEW` | Indicator App entry and indicator market viewing | `FEATURE_INDICATOR`, `FEATURE_INDICATOR_APP`, `/indicator-app` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER`, `VIEWER` |
+| `INDICATOR_EDIT` | Create / edit / maintain indicators | `FEATURE_INDICATOR` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `DATA_FACTORY_VIEW` | Data Factory view capability | `FEATURE_DATA_FACTORY` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `DATA_FACTORY_EDIT` | Data Factory edit capability | `FEATURE_DATA_FACTORY` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` |
+| `PERMISSION_APPROVAL_VIEW` | Permission approval view enum; related controller guard is currently commented out | Permission Approval API | No default enabled role |
+| `PERMISSION_APPROVAL_EDIT` | Permission approval update API | Permission Approval API | No default enabled role |

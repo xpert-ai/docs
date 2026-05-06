@@ -1,0 +1,167 @@
+---
+title: 功能权限矩阵
+description: 页面、功能和按钮需要开启的 feature、permission 与 roleName。
+---
+
+本文整理每个功能、页面、按钮需要开启的功能开关和权限。除特别说明外：
+
+- 多个 feature 同时出现时，需要全部开启。
+- 多个 permission 或 roleName 同时出现时，通常命中任意一个即可访问。
+- 页面入口、按钮显示和后端操作权限可能分层控制；实际可用性以页面内按钮权限和后端权限共同决定。
+- `roleName` 指平台角色名时，可取：`SUPER_ADMIN`、`ADMIN`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER`、`TRIAL`。
+
+## 主导航
+
+| 功能 / 页面 | 路径 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- | --- |
+| Chat | `/chat` | `FEATURE_XPERT` | `CHAT_VIEW` | Chat 入口显示需要同时满足 feature 与权限。 |
+| Explore Xperts | `/explore` | `FEATURE_XPERT` | `XPERT_EDIT` | 用于浏览/探索 Xpert。 |
+| Xpert Workspace | `/xpert` | `FEATURE_XPERT` | `XPERT_EDIT` | 进入工作区后，具体读写还受 workspace 能力控制。 |
+| Story | `/story` | 无显式主导航开关 | `STORIES_VIEW` | 当前入口不在主导航中，但页面访问需要故事查看权限。 |
+| Data | `/data` | 子功能分别控制 | `MODELS_EDIT` 或 `STORIES_EDIT` | 父级 Data 至少需要模型编辑或故事编辑之一。 |
+| Data / Project | `/data/project` | `FEATURE_PROJECT` | `STORIES_EDIT` | BI 项目入口。 |
+| Data / Semantic Model | `/data/models` | `FEATURE_MODEL` | `MODELS_EDIT` | 语义模型入口和建模操作。 |
+| Indicator App | `/indicator-app` | `FEATURE_INDICATOR` + `FEATURE_INDICATOR_APP` | `INDICATOR_MARTKET_VIEW` | 指标应用入口。 |
+| Settings | `/settings` | `FEATURE_SETTING` | 无统一入口权限 | 设置页内部每个菜单单独控制。 |
+
+## Chat 与智能体
+
+| 功能 / 页面 / 按钮 | 路径或入口 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- | --- |
+| Common Assistant | `/chat/x/common` | 入口继承 `FEATURE_XPERT` | 入口继承 `CHAT_VIEW` | 通用聊天助手。 |
+| ClawXpert | `/chat/clawxpert` | `FEATURE_XPERT` + `FEATURE_XPERT_CLAWXPERT` | 无额外 permission | 两个 feature 都开启后可进入。 |
+| ChatBI | `/chat/chatbi` | `FEATURE_XPERT` + `FEATURE_XPERT_CHATBI` | 无额外 permission | 两个 feature 都开启后可进入。 |
+| Chat 侧边栏 ChatBI | Chat 侧边栏 | `FEATURE_XPERT_CHATBI` | 无额外 permission | 仅控制入口显示。 |
+| Chat 侧边栏 CodeXpert | Chat 侧边栏 | `FEATURE_XPERT_CODEXPERT` | 无额外 permission | 外链入口。 |
+| Chat 侧边栏 DeepResearch | Chat 侧边栏 | `FEATURE_XPERT_DEEP_RESEARCH` | 无额外 permission | 外链入口。 |
+| Change Settings 按钮 | Common Assistant 欢迎页 | 无额外 feature | `SUPER_ADMIN` 或 `ADMIN` | 跳转到 Assistants 设置。 |
+| Common Assistant 配置 | Assistants 设置 | `FEATURE_XPERT` | 页面入口需要 `SUPER_ADMIN` 或 `ADMIN` | 系统级助手配置。 |
+| Workspace Assistant 配置 | Assistants 设置 | `FEATURE_XPERT` | 页面入口需要 `SUPER_ADMIN` 或 `ADMIN` | Xpert 工作区共享助手配置。 |
+| ChatBI Assistant 配置 | Assistants 设置 | `FEATURE_XPERT` + `FEATURE_XPERT_CHATBI` | 页面入口需要 `SUPER_ADMIN` 或 `ADMIN` | ChatBI 助手配置。 |
+| ClawXpert Assistant 配置 | 用户级 ClawXpert 绑定 | `FEATURE_XPERT` + `FEATURE_XPERT_CLAWXPERT` | 用户级配置 | 不在系统级 assistant 列表中。 |
+
+## 设置页
+
+| 功能 / 页面 | 路径 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- | --- |
+| Account | `/settings/account` | 无 | 无 | 个人账户设置。 |
+| AI Copilot | `/settings/copilot` | `FEATURE_COPILOT` | `COPILOT_EDIT` | Copilot 基础配置、示例、用量、用户等。 |
+| Data Sources | `/settings/data-sources` | `FEATURE_MODEL` | `DATA_SOURCE_EDIT` | 数据源设置入口。 |
+| Assistants | `/settings/assistants` | `FEATURE_XPERT` | `SUPER_ADMIN` 或 `ADMIN` | 租户默认配置仅 `SUPER_ADMIN` 可编辑；组织覆盖配置需要已选择组织。 |
+| Chat BI | `/settings/chatbi` | `FEATURE_XPERT` + `FEATURE_MODEL` | `MODELS_EDIT` | ChatBI 模型设置。 |
+| Business Area | `/settings/business-area` | `FEATURE_BUSINESS_AREA` | `BUSINESS_AREA_EDIT` | 业务域设置。 |
+| Certification | `/settings/certification` | 无 | 入口显示需要 `CERTIFICATION_EDIT`；页面访问还依赖 `BUSINESS_AREA_EDIT` | 当前实际需要同时关注这两个权限。 |
+| System Integration | `/settings/integration` | `FEATURE_INTEGRATION` | `INTEGRATION_EDIT` | 集成列表、新建、查看、编辑。 |
+| Users | `/settings/users` | `FEATURE_USER` | `ALL_ORG_VIEW` / `ALL_ORG_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` 任一 | 用户列表入口；按钮再细分。 |
+| Groups | `/settings/groups` | `FEATURE_USER` | 查看：`ORG_USERS_VIEW`；编辑：`ORG_USERS_EDIT` | 用户组列表和维护。 |
+| Roles | `/settings/roles` | `FEATURE_ROLES_PERMISSION` | `CHANGE_ROLES_PERMISSIONS` | 角色与权限维护。 |
+| Feature | `/settings/features/tenant`、`/settings/features/organization` | 无 | 页面入口：`CHANGE_ROLES_PERMISSIONS`；读取功能：`ALL_ORG_VIEW`；更新开关：`ALL_ORG_EDIT` | 租户和组织功能开关维护。 |
+| Organizations | `/settings/organizations` | 无 | `ALL_ORG_VIEW` / `ALL_ORG_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` 任一 | 组织列表和组织详情；按钮再细分。 |
+| Email Template | `/settings/email-templates` | `FEATURE_EMAIL_TEMPLATE` | `VIEW_ALL_EMAIL_TEMPLATES` | 邮件模板管理。 |
+| Custom SMTP | `/settings/custom-smtp` | `FEATURE_SMTP` | `CUSTOM_SMTP_VIEW` | 租户或组织 SMTP 配置。 |
+| Plugins | `/settings/plugins` | 无 | `SUPER_ADMIN` 或 `ADMIN` 或 `TRIAL` | 插件设置入口。 |
+| Tenant | `/settings/tenant` | 无 | `SUPER_ADMIN` | 租户设置、租户技能、租户标签。 |
+
+## 设置页按钮与操作
+
+| 功能 / 页面 | 按钮或操作 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- | --- |
+| Users | Batch Import | `FEATURE_USER` | 前端按钮：租户范围 + `ALL_ORG_EDIT`；实际导入：`SUPER_ADMIN` 或 `ADMIN` | 批量导入用户。 |
+| Users | New | `FEATURE_USER` | 租户范围 + `ALL_ORG_EDIT` | 新建用户。 |
+| Users | Invite 按钮 | `FEATURE_USER` | 组织范围 + `ORG_INVITE_VIEW` 或 `ORG_INVITE_EDIT` | 按钮显示条件；真正创建邀请需要 `ORG_INVITE_EDIT`。 |
+| Users | Invite 列表 | `FEATURE_USER` | `ORG_INVITE_VIEW` 或 `ORG_INVITE_EDIT` | 查看邀请记录。 |
+| Users | 重发 / 删除邀请 | `FEATURE_USER` | `ORG_INVITE_EDIT` | 邀请维护操作。 |
+| Users | 修改用户角色 | `FEATURE_USER` | 当前用户为 `SUPER_ADMIN` 或 `ADMIN` | 编辑超级管理员用户还需要超级管理员相关保护权限。 |
+| Organizations | 新建组织 | 无 | 租户范围 + `ALL_ORG_EDIT` | 新建组织。 |
+| Organizations | 删除组织 | 无 | 租户范围 + `ALL_ORG_EDIT` | 删除组织。 |
+| Organizations | 保存组织基础信息 | 无 | 已选组织 + `ALL_ORG_EDIT` | 保存名称、描述、状态等。 |
+| Organizations | 上传组织头像 | 无 | 已选组织 + `ALL_ORG_EDIT` | 修改组织头像。 |
+| Organizations | 治理字段 | 无 | 租户范围 + `ALL_ORG_EDIT` | currency、timezone、default date 等治理字段。 |
+| Organizations | Members 编辑 | 无 | 已选组织 + `ALL_ORG_EDIT` 或 `ORG_USERS_EDIT` | 组织成员维护。 |
+| Organizations | Generate Demo | 无 | 前端按钮：已选组织 + `ALL_ORG_EDIT`；实际生成：`SUPER_ADMIN` 或 `ADMIN` 或 `TRIAL` | 生成或刷新组织 demo 数据。 |
+| Assistants | 租户默认 assistant 配置 | `FEATURE_XPERT` + assistant 对应 feature | `SUPER_ADMIN` | 租户默认助手配置。 |
+| Assistants | 组织覆盖 assistant 配置 | `FEATURE_XPERT` + assistant 对应 feature | 页面入口 `SUPER_ADMIN` 或 `ADMIN`，并且已选择组织 | 组织级覆盖配置。 |
+| Xpert Workspace | 保存工作区基础设置 | `FEATURE_XPERT` | `workspace.capabilities.canManage` | 不是枚举权限，由 workspace 能力决定。 |
+| Xpert Workspace | 成员、可见性、删除、归档 | `FEATURE_XPERT` | `workspace.capabilities.canManage` | owner 或具备管理能力的租户管理员才可操作。 |
+| Xpert 授权 | 组织列表范围 | 无 | 有 `ALL_ORG_VIEW` 可看所有组织；否则只看当前用户所属组织 | 影响数据范围，不是按钮权限。 |
+
+## BI 与数据功能
+
+| 功能 / 页面 / 操作 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- |
+| 数据源列表查看 | `FEATURE_MODEL` | `DATA_SOURCE_VIEW` | 查看数据源列表。 |
+| 数据源创建 / 编辑 / 删除 | `FEATURE_MODEL` | `DATA_SOURCE_EDIT` | 数据源维护。 |
+| 数据源类型同步 | 无 | `SUPER_ADMIN` 或 `ADMIN` | 同步内置数据源类型。 |
+| 语义模型入口 | `FEATURE_MODEL` | `MODELS_EDIT` | `/data/models` 页面入口。 |
+| 语义模型列表 API | `FEATURE_MODEL` | `ADMIN` | 后端模型列表存在管理员角色限制。 |
+| 语义模型 XMLA 查询 | `FEATURE_MODEL` | `MODELS_VIEW` | 还要求模型已开放 XMLA，且通过模型查看授权。 |
+| 语义模型缓存清理 | `FEATURE_MODEL` | `MODELS_EDIT` | 删除模型缓存。 |
+| Project | `FEATURE_PROJECT` | `STORIES_EDIT` | `/data/project` 入口。 |
+| Story 查看 | 无显式主导航开关 | `STORIES_VIEW` | `/story` 页面访问。 |
+| Story 编辑 / Project 能力 | `FEATURE_PROJECT` | `STORIES_EDIT` | BI 项目和故事编辑能力。 |
+| Business Area 设置 | `FEATURE_BUSINESS_AREA` | `BUSINESS_AREA_EDIT` | 业务域维护。 |
+| Certification 设置 | 无 | `CERTIFICATION_EDIT` + `BUSINESS_AREA_EDIT` 需共同关注 | 入口显示和页面访问权限当前分属两个权限。 |
+| Indicator App | `FEATURE_INDICATOR` + `FEATURE_INDICATOR_APP` | `INDICATOR_MARTKET_VIEW` | 指标应用入口。 |
+| 指标查看 | `FEATURE_INDICATOR` | `INDICATOR_VIEW` | 指标查看类能力。 |
+| 指标编辑 | `FEATURE_INDICATOR` | `INDICATOR_EDIT` | 指标维护类能力。 |
+| Data Factory | `FEATURE_DATA_FACTORY` | `DATA_FACTORY_VIEW` / `DATA_FACTORY_EDIT` | 当前主要是权限与 feature 枚举，入口使用情况需要结合具体页面。 |
+
+## AI 后端能力
+
+| 功能 / 操作 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- |
+| Copilot 创建、启用/禁用、更新 | `FEATURE_COPILOT` | `COPILOT_EDIT` | Copilot 管理。 |
+| Copilot 统计 | `FEATURE_COPILOT` | `COPILOT_EDIT` | 对话、用户、消息、token 等统计。 |
+| Copilot Provider 创建 / 更新 | `FEATURE_COPILOT` | `COPILOT_EDIT` | 模型供应商配置。 |
+| Copilot User 列表 / renew | `FEATURE_COPILOT` | `COPILOT_EDIT` | Copilot 用户管理。 |
+| Knowledgebase 列表 / 统计 | `FEATURE_COPILOT_KNOWLEDGEBASE` 或知识库入口所在功能 | `KNOWLEDGEBASE_EDIT` | 知识库编辑和统计。 |
+| Xpert 列表 / 下拉选项 / 统计 | `FEATURE_XPERT` | `XPERT_EDIT` | Xpert 管理与统计。 |
+| Workspace 全量列表 | `FEATURE_XPERT` | `XPERT_EDIT` | 管理型 workspace 查询。 |
+| Workspace 读取 | `FEATURE_XPERT` | `workspace.capabilities.canRead` | 根据 owner/member、scope、tenant shared 等计算。 |
+| Workspace 运行 | `FEATURE_XPERT` | `workspace.capabilities.canRun` | 根据 workspace 能力计算。 |
+| Workspace 写入 | `FEATURE_XPERT` | `workspace.capabilities.canWrite` | 根据 workspace 能力计算。 |
+| Workspace 管理 | `FEATURE_XPERT` | `workspace.capabilities.canManage` | 成员、可见性、删除、归档等管理操作。 |
+| Agent view extension | `FEATURE_XPERT` | `XPERT_EDIT` | 智能体视图扩展。 |
+| Sandbox view extension | `FEATURE_XPERT` | `XPERT_EDIT` | 沙箱视图扩展。 |
+| Project view extension | `FEATURE_XPERT` | `CHAT_VIEW` 或 `XPERT_EDIT` | 项目视图扩展。 |
+| Knowledgebase view extension | 知识库相关功能 | `KNOWLEDGEBASE_EDIT` | 知识库视图扩展。 |
+
+## 平台设置能力
+
+| 功能 / 操作 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
+| --- | --- | --- | --- |
+| 角色新增 / 修改 / 删除 / 恢复 | `FEATURE_ROLES_PERMISSION` | `CHANGE_ROLES_PERMISSIONS` | 角色维护。 |
+| 角色权限启停 | `FEATURE_ROLES_PERMISSION` | `CHANGE_ROLES_PERMISSIONS` | 权限矩阵维护；`SUPER_ADMIN` 权限受保护。 |
+| Feature 查询 | 无 | `ALL_ORG_VIEW` | 查询租户/组织功能开关。 |
+| Feature 更新 | 无 | `ALL_ORG_EDIT` | 更新租户/组织功能开关。 |
+| Feature 升级 | 无 | `SUPER_ADMIN` | 系统级 feature 升级/补齐。 |
+| 组织列表 / 分页 / 统计 | 无 | `ALL_ORG_VIEW` 或 `ALL_ORG_EDIT` | 租户级组织管理。 |
+| 组织详情 | 无 | `ALL_ORG_VIEW` / `ALL_ORG_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` 任一 | 还受当前组织范围限制。 |
+| 用户列表 / 分页 / 统计 | `FEATURE_USER` | `ALL_ORG_VIEW` 或 `ALL_ORG_EDIT` | 租户级用户管理。 |
+| 用户搜索 | `FEATURE_USER` | `ORG_USERS_VIEW` / `ORG_USERS_EDIT` / `ALL_ORG_VIEW` / `ALL_ORG_EDIT` 任一 | 搜索范围受组织上下文影响。 |
+| 用户详情 | `FEATURE_USER` | 自己；或 `PROFILE_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` / `ALL_ORG_VIEW` / `ALL_ORG_EDIT` 任一 | 非本人还需要通过组织范围校验。 |
+| 用户创建 / 删除 | `FEATURE_USER` | `ALL_ORG_EDIT` | 租户级用户维护。 |
+| 用户更新 / 重置密码 | `FEATURE_USER` | 自己可用 `PROFILE_EDIT`；管理他人需要 `ALL_ORG_EDIT` 或 `SUPER_ADMIN_EDIT` | 超级管理员用户有额外保护。 |
+| 删除全部用户数据 | 无 | `ACCESS_DELETE_ALL_DATA` | 高危操作。 |
+| 用户组查看 | `FEATURE_USER` | `ORG_USERS_VIEW` | 用户组列表和详情。 |
+| 用户组维护 | `FEATURE_USER` | `ORG_USERS_EDIT` | 新增、编辑、成员维护、删除。 |
+| 邀请查看 | `FEATURE_USER` | `ORG_INVITE_VIEW` 或 `ORG_INVITE_EDIT` | 邀请列表。 |
+| 邀请维护 | `FEATURE_USER` | `ORG_INVITE_EDIT` | 创建、重发、删除邀请。 |
+| 集成维护 | `FEATURE_INTEGRATION` | `INTEGRATION_EDIT` | 系统集成。 |
+| 邮件模板 | `FEATURE_EMAIL_TEMPLATE` | `VIEW_ALL_EMAIL_TEMPLATES` | 邮件模板页面。 |
+| SMTP | `FEATURE_SMTP` | `CUSTOM_SMTP_VIEW` | 自定义 SMTP。 |
+| Tenant 设置 | 无 | `SUPER_ADMIN` | 租户级设置。 |
+| Plugins | 无 | `SUPER_ADMIN` 或 `ADMIN` 或 `TRIAL` | 插件入口。 |
+
+## roleName 相关说明
+
+| 使用场景 | roleName 含义 | 影响 |
+| --- | --- | --- |
+| 平台角色 | `SUPER_ADMIN`、`ADMIN`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER`、`TRIAL` | 控制页面入口、按钮显示和后端角色权限。 |
+| 邀请用户 | 被邀请用户的目标平台角色 | 邀请创建本身需要 `ORG_INVITE_EDIT`。 |
+| CSV 批量导入用户 | 导入用户的目标平台角色 | 导入操作本身需要 `SUPER_ADMIN` 或 `ADMIN`。 |
+| SSO 登录 | 第三方登录/注册时的默认角色上下文 | 不直接等同于页面按钮权限。 |
+| 飞书登录 | 飞书配置中的默认角色上下文 | 不直接等同于页面按钮权限。 |
+| 语义模型 / OLAP | 模型查询角色或 Mondrian role | 这是模型访问角色，不是平台 `RolesEnum`。 |
+| 语义模型访问控制 | 模型内部 role name | 控制模型数据访问，不是平台导航权限。 |
+| 插件用户权限 | 插件默认用户角色 | 插件权限上下文使用。 |

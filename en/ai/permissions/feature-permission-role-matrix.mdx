@@ -1,0 +1,167 @@
+---
+title: Feature Permission Matrix
+description: Features, permissions, and roleNames required by pages, functions, and buttons.
+---
+
+This page lists the feature switches and permissions required by each function, page, and button. Unless otherwise noted:
+
+- When multiple features are listed together, all of them must be enabled.
+- When multiple permissions or roleNames are listed together, matching any one of them is usually enough to access the entry.
+- Page entries, button visibility, and backend operations can be controlled at different layers. A function is actually usable only when both the UI condition and the backend permission allow it.
+- When `roleName` means a platform role, possible values are `SUPER_ADMIN`, `ADMIN`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER`, and `TRIAL`.
+
+## Main Navigation
+
+| Function / Page | Path | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- | --- |
+| Chat | `/chat` | `FEATURE_XPERT` | `CHAT_VIEW` | The Chat entry is visible only when both the feature and permission are available. |
+| Explore Xperts | `/explore` | `FEATURE_XPERT` | `XPERT_EDIT` | Used to browse and explore Xperts. |
+| Xpert Workspace | `/xpert` | `FEATURE_XPERT` | `XPERT_EDIT` | After entering the workspace, concrete read/write actions are still controlled by workspace capabilities. |
+| Story | `/story` | No explicit main-navigation switch | `STORIES_VIEW` | This entry is not currently in the main navigation, but page access requires story view permission. |
+| Data | `/data` | Controlled by child functions | `MODELS_EDIT` or `STORIES_EDIT` | The parent Data route requires either model edit or story edit permission. |
+| Data / Project | `/data/project` | `FEATURE_PROJECT` | `STORIES_EDIT` | BI project entry. |
+| Data / Semantic Model | `/data/models` | `FEATURE_MODEL` | `MODELS_EDIT` | Semantic model entry and modeling operations. |
+| Indicator App | `/indicator-app` | `FEATURE_INDICATOR` + `FEATURE_INDICATOR_APP` | `INDICATOR_MARTKET_VIEW` | Indicator app entry. |
+| Settings | `/settings` | `FEATURE_SETTING` | No unified entry permission | Each menu inside Settings is controlled separately. |
+
+## Chat And Agents
+
+| Function / Page / Button | Path or entry | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- | --- |
+| Common Assistant | `/chat/x/common` | Inherits `FEATURE_XPERT` from the entry | Inherits `CHAT_VIEW` from the entry | Common chat assistant. |
+| ClawXpert | `/chat/clawxpert` | `FEATURE_XPERT` + `FEATURE_XPERT_CLAWXPERT` | No extra permission | Both features must be enabled. |
+| ChatBI | `/chat/chatbi` | `FEATURE_XPERT` + `FEATURE_XPERT_CHATBI` | No extra permission | Both features must be enabled. |
+| Chat sidebar ChatBI | Chat sidebar | `FEATURE_XPERT_CHATBI` | No extra permission | Controls entry visibility only. |
+| Chat sidebar CodeXpert | Chat sidebar | `FEATURE_XPERT_CODEXPERT` | No extra permission | External link entry. |
+| Chat sidebar DeepResearch | Chat sidebar | `FEATURE_XPERT_DEEP_RESEARCH` | No extra permission | External link entry. |
+| Change Settings button | Common Assistant welcome page | No extra feature | `SUPER_ADMIN` or `ADMIN` | Opens Assistants settings. |
+| Common Assistant configuration | Assistants settings | `FEATURE_XPERT` | Page entry requires `SUPER_ADMIN` or `ADMIN` | System assistant configuration. |
+| Workspace Assistant configuration | Assistants settings | `FEATURE_XPERT` | Page entry requires `SUPER_ADMIN` or `ADMIN` | Shared assistant configuration for the Xpert workspace. |
+| ChatBI Assistant configuration | Assistants settings | `FEATURE_XPERT` + `FEATURE_XPERT_CHATBI` | Page entry requires `SUPER_ADMIN` or `ADMIN` | ChatBI assistant configuration. |
+| ClawXpert Assistant configuration | User-level ClawXpert binding | `FEATURE_XPERT` + `FEATURE_XPERT_CLAWXPERT` | User-level configuration | Not included in the system assistant list. |
+
+## Settings Pages
+
+| Function / Page | Path | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- | --- |
+| Account | `/settings/account` | None | None | Personal account settings. |
+| AI Copilot | `/settings/copilot` | `FEATURE_COPILOT` | `COPILOT_EDIT` | Copilot basic configuration, examples, usage, users, and related settings. |
+| Data Sources | `/settings/data-sources` | `FEATURE_MODEL` | `DATA_SOURCE_EDIT` | Data source settings entry. |
+| Assistants | `/settings/assistants` | `FEATURE_XPERT` | `SUPER_ADMIN` or `ADMIN` | Tenant default configuration is editable only by `SUPER_ADMIN`; organization overrides require a selected organization. |
+| Chat BI | `/settings/chatbi` | `FEATURE_XPERT` + `FEATURE_MODEL` | `MODELS_EDIT` | ChatBI model settings. |
+| Business Area | `/settings/business-area` | `FEATURE_BUSINESS_AREA` | `BUSINESS_AREA_EDIT` | Business area settings. |
+| Certification | `/settings/certification` | None | Entry visibility requires `CERTIFICATION_EDIT`; page access also depends on `BUSINESS_AREA_EDIT` | Both permissions need attention in the current behavior. |
+| System Integration | `/settings/integration` | `FEATURE_INTEGRATION` | `INTEGRATION_EDIT` | Integration list, create, view, and edit. |
+| Users | `/settings/users` | `FEATURE_USER` | Any of `ALL_ORG_VIEW` / `ALL_ORG_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` | User list entry. Buttons are split further. |
+| Groups | `/settings/groups` | `FEATURE_USER` | View: `ORG_USERS_VIEW`; edit: `ORG_USERS_EDIT` | User group list and maintenance. |
+| Roles | `/settings/roles` | `FEATURE_ROLES_PERMISSION` | `CHANGE_ROLES_PERMISSIONS` | Role and permission maintenance. |
+| Feature | `/settings/features/tenant`, `/settings/features/organization` | None | Page entry: `CHANGE_ROLES_PERMISSIONS`; read features: `ALL_ORG_VIEW`; update switches: `ALL_ORG_EDIT` | Tenant and organization feature switch maintenance. |
+| Organizations | `/settings/organizations` | None | Any of `ALL_ORG_VIEW` / `ALL_ORG_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` | Organization list and details. Buttons are split further. |
+| Email Template | `/settings/email-templates` | `FEATURE_EMAIL_TEMPLATE` | `VIEW_ALL_EMAIL_TEMPLATES` | Email template management. |
+| Custom SMTP | `/settings/custom-smtp` | `FEATURE_SMTP` | `CUSTOM_SMTP_VIEW` | Tenant or organization SMTP configuration. |
+| Plugins | `/settings/plugins` | None | `SUPER_ADMIN` or `ADMIN` or `TRIAL` | Plugin settings entry. |
+| Tenant | `/settings/tenant` | None | `SUPER_ADMIN` | Tenant settings, tenant skills, and tenant tags. |
+
+## Settings Buttons And Actions
+
+| Function / Page | Button or action | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- | --- |
+| Users | Batch Import | `FEATURE_USER` | UI button: tenant scope + `ALL_ORG_EDIT`; actual import: `SUPER_ADMIN` or `ADMIN` | Bulk user import. |
+| Users | New | `FEATURE_USER` | Tenant scope + `ALL_ORG_EDIT` | Create user. |
+| Users | Invite button | `FEATURE_USER` | Organization scope + `ORG_INVITE_VIEW` or `ORG_INVITE_EDIT` | Button visibility condition. Actually creating invites requires `ORG_INVITE_EDIT`. |
+| Users | Invite list | `FEATURE_USER` | `ORG_INVITE_VIEW` or `ORG_INVITE_EDIT` | View invite records. |
+| Users | Resend / delete invite | `FEATURE_USER` | `ORG_INVITE_EDIT` | Invite maintenance operations. |
+| Users | Change user role | `FEATURE_USER` | Current user is `SUPER_ADMIN` or `ADMIN` | Editing a super admin user is additionally protected by super-admin-related permissions. |
+| Organizations | Create organization | None | Tenant scope + `ALL_ORG_EDIT` | Create organization. |
+| Organizations | Delete organization | None | Tenant scope + `ALL_ORG_EDIT` | Delete organization. |
+| Organizations | Save basic organization information | None | Selected organization + `ALL_ORG_EDIT` | Save name, description, status, and similar fields. |
+| Organizations | Upload organization avatar | None | Selected organization + `ALL_ORG_EDIT` | Change organization avatar. |
+| Organizations | Governance fields | None | Tenant scope + `ALL_ORG_EDIT` | Currency, timezone, default date, and similar governance fields. |
+| Organizations | Edit members | None | Selected organization + `ALL_ORG_EDIT` or `ORG_USERS_EDIT` | Organization member maintenance. |
+| Organizations | Generate Demo | None | UI button: selected organization + `ALL_ORG_EDIT`; actual generation: `SUPER_ADMIN` or `ADMIN` or `TRIAL` | Generate or refresh organization demo data. |
+| Assistants | Tenant default assistant configuration | `FEATURE_XPERT` + assistant-specific feature | `SUPER_ADMIN` | Tenant default assistant configuration. |
+| Assistants | Organization override assistant configuration | `FEATURE_XPERT` + assistant-specific feature | Page entry `SUPER_ADMIN` or `ADMIN`, and a selected organization | Organization-level override configuration. |
+| Xpert Workspace | Save workspace general settings | `FEATURE_XPERT` | `workspace.capabilities.canManage` | Not an enum permission. It is determined by workspace capabilities. |
+| Xpert Workspace | Members, visibility, delete, archive | `FEATURE_XPERT` | `workspace.capabilities.canManage` | Owner or tenant admin with manage capability can operate. |
+| Xpert authorization | Organization list scope | None | Users with `ALL_ORG_VIEW` can see all organizations; otherwise only organizations they belong to | Affects data scope, not button permission. |
+
+## BI And Data Functions
+
+| Function / Page / Action | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- |
+| View data source list | `FEATURE_MODEL` | `DATA_SOURCE_VIEW` | View data source list. |
+| Create / edit / delete data source | `FEATURE_MODEL` | `DATA_SOURCE_EDIT` | Data source maintenance. |
+| Sync data source types | None | `SUPER_ADMIN` or `ADMIN` | Sync built-in data source types. |
+| Semantic model entry | `FEATURE_MODEL` | `MODELS_EDIT` | `/data/models` page entry. |
+| Semantic model list API | `FEATURE_MODEL` | `ADMIN` | The backend model list has an administrator role restriction. |
+| Semantic model XMLA query | `FEATURE_MODEL` | `MODELS_VIEW` | The model must also expose XMLA and pass model viewer authorization. |
+| Clear semantic model cache | `FEATURE_MODEL` | `MODELS_EDIT` | Delete model cache. |
+| Project | `FEATURE_PROJECT` | `STORIES_EDIT` | `/data/project` entry. |
+| View Story | No explicit main-navigation switch | `STORIES_VIEW` | `/story` page access. |
+| Edit Story / Project capability | `FEATURE_PROJECT` | `STORIES_EDIT` | BI project and story editing capability. |
+| Business Area settings | `FEATURE_BUSINESS_AREA` | `BUSINESS_AREA_EDIT` | Business area maintenance. |
+| Certification settings | None | `CERTIFICATION_EDIT` + `BUSINESS_AREA_EDIT` both need attention | Entry visibility and page access currently depend on different permissions. |
+| Indicator App | `FEATURE_INDICATOR` + `FEATURE_INDICATOR_APP` | `INDICATOR_MARTKET_VIEW` | Indicator app entry. |
+| View indicators | `FEATURE_INDICATOR` | `INDICATOR_VIEW` | Indicator viewing capability. |
+| Edit indicators | `FEATURE_INDICATOR` | `INDICATOR_EDIT` | Indicator maintenance capability. |
+| Data Factory | `FEATURE_DATA_FACTORY` | `DATA_FACTORY_VIEW` / `DATA_FACTORY_EDIT` | Currently mainly permission and feature enums. Confirm concrete entry usage with the specific page. |
+
+## AI Backend Capabilities
+
+| Function / Action | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- |
+| Create, enable/disable, update Copilot | `FEATURE_COPILOT` | `COPILOT_EDIT` | Copilot management. |
+| Copilot statistics | `FEATURE_COPILOT` | `COPILOT_EDIT` | Conversation, user, message, token, and related statistics. |
+| Create / update Copilot Provider | `FEATURE_COPILOT` | `COPILOT_EDIT` | Model provider configuration. |
+| Copilot User list / renew | `FEATURE_COPILOT` | `COPILOT_EDIT` | Copilot user management. |
+| Knowledgebase list / statistics | `FEATURE_COPILOT_KNOWLEDGEBASE` or the feature that owns the knowledge-base entry | `KNOWLEDGEBASE_EDIT` | Knowledge base editing and statistics. |
+| Xpert list / select options / statistics | `FEATURE_XPERT` | `XPERT_EDIT` | Xpert management and statistics. |
+| Full workspace list | `FEATURE_XPERT` | `XPERT_EDIT` | Administrative workspace query. |
+| Read workspace | `FEATURE_XPERT` | `workspace.capabilities.canRead` | Determined by owner/member, scope, tenant-shared status, and similar factors. |
+| Run workspace | `FEATURE_XPERT` | `workspace.capabilities.canRun` | Determined by workspace capabilities. |
+| Write workspace | `FEATURE_XPERT` | `workspace.capabilities.canWrite` | Determined by workspace capabilities. |
+| Manage workspace | `FEATURE_XPERT` | `workspace.capabilities.canManage` | Member, visibility, delete, archive, and similar management actions. |
+| Agent view extension | `FEATURE_XPERT` | `XPERT_EDIT` | Agent view extension. |
+| Sandbox view extension | `FEATURE_XPERT` | `XPERT_EDIT` | Sandbox view extension. |
+| Project view extension | `FEATURE_XPERT` | `CHAT_VIEW` or `XPERT_EDIT` | Project view extension. |
+| Knowledgebase view extension | Knowledge-base-related feature | `KNOWLEDGEBASE_EDIT` | Knowledgebase view extension. |
+
+## Platform Settings Capabilities
+
+| Function / Action | Required feature | Required permission / roleName | Notes |
+| --- | --- | --- | --- |
+| Add / update / delete / recover roles | `FEATURE_ROLES_PERMISSION` | `CHANGE_ROLES_PERMISSIONS` | Role maintenance. |
+| Enable / disable role permissions | `FEATURE_ROLES_PERMISSION` | `CHANGE_ROLES_PERMISSIONS` | Permission matrix maintenance. `SUPER_ADMIN` permissions are protected. |
+| Query features | None | `ALL_ORG_VIEW` | Query tenant or organization feature switches. |
+| Update features | None | `ALL_ORG_EDIT` | Update tenant or organization feature switches. |
+| Upgrade features | None | `SUPER_ADMIN` | System-level feature upgrade or backfill. |
+| Organization list / pagination / count | None | `ALL_ORG_VIEW` or `ALL_ORG_EDIT` | Tenant-level organization management. |
+| Organization details | None | Any of `ALL_ORG_VIEW` / `ALL_ORG_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` | Also limited by current organization scope. |
+| User list / pagination / count | `FEATURE_USER` | `ALL_ORG_VIEW` or `ALL_ORG_EDIT` | Tenant-level user management. |
+| User search | `FEATURE_USER` | Any of `ORG_USERS_VIEW` / `ORG_USERS_EDIT` / `ALL_ORG_VIEW` / `ALL_ORG_EDIT` | Search scope depends on the organization context. |
+| User details | `FEATURE_USER` | Self; or any of `PROFILE_EDIT` / `ORG_USERS_VIEW` / `ORG_USERS_EDIT` / `ALL_ORG_VIEW` / `ALL_ORG_EDIT` | Non-self access must also pass organization-scope checks. |
+| Create / delete user | `FEATURE_USER` | `ALL_ORG_EDIT` | Tenant-level user maintenance. |
+| Update user / reset password | `FEATURE_USER` | Self can use `PROFILE_EDIT`; managing others requires `ALL_ORG_EDIT` or `SUPER_ADMIN_EDIT` | Super admin users have extra protection. |
+| Delete all user data | None | `ACCESS_DELETE_ALL_DATA` | High-risk operation. |
+| View user groups | `FEATURE_USER` | `ORG_USERS_VIEW` | User group list and details. |
+| Maintain user groups | `FEATURE_USER` | `ORG_USERS_EDIT` | Create, edit, maintain members, and delete. |
+| View invites | `FEATURE_USER` | `ORG_INVITE_VIEW` or `ORG_INVITE_EDIT` | Invite list. |
+| Maintain invites | `FEATURE_USER` | `ORG_INVITE_EDIT` | Create, resend, and delete invites. |
+| Maintain integrations | `FEATURE_INTEGRATION` | `INTEGRATION_EDIT` | System integration. |
+| Email templates | `FEATURE_EMAIL_TEMPLATE` | `VIEW_ALL_EMAIL_TEMPLATES` | Email template page. |
+| SMTP | `FEATURE_SMTP` | `CUSTOM_SMTP_VIEW` | Custom SMTP. |
+| Tenant settings | None | `SUPER_ADMIN` | Tenant-level settings. |
+| Plugins | None | `SUPER_ADMIN` or `ADMIN` or `TRIAL` | Plugin entry. |
+
+## roleName Notes
+
+| Scenario | Meaning of roleName | Impact |
+| --- | --- | --- |
+| Platform role | `SUPER_ADMIN`, `ADMIN`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER`, `TRIAL` | Controls page entries, button visibility, and backend role permissions. |
+| User invitation | Target platform role for the invited user | Creating the invitation itself requires `ORG_INVITE_EDIT`. |
+| CSV bulk user import | Target platform role for imported users | The import operation itself requires `SUPER_ADMIN` or `ADMIN`. |
+| SSO login | Default role context during third-party login or registration | Not directly equivalent to page button permissions. |
+| Lark login | Default role context in the Lark configuration | Not directly equivalent to page button permissions. |
+| Semantic model / OLAP | Model query role or Mondrian role | This is a model access role, not a platform `RolesEnum`. |
+| Semantic model access control | Internal model role name | Controls model data access, not platform navigation permissions. |
+| Plugin user permission | Default user role used by plugins | Used in the plugin permission context. |

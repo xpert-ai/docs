@@ -1,0 +1,135 @@
+---
+title: 开关对应功能列表
+description: Feature 和 permission 开关对应的功能列表。
+---
+
+本文用于从开关反查它控制的功能和入口。feature 开关只决定模块或入口是否启用，permission / roleName 仍需要同时满足。
+
+## 功能开关对应功能列表
+
+这个表用于从 feature 开关反查它控制的具体功能。feature 开关只决定模块或入口是否启用；表中列出的权限或角色门槛仍然需要同时满足。
+
+| Feature 开关 | 控制的功能 / 入口 | 主要路径或入口 | 额外 permission / roleName 门槛 |
+| --- | --- | --- | --- |
+| `FEATURE_SETTING` | Settings 根页面和设置模块容器 | `/settings` | 内部菜单仍按各自权限控制。 |
+| `FEATURE_HOME` | Home feature 父级和首页功能容器 | `home` | 当前主菜单 dashboard 入口已注释；Home 下的 Analytics 子功能另由 `FEATURE_HOME_CATALOG`、`FEATURE_HOME_TREND` 控制。 |
+| `FEATURE_DASHBOARD` | Dashboard 子功能定义 | Home / Dashboard | 默认开启，但当前主菜单 dashboard 子入口已注释。 |
+| `FEATURE_ORGANIZATION` | Manage Organization feature 定义 | `organizations` | 组织列表、详情、创建、编辑、删除实际仍由 `ALL_ORG_VIEW`、`ALL_ORG_EDIT`、`ORG_USERS_VIEW`、`ORG_USERS_EDIT` 控制。 |
+| `FEATURE_USER` | Users 页面、用户列表、用户搜索、用户详情、用户创建/删除/更新 | `/settings/users` | 根据操作不同，需要 `ALL_ORG_VIEW`、`ALL_ORG_EDIT`、`ORG_USERS_VIEW` 或 `ORG_USERS_EDIT`。 |
+| `FEATURE_USER` | Groups 页面和用户组维护 | `/settings/groups` | 查看需要 `ORG_USERS_VIEW`；维护需要 `ORG_USERS_EDIT`。 |
+| `FEATURE_USER` | Invite 按钮、Invite 列表、重发邀请、删除邀请 | Users 邀请区域 | 查看需要 `ORG_INVITE_VIEW` 或 `ORG_INVITE_EDIT`；维护需要 `ORG_INVITE_EDIT`。 |
+| `FEATURE_ROLES_PERMISSION` | Roles 页面和角色权限矩阵 | `/settings/roles` | `CHANGE_ROLES_PERMISSIONS`。 |
+| `FEATURE_INTEGRATION` | System Integration 页面和集成维护 | `/settings/integration` | `INTEGRATION_EDIT`。 |
+| `FEATURE_EMAIL` | Email feature 父级和邮件管理入口 | `settings/email-history` | 邮件模板由子开关 `FEATURE_EMAIL_TEMPLATE` 和权限 `VIEW_ALL_EMAIL_TEMPLATES` 控制；邮件历史对应 `VIEW_ALL_EMAILS`。 |
+| `FEATURE_EMAIL_TEMPLATE` | Email Template 页面 | `/settings/email-templates` | `VIEW_ALL_EMAIL_TEMPLATES`。 |
+| `FEATURE_FILE_STORAGE` | File Storage 子功能定义 | `settings/file-storage` | `FILE_STORAGE_VIEW`；当前 Settings 菜单里未列出单独入口时，需要结合具体页面确认入口是否开放。 |
+| `FEATURE_SMTP` | Custom SMTP 页面 | `/settings/custom-smtp` | `CUSTOM_SMTP_VIEW`。 |
+| `FEATURE_SMS_GATEWAY` | SMS Gateway 子功能定义 | `tasks/me` | 枚举和环境开关存在，但当前默认 feature 定义中该子项被注释，没有默认 feature 记录。 |
+| `FEATURE_COPILOT` | AI Copilot 设置、Copilot 创建/更新/启停、Copilot 统计、Provider、用户管理 | `/settings/copilot` | `COPILOT_EDIT`；`COPILOT_VIEW` 只覆盖单独使用它的查看/使用场景。 |
+| `FEATURE_COPILOT_KNOWLEDGEBASE` | Copilot 知识库列表和统计 | Copilot 所属知识库入口 | `KNOWLEDGEBASE_EDIT`。 |
+| `FEATURE_COPILOT_CHAT` | 默认 feature 定义中的 Copilot Chat 子功能 | `chat` | 还取决于实际聊天入口和页面使用的权限。 |
+| `FEATURE_XPERT` | Chat 主入口和 Common Assistant | `/chat`、`/chat/x/common` | `CHAT_VIEW`。 |
+| `FEATURE_XPERT` | Explore Xperts 和 Xpert Workspace 入口 | `/explore`、`/xpert` | `XPERT_EDIT`；进入工作区后继续受 workspace capabilities 控制。 |
+| `FEATURE_XPERT` | Common Assistant、Workspace Assistant 的 Assistants 设置 | `/settings/assistants` | 页面入口需要 `SUPER_ADMIN` 或 `ADMIN`；租户默认配置编辑需要 `SUPER_ADMIN`。 |
+| `FEATURE_XPERT` | Xpert 列表、下拉选项、统计、全量 workspace 列表、workspace 读/运行/写/管理、view extensions | 后端和 workspace API | 根据操作不同，需要 `XPERT_EDIT`、`CHAT_VIEW` 或计算出的 `workspace.capabilities.*`。 |
+| `FEATURE_XPERT_CLAWXPERT` | ClawXpert 聊天入口和 ClawXpert assistant 绑定 | `/chat/clawxpert`、用户级 ClawXpert 绑定 | 需要父级 `FEATURE_XPERT`；聊天入口在本矩阵中没有额外枚举权限。 |
+| `FEATURE_XPERT_CHATBI` | ChatBI 聊天入口、Chat 侧边栏 ChatBI、ChatBI assistant 配置、Chat BI 设置 | `/chat/chatbi`、`/settings/chatbi` | 需要父级 `FEATURE_XPERT`；设置页还需要 `MODELS_EDIT`，并可能同时需要 `FEATURE_MODEL`。 |
+| `FEATURE_XPERT_CODEXPERT` | Chat 侧边栏 CodeXpert 外链入口 | Chat 侧边栏 | 需要父级聊天访问；本矩阵中没有额外枚举权限。 |
+| `FEATURE_XPERT_DEEP_RESEARCH` | Chat 侧边栏 DeepResearch 外链入口 | Chat 侧边栏 | 需要父级聊天访问；本矩阵中没有额外枚举权限。 |
+| `FEATURE_MODEL` | Data / Semantic Model 入口和语义模型操作 | `/data/models` | 入口和编辑需要 `MODELS_EDIT`；XMLA 查询需要 `MODELS_VIEW`；后端列表 API 需要 `ADMIN`。 |
+| `FEATURE_MODEL` | Data Sources 页面和数据源操作 | `/settings/data-sources` | `DATA_SOURCE_VIEW` 或 `DATA_SOURCE_EDIT`。 |
+| `FEATURE_MODEL` | Chat BI 设置 | `/settings/chatbi` | 与 `FEATURE_XPERT` 同时使用；权限门槛是 `MODELS_EDIT`。 |
+| `FEATURE_PROJECT` | Data / Project 入口和 BI project/story 编辑能力 | `/data/project` | `STORIES_EDIT`。 |
+| `FEATURE_STORY` | Story feature 定义 | `/story` | 当前矩阵中 `/story` 页面访问使用 `STORIES_VIEW`；未列出显式主导航 feature 开关。 |
+| `FEATURE_BUSINESS_AREA` | Business Area 设置 | `/settings/business-area` | `BUSINESS_AREA_EDIT`。 |
+| `FEATURE_INDICATOR` | Indicator App 基础 feature、指标查看/编辑能力 | `/indicator-app`、指标相关区域 | `INDICATOR_VIEW`、`INDICATOR_EDIT` 或 `INDICATOR_MARTKET_VIEW`。 |
+| `FEATURE_INDICATOR_APP` | Indicator App 入口 | `/indicator-app` | 需要父级 `FEATURE_INDICATOR` 和 `INDICATOR_MARTKET_VIEW`。 |
+| `FEATURE_INDICATOR_MARKET` | Analytics 默认 feature 定义中的 Indicator Market 子功能 | `indicator/market` | 具体操作继续使用指标权限。 |
+| `FEATURE_INDICATOR_REGISTER` | Analytics 默认 feature 定义中的 Indicator Creation 子功能 | `indicator/create` | 具体操作继续使用指标权限。 |
+| `FEATURE_HOME_CATALOG` | Analytics 默认 feature 定义中的 Home Catalog 子功能 | `catalog` | 本矩阵中未单独列出具体页面权限。 |
+| `FEATURE_HOME_TREND` | Analytics 默认 feature 定义中的 Home Trend 子功能 | `trend` | 本矩阵中未单独列出具体页面权限。 |
+| `FEATURE_DATA_FACTORY` | Data Factory feature 枚举和 data factory 权限 | Data Factory 区域 | 当前默认 feature 定义没有初始化该开关；依赖前需要结合具体入口确认。 |
+
+## 仅枚举存在或当前未初始化的 feature
+
+这些 feature enum 在 contracts 或环境开关中存在，但没有出现在当前平台、AI、Analytics 的默认 feature 初始化列表中；因此默认不会生成可在 Settings / Feature 中直接开关的 feature 记录，除非额外迁移或后续模块补齐。
+
+| Feature enum | 当前状态 |
+| --- | --- |
+| `FEATURE_JOB` | 平台 enum 存在；当前默认 feature 初始化未使用。 |
+| `FEATURE_EMPLOYEES` | 平台 enum 存在；当前默认 feature 初始化未使用。 |
+| `FEATURE_MANAGE_INVITE` | 平台 enum 存在；当前默认 feature 初始化未使用。 |
+| `FEATURE_ORGANIZATION_TAG` | 平台 enum 和环境开关存在；默认 feature 中对应子项被注释。 |
+| `FEATURE_ORGANIZATION_PROJECT` | 平台 enum 和环境开关存在；当前默认 feature 初始化未使用。 |
+| `FEATURE_CONTACT` | 平台 enum 存在；当前默认 feature 初始化未使用。 |
+| `FEATURE_ORGANIZATIONS` | 平台 enum 和环境开关存在；注意它不同于当前已初始化的 `FEATURE_ORGANIZATION`。 |
+| `FEATURE_EMAIL_HISTORY` | 平台 enum 和环境开关存在；当前默认 feature 使用父级 `FEATURE_EMAIL`，没有初始化该 code。 |
+| `FEATURE_MODEL_CREATION` | Analytics enum 存在；当前 Analytics 默认 feature 初始化未使用。 |
+| `FEATURE_MODEL_VIEWER` | Analytics enum 存在；当前 Analytics 默认 feature 初始化未使用。 |
+| `FEATURE_STORY_CREATION` | Analytics enum 存在；当前 Analytics 默认 feature 初始化未使用。 |
+| `FEATURE_STORY_VIEWER` | Analytics enum 存在；当前 Analytics 默认 feature 初始化未使用。 |
+| `FEATURE_STORY_MARKET` | Analytics enum 存在；当前 Analytics 默认 feature 初始化未使用。 |
+| `FEATURE_SUBSCRIPTION` | Analytics enum 存在；当前 Analytics 默认 feature 初始化未使用。 |
+
+## 权限开关对应功能列表
+
+这个表用于从 role permission 开关反查它控制的具体功能。默认开启角色来自平台、AI、Analytics 的默认角色权限定义；`无默认开启角色` 表示 enum 或 guard 存在，但默认初始化不会给任何角色写入开启记录。
+
+| Permission 开关 | 控制的功能 / 入口 | 常见 feature / 路径 | 默认开启角色 |
+| --- | --- | --- | --- |
+| `PROFILE_EDIT` | 个人资料编辑；自身用户更新 | `/settings/account`、用户更新接口 | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `ADMIN_DASHBOARD_VIEW` | 管理员仪表盘查看能力 | 管理员仪表盘相关入口 | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER` |
+| `ORG_EMPLOYEES_VIEW` | 组织员工查看能力 | 组织员工 / 联系人相关区域 | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_EMPLOYEES_EDIT` | 组织员工编辑；按员工更新组织联系人 | 组织联系人 API | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_TAGS_EDIT` | 组织标签创建 / 维护 | Tags API | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_USERS_VIEW` | 用户、组织详情、用户组查看 | `FEATURE_USER`、`/settings/users`、`/settings/groups`、`/settings/organizations` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `ORG_USERS_EDIT` | 用户组维护、组织成员维护 | `FEATURE_USER`、`/settings/groups`、Organizations Members | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_INVITE_VIEW` | 邀请按钮显示、邀请列表查看 | `FEATURE_USER`、Users 邀请区域 | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `ORG_INVITE_EDIT` | 创建邀请、重发邀请、删除邀请 | `FEATURE_USER`、Users 邀请区域 | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ALL_ORG_VIEW` | 查询租户 / 组织 feature；组织列表、用户列表、跨组织查看范围 | Feature 查询、Organizations、Users | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ALL_ORG_EDIT` | 更新租户 / 组织 feature；新建 / 编辑 / 删除组织；新建 / 删除用户；管理他人用户信息 | Feature 更新、Organizations、Users | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `APPROVALS_POLICY_VIEW` | 审批策略读取接口；代码中的 enum member 是 `APPROVAL_POLICY_VIEW` | Approval Policy API | 无默认开启角色 |
+| `APPROVALS_POLICY_EDIT` | 审批策略创建 / 更新 / 维护；代码中的 enum member 是 `APPROVAL_POLICY_EDIT` | Approval Policy API | 无默认开启角色 |
+| `CHANGE_SELECTED_ORGANIZATION` | 切换当前组织上下文 | 组织切换 | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `CHANGE_ROLES_PERMISSIONS` | Roles 页面、角色维护、角色权限启停；Feature 页面入口 | `FEATURE_ROLES_PERMISSION`、`/settings/roles`、`/settings/features/tenant`、`/settings/features/organization` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `SUPER_ADMIN_EDIT` | 编辑受保护的超级管理员用户 | 用户更新 / 重置密码保护 | `SUPER_ADMIN` |
+| `PUBLIC_PAGE_EDIT` | 组织公共页面编辑 | Organization public page | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `VIEW_ALL_EMAILS` | 邮件历史 / 邮件记录查看 | `FEATURE_EMAIL`、`settings/email-history` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `VIEW_ALL_EMAIL_TEMPLATES` | 邮件模板页面和模板维护 | `FEATURE_EMAIL_TEMPLATE`、`/settings/email-templates` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_HELP_CENTER_EDIT` | 组织帮助中心编辑 | Organization Help Center | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_CONTACT_EDIT` | 创建 / 编辑联系人 | Organization contacts | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ORG_CONTACT_VIEW` | 查看联系人 | Organization contacts | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `ORG_DEMO_EDIT` | 组织 demo 按钮显示和维护能力 | Home dashboard、Organizations Generate Demo | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `INTEGRATION_VIEW` | 集成查看、集成 view extension 可见性 | `FEATURE_INTEGRATION`、`/settings/integration` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `INTEGRATION_EDIT` | 集成创建 / 编辑 / 维护 | `FEATURE_INTEGRATION`、`/settings/integration` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `FILE_STORAGE_VIEW` | 文件存储配置查看 | `FEATURE_FILE_STORAGE`、`settings/file-storage` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `SMS_GATEWAY_VIEW` | SMS Gateway 查看 | `FEATURE_SMS_GATEWAY` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `CUSTOM_SMTP_VIEW` | Custom SMTP 页面 | `FEATURE_SMTP`、`/settings/custom-smtp` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `VIEW_ALL_ACCOUNTING_TEMPLATES` | 会计模板查看 | Accounting templates | `SUPER_ADMIN`、`ADMIN`、`TRIAL` |
+| `ACCESS_DELETE_ACCOUNT` | 删除账户入口 / 能力 | 用户危险操作 | `SUPER_ADMIN` |
+| `ACCESS_DELETE_ALL_DATA` | 删除全部用户数据 | 用户危险操作 API | `SUPER_ADMIN` |
+| `KNOWLEDGEBASE_EDIT` | 知识库编辑、知识库统计、知识库 view extension | `FEATURE_COPILOT_KNOWLEDGEBASE` 或知识库所属入口 | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `COPILOT_VIEW` | Copilot 查看 / 使用类能力 | `FEATURE_COPILOT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `COPILOT_EDIT` | Copilot 设置、创建 / 更新 / 启停、统计、Provider、Copilot User 管理 | `FEATURE_COPILOT`、`/settings/copilot` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` |
+| `XPERT_EDIT` | Explore Xperts、Xpert Workspace、Xpert 列表 / 统计 / 管理型 workspace 查询 | `FEATURE_XPERT`、`/explore`、`/xpert` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER` |
+| `CHAT_VIEW` | Chat 主入口、Common Assistant、部分 project view extension | `FEATURE_XPERT`、`/chat`、`/chat/x/common` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `CERTIFICATION_EDIT` | Certification 入口显示 / 维护能力 | `/settings/certification` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `DATA_SOURCE_VIEW` | 数据源列表查看 | `FEATURE_MODEL`、`/settings/data-sources` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `DATA_SOURCE_EDIT` | 数据源创建 / 编辑 / 删除 | `FEATURE_MODEL`、`/settings/data-sources` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `NOTIFICATION_DESTINATION_VIEW` | 通知目标地查看 | Notification Destinations；当前设置路由已注释，controller 未单独加权限 guard | `SUPER_ADMIN`、`ADMIN` |
+| `NOTIFICATION_DESTINATION_EDIT` | 通知目标地创建 / 编辑 | Notification Destinations；当前设置路由已注释，controller 未单独加权限 guard | `SUPER_ADMIN`、`ADMIN` |
+| `SUBSCRIPTION_VIEW` | Story 订阅查看能力枚举 | Subscription API / Story toolbar | 无默认开启角色 |
+| `SUBSCRIPTION_EDIT` | Story 订阅编辑能力枚举 | Subscription API / Story toolbar | 无默认开启角色 |
+| `MODELS_VIEW` | 语义模型查看、XMLA 查询、AI Builder / Viewer 的模型只读能力 | `FEATURE_MODEL`、`/data/models` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `MODELS_EDIT` | 语义模型入口、建模、模型缓存清理、Chat BI 设置 | `FEATURE_MODEL`、`/data/models`、`/settings/chatbi` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `STORIES_VIEW` | Story 页面查看、AI Builder / Viewer 的故事只读能力 | `/story` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `STORIES_EDIT` | Data / Project 入口、Story / Project 编辑 | `FEATURE_PROJECT`、`/data/project` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `BUSINESS_AREA_VIEW` | Business Area 查看 | `FEATURE_BUSINESS_AREA` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `BUSINESS_AREA_EDIT` | Business Area 设置；Certification 页面实际访问也需要关注该权限 | `FEATURE_BUSINESS_AREA`、`/settings/business-area`、`/settings/certification` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `INDICATOR_VIEW` | 指标查看 | `FEATURE_INDICATOR` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `INDICATOR_MARTKET_VIEW` | Indicator App 入口、指标市场查看 | `FEATURE_INDICATOR`、`FEATURE_INDICATOR_APP`、`/indicator-app` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER`、`VIEWER` |
+| `INDICATOR_EDIT` | 指标创建 / 编辑 / 维护 | `FEATURE_INDICATOR` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `DATA_FACTORY_VIEW` | Data Factory 查看能力 | `FEATURE_DATA_FACTORY` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `DATA_FACTORY_EDIT` | Data Factory 编辑能力 | `FEATURE_DATA_FACTORY` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` |
+| `PERMISSION_APPROVAL_VIEW` | 权限申请查看能力枚举；当前 controller 中相关 guard 被注释 | Permission Approval API | 无默认开启角色 |
+| `PERMISSION_APPROVAL_EDIT` | 权限申请更新接口 | Permission Approval API | 无默认开启角色 |

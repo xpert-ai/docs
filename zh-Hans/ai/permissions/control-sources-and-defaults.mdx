@@ -1,0 +1,62 @@
+---
+title: 控制来源与默认值
+description: Feature、permission 与 roleName 的控制位置、后端来源和默认规则。
+---
+
+本文说明功能开关、角色权限开关、roleName 和工作区能力分别在哪里控制、由什么后端数据初始化，以及默认值如何生效。
+
+## 控制来源与默认值
+
+| 开关类型 | 在哪里控制 | 后端来源 | 默认规则 | 说明 |
+| --- | --- | --- | --- | --- |
+| 功能开关，例如 `FEATURE_XPERT` | Settings / Feature：`/settings/features/tenant` 和 `/settings/features/organization` | feature 定义由 `DEFAULT_FEATURES` 初始化；租户和组织级覆盖值存储在 feature-organization 记录中。 | feature 默认解析为开启。如果存在同名环境开关且值严格等于 `false`，默认解析为关闭；如果没有同名环境开关，则默认解析为开启。租户和组织记录创建时会复制当时解析出的 feature 值。 | 查询开关需要 `ALL_ORG_VIEW`；更新开关需要 `ALL_ORG_EDIT`；系统级升级/补齐需要 `SUPER_ADMIN`。 |
+| 角色权限开关，例如 `ALL_ORG_EDIT` | Settings / Roles：`/settings/roles` | role permission 记录由 `DEFAULT_ROLE_PERMISSIONS` 初始化。 | 初始化时只给下方默认权限表中列出的角色开启对应权限；未列出的角色-权限组合默认关闭或不存在。 | 修改角色权限需要 `CHANGE_ROLES_PERMISSIONS`。`SUPER_ADMIN` 角色的权限不能通过 role-permission API 修改或删除。 |
+| `roleName` 校验，例如 `SUPER_ADMIN` 或 `ADMIN` | 用户角色分配 | 路由 guard 或后端 decorator 校验当前用户角色。 | 默认系统角色包括 `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER`。 | 这不是 feature 开关；必须给用户分配对应角色。 |
+| 工作区能力，例如 `workspace.capabilities.canManage` | 工作区 owner、成员、可见性和共享规则 | 运行时计算出的 workspace capability，不是枚举权限。 | 不在全局角色权限矩阵中提供统一默认开关。 | 用户进入 Xpert 功能后，工作区内操作继续受该能力控制。 |
+
+## 按模块划分的默认功能开关
+
+| 模块 | 功能开关 | 默认值 | 控制 / 回退 |
+| --- | --- | --- | --- |
+| 平台首页 | `FEATURE_HOME`、`FEATURE_DASHBOARD` | 默认开启。 | 平台默认 feature 定义中硬编码开启。当前菜单中的 dashboard 入口已注释，Home 下的 Analytics 子功能另由 `FEATURE_HOME_CATALOG`、`FEATURE_HOME_TREND` 控制。 |
+| 平台设置 | `FEATURE_ORGANIZATION`、`FEATURE_USER`、`FEATURE_EMAIL`、`FEATURE_EMAIL_TEMPLATE`、`FEATURE_SETTING`、`FEATURE_FILE_STORAGE`、`FEATURE_SMTP`、`FEATURE_ROLES_PERMISSION`、`FEATURE_INTEGRATION` | 默认开启。 | 同名环境变量只有在值严格等于 `false` 时才会把 feature 解析为关闭；没有同名环境开关的 feature 会解析为开启。初始化后，租户/组织级开关在 Settings / Feature 中维护。 |
+| 平台未启用默认项 | `FEATURE_SMS_GATEWAY` | 当前默认 feature 列表中没有作为启用项初始化。 | 枚举和环境开关存在，但默认 feature 定义中的 SMS Gateway 子项被注释。 |
+| AI / Copilot | `FEATURE_COPILOT`、`FEATURE_COPILOT_KNOWLEDGEBASE`、`FEATURE_COPILOT_CHAT` | 默认开启。 | 由环境默认值和租户/组织 feature 开关共同控制。 |
+| AI / Xpert | `FEATURE_XPERT` | 默认开启。 | 由环境默认值和租户/组织 feature 开关共同控制。 |
+| AI / Xpert 子入口 | `FEATURE_XPERT_CLAWXPERT`、`FEATURE_XPERT_CHATBI`、`FEATURE_XPERT_CODEXPERT`、`FEATURE_XPERT_DEEP_RESEARCH` | 在 AI feature 默认定义中默认开启。 | 这些是 Xpert 下的子开关，运行时仍按租户/组织 feature 记录判断。 |
+| BI / Analytics | `FEATURE_BUSINESS_AREA`、`FEATURE_INDICATOR`、`FEATURE_INDICATOR_MARKET`、`FEATURE_INDICATOR_REGISTER`、`FEATURE_INDICATOR_APP`、`FEATURE_MODEL`、`FEATURE_STORY`、`FEATURE_PROJECT`、`FEATURE_HOME_CATALOG`、`FEATURE_HOME_TREND` | 默认开启。 | Analytics 模块准备阶段会把这些 feature 定义追加到系统默认 feature 列表。 |
+| BI / Data Factory | `FEATURE_DATA_FACTORY` | 当前默认 feature 列表中没有作为启用项初始化。 | 枚举存在，但默认 feature 定义目前被注释；依赖该开关前需要结合具体入口确认。 |
+| 仅权限控制的页面 | Organizations、Feature 维护、Tenant 设置、Plugins | 本矩阵中无 feature 开关。 | 这些入口由 role permission 或 roleName 控制，不由 feature 控制。 |
+
+## 按角色划分的默认权限开关
+
+这些默认值描述初始化时写入的 role-permission 记录。非 `SUPER_ADMIN` 角色的权限后续可以在 Settings / Roles 中调整，前提是当前用户拥有 `CHANGE_ROLES_PERMISSIONS`。
+
+| 权限分组 | 权限 | 默认开启角色 | 说明 |
+| --- | --- | --- | --- |
+| 租户和组织管理 | `ALL_ORG_VIEW`、`ALL_ORG_EDIT`、`CHANGE_SELECTED_ORGANIZATION`、`CHANGE_ROLES_PERMISSIONS` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` | `ALL_ORG_EDIT` 是更新租户/组织 feature 开关，以及执行租户级组织/用户操作的权限开关。 |
+| 用户查看 | `ORG_USERS_VIEW` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` | `AI_BUILDER` 默认可以查看组织用户。 |
+| 用户维护 | `ORG_USERS_EDIT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` | 新建、编辑、维护组织用户。 |
+| 邀请查看 | `ORG_INVITE_VIEW` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` | 查看邀请记录。 |
+| 邀请维护 | `ORG_INVITE_EDIT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` | 创建、重发、删除邀请。 |
+| 集成查看 | `INTEGRATION_VIEW` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` | `AI_BUILDER` 默认可以查看集成。 |
+| 邮件和 SMTP 设置 | `VIEW_ALL_EMAIL_TEMPLATES`、`CUSTOM_SMTP_VIEW` | `SUPER_ADMIN`、`ADMIN`、`TRIAL` | AI 和 BI 之外的设置项。 |
+| 集成编辑 | `INTEGRATION_EDIT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` | `AI_BUILDER` 默认可以编辑集成。 |
+| 高危管理 | `SUPER_ADMIN_EDIT`、`ACCESS_DELETE_ACCOUNT`、`ACCESS_DELETE_ALL_DATA` | `SUPER_ADMIN` | demo 模式会移除删除账户和删除全部数据权限。 |
+| AI 查看/使用 | `COPILOT_VIEW`、`CHAT_VIEW` | 全部默认角色 | `CHAT_VIEW` 默认分配给 `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER`。 |
+| AI 构建/管理 | `XPERT_EDIT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER`、`ANALYTICS_BUILDER` | `VIEWER` 默认没有 `XPERT_EDIT`。 |
+| AI 管理 | `COPILOT_EDIT`、`KNOWLEDGEBASE_EDIT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`AI_BUILDER` | `ANALYTICS_BUILDER` 和 `VIEWER` 默认没有这些编辑权限。 |
+| BI 查看 | `MODELS_VIEW`、`STORIES_VIEW` | 全部默认角色 | 这是默认覆盖最广的 BI 查看权限。 |
+| BI 构建/管理 | `DATA_SOURCE_VIEW`、`DATA_SOURCE_EDIT`、`MODELS_EDIT`、`STORIES_EDIT`、`BUSINESS_AREA_EDIT`、`CERTIFICATION_EDIT`、`INDICATOR_EDIT`、`DATA_FACTORY_VIEW`、`DATA_FACTORY_EDIT` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER` | `AI_BUILDER` 默认没有这些 BI 编辑权限。 |
+| BI 只读扩展 | `BUSINESS_AREA_VIEW`、`INDICATOR_VIEW`、`INDICATOR_MARTKET_VIEW` | `SUPER_ADMIN`、`ADMIN`、`TRIAL`、`ANALYTICS_BUILDER`、`VIEWER` | `VIEWER` 默认可以查看这些 BI 区域，但不能编辑。 |
+
+## 默认角色
+
+| roleName | 默认可用范围 |
+| --- | --- |
+| `SUPER_ADMIN` | 全量平台、AI、BI 管理权限；包含超级管理员专属能力和危险删除能力。 |
+| `ADMIN` | 大部分平台、AI、BI 管理权限；不含超级管理员专属能力和危险删除能力。 |
+| `TRIAL` | AI 全量权限，BI 建模/故事/指标等构建权限，大部分平台管理权限；部分操作仍会被单独限制。 |
+| `AI_BUILDER` | AI 构建能力；平台侧可查看/编辑集成、查看组织用户和邀请；BI 侧主要为模型和故事查看。 |
+| `ANALYTICS_BUILDER` | BI 构建能力；AI 侧可进入聊天和 Xpert 构建，不含 Copilot/知识库编辑。 |
+| `VIEWER` | 查看型角色；可进入聊天，查看部分 BI 内容，平台侧主要为个人资料和组织切换。 |

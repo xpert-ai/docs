@@ -406,6 +406,19 @@
                 ]
               },
               {
+                "tab": "Permissions",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/permissions/control-sources-and-defaults",
+                      "en/ai/permissions/feature-permission-role-matrix",
+                      "en/ai/permissions/switch-function-mapping"
+                    ]
+                  }
+                ]
+              },
+              {
                 "tab": "OpenAPI",
                 "groups": [
                   {
@@ -1093,6 +1106,19 @@
                       "zh-Hans/ai/tutorial/build-agentic-chatbi-from-scratch",
                       "zh-Hans/ai/tutorial/project-group-single-vs-multi-agent",
                       "zh-Hans/ai/tutorial/agentic-bi-end-to-end-analysis"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "权限矩阵",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/permissions/control-sources-and-defaults",
+                      "zh-Hans/ai/permissions/feature-permission-role-matrix",
+                      "zh-Hans/ai/permissions/switch-function-mapping"
                     ]
                   }
                 ]

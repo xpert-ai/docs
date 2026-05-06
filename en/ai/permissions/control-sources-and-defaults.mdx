@@ -1,0 +1,62 @@
+---
+title: Control Sources And Defaults
+description: Where features, permissions, roleNames, and workspace capabilities are controlled and how their defaults are seeded.
+---
+
+This page explains where feature switches, role permission switches, roleNames, and workspace capabilities are controlled, what backend data seeds them, and how default values take effect.
+
+## Control Sources And Defaults
+
+| Switch type | Where it is controlled | Backend source | Default rule | Notes |
+| --- | --- | --- | --- | --- |
+| Feature switch, for example `FEATURE_XPERT` | Settings / Feature: `/settings/features/tenant` and `/settings/features/organization` | Feature definitions are seeded from `DEFAULT_FEATURES`; tenant and organization overrides are stored as feature-organization rows. | A feature resolves to enabled by default. If a matching environment toggle exists and is exactly `false`, the resolved default becomes disabled; if no matching environment toggle exists, the resolved default is enabled. Tenant and organization rows copy the resolved feature value when created. | Reading switches requires `ALL_ORG_VIEW`; updating switches requires `ALL_ORG_EDIT`; system upgrade/backfill requires `SUPER_ADMIN`. |
+| Role permission switch, for example `ALL_ORG_EDIT` | Settings / Roles: `/settings/roles` | Role permission rows are seeded from `DEFAULT_ROLE_PERMISSIONS`. | Seeded role-permission rows are enabled for the roles listed in the default permission table below; unlisted role-permission pairs are off or absent by default. | Changing role permissions requires `CHANGE_ROLES_PERMISSIONS`. `SUPER_ADMIN` role permissions cannot be modified or deleted through the role-permission API. |
+| `roleName` check, for example `SUPER_ADMIN` or `ADMIN` | User role assignment | Route guards or backend decorators check the current user's role. | The default system roles are `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, and `VIEWER`. | This is not a feature switch. The role must be assigned to the user. |
+| Workspace capability, for example `workspace.capabilities.canManage` | Workspace ownership, membership, visibility, and sharing rules | Computed workspace capability, not a role-permission enum. | No global on/off default in the role-permission matrix. | Used by Xpert workspace actions after the user has entered the Xpert feature. |
+
+## Default Feature Switches By Module
+
+| Module | Feature switches | Default value | Control / fallback |
+| --- | --- | --- | --- |
+| Platform home | `FEATURE_HOME`, `FEATURE_DASHBOARD` | Enabled by default. | Hardcoded as enabled in the platform default feature definition. The current dashboard menu entry is commented out; Analytics children under Home are controlled separately by `FEATURE_HOME_CATALOG` and `FEATURE_HOME_TREND`. |
+| Platform settings | `FEATURE_ORGANIZATION`, `FEATURE_USER`, `FEATURE_EMAIL`, `FEATURE_EMAIL_TEMPLATE`, `FEATURE_SETTING`, `FEATURE_FILE_STORAGE`, `FEATURE_SMTP`, `FEATURE_ROLES_PERMISSION`, `FEATURE_INTEGRATION` | Enabled by default. | Matching environment variables can resolve the feature as disabled only when they are exactly `false`; a feature without a matching environment toggle resolves to enabled. After seeding, tenant/organization switches are maintained from Settings / Feature. |
+| Platform defaults not seeded | `FEATURE_SMS_GATEWAY` | Not seeded as an enabled feature row in the current default feature list. | The enum and environment toggle exist, but the SMS Gateway child entry is commented out in the default feature definition. |
+| AI / Copilot | `FEATURE_COPILOT`, `FEATURE_COPILOT_KNOWLEDGEBASE`, `FEATURE_COPILOT_CHAT` | Enabled by default. | Controlled by environment seed value plus tenant/organization feature switches. |
+| AI / Xpert | `FEATURE_XPERT` | Enabled by default. | Controlled by environment seed value plus tenant/organization feature switches. |
+| AI / Xpert child entries | `FEATURE_XPERT_CLAWXPERT`, `FEATURE_XPERT_CHATBI`, `FEATURE_XPERT_CODEXPERT`, `FEATURE_XPERT_DEEP_RESEARCH` | Enabled by default in the seeded AI feature definition. | These are child switches under Xpert and are still evaluated with the tenant/organization feature rows at runtime. |
+| BI / Analytics | `FEATURE_BUSINESS_AREA`, `FEATURE_INDICATOR`, `FEATURE_INDICATOR_MARKET`, `FEATURE_INDICATOR_REGISTER`, `FEATURE_INDICATOR_APP`, `FEATURE_MODEL`, `FEATURE_STORY`, `FEATURE_PROJECT`, `FEATURE_HOME_CATALOG`, `FEATURE_HOME_TREND` | Enabled by default. | Analytics feature definitions are appended into the system default feature list during analytics module preparation. |
+| BI / Data Factory | `FEATURE_DATA_FACTORY` | Not seeded as an enabled feature row in the current default feature list. | The enum exists, but the default feature definition is currently commented out; confirm concrete entry behavior before relying on it as a visible switch. |
+| Permission-only pages | Organizations, Feature maintenance, Tenant settings, Plugins | No feature switch in this matrix. | These entries are controlled by role permissions or roleName checks instead of feature switches. |
+
+## Default Permission Switches By Role
+
+These defaults describe seed-time role-permission rows. They can be changed from Settings / Roles for non-`SUPER_ADMIN` roles when the current user has `CHANGE_ROLES_PERMISSIONS`.
+
+| Permission group | Permissions | Enabled by default for | Notes |
+| --- | --- | --- | --- |
+| Tenant and organization administration | `ALL_ORG_VIEW`, `ALL_ORG_EDIT`, `CHANGE_SELECTED_ORGANIZATION`, `CHANGE_ROLES_PERMISSIONS` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` | `ALL_ORG_EDIT` is the switch that allows updating tenant/organization feature switches and tenant-level organization/user operations. |
+| User viewing | `ORG_USERS_VIEW` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` | `AI_BUILDER` can view organization users by default. |
+| User maintenance | `ORG_USERS_EDIT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` | Create, edit, and maintain organization users. |
+| Invite administration | `ORG_INVITE_VIEW` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` | View invite records. |
+| Invite maintenance | `ORG_INVITE_EDIT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` | Create, resend, and delete invites. |
+| Integration viewing | `INTEGRATION_VIEW` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` | AI builders can view integrations by default. |
+| Email and SMTP settings | `VIEW_ALL_EMAIL_TEMPLATES`, `CUSTOM_SMTP_VIEW` | `SUPER_ADMIN`, `ADMIN`, `TRIAL` | Settings entries outside AI and BI. |
+| Integration edit | `INTEGRATION_EDIT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` | AI builders can edit integrations by default. |
+| High-risk administration | `SUPER_ADMIN_EDIT`, `ACCESS_DELETE_ACCOUNT`, `ACCESS_DELETE_ALL_DATA` | `SUPER_ADMIN` | Delete-account and delete-all-data permissions are removed in demo mode. |
+| AI read/use | `COPILOT_VIEW`, `CHAT_VIEW` | All default roles | `CHAT_VIEW` is available to `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER`, and `VIEWER`. |
+| AI build/manage | `XPERT_EDIT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER`, `ANALYTICS_BUILDER` | `VIEWER` does not get `XPERT_EDIT` by default. |
+| AI administration | `COPILOT_EDIT`, `KNOWLEDGEBASE_EDIT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `AI_BUILDER` | `ANALYTICS_BUILDER` and `VIEWER` do not get these edit permissions by default. |
+| BI view | `MODELS_VIEW`, `STORIES_VIEW` | All default roles | These are the broadest BI view defaults. |
+| BI build/manage | `DATA_SOURCE_VIEW`, `DATA_SOURCE_EDIT`, `MODELS_EDIT`, `STORIES_EDIT`, `BUSINESS_AREA_EDIT`, `CERTIFICATION_EDIT`, `INDICATOR_EDIT`, `DATA_FACTORY_VIEW`, `DATA_FACTORY_EDIT` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER` | AI builders do not get these BI edit permissions by default. |
+| BI read-only extras | `BUSINESS_AREA_VIEW`, `INDICATOR_VIEW`, `INDICATOR_MARTKET_VIEW` | `SUPER_ADMIN`, `ADMIN`, `TRIAL`, `ANALYTICS_BUILDER`, `VIEWER` | Viewer can view these BI areas but cannot edit them by default. |
+
+## Default Roles
+
+| roleName | Default access scope |
+| --- | --- |
+| `SUPER_ADMIN` | Full platform, AI, and BI administration permissions, including super-admin-only abilities and dangerous delete abilities. |
+| `ADMIN` | Most platform, AI, and BI administration permissions, excluding super-admin-only abilities and dangerous delete abilities. |
+| `TRIAL` | Full AI permissions, BI builder permissions for models/stories/indicators, and most platform administration permissions. Some operations are still restricted separately. |
+| `AI_BUILDER` | AI building capabilities. On the platform side, can view/edit integrations and view organization users/invites. On the BI side, mainly model and story viewing. |
+| `ANALYTICS_BUILDER` | BI building capabilities. On the AI side, can enter chat and build Xperts, but cannot edit Copilot or knowledge bases. |
+| `VIEWER` | Read-oriented role. Can enter chat, view part of BI content, and mainly use profile and organization switching on the platform side. |

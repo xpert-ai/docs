@@ -69,6 +69,19 @@
         {
           "slug": "tutorial",
           "groups": []
+        },
+        {
+          "slug": "permissions",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "control-sources-and-defaults",
+                "feature-permission-role-matrix",
+                "switch-function-mapping"
+              ]
+            }
+          ]
         }
       ]
     },

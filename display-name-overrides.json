@@ -19,7 +19,11 @@
     "website-features": "Website Features",
     "widget": "Widget",
     "harness": "Harness",
-    "overview": "Overview"
+    "overview": "Overview",
+    "permissions": "Permissions",
+    "control-sources-and-defaults": "Control Sources And Defaults",
+    "feature-permission-role-matrix": "Feature Permission Matrix",
+    "switch-function-mapping": "Switch Function Mapping"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -65,6 +69,10 @@
     "trigger": "触发器",
     "built-in": "内置",
     "harness": "Harness",
-    "overview": "概述"
+    "overview": "概述",
+    "permissions": "权限矩阵",
+    "control-sources-and-defaults": "控制来源与默认值",
+    "feature-permission-role-matrix": "功能权限矩阵",
+    "switch-function-mapping": "开关对应功能列表"
   }
 }
