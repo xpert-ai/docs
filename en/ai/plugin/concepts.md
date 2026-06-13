@@ -169,10 +169,29 @@ export class IntegrationStrategyRegistry
 
 ---
 
+### 2.9 Plugin Resources and Initialization Targets
+
+Besides code extension points, a plugin can also declare resources that the host can initialize after the plugin bundle is loaded. The host reads the current bundle definitions live and exposes a plugin-side initialization entry.
+
+Resources are split by target:
+
+* **Workspace**: initialize into a workspace for `Skills`, `MCP`, and `Apps`
+* **Xpert**: initialize into an existing Xpert for `Hooks`
+
+During initialization, the host maps resource definitions to real runtime objects and tracks installation state, runtime identifiers, definition versions, and whether an update is available. This means:
+
+* Already initialized resources are recognized as installed and do not reappear in the selectable list
+* When the plugin bundle changes, the host can surface stale definitions as updateable resources
+* Resource state refreshes with the host instead of relying on a stale static cache
+
+`assets/` are presentation metadata only. They are not installable resources.
+
+---
+
 📌 Summary:
 
 * `XpertPlugin` defines plugin **metadata, configuration, and lifecycle**
 * `XpertServerPlugin` registers plugins as **NestJS modules**
 * **Enhancement points (Strategy)** are the core for plugins to extend host system functionality
 * All plugins form extensible and maintainable modules via **lifecycle + strategy interfaces + config schema**
-
+* Plugin resources can be initialized into **Workspace** or **Xpert** targets with tracked installation state

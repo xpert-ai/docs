@@ -43,3 +43,21 @@ When the host starts, it will automatically parse the `PLUGINS` environment vari
 * If a plugin fails to load correctly, check the logs for `register` or `onPluginBootstrap` output.
 * After starting the Xpert AI system, you can view the loaded plugins on the system settings [Plugins page](https://app.xpertai.cn/settings/plugins).
 
+## Initialize Plugin Resources
+
+Loading a plugin into the host is only the first step. The host can also initialize the resources declared inside the plugin bundle into the target runtime.
+
+On the Plugins page, the installed plugin card exposes a resource initialization action. Opening it launches a dialog that reads the current bundle definitions live, rather than relying on a stale cached list.
+
+Resources are split into two targets:
+
+* **Workspace**: initialize into a workspace for `Skills`, `MCP`, and `Apps`
+* **Xpert**: initialize into an existing Xpert for `Hooks`
+
+The dialog groups resources by type and shows their current state:
+
+* Already initialized resources are marked as installed and cannot be selected again
+* If the plugin bundle changes, the dialog can surface stale definitions as updateable resources
+* `assets/` are bundle metadata and presentation assets, not installable resources
+
+After initialization, the host binds the resource to the actual runtime object and updates the corresponding middleware, toolset, or connector state in the workspace or Xpert.
