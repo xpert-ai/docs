@@ -219,6 +219,70 @@ Implementation notes:
 * For long-running tasks (crawling, bulk imports), use a job queue (Bull, Queue) and return a task id instead of blocking HTTP requests.
 * Use `@I18nLang()` or other i18n tools in services/controllers for multi-language messages.
 
+### 7.1 Webhook controllers and scoped credentials
+
+If a plugin exposes a webhook endpoint for an external system, protect it with the SDK-provided `PluginWebhookAuthGuard` instead of asking users to place a full platform API key in the webhook URL.
+
+The host manages a per-Integration webhook credential through `IntegrationPermissionService`:
+
+* `ensureWebhookCredential(id, { provider })` creates or returns the active credential and returns the plain token once.
+* `rotateWebhookCredential(id, { provider })` creates a replacement token.
+* `revokeWebhookCredential(id, { provider })` disables the token.
+* The Integration stores only `options.webhookCredential.tokenHash` plus metadata, never the plain token.
+
+Build callback URLs with an opaque query secret:
+
+```text
+https://api.example.com/api/my-provider/webhook/<integration-id>?secret=<webhook-secret>
+```
+
+Route pattern:
+
+```ts
+import { Body, Controller, Param, Post, Request, UseGuards } from '@nestjs/common'
+import { PluginWebhookAuth, PluginWebhookAuthGuard, runWithRequestContext } from '@xpert-ai/plugin-sdk'
+
+@Controller('my-provider')
+export class MyWebhookController {
+  // Use the host public-route decorator when normal platform auth is global.
+  @Public()
+  @PluginWebhookAuth({
+    provider: 'my-provider',
+    integrationParam: 'integrationId',
+    secretQueryParam: 'secret'
+  })
+  @UseGuards(PluginWebhookAuthGuard)
+  @Post('webhook/:integrationId')
+  async webhook(
+    @Param('integrationId') integrationId: string,
+    @Request() req: { user?: unknown; headers?: Record<string, string> },
+    @Body() body: unknown
+  ) {
+    await new Promise<void>((resolve, reject) => {
+      runWithRequestContext({ user: req.user, headers: req.headers ?? {} }, {}, () => {
+        this.handleWebhook(integrationId, body).then(resolve).catch(reject)
+      })
+    })
+    return 'success'
+  }
+}
+```
+
+Register the guard in the plugin module:
+
+```ts
+@XpertServerPlugin({
+  providers: [
+    MyWebhookService,
+    PluginWebhookAuthGuard
+  ],
+  controllers: [MyWebhookController]
+})
+export class MyProviderPlugin {}
+```
+
+Use the normal host public-route decorator when the webhook must bypass the global login guard. Do not add `PluginWebhookAuthGuard` as a global bootstrap guard; attach it only to webhook routes with `@UseGuards()`. Always set `provider` in `@PluginWebhookAuth()` so a credential issued for one Integration provider cannot be replayed against another provider route.
+
 ---
 
 ## 8. Config schema and UI metadata (zod + JSON Schema)

@@ -33,7 +33,8 @@ title: 🧩插件开发
 3. **实现 Integration Strategy**：定义外部服务集成方式
 4. **实现 Document Source Strategy**：定义数据源接入方式
 5. **提供服务与控制器**：暴露 REST API / 服务方法
-6. **编写测试用例**
+6. **保护 Webhook 路由**：使用 `PluginWebhookAuthGuard` 和 per-Integration webhook credential
+7. **编写测试用例**
 
 ### [5. 插件示例：飞书文档集成](./lark)
 
@@ -52,6 +53,7 @@ title: 🧩插件开发
 
 * 插件解耦与重用
 * 插件配置与安全（密钥、API Key 管理）
+* Webhook URL 只放 scoped opaque secret，不放完整平台 API Key
 * 错误处理与异常隔离
 * 日志与可观测性
 

@@ -220,6 +220,70 @@ Strategy 是插件扩展系统能力的核心。常见的类型有：
 * 对于长任务（爬取、批量导入），建议使用作业队列（Bull、Queue）处理并返回任务 id，而不是阻塞 HTTP 请求。
 * 使用 `@I18nLang()` 或其他国际化工具在 Service/Controller 中处理多语言提示。
 
+### 7.1 Webhook Controller 与 scoped credential
+
+如果插件需要暴露给外部系统调用的 webhook endpoint，应使用 SDK 提供的 `PluginWebhookAuthGuard`，不要让用户把完整平台 API Key 放进 webhook URL。
+
+宿主通过 `IntegrationPermissionService` 管理每个 Integration 独立的 webhook credential：
+
+* `ensureWebhookCredential(id, { provider })` 创建或返回当前有效 credential，并只在这次调用中返回明文 token。
+* `rotateWebhookCredential(id, { provider })` 轮换 token。
+* `revokeWebhookCredential(id, { provider })` 吊销 token。
+* Integration 只保存 `options.webhookCredential.tokenHash` 和元数据，不保存明文 token。
+
+callback URL 中只放 opaque query secret：
+
+```text
+https://api.example.com/api/my-provider/webhook/<integration-id>?secret=<webhook-secret>
+```
+
+路由写法：
+
+```ts
+import { Body, Controller, Param, Post, Request, UseGuards } from '@nestjs/common'
+import { PluginWebhookAuth, PluginWebhookAuthGuard, runWithRequestContext } from '@xpert-ai/plugin-sdk'
+
+@Controller('my-provider')
+export class MyWebhookController {
+  // 当宿主启用了全局平台鉴权时，这里使用宿主的 public-route decorator。
+  @Public()
+  @PluginWebhookAuth({
+    provider: 'my-provider',
+    integrationParam: 'integrationId',
+    secretQueryParam: 'secret'
+  })
+  @UseGuards(PluginWebhookAuthGuard)
+  @Post('webhook/:integrationId')
+  async webhook(
+    @Param('integrationId') integrationId: string,
+    @Request() req: { user?: unknown; headers?: Record<string, string> },
+    @Body() body: unknown
+  ) {
+    await new Promise<void>((resolve, reject) => {
+      runWithRequestContext({ user: req.user, headers: req.headers ?? {} }, {}, () => {
+        this.handleWebhook(integrationId, body).then(resolve).catch(reject)
+      })
+    })
+    return 'success'
+  }
+}
+```
+
+在插件模块中注册 guard：
+
+```ts
+@XpertServerPlugin({
+  providers: [
+    MyWebhookService,
+    PluginWebhookAuthGuard
+  ],
+  controllers: [MyWebhookController]
+})
+export class MyProviderPlugin {}
+```
+
+当 webhook route 需要跳过全局登录鉴权时，使用宿主已有的 public-route decorator。不要把 `PluginWebhookAuthGuard` 加成全局 bootstrap guard，应只通过 `@UseGuards()` 挂到 webhook route 上。`@PluginWebhookAuth()` 中应始终声明 `provider`，避免一个 Integration provider 的 credential 被重放到另一个 provider route。
+
 ---
 
 ## 8. 配置 Schema 与 UI 元数据（zod + JSON Schema）
