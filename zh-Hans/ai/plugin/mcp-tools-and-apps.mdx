@@ -1,0 +1,439 @@
+---
+sidebar_position: 5
+title: MCP Tools 和 MCP Apps
+---
+
+插件可以把 MCP server 作为可安装资源交付。这是为 Xpert 增加标准 MCP tools 的推荐方式，也是交付可在 ChatKit 中内联渲染的 MCP Apps 的推荐方式。
+
+本文只讲插件侧如何打包和实现。ChatKit 宿主运行时、iframe bridge、消息渲染和安全模型请参考 [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)。
+
+如果你想从一个完整业务案例入手，可以继续阅读 [开发一个销售经营分析 MCP App 插件](../tutorial/echarts-mcp-app)。该教程以销售经营分析为例，展示如何把 model-visible tool、app-only tool、`ui://` resource 和 Vanilla TypeScript App 组合成一个可交互插件。
+
+## 适用场景
+
+当你需要以下能力时，使用 plugin-managed MCP server：
+
+- 通过 MCP 协议暴露工具，而不是实现 Xpert 原生 `ToolsetStrategy`
+- 让工具实现尽量保持 MCP host 可移植性
+- 在工具结果中返回可交互的 MCP App
+- 提供 iframe 可调用、但模型不可见的 app-only 工具
+- 把 MCP server 的安装、启用、停用和版本管理纳入插件生命周期
+
+如果要开发长期存在的 Workbench 页面或集成配置页面，应使用 [Remote Component 插件](./remote-component) 或其他 View Extension 能力。不要让 Agent middleware 承担 MCP App resource host 的职责；middleware 可以触发工作流，但 MCP Apps 应通过 MCP resource 和 MCP Apps Host 交付。
+
+## 包结构
+
+一个最小的 plugin-managed MCP App 包通常是：
+
+```text
+tools/my-mcp-app/
+├── .xpertai-plugin/
+│   └── plugin.json
+├── package.json
+├── src/
+│   ├── index.ts
+│   ├── mcp-server.ts
+│   └── lib/
+│       ├── mcp-tools.ts
+│       ├── app-html.ts
+│       └── data.ts
+└── tsconfig.lib.json
+```
+
+如果插件只贡献 plugin-managed MCP server，`src/index.ts` 可以很轻量，但仍应导出标准插件元数据，便于宿主展示、安装和初始化资源。
+
+```ts
+import { z } from 'zod';
+import type { XpertPlugin } from '@xpert-ai/plugin-sdk';
+import { MyMcpAppPluginModule } from './lib/plugin.js';
+
+const plugin: XpertPlugin = {
+  meta: {
+    name: '@acme/plugin-sales-mcp-app',
+    version: '0.1.0',
+    category: 'tools',
+    targetApps: ['xpert'],
+    displayName: 'Sales MCP App',
+    description: 'Interactive sales analysis tools delivered through MCP Apps.',
+  },
+  config: {
+    schema: z.object({}),
+  },
+  register() {
+    return { module: MyMcpAppPluginModule, global: true };
+  },
+};
+
+export default plugin;
+```
+
+## package.json
+
+MCP server 入口必须被构建到 `dist`，并包含在发布包中。
+
+```json
+{
+  "name": "@acme/plugin-sales-mcp-app",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "acme-sales-mcp-app": "./dist/mcp-server.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./mcp-server": {
+      "types": "./dist/mcp-server.d.ts",
+      "import": "./dist/mcp-server.js"
+    }
+  },
+  "files": [
+    "dist",
+    ".xpertai-plugin",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "^1.7.4",
+    "@modelcontextprotocol/sdk": "^1.29.0"
+  },
+  "peerDependencies": {
+    "@xpert-ai/plugin-sdk": "^3.9.1",
+    "zod": "^3.25.0"
+  }
+}
+```
+
+`@xpert-ai/plugin-sdk` 放在 `peerDependencies`，由宿主提供 SDK 实例。stdio server 直接 import `@modelcontextprotocol/sdk` 时，应把它放在 `dependencies`。MCP Apps 插件推荐同时依赖 `@modelcontextprotocol/ext-apps`，使用官方 `registerAppTool`、`registerAppResource` 和 `RESOURCE_MIME_TYPE` helper。`ext-apps` 是 ESM 包，建议插件 server 使用 `"type": "module"` 并运行在 Node.js 20 或更高版本。
+
+## 插件 Manifest
+
+在 `.xpertai-plugin/plugin.json` 中声明 MCP server：
+
+```json
+{
+  "name": "@acme/plugin-sales-mcp-app",
+  "version": "0.1.0",
+  "targetApps": ["xpert"],
+  "targetAppMeta": {
+    "xpert": {
+      "types": ["mcp-server", "tool"],
+      "capabilities": ["mcp-apps", "sales-analysis"]
+    }
+  },
+  "mcpServers": {
+    "sales-drilldown": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${PLUGIN_ROOT}/dist/mcp-server.js"],
+      "policy": {
+        "enabled": true,
+        "defaultToolsApprovalMode": "approve",
+        "enabledTools": [
+          "sales_overview",
+          "sales_drilldown"
+        ],
+        "tools": {
+          "sales_overview": {
+            "approvalMode": "approve"
+          },
+          "sales_drilldown": {
+            "approvalMode": "approve"
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+使用 `${PLUGIN_ROOT}`，不要把安装后的绝对 runtime 路径写入 manifest。Xpert 会把占位符保存在生成的 Toolset schema 中，并在运行时解析到当前加载的插件目录。这样插件重装或重新加载后，不会因为旧的 `@runtime__...` 路径失效。
+
+如果 server 需要插件自己的可写数据目录，可以使用 `${PLUGIN_DATA}`。
+
+## MCP Server 入口
+
+stdio 入口负责创建 MCP server、注册 resources/tools，并连接 `StdioServerTransport`。
+
+```ts
+#!/usr/bin/env node
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { pathToFileURL } from 'node:url';
+import { registerSalesMcpApp } from './lib/mcp-tools.js';
+
+export function createSalesMcpServer() {
+  const server = new McpServer({
+    name: 'acme-sales-mcp-app',
+    version: '0.1.0',
+  });
+
+  registerSalesMcpApp(server);
+  return server;
+}
+
+export async function main() {
+  const server = createSalesMcpServer();
+  await server.connect(new StdioServerTransport());
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    const message = error instanceof Error ? error.stack || error.message : String(error);
+    process.stderr.write(`${message}\n`);
+    process.exit(1);
+  });
+}
+```
+
+stdio MCP server 不要把普通日志写入 `stdout`，因为 stdout 是 MCP 协议通道。诊断日志应写入 `stderr`。
+
+## 注册 MCP App Resource
+
+MCP App resource 必须使用 `ui://` URI，并返回 `text/html;profile=mcp-app`。
+
+```ts
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { ReadResourceResult } from '@modelcontextprotocol/sdk/types.js';
+import {
+  RESOURCE_MIME_TYPE,
+  registerAppResource,
+} from '@modelcontextprotocol/ext-apps/server';
+import { getDashboardHtml } from './app-html.js';
+
+const SALES_APP_URI = 'ui://sales-dashboard';
+const SALES_APP_CSP = {
+  resourceDomains: ['https://cdn.jsdelivr.net'],
+  connectDomains: [],
+  frameDomains: [],
+  baseUriDomains: [],
+};
+
+function buildDashboardResource(): ReadResourceResult {
+  return {
+    contents: [
+      {
+        uri: SALES_APP_URI,
+        mimeType: RESOURCE_MIME_TYPE,
+        text: getDashboardHtml(),
+        _meta: {
+          ui: {
+            csp: SALES_APP_CSP,
+            prefersBorder: true,
+          },
+        },
+      },
+    ],
+  };
+}
+
+export function registerSalesMcpApp(server: McpServer) {
+  registerAppResource(
+    server,
+    'sales-dashboard',
+    SALES_APP_URI,
+    {
+      title: 'Sales Dashboard',
+      description: 'Interactive sales dashboard rendered in ChatKit.',
+      _meta: {
+        ui: {
+          csp: SALES_APP_CSP,
+          prefersBorder: true,
+        },
+      },
+    },
+    () => buildDashboardResource(),
+  );
+}
+```
+
+资源安全与呈现 metadata 应放在 resource 的 `_meta.ui` 上。`resources/read` 返回的 content item metadata 优先；`registerAppResource` 配置中的 `_meta.ui` 会出现在 `resources/list` 中，可作为 host fallback。不要把 CSP 或权限放在 tool `_meta.ui` 中，旧 host 兼容除外。
+
+小型 demo 可以用 TypeScript 函数返回 HTML 字符串。生产应用更推荐把 App 按普通前端工程维护，并在构建阶段产出静态 HTML 或 JS asset；MCP resource handler 再从 `dist` 读取构建产物。这样比手写和维护大段模板字符串更可靠。
+
+推荐的集中开发方式是把 MCP App 前端源码放在插件包内的 `src/app`：
+
+```text
+src/app/
+├── index.html
+├── main.ts
+└── styles.css
+scripts/
+└── build-app.mjs
+dist/
+└── app/
+    └── index.html
+```
+
+其中 `index.html` 只维护页面外壳，`main.ts` 维护标准 MCP Apps bridge 和交互逻辑，`styles.css` 维护样式。构建时使用 Vite 或 esbuild 把它们打成一个可由 MCP resource 返回的 `dist/app/index.html`。`src/lib/app-html.ts` 这类 server 侧 helper 应只负责读取构建产物，不再手写大段 HTML 字符串。
+
+esbuild 方式的最小构建脚本可以读取 `src/app/index.html`，打包 `src/app/main.ts`，内联 `src/app/styles.css`，并输出 `dist/app/index.html`。将该脚本接入插件构建，例如：
+
+```json
+{
+  "scripts": {
+    "build:app": "node scripts/build-app.mjs"
+  }
+}
+```
+
+如果使用 Nx，确保 `nx build <plugin>` 会在编译 server 代码前后执行 App 构建，并确认发布包的 `files` 包含 `dist`、`.xpertai-plugin` 和必要的构建脚本或源码目录。
+
+## 注册 Tools
+
+模型可见工具通过返回 `_meta.ui.resourceUri` 打开 MCP App。工具结果也可以包含 `structuredContent` 作为 App 初始状态，并返回文本作为不支持 UI 的客户端降级内容。
+
+```ts
+import { registerAppTool } from '@modelcontextprotocol/ext-apps/server';
+
+const overviewMeta = {
+  ui: {
+    resourceUri: SALES_APP_URI,
+    visibility: ['model', 'app'],
+  },
+  'openai/outputTemplate': SALES_APP_URI,
+};
+
+registerAppTool(
+  server,
+  'sales_overview',
+  {
+    title: 'Sales Overview',
+    description: 'Show an interactive sales dashboard with drilldown analysis.',
+    inputSchema: {
+      metric: z.enum(['revenue', 'margin', 'orders']).default('revenue'),
+      groupBy: z.enum(['region', 'product', 'month']).default('region'),
+      year: z.number().int().default(2026),
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    _meta: overviewMeta,
+  },
+  (args) => ({
+    content: [{ type: 'text', text: 'Revenue by region for 2026.' }],
+    structuredContent: {
+      chart: {
+        labels: ['West', 'East', 'South', 'North'],
+        values: [7600000, 6500000, 5600000, 4800000],
+      },
+    },
+    _meta: overviewMeta,
+  }),
+);
+```
+
+`registerAppTool` 会规范化 `_meta.ui.resourceUri`，并保留兼容用的 resource URI metadata。`_meta['openai/outputTemplate']` 可作为 ChatGPT 兼容 alias，但 Xpert + ChatKit 不实现 ChatGPT 专属 `window.openai` API。
+
+app-only 工具可以通过 MCP Apps bridge 调用，但不会暴露给 LLM。
+
+```ts
+registerAppTool(
+  server,
+  'sales_drilldown',
+  {
+    title: 'Sales Drilldown',
+    description: 'App-only tool used by the dashboard after a chart click.',
+    inputSchema: {
+      metric: z.enum(['revenue', 'margin', 'orders']).default('revenue'),
+      groupBy: z.enum(['region', 'product', 'month']).default('product'),
+      year: z.number().int().default(2026),
+      filters: z.object({
+        region: z.string().optional(),
+        product: z.string().optional(),
+        month: z.string().optional(),
+      }).default({}),
+    },
+    _meta: {
+      ui: {
+        visibility: ['app'],
+      },
+    },
+  },
+  (args) => ({
+    content: [{ type: 'text', text: 'Drilldown data loaded.' }],
+    structuredContent: {
+      chart: {
+        labels: ['Hardware', 'Software', 'Services'],
+        values: [4100000, 2600000, 900000],
+      },
+      filters: args.filters,
+    },
+  }),
+);
+```
+
+Xpert 会同时校验两侧可见性：
+
+- 没有 `model` visibility 的工具不会暴露给 LLM
+- iframe 调用目标必须具备 `app` visibility，并且在 Toolset policy 中已启用
+
+## App HTML
+
+App 运行在 sandbox iframe 中，通过 MCP Apps JSON-RPC bridge 与 ChatKit 通信。插件文档只保留编写和打包要点；完整宿主协议请看 [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)。
+
+HTML App 至少应该：
+
+- 通过 `ui/initialize` 初始化
+- 处理 `ui/notifications/tool-input`，读取原始工具输入
+- 处理 `ui/notifications/tool-result`，读取原始工具结果
+- 通过 `tools/call` 调用 app-visible 工具
+- 通过 `ui/notifications/size-changed` 通知高度变化
+- 避免直接调用 Xpert 后端 API
+
+bridge 消息结构和 host 行为请参考 [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)。新的 App 应读取标准 `CallToolResult` 形状的 `ui/notifications/tool-result.params.content` 和 `params.structuredContent`；如果需要兼容旧版本，可以临时 fallback 到 `params.result`。当 App 超过小型 demo 的复杂度后，建议像普通前端项目一样维护源码，并把 MCP resource 作为构建产物的交付机制。
+
+如果 App 加载 CDN 资源，需要在 resource `_meta.ui.csp.resourceDomains` 中声明域名。如果 App 需要浏览器侧网络请求，需要在 resource `_meta.ui.csp.connectDomains` 中声明目标域；更推荐通过 `resources/read` 或 `tools/call` 走宿主代理访问。
+
+## 构建和安装
+
+构建插件，并确认发布包中包含 `dist/mcp-server.js` 和 `.xpertai-plugin/plugin.json`。
+
+```bash
+pnpm nx build @acme/plugin-sales-mcp-app
+```
+
+在 Xpert 中安装或重新加载插件，然后初始化插件资源，让 Xpert 创建 plugin-managed MCP Toolset。把该 Toolset 挂到 agent 上，再在 ChatKit 中请求交互式结果。
+
+本地开发时要注意：源码包重新构建后，Xpert 插件运行目录中的已安装副本不一定会自动更新。修改后需要重新安装或重新加载插件，确保运行副本拿到最新的 `dist` 文件和 manifest。
+
+## 测试清单
+
+发布前建议覆盖：
+
+- stdio server 能启动，并且普通日志不写入 stdout
+- App 构建产物 `dist/app/index.html` 已生成，并包含 MCP Apps bridge 脚本
+- `tools/list` 返回模型可见工具，并排除 app-only 工具
+- 模型可见工具结果包含 `_meta.ui.resourceUri`
+- MCP App resource 返回 `text/html;profile=mcp-app`
+- MCP App resource metadata 包含需要的 `_meta.ui.csp`、`_meta.ui.permissions`、`prefersBorder`
+- `structuredContent` 结构符合 iframe 预期
+- app-only 工具包含 `_meta.ui.visibility = ['app']`
+- Toolset policy 启用了 App 需要的所有工具
+- iframe 能初始化、接收原始工具输入和工具结果、调用 app-only 工具并调整高度
+- 外部脚本和连接域名已写入 resource CSP metadata
+- 插件重装后不会持久化旧的 `@runtime__...` 绝对路径
+
+## 故障排查
+
+| 现象 | 可能原因 | 修复方式 |
+| --- | --- | --- |
+| `Cannot find module ... @runtime__...` | 持久化的 MCP schema 中记录了旧安装运行目录 | 在 `plugin.json` 中使用 `${PLUGIN_ROOT}`，重新构建插件，并重新安装或初始化旧插件资源。 |
+| MCP server 立即退出 | 缺少构建后的 `dist/mcp-server.js`、ESM/CJS 配置错误，或 server setup 阶段异常 | 本地执行 `node dist/mcp-server.js` 并查看 stderr；确认 `package.json` 中的 `type`、`exports`、`files`。 |
+| app-only 工具仍出现在模型工具列表 | 缺少 `_meta.ui.visibility = ['app']`，或宿主没有保留 `_meta` | 为工具设置 visibility，并检查生成的 Toolset metadata。 |
+| App 能加载但 `tools/call` 失败 | 目标工具不是 app-visible，或被 Toolset policy 禁用 | 添加 `app` visibility，并在 `mcpServers.*.policy.enabledTools` 中启用该工具。 |
+| CDN 脚本被阻止 | Resource CSP metadata 没有包含 CDN 域名 | 把域名加入 resource `_meta.ui.csp.resourceDomains`。 |
+
+## 相关文档
+
+- [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)
+- [MCP 工具](../toolset/mcp-tools/mcp-tools)
+- [Remote Component 插件](./remote-component)
+- [插件的开发步骤](./development-steps)
+- [发布与使用](./publish-and-use)

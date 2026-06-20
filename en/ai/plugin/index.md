@@ -9,7 +9,7 @@ title: 🧩 Plugin Development
 * Why plugin architecture: flexible extension, modular decoupling, ecosystem building
 * Applicable scenarios for plugin development
 
-### [2. Core Concepts of the Plugin System](./concepts/)
+### [2. Core Concepts of the Plugin System](./concepts)
 
 * **XpertPlugin**: Entry definition of a plugin
 * **Enhancement Points**: Mounting points for plugins to extend system functionality
@@ -26,7 +26,7 @@ title: 🧩 Plugin Development
 * Typical directory structure (`plugin.ts`, `*.strategy.ts`, `*.controller.ts`, `*.service.ts`)
 * Dependency relationship between plugin and host system
 
-### [4. Plugin Development Steps](./develop/)
+### [4. Plugin Development Steps](./develop)
 
 1. **Initialize the plugin**: Define plugin metadata (`meta`) and configuration (`config`)
 2. **Register plugin modules**: Use the `@XpertServerPlugin` decorator
@@ -35,33 +35,39 @@ title: 🧩 Plugin Development
 5. **Provide services and controllers**: Expose REST API / service methods
 6. **Write test cases**
 
-### [5. Plugin Example: Lark Docs Integration](./lark)
+### [5. MCP Tools and MCP Apps](./mcp-tools-and-apps)
 
-* Introduction to the Lark Docs plugin
+* Ship plugin-managed MCP servers through `.xpertai-plugin/plugin.json`
+* Expose model-visible MCP tools and app-only tools
+* Return `ui://` MCP App resources for ChatKit inline rendering
+
+### [6. Plugin Example: Feishu Docs Integration](./feishu-document-example/index)
+
+* Introduction to the Feishu Docs plugin
 * Configuration example
 * Code breakdown (meta, IntegrationStrategy, DocumentSourceStrategy, Controller)
 * Complete workflow for loading document data
 
-### 6. Plugin Lifecycle and Events
+### 7. Plugin Lifecycle and Events
 
 * Plugin registration → startup → destruction
 * Logging and debugging methods
 * How to manage plugin state
 
-### 7. Best Practices for Development
+### 8. Best Practices for Development
 
 * Plugin decoupling and reuse
 * Plugin configuration and security (key, API Key management)
 * Error handling and exception isolation
 * Logging and observability
 
-### [8. Publishing and Usage](./install/)
+### [9. Publishing and Usage](./install)
 
 * Plugin packaging and version management
 * Plugin installation and activation
 * Plugin update and uninstallation
 
-### 9. Frequently Asked Questions (FAQ)
+### 10. Frequently Asked Questions (FAQ)
 
 * How to manage dependencies between plugins and host services?
 * How to register database entities in plugins?

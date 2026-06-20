@@ -44,4 +44,5 @@ The plugin system is widely applicable to the following scenarios:
 * **System integration**: Integrating with third-party systems such as Firecrawl, OpenAI, Slack, Feishu, etc.
 * **Data source extension**: Introducing new data sources for BI, search, knowledge base, and other features
 * **Toolset extension**: Providing new tool capabilities for agents or Copilot
+* **MCP Tools and MCP Apps**: Exposing standard MCP tools through a [plugin-managed MCP server](./mcp-tools-and-apps) and rendering interactive tool results in ChatKit
 * **Industry-specific customization**: Developing independent plugins for business expansion in industries such as energy, finance, retail, etc.

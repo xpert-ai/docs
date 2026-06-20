@@ -359,6 +359,7 @@
                       "en/ai/plugin/overview",
                       "en/ai/plugin/concepts",
                       "en/ai/plugin/develop",
+                      "en/ai/plugin/mcp-tools-and-apps",
                       "en/ai/plugin/remote-component",
                       "en/ai/plugin/install",
                       "en/ai/plugin/permissions",
@@ -399,7 +400,8 @@
                       "en/ai/chatkit/chatkit-pet",
                       "en/ai/chatkit/chatkit-plan-mode",
                       "en/ai/chatkit/chatkit-runtime-capabilities",
-                      "en/ai/chatkit/chatkit-prompt-workflows"
+                      "en/ai/chatkit/chatkit-prompt-workflows",
+                      "en/ai/chatkit/chatkit-mcp-apps"
                     ]
                   },
                   {
@@ -425,16 +427,32 @@
                 "tab": "Tutorial",
                 "groups": [
                   {
-                    "group": "Default",
+                    "group": "Agentic Apps",
                     "pages": [
-                      "en/ai/tutorial/workflow-and-agent",
-                      "en/ai/tutorial/develop-custom-agentic-app",
-                      "en/ai/tutorial/wechat-work-integration",
-                      "en/ai/tutorial/integrate-with-mcp-dify",
-                      "en/ai/tutorial/agentic-bi-end-to-end-analysis",
-                      "en/ai/tutorial/build-agentic-chatbi-from-scratch",
-                      "en/ai/tutorial/project-group-single-vs-multi-agent",
+                      "en/ai/tutorial/echarts-mcp-app",
                       "en/ai/tutorial/chatkit-browser-extension",
+                      "en/ai/tutorial/develop-custom-agentic-app"
+                    ]
+                  },
+                  {
+                    "group": "Agentic BI",
+                    "pages": [
+                      "en/ai/tutorial/agentic-bi-end-to-end-analysis",
+                      "en/ai/tutorial/build-agentic-chatbi-from-scratch"
+                    ]
+                  },
+                  {
+                    "group": "Integrations",
+                    "pages": [
+                      "en/ai/tutorial/integrate-with-mcp-dify",
+                      "en/ai/tutorial/wechat-work-integration"
+                    ]
+                  },
+                  {
+                    "group": "Start Here",
+                    "pages": [
+                      "en/ai/tutorial/project-group-single-vs-multi-agent",
+                      "en/ai/tutorial/workflow-and-agent",
                       "en/ai/tutorial/tutorial"
                     ]
                   }
@@ -1170,6 +1188,7 @@
                       "zh-Hans/ai/plugin/overview",
                       "zh-Hans/ai/plugin/core-concepts",
                       "zh-Hans/ai/plugin/development-steps",
+                      "zh-Hans/ai/plugin/mcp-tools-and-apps",
                       "zh-Hans/ai/plugin/remote-component",
                       "zh-Hans/ai/plugin/publish-and-use",
                       "zh-Hans/ai/plugin/permission-design-guide",
@@ -1218,7 +1237,8 @@
                       "zh-Hans/ai/chatkit/chatkit-pet",
                       "zh-Hans/ai/chatkit/chatkit-plan-mode",
                       "zh-Hans/ai/chatkit/chatkit-runtime-capabilities",
-                      "zh-Hans/ai/chatkit/chatkit-prompt-workflows"
+                      "zh-Hans/ai/chatkit/chatkit-prompt-workflows",
+                      "zh-Hans/ai/chatkit/chatkit-mcp-apps"
                     ]
                   },
                   {
@@ -1244,16 +1264,32 @@
                 "tab": "教程",
                 "groups": [
                   {
-                    "group": "默认",
+                    "group": "智能体应用",
                     "pages": [
-                      "zh-Hans/ai/tutorial/workflow-and-agent",
-                      "zh-Hans/ai/tutorial/develop-custom-agentic-app",
-                      "zh-Hans/ai/tutorial/wechat-work-integration",
-                      "zh-Hans/ai/tutorial/integrate-with-mcp-dify",
-                      "zh-Hans/ai/tutorial/build-agentic-chatbi-from-scratch",
-                      "zh-Hans/ai/tutorial/project-group-single-vs-multi-agent",
-                      "zh-Hans/ai/tutorial/agentic-bi-end-to-end-analysis",
+                      "zh-Hans/ai/tutorial/echarts-mcp-app",
                       "zh-Hans/ai/tutorial/chatkit-browser-extension",
+                      "zh-Hans/ai/tutorial/develop-custom-agentic-app"
+                    ]
+                  },
+                  {
+                    "group": "Agentic BI",
+                    "pages": [
+                      "zh-Hans/ai/tutorial/agentic-bi-end-to-end-analysis",
+                      "zh-Hans/ai/tutorial/build-agentic-chatbi-from-scratch"
+                    ]
+                  },
+                  {
+                    "group": "集成",
+                    "pages": [
+                      "zh-Hans/ai/tutorial/integrate-with-mcp-dify",
+                      "zh-Hans/ai/tutorial/wechat-work-integration"
+                    ]
+                  },
+                  {
+                    "group": "入门",
+                    "pages": [
+                      "zh-Hans/ai/tutorial/project-group-single-vs-multi-agent",
+                      "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/tutorial"
                     ]
                   }

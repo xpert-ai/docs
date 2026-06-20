@@ -104,3 +104,4 @@ export function MyChat() {
 - [计划模式](./chatkit-plan-mode)
 - [技能和插件](./chatkit-runtime-capabilities)
 - [Prompt Workflows](./chatkit-prompt-workflows)
+- [MCP Apps](./chatkit-mcp-apps)

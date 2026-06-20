@@ -128,3 +128,4 @@ See these resources to customize ChatKit and extend the chat experience:
 - [Plan Mode](./chatkit-plan-mode)
 - [Skills and Plugins](./chatkit-runtime-capabilities)
 - [Prompt Workflows](./chatkit-prompt-workflows)
+- [MCP Apps](./chatkit-mcp-apps)
