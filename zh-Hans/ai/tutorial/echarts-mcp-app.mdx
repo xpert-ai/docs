@@ -79,7 +79,7 @@ sequenceDiagram
     Host-->>App: drilldown result
 ```
 
-关键点是：ChatKit 不把任意 HTML 存进历史消息。历史中只保存 `resourceUri`、`toolName`、`toolsetId`、`serverName` 等安全元数据；刷新页面时，后端可以重新读取 `ui://` resource 并恢复 App instance。
+关键点是：ChatKit 不把任意 HTML 存进历史消息。历史中只保存 `resourceUri`、`toolName`、`toolsetId`、`serverName` 等安全元数据，以及受大小限制的初始工具结果快照；刷新页面时，后端会优先使用仍然有效的 live app instance，过期后再重新读取 `ui://` resource 并恢复 App instance。
 
 ## 真实业务建模
 
@@ -102,7 +102,7 @@ sequenceDiagram
 `@xpert-ai/plugin-echarts-mcp-app` 的核心结构如下：
 
 ```text
-tools/echarts-mcp-app/
+examples/echarts-mcp-app/
 ├── .xpertai-plugin/
 │   └── plugin.json
 ├── package.json
@@ -209,6 +209,8 @@ function buildStructuredContent(analysis: SalesAnalysis) {
 
 生产系统建议为 `structuredContent` 制定版本字段，例如 `kind: 'sales-performance-analysis.v1'`，并在 App 中兼容一个版本窗口。这样后端分析结构演进时，不会轻易打破历史消息中的 App。
 
+同时要控制初始结果大小。ChatKit 会优先从 live app instance 读取完整 `toolResult`，但聊天历史只内联小型结果快照；超过宿主阈值的大结果只记录大小和截断标记。销售经营分析类 App 应把初始 `structuredContent` 控制为首屏聚合、摘要和必要筛选条件，明细、长列表和更多层级通过 app-only 工具分页或按需下钻加载。
+
 ## 注册 MCP App Resource
 
 MCP App 的 HTML 通过 MCP resource 返回。安全相关配置应放在 resource metadata，而不是 tool metadata：
@@ -301,8 +303,8 @@ request('tools/call', {
 开发时先构建 App asset，再构建插件 server：
 
 ```bash
-pnpm -C tools/echarts-mcp-app run build:app
-pnpm -C tools/echarts-mcp-app exec tsc --build tsconfig.lib.json
+pnpm -C examples/echarts-mcp-app run build:app
+pnpm -C examples/echarts-mcp-app exec tsc --build tsconfig.lib.json
 ```
 
 如果通过 workspace Nx 构建，确保 `nx build @xpert-ai/plugin-echarts-mcp-app` 同时执行 server 编译和 App 构建。

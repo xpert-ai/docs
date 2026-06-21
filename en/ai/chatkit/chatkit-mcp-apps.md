@@ -49,7 +49,23 @@ sequenceDiagram
     ChatKit-->>MCP: tools/call / resources/read via host RPC
 ```
 
-The chat history stores only safe metadata such as `appInstanceId`, `resourceUri`, `toolName`, `toolsetId`, and `serverName`. The raw HTML is not stored in the conversation. On page refresh, the backend can reconnect to the toolset and rebuild an expired app instance from the stored metadata.
+The chat history stores only safe metadata such as `appInstanceId`, `resourceUri`, `toolName`, `toolsetId`, and `serverName`, plus size-limited snapshots of the initial tool input/result. The raw HTML is not stored in the conversation. On page refresh, the backend can reconnect to the toolset and rebuild an expired app instance from the stored metadata.
+
+## History Replay And Initial Tool Results
+
+An MCP App usually needs the triggering tool call's `tool-input` and `tool-result` during initialization. Xpert + ChatKit resolves that data in this order:
+
+1. **Use the live app instance first**: while the in-memory app instance is still valid, the resource response returns the complete initial `toolResult` kept on the live instance.
+2. **Revive when the live instance is gone**: after a history refresh, a closed Agent Toolset, or a backend restart, the MCP Apps Host reconnects to the Toolset, reads the `ui://` resource again, and creates a fresh app instance.
+3. **Fall back to small snapshots in chat history**: if the message contains a size-limited initial `toolResult`, ChatKit replays it through `ui/notifications/tool-result`; if no replayable result is available, ChatKit sends only `ui/notifications/tool-input` and does not invent an empty result.
+
+To keep chat messages from becoming large data blobs, Xpert does not inline every tool result into message content. By default, only standardized `CallToolResult` payloads whose serialized size is at most `128KB` are persisted inline. Oversized results store only `toolResultSize` and `toolResultTruncated: true`. The backend threshold can be configured with:
+
+```bash
+XPERT_MCP_APP_HISTORY_TOOL_RESULT_MAX_BYTES=131072
+```
+
+This keeps live runs fully interactive while preventing history messages from ballooning. Small results can be replayed directly from history; large results should provide a graceful fallback such as a summary, a rerun prompt, or app-visible tools that page or reload data on demand. If a product needs full replay of large historical results, store them in a dedicated artifact store rather than expanding message content.
 
 ## Runtime Metadata Contract
 
@@ -74,6 +90,8 @@ For plugin-side metadata and tool registration examples, see [MCP Tools and MCP 
 
 The app resource must return HTML with the MCP App profile MIME type `text/html;profile=mcp-app`. Registering the resource is the MCP server's responsibility; validating and sandboxing it is the host's responsibility.
 
+The resource can also declare display metadata in `_meta.ui`: `title`, `description`, and `icon`. `title` and `description` may be strings or Xpert-style `I18nObject` values. `icon` uses the shared `IconDefinition` shape. ChatKit stores only this safe descriptor in the message history, localizes the text with the current ChatKit language, and renders the icon/title/description in the MCP App message header.
+
 Security defaults are intentionally strict:
 
 - the initial App HTML must come from a `ui://` resource
@@ -83,6 +101,77 @@ Security defaults are intentionally strict:
 - iframe `resources/read` calls are limited to the same MCP server and reject browser/script schemes such as `http://`, `https://`, `javascript://`, `data://`, and `blob://`
 - resource `domain` does not create a dedicated origin in v1; it is treated as unsupported host metadata
 - iframe tool calls always go through the Xpert backend and its tenant, organization, workspace, toolset, and tool-enabled checks
+
+## Theme Variables
+
+Before ChatKit writes an MCP App HTML document into the iframe, it injects host theme variables into the app `<head>`. Variables use the generic `--mcp-app-*` prefix so other MCP Apps hosts can reuse the same contract:
+
+```html
+<style id="mcp-app-host-theme">
+  :root {
+    color-scheme: light;
+    --mcp-app-color-background: hsl(0 0% 100%);
+    --mcp-app-color-foreground: hsl(222.2 84% 4.9%);
+    --mcp-app-color-primary: hsl(221.2 83.2% 53.3%);
+  }
+</style>
+```
+
+MCP Apps should use the public `--mcp-app-*` variables instead of depending on ChatKit internal classes or private tokens. The current host provides:
+
+| Variable | Purpose |
+| --- | --- |
+| `--mcp-app-color-background` / `--mcp-app-color-foreground` | page background and body text |
+| `--mcp-app-color-card` / `--mcp-app-color-card-foreground` | cards, panels, chart containers |
+| `--mcp-app-color-popover` / `--mcp-app-color-popover-foreground` | popovers and menus |
+| `--mcp-app-color-primary` / `--mcp-app-color-primary-foreground` | primary actions, key metrics, chart primary color |
+| `--mcp-app-color-secondary` / `--mcp-app-color-secondary-foreground` | secondary actions |
+| `--mcp-app-color-muted` / `--mcp-app-color-muted-foreground` | muted backgrounds and supporting text |
+| `--mcp-app-color-accent` / `--mcp-app-color-accent-foreground` | hover, selected, and accent states |
+| `--mcp-app-color-destructive` / `--mcp-app-color-destructive-foreground` | destructive actions and error states |
+| `--mcp-app-color-border`, `--mcp-app-color-input`, `--mcp-app-color-ring` | borders, inputs, focus rings |
+| `--mcp-app-color-chart-1` through `--mcp-app-color-chart-5` | chart color hints from the host |
+| `--mcp-app-radius` | base border radius |
+| `--mcp-app-font-sans`, `--mcp-app-font-mono` | sans and monospace fonts |
+| `--mcp-app-color-scheme` | `light` or `dark` |
+
+Recommended app styling:
+
+```css
+body {
+  margin: 0;
+  font-family: var(--mcp-app-font-sans, system-ui, sans-serif);
+  color: var(--mcp-app-color-foreground, #0f172a);
+  background: var(--mcp-app-color-background, #fff);
+}
+
+.panel {
+  background: var(--mcp-app-color-card, #fff);
+  color: var(--mcp-app-color-card-foreground, #0f172a);
+  border: 1px solid var(--mcp-app-color-border, #e2e8f0);
+  border-radius: var(--mcp-app-radius, 8px);
+}
+
+.primary {
+  background: var(--mcp-app-color-primary, #2563eb);
+  color: var(--mcp-app-color-primary-foreground, #fff);
+}
+```
+
+If a charting library needs colors in JavaScript, read the injected CSS variables:
+
+```js
+const styles = getComputedStyle(document.documentElement);
+const primaryColor = styles
+  .getPropertyValue('--mcp-app-color-primary')
+  .trim();
+```
+
+Note: `--mcp-app-color-chart-*` values are host-provided chart color hints, not a guarantee that they fit every business chart. If the host theme uses neutral or muted chart tokens, the MCP App can define its own semantic data palette such as `--sales-chart-revenue`, `--sales-chart-margin`, or `--risk-chart-high`, while still using `--mcp-app-*` for background, text, borders, fonts, and radius.
+
+`ui/initialize` still returns `hostContext.theme` as the `light` / `dark` string. The same variable map is also returned as `hostContext.themeCssVariables` so apps can initialize chart themes or canvas colors.
+
+ChatKit also passes the current UI language through `hostContext.locale`, `hostContext.language`, and `hostContext.direction`. Before the iframe document runs, ChatKit sets the app HTML `lang` and `dir` attributes to the same values. MCP Apps should use these fields to localize labels, number/date formatting, chart titles, and validation messages inside the app resource.
 
 ## Bridge Methods
 
@@ -130,8 +219,22 @@ ChatKit responds with the standard `McpUiInitializeResult` shape:
     hostContext: {
       displayMode: 'inline',
       availableDisplayModes: ['inline'],
+      theme: 'light',
+      themeCssVariables: {
+        '--mcp-app-color-background': 'hsl(0 0% 100%)',
+        '--mcp-app-color-foreground': 'hsl(222.2 84% 4.9%)',
+      },
+      locale: 'zh-Hans',
+      language: 'zh',
+      direction: 'ltr',
       toolInfo: {
-        tool: { name: 'sales_overview' },
+        tool: {
+          name: 'sales_overview',
+          inputSchema: {
+            type: 'object',
+            properties: {},
+          },
+        },
       },
     },
   },
@@ -257,9 +360,12 @@ In production, enable MCP Apps explicitly:
 
 ```bash
 XPERT_MCP_APPS_ENABLED=true
+XPERT_MCP_APP_TOKEN_SECRET=<long-random-secret>
 ```
 
-For local development, non-production environments enable MCP Apps by default. For plugin build, install, and runtime-copy checks, see [MCP Tools and MCP Apps](../plugin/mcp-tools-and-apps).
+ChatKit stores only safe MCP App component metadata in chat history. The backend also issues an `appInstanceToken` for each app instance and ChatKit includes it on resource and RPC requests. In production, revive, `tools/call`, and `resources/read` requests are rejected if the signed token is missing, expired, or does not match the tenant, workspace, Toolset, server, tool, and resource URI.
+
+For local development, non-production environments enable MCP Apps by default and tolerate legacy messages without `appInstanceToken`. For plugin build, install, controlled stdio runtime, and runtime-copy checks, see [MCP Tools and MCP Apps](../plugin/mcp-tools-and-apps).
 
 ## Troubleshooting
 

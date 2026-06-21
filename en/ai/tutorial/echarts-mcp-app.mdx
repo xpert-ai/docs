@@ -79,7 +79,7 @@ sequenceDiagram
     Host-->>App: drilldown result
 ```
 
-The key point is that ChatKit does not persist arbitrary HTML in conversation history. It stores safe metadata such as `resourceUri`, `toolName`, `toolsetId`, and `serverName`. When the page refreshes, the backend can read the `ui://` resource again and revive the App instance.
+The key point is that ChatKit does not persist arbitrary HTML in conversation history. It stores safe metadata such as `resourceUri`, `toolName`, `toolsetId`, and `serverName`, plus a size-limited initial tool result snapshot. When the page refreshes, the backend uses a still-live app instance first; if it has expired, it reads the `ui://` resource again and revives the App instance.
 
 ## Real Business Modeling
 
@@ -102,7 +102,7 @@ In production, the mock dataset can be replaced with CRM, ERP, warehouse, metric
 `@xpert-ai/plugin-echarts-mcp-app` uses this structure:
 
 ```text
-tools/echarts-mcp-app/
+examples/echarts-mcp-app/
 ├── .xpertai-plugin/
 │   └── plugin.json
 ├── package.json
@@ -209,6 +209,8 @@ function buildStructuredContent(analysis: SalesAnalysis) {
 
 For production apps, add a versioned kind such as `sales-performance-analysis.v1` and keep the App compatible with at least one previous version. That prevents old conversation messages from breaking when backend analysis evolves.
 
+Also keep initial result size under control. ChatKit reads the complete `toolResult` from a live app instance first, but chat history only inlines small result snapshots; oversized results store only size and truncation metadata. For sales performance analysis, keep initial `structuredContent` to first-screen aggregates, summaries, and required filters. Load long details, large lists, and deeper levels through app-only tools with pagination or drilldown calls.
+
 ## Register the MCP App Resource
 
 The App HTML is returned by an MCP resource. Security and rendering metadata belongs on the resource, not the tool:
@@ -301,8 +303,8 @@ After chart redraws, error-state changes, or responsive layout changes, send `ui
 Build the App asset first, then compile the plugin server:
 
 ```bash
-pnpm -C tools/echarts-mcp-app run build:app
-pnpm -C tools/echarts-mcp-app exec tsc --build tsconfig.lib.json
+pnpm -C examples/echarts-mcp-app run build:app
+pnpm -C examples/echarts-mcp-app exec tsc --build tsconfig.lib.json
 ```
 
 If you build through Nx, ensure `nx build @xpert-ai/plugin-echarts-mcp-app` runs both the server build and the App build.

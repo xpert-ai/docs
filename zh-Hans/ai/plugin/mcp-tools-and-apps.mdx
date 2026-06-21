@@ -23,7 +23,7 @@ title: MCP Tools 和 MCP Apps
 
 ## 包结构
 
-一个最小的 plugin-managed MCP App 包通常是：
+一个最小的 plugin-managed MCP App 包通常是。面向正式发布的工具插件通常放在 `tools/`；教程和参考实现放在 `examples/`。
 
 ```text
 tools/my-mcp-app/
@@ -154,6 +154,76 @@ MCP server 入口必须被构建到 `dist`，并包含在发布包中。
 
 如果 server 需要插件自己的可写数据目录，可以使用 `${PLUGIN_DATA}`。
 
+## Runtime 与企业级安全
+
+plugin-managed MCP stdio server 不会在插件安装时启动。它会在 Xpert 初始化 MCP Toolset 以发现工具时启动，通常发生在 agent graph 编译或调用阶段。v1 仍保持 `on-toolset-init` 时机；`on-first-tool-call` 需要缓存工具元数据，后续再优化。
+
+在企业部署中，stdio MCP server 会经过 Xpert 受控 stdio runtime：
+
+1. Xpert 为当前插件 runtime 副本解析 `${PLUGIN_ROOT}` 和 `${PLUGIN_DATA}`。
+2. Xpert 校验 tenant、organization、workspace、Toolset、serverName 以及是否为 plugin-managed。
+3. Xpert 把 MCP server command 改写为平台 runner，而不是把原始命令直接交给 MCP adapter。
+4. runner 使用 `shell: false` 启动真实子进程，并限制 env、cwd、stderr 采集、启动超时、空闲超时、最大生命周期和进程组清理。
+5. `MCPToolset.close()` 以及 graph 正常完成、异常、abort 清理都会关闭登记的 runtime。
+
+生产环境默认 fail-closed。只有平台策略配置完成后才启用 stdio runtime：
+
+```bash
+XPERT_MCP_STDIO_RUNTIME_ENABLED=true
+XPERT_MCP_STDIO_ALLOWED_COMMANDS=node
+XPERT_MCP_STDIO_MAX_CONCURRENT_PER_TENANT=10
+XPERT_MCP_STDIO_STARTUP_TIMEOUT_MS=15000
+XPERT_MCP_STDIO_IDLE_TIMEOUT_MS=1800000
+XPERT_MCP_STDIO_MAX_LIFETIME_MS=7200000
+```
+
+plugin-managed stdio server 应通过 Node.js 启动 `${PLUGIN_ROOT}` 内的入口文件。Xpert 会拒绝旧的绝对 `@runtime__...` 路径、路径穿越和 symlink 逃逸。插件代码目录只作为只读来源，可写状态应放到 `${PLUGIN_DATA}`。生产环境中的 custom stdio 命令必须命中管理员配置的 command allowlist。
+
+生产环境默认禁用 `initScripts`。如果管理员显式启用，也必须走同一套 runtime 和策略限制。
+
+插件可以在 `policy.runtime` 中请求 runtime 限制，但最终以平台策略为准并被 clamp：
+
+```json
+{
+  "policy": {
+    "runtime": {
+      "provider": "local-process",
+      "startupTimeoutMs": 15000,
+      "idleTimeoutMs": 1800000,
+      "maxLifetimeMs": 7200000,
+      "allowedCommands": ["node"]
+    }
+  }
+}
+```
+
+### Runtime 运维与审计
+
+Super Admin 可以通过 MCP Runtime 运维页或 `/api/xpert-toolset/operations/mcp-runtimes` 查看 runtime 记录并停止仍在运行的实例。该接口默认只返回当前租户和当前组织范围内的数据。
+
+runtime 管理分为两层：
+
+- 内存中的 runtime manager 只表示当前进程内仍可控制的 live runtime。
+- `mcp_runtime_instance` 审计表保存 runtime 生命周期与关联关系，默认按最近 180 天查询。
+
+审计记录包含 tenant、organization、workspace、Toolset、plugin、server、execution、conversation、app instance、resource installation、status、PID、启动时间、关闭时间、关闭原因、空闲过期时间、最长生命周期时间和截断后的 stderr 摘要。记录只保存脱敏后的 command label/hash 和 policy snapshot，不保存 env、token、runner spec 或原始 HTML。
+
+运维页支持按 workspace、Toolset、plugin、execution、app instance、status 和时间范围查询。筛选项来自审计记录和当前 live runtime 的合并结果；workspace 选项和表格范围列会优先显示工作区名称，无法解析名称时回退到短 ID。Toolset 选项优先显示 Toolset 名称。
+
+状态语义：
+
+- `live` 表示该 runtime 仍在当前 API 进程的 runtime manager 中，且可以被平台停止。
+- `running` / `starting` 只表示记录状态；历史记录如果不是 live，不能再被 stop。
+- runtime manager 在列表查询时会校验 runner PID 是否仍存在；如果进程已经退出，会把记录收敛为关闭/失败状态并移出 live 列表。
+- `origin` 用于区分 runtime 来源：`Agent toolset` 表示 Agent 初始化 Toolset 时启动，`MCP App Host` 表示 MCP App revive 或 iframe host 为资源/RPC 重新创建 client 时启动。
+
+运维页的 Actions 列提供两类操作：
+
+- 每行的 **停止**：只停止该行对应的 live runtime。
+- 表头的 **停止当前筛选**：停止当前筛选条件下所有 live 且处于 `starting/running` 的 runtime；历史记录只读，不会被停止。
+
+所有停止操作仍通过受控 runtime manager 执行，关闭原因会写入审计记录，例如 `admin-stop`、`admin-kill`、`idle-timeout`、`max-lifetime-timeout`、`transport-close` 或 `runner-process-exited`。
+
 ## MCP Server 入口
 
 stdio 入口负责创建 MCP server、注册 resources/tools，并连接 `StdioServerTransport`。
@@ -211,6 +281,21 @@ const SALES_APP_CSP = {
   frameDomains: [],
   baseUriDomains: [],
 };
+const SALES_APP_DISPLAY = {
+  title: {
+    en_US: 'Sales Performance',
+    zh_Hans: '销售经营分析',
+  },
+  description: {
+    en_US: 'Interactive sales dashboard with drilldown analysis.',
+    zh_Hans: '支持下钻分析的交互式销售看板。',
+  },
+  icon: {
+    type: 'svg',
+    value: '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M4 19h16v2H4z"/></svg>',
+    alt: 'Sales dashboard',
+  },
+};
 
 function buildDashboardResource(): ReadResourceResult {
   return {
@@ -221,6 +306,7 @@ function buildDashboardResource(): ReadResourceResult {
         text: getDashboardHtml(),
         _meta: {
           ui: {
+            ...SALES_APP_DISPLAY,
             csp: SALES_APP_CSP,
             prefersBorder: true,
           },
@@ -240,6 +326,7 @@ export function registerSalesMcpApp(server: McpServer) {
       description: 'Interactive sales dashboard rendered in ChatKit.',
       _meta: {
         ui: {
+          ...SALES_APP_DISPLAY,
           csp: SALES_APP_CSP,
           prefersBorder: true,
         },
@@ -250,7 +337,9 @@ export function registerSalesMcpApp(server: McpServer) {
 }
 ```
 
-资源安全与呈现 metadata 应放在 resource 的 `_meta.ui` 上。`resources/read` 返回的 content item metadata 优先；`registerAppResource` 配置中的 `_meta.ui` 会出现在 `resources/list` 中，可作为 host fallback。不要把 CSP 或权限放在 tool `_meta.ui` 中，旧 host 兼容除外。
+resource 展示 metadata，例如 `title`、`description` 和 `icon`，应放在 resource 的 `_meta.ui` 上。`title` 和 `description` 可以是普通字符串，也可以是 Xpert 风格的 `I18nObject`；`icon` 使用共享的 `IconDefinition` 结构（`svg`、`image`、`font`、`emoji` 或 `lottie`）。ChatKit 会根据当前 host 语言解析 `title` 和 `description`，并在 MCP App 消息头部渲染 icon。
+
+资源安全与呈现 metadata 应放在 resource 的 `_meta.ui` 上。`resources/read` 返回的 content item metadata 优先；`registerAppResource` 配置中的 `_meta.ui` 会出现在 `resources/list` 中，可作为 host fallback。不要把 CSP 或权限放在 tool `_meta.ui` 中，旧 host 兼容除外。tool `_meta.ui` 可以少量镜像展示 metadata 作为短生命周期兜底，但 resource 仍然是权威来源。
 
 小型 demo 可以用 TypeScript 函数返回 HTML 字符串。生产应用更推荐把 App 按普通前端工程维护，并在构建阶段产出静态 HTML 或 JS asset；MCP resource handler 再从 `dist` 读取构建产物。这样比手写和维护大段模板字符串更可靠。
 
@@ -387,7 +476,31 @@ HTML App 至少应该：
 - 通过 `ui/notifications/size-changed` 通知高度变化
 - 避免直接调用 Xpert 后端 API
 
-bridge 消息结构和 host 行为请参考 [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)。新的 App 应读取标准 `CallToolResult` 形状的 `ui/notifications/tool-result.params.content` 和 `params.structuredContent`；如果需要兼容旧版本，可以临时 fallback 到 `params.result`。当 App 超过小型 demo 的复杂度后，建议像普通前端项目一样维护源码，并把 MCP resource 作为构建产物的交付机制。
+bridge 消息结构、历史回放和初始工具结果的大小限制请参考 [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)。新的 App 应读取标准 `CallToolResult` 形状的 `ui/notifications/tool-result.params.content` 和 `params.structuredContent`；如果需要兼容旧版本，可以临时 fallback 到 `params.result`。App 也应能处理没有初始 `tool-result` 的情况：旧历史消息或超过宿主内联阈值的大结果可能只收到 `tool-input`，此时应展示摘要、提示重新运行，或通过 app-visible 工具按需重新加载/分页读取数据。当 App 超过小型 demo 的复杂度后，建议像普通前端项目一样维护源码，并把 MCP resource 作为构建产物的交付机制。
+
+### 国际化
+
+插件 App 应根据 `ui/initialize` 返回值在 iframe 内部完成 UI 本地化。ChatKit 会提供 `hostContext.locale`、`hostContext.language` 和 `hostContext.direction`，并在 App 运行前设置 HTML 文档的 `lang` / `dir` 属性。MCP 工具结果尽量保持结构化和语言中立，再由 `src/app/main.ts` 或前端框架负责格式化标签、摘要、数字、日期、图表标题和校验消息。
+
+### 主题和样式
+
+ChatKit 会在 MCP App iframe 内注入公共 CSS 变量，完整变量表和示例见 [ChatKit MCP Apps 的主题变量](../chatkit/chatkit-mcp-apps#主题变量)。插件 App 应使用通用 `--mcp-app-*` 变量来定义背景、文字、边框、按钮、圆角和字体，不要依赖 ChatKit 内部 class 或私有 token；其他 MCP Apps host 也可以复用这一契约。业务图表的数据系列色可以由 App 自己定义语义色板，避免把宿主的弱化 UI 色或灰阶 token 直接用于柱、线、点。
+
+```css
+body {
+  font-family: var(--mcp-app-font-sans, system-ui, sans-serif);
+  color: var(--mcp-app-color-foreground, #0f172a);
+  background: var(--mcp-app-color-background, #fff);
+}
+
+.chart-panel {
+  background: var(--mcp-app-color-card, #fff);
+  border: 1px solid var(--mcp-app-color-border, #e2e8f0);
+  border-radius: var(--mcp-app-radius, 8px);
+}
+```
+
+如果使用 ECharts、Mapbox、Monaco 等需要 JavaScript 主题对象的库，可以在 App 初始化后通过 `getComputedStyle(document.documentElement)` 读取这些变量，或从 `ui/initialize` 返回的 `hostContext.themeCssVariables` 读取同一份值。
 
 如果 App 加载 CDN 资源，需要在 resource `_meta.ui.csp.resourceDomains` 中声明域名。如果 App 需要浏览器侧网络请求，需要在 resource `_meta.ui.csp.connectDomains` 中声明目标域；更推荐通过 `resources/read` 或 `tools/call` 走宿主代理访问。
 
