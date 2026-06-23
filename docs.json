@@ -211,7 +211,8 @@
                       "en/ai/knowledge-base/api",
                       "en/ai/knowledge-base/connect-external-knowledge-base",
                       "en/ai/knowledge-base/recall-test",
-                      "en/ai/knowledge-base/ways-to-use-knowledge-base"
+                      "en/ai/knowledge-base/ways-to-use-knowledge-base",
+                      "en/ai/knowledge-base/knowledge-workbench"
                     ]
                   },
                   {
@@ -1041,7 +1042,8 @@
                       "zh-Hans/ai/knowledge-base/api",
                       "zh-Hans/ai/knowledge-base/connect-external-knowledge-base",
                       "zh-Hans/ai/knowledge-base/recall-test",
-                      "zh-Hans/ai/knowledge-base/ways-to-use-knowledge-base"
+                      "zh-Hans/ai/knowledge-base/ways-to-use-knowledge-base",
+                      "zh-Hans/ai/knowledge-base/knowledge-workbench"
                     ]
                   },
                   {

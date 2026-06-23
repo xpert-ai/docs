@@ -1,0 +1,132 @@
+---
+title: Knowledgebase Workbench
+sidebar_position: 8
+---
+
+Knowledgebase Workbench is an interactive knowledge workspace for Xpert Assistant. It brings knowledgebase navigation, document preview, document upload, targeted document Q&A, citation tracing, source opening, and knowledge graph exploration into the Agent Workbench.
+
+It is designed for knowledge Q&A scenarios where users need to see the source, choose the right documents, and verify the answer path, such as operation manuals, policy documents, project materials, sales enablement content, and internal training assistants.
+
+<Info>
+Knowledgebase Workbench does not replace the knowledgebase node. The agent still needs connected knowledgebase nodes to define which knowledgebases it can access. Workbench adds browsing, preview, document selection, structured citations, and source navigation on top of that authorized scope.
+</Info>
+
+## What It Does
+
+Traditional knowledge retrieval is usually controlled by the agent. Users may not know which file was searched, and it can be hard to trace an answer back to the original document. Knowledgebase Workbench focuses on the interactive and traceable layer:
+
+- **Browse knowledgebase directories**: View the knowledgebases, folders, and documents connected to the current assistant.
+- **Preview document content**: Open a document to inspect its original file information, processing status, and parsed chunks. Markdown preview is shown by default, with raw text available when needed.
+- **Ask questions about selected documents**: When users select documents, Workbench writes the selection into the assistant context. The agent can then retrieve primarily from those documents during ChatKit conversations.
+- **Trace answer sources**: Retrieval results include `documentId`, `chunkId`, document name, score, snippet, and file URL when available. Workbench can highlight the matching chunk and open the source file.
+- **Upload and process documents**: Upload files to the current knowledgebase and trigger processing directly from Workbench.
+- **Explore the knowledge graph**: If the knowledgebase supports graph indexing, Workbench displays an entity-relation graph for exploration.
+
+## Requirements
+
+Before using Knowledgebase Workbench, make sure that:
+
+1. The assistant is connected to at least one knowledgebase node.
+2. The Knowledgebase Workbench middleware capability is enabled for the assistant.
+3. Documents have been parsed and embedded before they are used for stable retrieval.
+4. The knowledgebase has graph indexing enabled if you want to use the graph view.
+
+After it is enabled, Workbench shows the knowledgebases connected to the current assistant. If multiple knowledgebases are connected, users can switch between them from the top selector.
+
+## Interface Overview
+
+| Area | Purpose |
+| --- | --- |
+| Knowledgebase selector | Switch between connected knowledgebases and view document/chunk counts. |
+| Knowledgebase header | Shows the logo, name, current path, and management entry. The settings button opens the knowledgebase document management page. |
+| Document list | Shows folders and documents, with search, sorting, folder creation, and upload actions. |
+| Document preview | Shows parsed chunks with Markdown and raw text modes. |
+| Graph view | Shows entities, relations, focused nodes, and related mentions for graph-enabled knowledgebases. |
+| ChatKit conversation | Users ask questions directly in ChatKit; the agent retrieves based on the active knowledgebase and selected document context. |
+
+## Typical Workflow
+
+### 1. Browse Knowledgebase Content
+
+Open the assistant Workbench and switch to the Knowledgebase view. The system lists the knowledgebases connected to the current assistant and selects one by default.
+
+You can enter folders, return to the root path, search documents, and sort the list.
+
+### 2. Preview a Document
+
+Click a document to open the preview panel. The panel shows the document name, type, source file action, and parsed chunks.
+
+Markdown preview is used by default for content parsed from PDF, Word, Markdown, and other files. Raw text mode can help when checking parser output.
+
+### 3. Select Documents and Ask
+
+Select one or more documents from the list or preview panel. Workbench writes the selected document context to the assistant. Then ask directly in ChatKit, for example:
+
+```text
+Based on the selected operation manual, summarize the pre-start inspection steps.
+```
+
+The Workbench retrieval tool will prefer the selected document scope, reducing irrelevant recall from other documents.
+
+### 4. Open the Answer Source
+
+When the agent answers with the Workbench retrieval tool, the retrieval result carries structured citation data. Workbench can use this data to:
+
+- Switch to the corresponding knowledgebase;
+- Open the referenced document preview;
+- Highlight the cited chunk;
+- Open the original file when a source URL is available.
+
+This allows users to verify the evidence behind an answer quickly.
+
+### 5. Upload New Documents
+
+Use the upload button to add files to the current knowledgebase. Workbench uploads the files and triggers document processing. Once processing is complete, the new documents can be previewed, selected, and used in Q&A.
+
+If a document is still processing, retrieval may be incomplete. Wait for parsing and embedding to finish before using it for production answers.
+
+### 6. Explore the Knowledge Graph
+
+For graph-enabled knowledgebases, Workbench provides a Graph view. You can:
+
+- Inspect entity and relation counts;
+- Search entities or filter by entity type;
+- Focus a node and view its related edges;
+- Review neighboring entities and mention snippets in the side panel.
+
+The graph view is useful for exploring topic structure, conceptual relationships, and important objects across documents.
+
+## Relationship with Knowledgebase Nodes
+
+Knowledgebase Workbench and knowledgebase nodes serve different purposes:
+
+| Capability | Purpose |
+| --- | --- |
+| Knowledgebase node | Defines which knowledgebases the agent can access and provides standard retrieval capability. |
+| Knowledgebase Workbench | Adds browsing, preview, upload, document selection, citation tracing, and graph interaction within the authorized knowledgebase scope. |
+
+The recommended setup is:
+
+1. Connect the required knowledgebase nodes to the assistant.
+2. Enable the Knowledgebase Workbench middleware.
+3. Browse, select, upload, and trace documents in Workbench.
+4. Ask questions naturally in ChatKit and let the agent retrieve according to the current context.
+
+If only knowledgebase nodes are connected, the agent can still perform standard knowledge retrieval, but users will not get the Workbench view or source interaction. If only Workbench is enabled without connected knowledgebase nodes, there is no authorized knowledgebase scope for effective retrieval.
+
+## Common Use Cases
+
+- **Operation manual assistant**: Select a specific manual before asking procedural questions.
+- **Policy and regulation Q&A**: Navigate policy files and return from answers to exact source clauses.
+- **Project material retrieval**: Locate proposals, contracts, and meeting notes in project folders for targeted Q&A.
+- **Knowledgebase quality checks**: Inspect parsed chunks and verify source recall quality.
+- **Graph exploration**: Discover entity relationships and conceptual links across knowledgebase documents.
+
+## Best Practices
+
+- Select documents first when the question requires precise, file-scoped answers.
+- Leave documents unselected for broader cross-document synthesis within the active knowledgebase.
+- Check highlighted chunks when an answer contains important facts.
+- Wait for document processing to complete after uploading new files.
+- If graph relationships look incomplete, verify that graph indexing has completed for the knowledgebase.
+
