@@ -362,6 +362,7 @@
                       "en/ai/plugin/develop",
                       "en/ai/plugin/mcp-tools-and-apps",
                       "en/ai/plugin/remote-component",
+                      "en/ai/plugin/managed-connections",
                       "en/ai/plugin/install",
                       "en/ai/plugin/permissions",
                       "en/ai/plugin/schema"
@@ -1192,6 +1193,7 @@
                       "zh-Hans/ai/plugin/development-steps",
                       "zh-Hans/ai/plugin/mcp-tools-and-apps",
                       "zh-Hans/ai/plugin/remote-component",
+                      "zh-Hans/ai/plugin/managed-connections",
                       "zh-Hans/ai/plugin/publish-and-use",
                       "zh-Hans/ai/plugin/permission-design-guide",
                       "zh-Hans/ai/plugin/schema-ui-extension",

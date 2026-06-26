@@ -1,0 +1,138 @@
+---
+sidebar_position: 6
+title: 托管连接
+---
+
+托管连接（Managed Connections）用于帮助插件开发者和管理员在生产环境中管理长生命周期连接。
+
+有些插件不是简单调用外部 API 后立即返回，而是需要长期保持一个 client、sidecar、worker 或 tunnel 在线。例如企业消息桥接、Lark/飞书出站长连接、SSE 流、TCP tunnel 和 worker bridge。在多 Pod 部署中，连接实际由某个 API Pod 持有，但管理员界面或普通请求可能落到另一个 Pod。
+
+托管连接让这些连接在集群内全局可见、可诊断、可管理。
+
+每条托管连接还会记录方向：
+
+- **Inbound / 接入型**：平台接受外部 client 连接，例如 sidecar tunnel 或浏览器 worker bridge。
+- **Outbound / 外连型**：平台主动连接并持有外部服务连接，例如 Lark/飞书长连接。
+- **Internal / 内部型**：平台内部 worker、bridge 或 stream。
+
+## 能提供什么
+
+对管理员：
+
+- 查看插件当前在线或最近断开的全局连接列表
+- 基于心跳和租约判断连接状态
+- 查看 owner 实例、远端地址、最近心跳、最近错误
+- 查看连接方向，例如接入型 tunnel 或外连型服务连接
+- 查看插件业务 metadata，例如账号绑定关系
+- 执行断开连接等管理动作
+
+对插件开发者：
+
+- 使用平台共享注册表，而不是每个插件各自建连接表
+- 使用 owner Pod 命令路由，处理断开连接、发送请求等动作
+- 形成一致的多 Pod 生产部署模式
+- 在不扩展平台强 schema 的前提下保存运维 metadata
+
+## 什么时候使用
+
+当插件持有一个绑定到某个 API 实例的长生命周期资源时，适合使用托管连接：
+
+- WebSocket 或 Socket.IO 客户端
+- 主动连接消息平台的出站 WebSocket
+- 反向隧道 sidecar
+- SSE 流
+- TCP tunnel 客户端
+- 后台桥接 worker
+- 自定义长连接传输客户端
+
+不适合用于普通短 HTTP API 调用、不保持连接的定时任务，或应该由插件自有数据模型保存的业务记录。
+
+## 工作方式
+
+托管连接由两类平台服务组成：
+
+- **Postgres 注册表**：保存连接身份、owner 实例、状态、租约、时间戳、租户/组织范围和 metadata。
+- **Redis 命令路由**：把管理命令发送给真正持有 live connection 的 API Pod。
+
+典型生命周期：
+
+1. 插件接受一个长连接 client。
+2. 插件把连接注册到平台。
+3. client 在线期间，插件持续刷新心跳和 metadata。
+4. 管理界面从共享注册表读取全部可见连接。
+5. 管理动作被路由到 owner Pod。
+6. 如果连接停止心跳，租约过期后记录变为 stale。
+
+## 飞书长连接示例
+
+`@xpert-ai/plugin-lark` 使用托管连接管理主动连到 Lark/飞书 OpenAPI 的出站长连接。当某个 integration 使用 `long_connection` 模式时，插件会打开一个出站 WebSocket，并把 live session 注册为托管连接：
+
+```text
+pluginName: @xpert-ai/plugin-lark
+connectionType: lark_long_connection
+connectionKey: <lark-app-key>
+transportType: websocket
+direction: outbound
+```
+
+会话在线期间，`LarkLongConnectionService` 持续刷新 heartbeat 和 metadata，例如租户/组织范围、integration 数量、最近连接时间、最近心跳时间和最近错误。
+
+在飞书 integration 视图中：
+
+- 状态页展示连接方式、状态、connection key、方向、传输类型、owner 实例、心跳、最近连接时间和错误
+- 连接页列出当前全局长连接记录
+- 重连和断开动作会路由到持有 live WebSocket 的 Pod
+
+因此，即使浏览器请求落到另一个 API Pod，管理员仍然可以管理由其他 Pod 持有的飞书长连接 WebSocket。
+
+## 状态含义
+
+- **已连接**：连接在线，且租约未过期。
+- **已过期 / Stale**：连接停止心跳，owner Pod 可能崩溃或网络不可达。
+- **已断开**：插件或管理员主动关闭连接。
+- **错误**：插件报告了该连接的运维错误。
+
+在线状态以租约为准，不只看当前 Pod 内存中是否有 client。
+
+## Metadata
+
+托管连接的 metadata 由插件定义，应保持小而偏运维。
+
+适合放入 metadata 的字段：
+
+- client 名称
+- 外部实例 ID
+- 与插件业务对象的绑定关系
+- 最近同步时间
+- 最近心跳时间
+- 最近错误摘要
+
+大体量业务数据仍应保存在插件自己的业务表中。
+
+## 开发者说明
+
+插件通过 `@xpert-ai/plugin-sdk` 的 token 使用此能力：
+
+- `MANAGED_CONNECTION_REGISTRY_TOKEN`
+- `CONNECTION_COMMAND_ROUTER_TOKEN`
+
+数据库和 Redis 细节由平台负责。插件只需要适配自己的协议，并同步有用的运维 metadata。
+
+推荐连接身份：
+
+```text
+pluginName + connectionType + connectionKey
+```
+
+例如：
+
+```text
+@xpert-ai/plugin-lark + lark_long_connection + <lark-app-key>
+```
+
+## 当前限制
+
+- 第一版面向同一 API 集群和共享数据库。
+- Redis Pub/Sub 用于低延迟命令，不作为持久命令存储。
+- owner Pod 消失后，记录会在租约 TTL 之后变为 stale。
+- 跨区域或跨集群连接管理应作为更高层的平台路由能力扩展。
