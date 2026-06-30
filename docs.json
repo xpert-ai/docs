@@ -369,11 +369,22 @@
                     ]
                   },
                   {
-                    "group": "Trigger",
+                    "group": "Triggers",
                     "pages": [
                       "en/ai/plugin/trigger/index",
                       "en/ai/plugin/trigger/schedule-trigger",
-                      "en/ai/plugin/trigger/lark-trigger"
+                      "en/ai/plugin/trigger/lark-trigger",
+                      "en/ai/plugin/trigger/wecom-trigger",
+                      "en/ai/plugin/trigger/dingtalk-trigger"
+                    ]
+                  },
+                  {
+                    "group": "Integrations",
+                    "pages": [
+                      "en/ai/plugin/integration/index",
+                      "en/ai/plugin/integration/lark-integration",
+                      "en/ai/plugin/integration/wecom-integration",
+                      "en/ai/plugin/integration/dingtalk-integration"
                     ]
                   },
                   {

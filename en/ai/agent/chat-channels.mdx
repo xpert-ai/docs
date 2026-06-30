@@ -16,10 +16,12 @@ Besides being used directly in the in-platform chat interface, a Digital Expert 
 - **In-platform chat channel (Chat Trigger)**: The flow is triggered when users submit questions in the platform chat window.
 - **[Scheduled channel (Schedule Trigger)](../plugin/trigger/schedule-trigger/)**: The system triggers the Digital Expert on a Cron schedule for fixed tasks (such as daily summaries or inspection reminders).
 - **[Lark channel (Lark Trigger)](../plugin/trigger/lark-trigger/)**: Users send messages in Lark, and the Lark trigger routes them to the corresponding Digital Expert.
+- **[WeCom channel (WeCom Trigger)](../plugin/trigger/wecom-trigger/)**: Users send messages in WeCom, and WeCom Trigger routes them to the corresponding Digital Expert.
+- **[DingTalk channel (DingTalk Trigger)](../plugin/trigger/dingtalk-trigger/)**: Users send direct or group messages in DingTalk, and DingTalk Trigger routes them to the corresponding Digital Expert.
 
 ## Integration principles
 
-All three channels share the same Digital Expert configuration:
+These channels share the same Digital Expert configuration:
 
 - Agent orchestration
 - Toolset and tool authorization
@@ -30,7 +32,8 @@ The differences are mainly in trigger timing and input source, not in the core w
 ## Related docs
 
 - Trigger node overview: [Workflow Trigger](../workflow/trigger/)
-- Trigger plugin implementation (Lark / Schedule): [Plugin Trigger](../plugin/trigger/)
+- Trigger plugin implementation: [Trigger Plugins](../plugin/trigger/)
+- Messaging integrations: [Integration Overview](../plugin/integration/)
 - Main Digital Expert doc: [Digital Expert](./agent/)
 - Toolset guide: [Toolset](../toolset/)
 - Knowledge base guide: [Knowledge Base](../knowledge-base/)

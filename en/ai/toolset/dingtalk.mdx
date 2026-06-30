@@ -3,106 +3,48 @@ title: DingTalk
 sidebar_position: 7
 ---
 
-With DingTalk integration, Xpert can receive messages from DingTalk private chats and group chats, then send expert responses back to DingTalk.
+The DingTalk plugin provides a bot entry point and notification tools. For new message-entry setup, use the plugin integration and trigger docs first:
 
-## Capability Overview
+- [DingTalk Integration](../plugin/integration/dingtalk-integration/)
+- [DingTalk Trigger](../plugin/trigger/dingtalk-trigger/)
+
+## Capability overview
 
 Current `@xpert-ai/plugin-dingtalk` capabilities:
 
-- Receive DingTalk events via HTTP callback
-- Handle private chat messages
-- Handle group messages when users mention the bot (`@bot`)
-- Send text/Markdown/card notifications via middleware
-- Update sent messages via middleware
-- Recall OTO (human-bot) messages via middleware
+- receive DingTalk events through Stream mode or HTTP callback
+- handle direct chat messages
+- handle group messages when users mention the bot (`@bot`)
+- send text, Markdown, or card notifications through middleware/tools
+- update sent messages
+- recall OTO (human-bot) messages
+- list DingTalk users when contact permissions are granted
 
-Current limitations:
+## Recommended setup
 
-- **HTTP callback only** (no Stream mode)
-- In groups, only `@bot` messages are processed
-- Recall currently applies to OTO messages only
-- Group list APIs are not stable across tenants; do not rely on automatic group discovery
+1. Install `@xpert-ai/plugin-dingtalk` at the tenant level.
+2. Create a [DingTalk Integration](../plugin/integration/dingtalk-integration/). Prefer **DingTalk Stream mode** (`dingtalk_long`).
+3. Add [DingTalk Trigger](../plugin/trigger/dingtalk-trigger/) to the target Digital Expert workflow.
+4. Select the DingTalk integration and publish the Digital Expert.
+5. Add the application bot to the target group or direct-chat scenario and test with an `@bot` message.
 
-## Prerequisites
+HTTP mode is still available when Stream mode cannot be used, but it requires a public HTTPS callback URL and matching callback Token/AES Key.
 
-Before setup, prepare:
+## Required permissions
 
-1. A DingTalk enterprise account with app management permission
-2. An internal enterprise app with robot capability enabled
-3. A public Xpert service URL
-4. Callback security values (`callbackToken`, `callbackAesKey`)
-
-## Required Permissions
-
-To read users (for user selector or `dingtalk_list_users`), you must grant:
+To read users for user selectors or `dingtalk_list_users`, grant:
 
 - `qyapi_get_department_member` (department member read permission)
 
-Without this permission, DingTalk APIs return insufficient permission errors (for example `60011`).
+Without this permission, DingTalk APIs can return insufficient permission errors such as `60011`.
 
-## Create DingTalk Integration in Xpert
+<Tip>
+`Client ID` and DingTalk console `AppKey` are the same value.
+</Tip>
 
-Go to **Settings -> System Integrations** and create a provider of type DingTalk.
+## Notification middleware/tools
 
-### Required fields
-
-| Field | Description |
-| --- | --- |
-| `Client ID (AppKey)` | DingTalk AppKey (same as Client ID) |
-| `Client Secret` | DingTalk app secret |
-| `Enable HTTP Callback` | Must be enabled in current version |
-| `Callback Token` | Signature verification token |
-| `Callback AES Key` | Used to decrypt callback payload |
-
-### Recommended fields
-
-| Field | Description |
-| --- | --- |
-| `Robot Code` | Needed for proactive send/update/recall operations |
-| `Xpert` | Fallback target when trigger binding is not hit |
-| `Preferred Language` | `zh-Hans` or `en` |
-
-:::tip
-`Client ID` and DingTalk `AppKey` are the same value.
-:::
-
-## Configure DingTalk Callback
-
-After saving integration, you can get callback info from system integration test:
-
-```text
-POST /api/dingtalk/webhook/:integrationId
-```
-
-Example:
-
-```text
-https://<your-domain>/api/dingtalk/webhook/<integrationId>
-```
-
-Recommended DingTalk console setup:
-
-1. Use this public callback URL in event/callback settings.
-2. Keep DingTalk token/aes_key consistent with Xpert integration config.
-3. Use HTTP push mode.
-
-## Build an Auto-Reply Bot (MyCoder Scenario)
-
-1. Create and validate a DingTalk integration in Xpert.
-2. Add **DingTalk Trigger** to target expert workflow and select that integration.
-3. Publish the expert.
-4. Add the application bot to target group.
-5. Send `@bot` message in the group for verification.
-
-Routing priority after publish:
-
-1. Existing conversation binding
-2. DingTalk trigger binding (`integrationId -> xpertId`)
-3. Integration-level fallback `xpertId`
-
-## DingTalk Notify Middleware
-
-Common tools:
+Common DingTalk tools:
 
 - `dingtalk_send_text_notification`
 - `dingtalk_send_rich_notification`
@@ -116,9 +58,9 @@ Common tools:
 - `interactive`
 - `template`
 
-### Recipient Configuration
+### Recipient configuration
 
-Middleware resolves target by `recipient_type + recipient_id`.
+Tools resolve the target by `recipient_type + recipient_id`.
 
 Common `recipient_type` values:
 
@@ -128,9 +70,18 @@ Common `recipient_type` values:
 
 Best practices:
 
-- For user notifications, prefer stable user identifiers (`open_id` or mapped `user_id`).
+- For user notifications, prefer stable identifiers such as `open_id` or mapped `user_id`.
 - For group notifications, use `chat_id` (`openConversationId`).
-- `recipient_id` can use runtime variable (for example `{{state.dingtalkRecipientId}}`).
+- `recipient_id` can use runtime variables, for example `{{state.dingtalkRecipientId}}`.
+
+## Routing after publish
+
+When used as a bot entry point, message routing is:
+
+1. Existing DingTalk conversation binding
+2. DingTalk trigger binding (`integrationId -> xpertId`)
+
+If both are missing, DingTalk messages cannot find a target Digital Expert.
 
 ## References
 
