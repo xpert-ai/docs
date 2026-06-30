@@ -1127,7 +1127,6 @@
                       "zh-Hans/ai/workflow/error-handling",
                       "zh-Hans/ai/workflow/execution-endpoint",
                       "zh-Hans/ai/workflow/trigger",
-                      "zh-Hans/ai/workflow/dingtalk-trigger",
                       "zh-Hans/ai/workflow/answer",
                       "zh-Hans/ai/workflow/sub-process",
                       "zh-Hans/ai/workflow/variable-assignment",
@@ -1206,13 +1205,17 @@
                       "zh-Hans/ai/plugin/trigger/index",
                       "zh-Hans/ai/plugin/trigger/schedule-trigger",
                       "zh-Hans/ai/plugin/trigger/lark-trigger",
-                      "zh-Hans/ai/plugin/trigger/wecom-trigger"
+                      "zh-Hans/ai/plugin/trigger/wecom-trigger",
+                      "zh-Hans/ai/plugin/trigger/dingtalk-trigger"
                     ]
                   },
                   {
-                    "group": "飞书",
+                    "group": "集成",
                     "pages": [
-                      "zh-Hans/ai/plugin/lark/index"
+                      "zh-Hans/ai/plugin/integration/index",
+                      "zh-Hans/ai/plugin/integration/lark-integration",
+                      "zh-Hans/ai/plugin/integration/wecom-integration",
+                      "zh-Hans/ai/plugin/integration/dingtalk-integration"
                     ]
                   },
                   {
@@ -1285,8 +1288,7 @@
                   {
                     "group": "集成",
                     "pages": [
-                      "zh-Hans/ai/tutorial/integrate-with-mcp-dify",
-                      "zh-Hans/ai/tutorial/wechat-work-integration"
+                      "zh-Hans/ai/tutorial/integrate-with-mcp-dify"
                     ]
                   },
                   {

@@ -15,6 +15,8 @@ sidebar_position: 11
 
 - **聊天触发器（Chat Trigger）**：来自平台内聊天界面的用户输入。
 - **飞书触发器（Lark Trigger）**：来自飞书消息事件的输入。
+- **企业微信触发器（WeCom Trigger）**：来自企业微信机器人消息的输入。
+- **钉钉触发器（DingTalk Trigger）**：来自钉钉机器人消息或卡片动作的输入。
 - **定时触发器（Schedule Trigger）**：来自 Cron 计划任务的系统输入。
 
 触发器接收输入后，会将数据注入工作流状态，再由后续 Agent、工具调用、知识检索等节点继续处理。
@@ -43,4 +45,4 @@ sidebar_position: 11
 ## 相关文档
 
 - 数字专家如何通过触发器接入不同对话渠道： [通过触发器接入不同对话渠道](../agent/chat-channels/)
-- Trigger 的插件化实现说明（含飞书与定时）： [插件 Trigger 实现](../plugin/trigger/)
+- Trigger 的插件化实现说明（含定时、飞书、企业微信与钉钉）： [插件 Trigger 实现](../plugin/trigger/)

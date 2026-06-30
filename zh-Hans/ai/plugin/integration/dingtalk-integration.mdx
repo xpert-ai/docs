@@ -1,0 +1,177 @@
+---
+title: 钉钉集成
+sidebar_position: 26
+---
+
+钉钉集成用于保存钉钉企业内部应用的凭证、机器人配置、HTTP 回调或 Stream 长连接状态。它只负责把钉钉平台连接到 Xpert AI；要让消息进入某个数字专家，还必须在目标数字专家工作流中添加并发布 [钉钉触发器](../trigger/dingtalk-trigger/)。
+
+当前 `@xpert-ai/plugin-dingtalk` 提供两类集成：
+
+<Tip>
+钉钉属于通信类插件，必须在**租户级别**安装 `@xpert-ai/plugin-dingtalk`。租户级安装会注册钉钉系统集成提供方、HTTP/Stream 消息入口和钉钉触发器；如果只在组织、项目或个人范围安装，后续创建集成和触发器时可能找不到对应能力。
+</Tip>
+
+| 集成提供方 | 页面显示 | 适合场景 | 关键配置 |
+| --- | --- | --- | --- |
+| `dingtalk_long` | 钉钉-Stream模式 | 推荐模式，不需要公网 HTTP 回调地址 | `Client ID (AppKey)`、`Client Secret`、`Robot Code` |
+| `dingtalk` | 钉钉-HTTP模式 | 仅在无法使用 Stream 模式时使用 | `Client ID (AppKey)`、`Client Secret`、`Callback Token`、`Callback AES Key` |
+
+默认推荐使用 **钉钉-Stream模式**（`dingtalk_long`）。它由 Xpert AI 服务端主动连接钉钉 Stream 服务，不要求外部网络直接访问 Xpert AI；只有无法使用 Stream 模式时，再选择 **钉钉-HTTP模式**（`dingtalk`）。HTTP 模式需要公网回调地址，并要求回调 Token/AES Key 与钉钉后台一致。
+
+## 准备钉钉应用
+
+1. 登录 [钉钉开放平台](https://open.dingtalk.com/)。
+2. 创建企业内部应用。
+3. 开启机器人能力。
+4. 复制应用凭证：
+   - **AppKey**，在 Xpert AI 中填写为 `Client ID (AppKey)`；
+   - **AppSecret**，在 Xpert AI 中填写为 `Client Secret`。
+5. 在应用的机器人配置中复制 **机器人编码（Robot Code）**。
+6. 如果需要用户选择器或 `dingtalk_list_users` 工具，开通通讯录部门成员读取权限。
+
+<Tip>
+`Client ID` 与钉钉控制台中的 `AppKey` 是同一个值。
+</Tip>
+
+## 一、Stream 模式配置
+
+Stream 模式使用钉钉长连接接收机器人消息和卡片回调，不需要公网 HTTP 回调地址。
+
+### 在 Xpert AI 创建 Stream 集成
+
+进入 **设置 -> 系统集成**，创建提供方为 **钉钉-Stream模式** 的集成。
+
+| 配置项 | 说明 |
+| --- | --- |
+| `Client ID (AppKey)` | 钉钉应用的 AppKey。 |
+| `Client Secret` | 钉钉应用密钥。 |
+| `Robot Code` | 机器人唯一标识，用于主动发送群/单聊消息。 |
+| `首选语言` | 可选，影响错误提示和系统提示。 |
+
+集成测试会探测钉钉 Stream 连接，并返回：
+
+- `mode=long_connection`
+- 订阅主题 `/v1.0/im/bot/messages/get`
+- 订阅主题 `/v1.0/card/instances/callback`
+- `probe.connected`
+- `probe.lastError`
+
+### 状态页
+
+钉钉集成详情页提供 **状态** 页签，展示：
+
+- 连接方式
+- 状态
+- 机器人 / 集成名称
+- Stream 订阅
+- 最近连接时间
+- 最近断开时间
+- 最近回调时间
+- 最近错误
+- 重连次数
+
+Stream 模式下状态页支持刷新、重连和断开。HTTP 模式只展示回调配置和可达性相关状态，不支持 Stream 重连/断开。
+
+## 二、HTTP 模式配置
+
+HTTP 模式使用钉钉回调地址接收机器人消息和卡片回调。它适合无法启用 Stream 模式，但已经有公网 API 地址的部署。
+
+### 在 Xpert AI 创建 HTTP 集成
+
+进入 **设置 -> 系统集成**，创建提供方为 **钉钉-HTTP模式** 的集成。
+
+| 配置项 | 说明 |
+| --- | --- |
+| `Client ID (AppKey)` | 钉钉应用的 AppKey。 |
+| `Client Secret` | 钉钉应用密钥。 |
+| `Robot Code` | 可选，但建议填写。用于通过 API 主动发送群/单聊消息。不要填写回调体里常见的 `robotCode=normal`。 |
+| `Callback Token` | 钉钉 HTTP 回调用于签名校验的 Token。 |
+| `Callback AES Key` | 钉钉 HTTP 回调用于解密回调密文的 AES Key。 |
+| `首选语言` | 可选，影响错误提示和系统提示。 |
+
+测试成功后会返回回调地址：
+
+```text
+https://<your-api-domain>/api/dingtalk/webhook/<integrationId>
+```
+
+也可以通过接口查看回调配置：
+
+```text
+GET /api/dingtalk/callback-config?integration=<integrationId>
+```
+
+该结果会包含回调地址、签名算法、是否已配置 Callback Token/AES Key，以及建议订阅的事件。
+
+### 配置钉钉后台
+
+1. 在钉钉开放平台进入应用的事件与回调或机器人消息推送配置。
+2. 接收方式选择 HTTP 推送。
+3. 填入 Xpert AI 返回的回调地址。
+4. 保证钉钉侧 Token/AES Key 与 Xpert AI 集成配置一致。
+5. 订阅机器人消息事件和卡片回调事件。
+
+HTTP 模式支持 `GET /api/dingtalk/webhook/<integrationId>` 可达性检查。集成存在且启用 HTTP 回调时，该接口返回纯文本 `success`。
+
+## 三、绑定数字专家
+
+完成集成配置后，还需要：
+
+1. 打开目标数字专家工作流。
+2. 添加 [钉钉触发器](../trigger/dingtalk-trigger/)。
+3. 选择刚创建的钉钉集成。
+4. 配置会话超时时间和消息汇总时间。
+5. 发布数字专家。
+6. 将钉钉机器人加入目标群或打开单聊测试。
+
+群聊中只有 @ 机器人消息会触发数字专家。单聊消息会直接触发。
+
+## 四、回复与通知能力
+
+钉钉通道支持：
+
+- 文本回复；
+- Markdown 回复；
+- 交互卡片回复；
+- 卡片按钮回调；
+- 更新消息；
+- 撤回人与机器人会话（OTO）消息；
+- 通过通知中间件主动发送文本、Markdown、交互卡片或模板消息。
+
+常用通知工具包括：
+
+- `dingtalk_send_text_notification`
+- `dingtalk_send_rich_notification`
+- `dingtalk_update_message`
+- `dingtalk_recall_message`
+- `dingtalk_list_users`
+
+普通对话回复不需要主动调用通知工具，数字专家直接输出文本即可；通知工具主要用于“发送给另一个用户/群”“主动通知”“发送带按钮卡片”等场景。
+
+## 常见问题
+
+### Stream 模式连接失败
+
+检查：
+
+- Client ID/AppSecret 是否正确；
+- 机器人能力是否开启；
+- 服务端是否能访问钉钉 Stream 网关；
+- 应用是否已发布。
+
+### HTTP 回调地址校验失败
+
+检查：
+
+- `API_BASE_URL` 是否是公网可访问的 HTTPS 地址；
+- 反向代理是否转发 `/api/dingtalk/webhook/<integrationId>`；
+- Callback Token 和 Callback AES Key 是否与钉钉后台一致；
+- 是否选择了钉钉-HTTP模式，而不是 Stream 模式集成。
+
+### 主动发群消息失败
+
+优先检查 `Robot Code`。它应来自钉钉开放平台 **应用 -> 机器人 -> 机器人的唯一标识**，不是回调 payload 中的 `robotCode=normal`。
+
+### 用户选择器为空
+
+请确认钉钉应用已开通通讯录部门成员读取权限，并且当前集成的 AppKey/AppSecret 有权访问通讯录接口。
