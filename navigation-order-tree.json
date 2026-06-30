@@ -108,7 +108,17 @@
                 "index",
                 "schedule-trigger",
                 "lark-trigger",
-                "wecom-trigger"
+                "wecom-trigger",
+                "dingtalk-trigger"
+              ]
+            },
+            {
+              "slug": "integration",
+              "pages": [
+                "index",
+                "lark-integration",
+                "wecom-integration",
+                "dingtalk-integration"
               ]
             }
           ]
