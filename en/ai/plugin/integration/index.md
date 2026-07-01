@@ -32,7 +32,7 @@ Communication plugins such as Lark, WeCom, and DingTalk must be installed at the
 
 1. Install the communication plugin at the tenant level.
 2. Create an enterprise app or bot in the external platform and grant required capabilities such as bot, message receiving, contact read, group read, or message-resource read permissions.
-3. In Xpert AI, go to **Settings -> System Integrations** and create the corresponding integration.
+3. In Xpert AI, switch to the target organization first, then go to **Settings -> System Integrations** and create the corresponding integration. System integrations are created at organization scope, and triggers can only select integrations that exist in the current organization.
 4. Prefer long connection or Stream mode. If you use Webhook, HTTP, or short-connection mode, make sure `API_BASE_URL` is a public HTTPS address reachable from the external platform.
 5. Save and test the integration. Confirm credentials, connection status, and callback URLs.
 6. Open the target Digital Expert workflow, add the corresponding trigger, and select the integration you created.

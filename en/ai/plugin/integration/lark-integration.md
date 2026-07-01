@@ -38,15 +38,30 @@ Long-connection mode does not use this callback URL. Instead, the Xpert AI serve
 4. Choose event receiving mode:
    - Webhook mode: configure request URL and event subscriptions.
    - Long-connection mode: choose long connection for receiving events.
-5. Subscribe to bot message events:
-   - `im.message.receive_v1`
-   - `card.action.trigger` if you need card-button callbacks.
-6. Grant permissions for sending messages, reading groups, reading contacts, and reading message resources. Otherwise the bot may receive messages but fail to reply, list users/groups, or read images.
-7. Publish the app version and set app availability for the required users or departments.
+5. Enable the app capabilities listed in "Event subscriptions" and "Required permissions" below.
+6. Publish the app version and set app availability for the required users or departments.
+
+### Event subscriptions
+
+| Event | Purpose |
+| --- | --- |
+| `im.message.receive_v1` | Receives direct and group messages. Without it, Lark messages will not enter Xpert AI. |
+
+### Required permissions
+
+In the Lark Open Platform **Permissions** page, search by permission name and request the scopes below. After requesting permissions, publish a new app version and make sure users or departments receive the updated app authorization.
+
+| Permission | Purpose |
+| --- | --- |
+| `im:message.group_at_msg.include_bot:readonly` | Gets group messages where other bots or users mention the current bot. |
+| `im:message.group_at_msg:readonly` | Gets group messages where users mention the bot. |
+| `im:message.p2p_msg:readonly` | Reads direct messages sent by users to the bot. |
+| `im:message.reactions:write_only` | Sends and deletes message reactions. |
+| `im:message:send_as_bot` | Sends replies as the bot. Without it, the bot may receive messages but fail to reply. |
 
 ## Create the integration in Xpert AI
 
-Go to **Settings -> System Integrations** and create a **Lark** integration.
+Switch to the target organization that will use the Lark bot, then go to **Settings -> System Integrations** and create a **Lark** integration. System integrations are created at organization scope, and Lark triggers can only select integrations that exist in the current organization.
 
 ### Required fields
 
