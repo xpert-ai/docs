@@ -188,6 +188,37 @@ During initialization, the host maps resource definitions to real runtime object
 
 ---
 
+### 2.10 Plugin Scope and Level
+
+Plugin scope determines where a plugin instance is installed and who can see or manage it. Plugin level describes the type of platform capability the plugin provides. They are related, but they are not the same thing.
+
+Common scopes:
+
+| Scope | Scope key | Who can see it | Typical use |
+| --- | --- | --- | --- |
+| Organization | `<organizationId>` | One organization | Normal business plugins, organization-specific integrations, custom workflows |
+| Tenant global | `global` or `tenant:<tenantId>:global` | All organizations inside one tenant | Tenant-wide defaults shared by that tenant |
+| System global | `system:global` | All tenants | Platform singleton plugins that provide system-wide modules, entities, or default capabilities |
+| Built-in global | `builtin:global` | All tenants | Host-code fallback providers; not an installed plugin |
+
+Runtime capability lookup follows this order:
+
+```text
+organization -> tenant-global -> system-global -> builtin-global
+```
+
+This means an organization plugin can override a tenant-global plugin, a tenant-global plugin can override a system plugin, and a system plugin can override only built-in host providers.
+
+Use `meta.level = 'system'` only when the plugin must be a platform singleton. Examples include plugins that define system-level database entities or modules that cannot safely exist in multiple tenant copies. System plugins are managed differently:
+
+* They can be installed or updated only by a Super Admin in the Default tenant.
+* The host stores them once under `system:global`; repeated installs update the same singleton instance.
+* Ordinary tenants can see and use the resulting capabilities, but cannot install, uninstall, or configure the system instance from their organization view.
+
+Most plugins should keep the default organization level. Even if a plugin is visible across a tenant, its own business data should still be scoped by tenant and organization when those fields are available.
+
+---
+
 📌 Summary:
 
 * `XpertPlugin` defines plugin **metadata, configuration, and lifecycle**
@@ -195,3 +226,4 @@ During initialization, the host maps resource definitions to real runtime object
 * **Enhancement points (Strategy)** are the core for plugins to extend host system functionality
 * All plugins form extensible and maintainable modules via **lifecycle + strategy interfaces + config schema**
 * Plugin resources can be initialized into **Workspace** or **Xpert** targets with tracked installation state
+* Plugin scope controls visibility and management; `system` plugins are platform singletons installed only from the Default tenant

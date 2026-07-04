@@ -43,6 +43,24 @@ PLUGINS=@xpert-ai/my-plugin1,@xpert-ai/my-plugin2
 * 如果插件未能正确加载，请检查日志中是否有 `register` 或 `onPluginBootstrap` 的输出。
 * 在启动XpertAI系统后在系统设置[插件页面](https://app.xpertai.cn/settings/plugins)中查看已加载的插件列表。
 
+## 安装 Scope
+
+已安装插件都有明确 scope：
+
+* **Organization 插件** 安装到当前组织，可在该组织中管理。
+* **Tenant-global 插件** 由当前租户内的所有组织共享。
+* **System 插件** 声明 `meta.level = 'system'`，全平台只安装一份，scope 为 `system:global`。
+
+System 插件是平台单例。它只能由 Default tenant 中的 Super Admin 安装或更新。其他租户可以看到并使用 system 插件提供的能力，但不能在自己的组织或租户视图中安装、卸载或配置系统实例。
+
+运行时插件能力按以下顺序解析：
+
+```text
+organization -> tenant-global -> system-global -> built-in
+```
+
+因此租户或组织插件可以按需覆盖系统默认能力，但不会创建第二份 system 实例。
+
 ## 初始化插件资源
 
 插件被宿主加载后，不只是“启用”这么简单，还可以把插件包内声明的资源初始化到对应运行时目标中。

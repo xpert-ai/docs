@@ -43,6 +43,24 @@ When the host starts, it will automatically parse the `PLUGINS` environment vari
 * If a plugin fails to load correctly, check the logs for `register` or `onPluginBootstrap` output.
 * After starting the Xpert AI system, you can view the loaded plugins on the system settings [Plugins page](https://app.xpertai.cn/settings/plugins).
 
+## Installation Scope
+
+Installed plugins have an explicit scope:
+
+* **Organization plugins** are installed into the current organization and can be managed from that organization.
+* **Tenant-global plugins** are shared by all organizations in the current tenant.
+* **System plugins** declare `meta.level = 'system'` and are installed once for the whole platform under `system:global`.
+
+System plugins are platform singletons. They can be installed or updated only by a Super Admin in the Default tenant. Other tenants may see and use the capabilities provided by system plugins, but they cannot install, uninstall, or configure the system instance from their own organization or tenant view.
+
+At runtime, the platform resolves plugin capabilities in this order:
+
+```text
+organization -> tenant-global -> system-global -> built-in
+```
+
+So tenant or organization plugins can intentionally override a system default without creating a second system instance.
+
 ## Initialize Plugin Resources
 
 Loading a plugin into the host is only the first step. The host can also initialize the resources declared inside the plugin bundle into the target runtime.

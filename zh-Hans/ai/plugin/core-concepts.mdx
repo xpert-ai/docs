@@ -188,6 +188,37 @@ export class IntegrationStrategyRegistry
 
 ---
 
+### 2.10 插件 Scope 与 Level
+
+插件 scope 决定插件实例安装在哪里，以及谁可以看到或管理它。插件 level 描述插件提供的是哪一类平台能力。两者相关，但不是同一个概念。
+
+常见 scope：
+
+| Scope | Scope key | 谁可见 | 典型用途 |
+| --- | --- | --- | --- |
+| Organization | `<organizationId>` | 单个组织 | 普通业务插件、组织级集成、自定义工作流 |
+| Tenant global | `global` 或 `tenant:<tenantId>:global` | 同一租户内的所有组织 | 某个租户共享的默认能力 |
+| System global | `system:global` | 所有租户 | 提供系统级模块、实体或默认能力的平台单例插件 |
+| Built-in global | `builtin:global` | 所有租户 | 宿主代码内置 Provider fallback，不是已安装插件 |
+
+运行时能力查找顺序为：
+
+```text
+organization -> tenant-global -> system-global -> builtin-global
+```
+
+这意味着 organization 插件可以覆盖 tenant-global 插件，tenant-global 插件可以覆盖 system 插件，而 system 插件只能覆盖宿主内置 Provider。
+
+只有当插件必须作为平台单例存在时，才使用 `meta.level = 'system'`。典型场景包括定义系统级数据库实体，或提供不能在多个租户中重复安装的系统模块。System 插件采用特殊管理规则：
+
+* 只能由 Default tenant 中的 Super Admin 安装或更新。
+* 宿主只会把它保存为 `system:global` 下的一份单例；重复安装会更新同一个实例。
+* 普通租户可以看到并使用它提供的能力，但不能在自己的组织视图中安装、卸载或配置系统实例。
+
+大多数插件应保持默认的 organization level。即使插件能力在租户内可见，插件自己的业务数据也仍应在可用时按 tenant 和 organization 进行隔离。
+
+---
+
 📌 小结：
 
 * `XpertPlugin` 定义了插件的**元信息、配置与生命周期**
@@ -195,3 +226,4 @@ export class IntegrationStrategyRegistry
 * **增强出口点（Strategy）** 是插件扩展宿主系统功能的核心
 * 所有插件都通过 **生命周期 + 策略接口 + 配置 Schema** 形成可扩展、可维护的模块
 * 插件资源可按 **Workspace / Xpert** 两种目标初始化，并在宿主中保持可追踪的安装状态
+* 插件 scope 控制可见性和管理边界；`system` 插件是平台单例，只能从 Default tenant 安装
