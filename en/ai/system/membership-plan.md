@@ -1,5 +1,5 @@
 ---
-title: Tenant and Organization Membership Plan Design
+title: Membership Plan
 sidebar_position: 6
 tags:
   - Membership
@@ -345,37 +345,6 @@ Tenant membership allows tenant copilot usage only when the current organization
 If the default plan is archived, the organization may enter a needs-repair state.
 
 Admins should set another active default plan or run repair.
-
-## Product Copy Recommendations
-
-### Initialization Copy
-
-> After organization membership is initialized, this organization will use its own membership plans and Copilot models. The system will create a default unlimited plan and assign membership to current active members.
-
-### Repair Copy
-
-> Some organization members do not have membership assignments. Repair will assign the current default plan to missing members without overwriting existing memberships.
-
-### Scope Mismatch Copy
-
-> This Copilot model is not available for the current membership plan. Switch to a model in the matching scope or ask an admin to review membership and model configuration.
-
-### No Available Model Copy
-
-> No Copilot model is available under the current membership plan. Ask an admin to configure models or check the membership plan.
-
-## Acceptance Criteria
-
-- If an organization has no plan but the user has tenant membership, organization users can use tenant models.
-- If an organization has an active plan, organization users use only organization models and do not fall back to tenant.
-- If an organization has local models but no plan, the first model lookup or chat initializes a default unlimited plan.
-- After initialization, all active organization members receive membership.
-- Repeated initialization does not create duplicate plans, memberships, or assignment ledger records.
-- Unlimited plans do not trigger total point-limit failures, but usage ledger and rate limits still work.
-- Tenant copilots cannot be used by organization membership.
-- Organization copilots cannot be directly used by tenant membership, unless current-organization self-healing runs and switches usage to organization membership.
-- The organization membership page is visible to organization local admins with `MEMBERSHIP_EDIT`.
-- Usage Overview and Usage & Billing show usage for the current effective membership.
 
 ## Future Improvements
 

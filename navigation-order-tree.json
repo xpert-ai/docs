@@ -70,7 +70,6 @@
                 "command",
                 "role",
                 "configure-ai-assistant",
-                "membership-plan-tenant-org-design",
                 "ai-assitant"
               ]
             }
@@ -135,6 +134,17 @@
         {
           "slug": "tutorial",
           "groups": []
+        },
+        {
+          "slug": "system",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "membership-plan"
+              ]
+            }
+          ]
         }
       ]
     },

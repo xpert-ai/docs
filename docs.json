@@ -173,7 +173,6 @@
                     "pages": [
                       "en/ai/agent/ai-assistant/command",
                       "en/ai/agent/ai-assistant/configure-ai-assistant",
-                      "en/ai/agent/ai-assistant/membership-plan-tenant-org-design",
                       "en/ai/agent/ai-assistant/index",
                       "en/ai/agent/ai-assistant/settings",
                       "en/ai/agent/ai-assistant/command",
@@ -476,6 +475,12 @@
               {
                 "tab": "System",
                 "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/system/membership-plan"
+                    ]
+                  },
                   {
                     "group": "Permissions",
                     "pages": [
@@ -1023,7 +1028,6 @@
                       "zh-Hans/ai/agent/ai-assistant/command",
                       "zh-Hans/ai/agent/ai-assistant/role",
                       "zh-Hans/ai/agent/ai-assistant/configure-ai-assistant",
-                      "zh-Hans/ai/agent/ai-assistant/membership-plan-tenant-org-design",
                       "zh-Hans/ai/agent/ai-assistant/ai-assitant"
                     ]
                   }
@@ -1319,6 +1323,12 @@
               {
                 "tab": "系统",
                 "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/system/membership-plan"
+                    ]
+                  },
                   {
                     "group": "权限矩阵",
                     "pages": [
