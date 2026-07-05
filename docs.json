@@ -173,6 +173,7 @@
                     "pages": [
                       "en/ai/agent/ai-assistant/command",
                       "en/ai/agent/ai-assistant/configure-ai-assistant",
+                      "en/ai/agent/ai-assistant/membership-plan-tenant-org-design",
                       "en/ai/agent/ai-assistant/index",
                       "en/ai/agent/ai-assistant/settings",
                       "en/ai/agent/ai-assistant/command",
@@ -1022,6 +1023,7 @@
                       "zh-Hans/ai/agent/ai-assistant/command",
                       "zh-Hans/ai/agent/ai-assistant/role",
                       "zh-Hans/ai/agent/ai-assistant/configure-ai-assistant",
+                      "zh-Hans/ai/agent/ai-assistant/membership-plan-tenant-org-design",
                       "zh-Hans/ai/agent/ai-assistant/ai-assitant"
                     ]
                   }
