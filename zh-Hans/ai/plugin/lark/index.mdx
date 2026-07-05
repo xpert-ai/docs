@@ -1,5 +1,6 @@
 ---
 title: 搭建自动回复机器人（MyCoder）
+sidebar_hidden: true
 sidebar_position: 3
 tags:
   - AI
@@ -7,73 +8,7 @@ tags:
   - Code
 ---
 
-## 一、创建并配置应用
+飞书机器人接入文档已移动到插件触发器章节：
 
-1. **创建企业自建应用**
-   - 登录[飞书开发者后台](https://open.feishu.cn/app)
-   - 点击"创建企业自建应用"，填写应用名称"MyCoder"及描述，完成创建
-
-2. **添加机器人能力**
-   - 在应用详情页的**应用能力** > **添加应用能力**中，找到**机器人**卡片并点击**添加**
-   - 参考[机器人能力](https://go.feishu.cn/s/6dFbxHpwQ02)文档完成基础配置
-
-3. **申请API权限**
-   - 在**开发配置** > **权限管理**页面，为应用开通以下权限：
-     - `im:message.p2p_msg:readonly`（读取用户发给机器人的单聊消息）
-     - `im:message.group_at_msg:readonly`（接收群聊中@机器人消息事件）
-     - `im:message:send_as_bot`（以应用身份发送消息）
-
-4. **订阅接收消息事件**
-   - 在**事件与回调** > **事件配置**页面：
-     - 选择**使用长连接接收事件**（推荐）
-     - 添加**接收消息事件**（`im.message.receive_v1`）
-   - 参考[事件概述](https://go.feishu.cn/s/5_sDxkQ3802)和[使用长连接接收事件](https://go.feishu.cn/s/626tU7DxM0s)文档配置
-
-#### 二、开发自动回复功能
-
-1. **建立长连接接收事件**
-   - 集成飞书SDK，通过长连接接收消息事件
-   - 示例代码框架（以Node.js为例）：
-     ```javascript
-     // 伪代码逻辑，实际需使用飞书官方SDK
-     const client = new Lark.Client({ appId, appSecret });
-     client.eventDispatcher.register('im.message.receive_v1', async (event) => {
-       const { message, chat_type } = event.data;
-       // 处理消息并回复
-     });
-     client.wsClient.start();
-     ```
-
-2. **消息处理逻辑**
-   - **单聊场景**：直接调用[发送消息](https://go.feishu.cn/s/61BYfgpwE01)接口回复
-   - **群聊场景**：当检测到@机器人消息时，调用[回复消息](https://go.feishu.cn/s/61BYfeQRw0s)接口回复
-   - 消息类型判断：区分文本、富文本等类型，仅处理支持的消息类型
-
-#### 三、发布应用
-
-1. **配置可用范围**
-   - 在**应用发布** > **版本管理与发布**页面创建版本
-   - 设置应用可用范围（如指定部门或全员可见），参考[配置应用可用范围](https://go.feishu.cn/s/63g3FAPNE01)
-
-2. **发布上线**
-   - 提交版本审核，等待企业管理员审批通过
-   - 测试环境可使用[测试企业功能](https://go.feishu.cn/s/6hRFcubyk04)免审核发布
-
-#### 四、测试机器人
-
-1. **添加机器人到群聊**
-   - 在飞书客户端群设置中搜索"MyCoder"机器人并添加
-
-2. **测试自动回复**
-   - 单聊：直接向机器人发送消息，验证自动回复
-   - 群聊：@机器人并发送消息，验证回复功能
-
-### 关键文档参考
-
-- [机器人概述](https://go.feishu.cn/s/6aRonz2AA04)
-- [发送消息接口](https://go.feishu.cn/s/61BYfgpwE01)
-- [回复消息接口](https://go.feishu.cn/s/61BYfeQRw0s)
-- [事件订阅流程](https://go.feishu.cn/s/5_sDxkQ3802)
-- [配置应用可用范围](https://go.feishu.cn/s/63g3FAPNE01)
-
-通过以上步骤，即可搭建一个能够自动回复群聊和单聊消息的机器人应用。实际开发中需根据具体编程语言选择对应SDK，并处理消息解析、错误处理等细节。
+- [飞书集成](../integration/lark-integration/)
+- [飞书触发器](../trigger/lark-trigger/)

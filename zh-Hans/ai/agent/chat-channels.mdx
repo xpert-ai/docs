@@ -16,10 +16,12 @@ tags:
 - **平台内聊天渠道（Chat Trigger）**：用户在平台本身的聊天窗口输入问题后触发流程。
 - **[定时渠道（Schedule Trigger）](../plugin/trigger/schedule-trigger/)**：系统按 Cron 定时触发数字专家执行固定任务（如日报汇总、巡检提醒）。
 - **[飞书渠道（Lark Trigger）](../plugin/trigger/lark-trigger/)**：用户在飞书中发送消息，由飞书触发器路由到对应数字专家。
+- **[企业微信渠道（WeCom Trigger）](../plugin/trigger/wecom-trigger/)**：用户在企业微信中发送消息，由企业微信触发器路由到对应数字专家。
+- **[钉钉渠道（DingTalk Trigger）](../plugin/trigger/dingtalk-trigger/)**：用户在钉钉中发送单聊消息或群聊 @ 机器人消息，由钉钉触发器路由到对应数字专家。
 
 ## 接入原则
 
-三种渠道共享同一份数字专家配置：
+多种渠道共享同一份数字专家配置：
 
 - 智能体编排
 - 工具集与工具授权
@@ -30,7 +32,7 @@ tags:
 ## 关联文档
 
 - 触发器节点总览： [工作流触发器](../workflow/trigger/)
-- Trigger 插件实现（Lark / Schedule）： [插件 Trigger 实现](../plugin/trigger/)
+- Trigger 插件实现（Schedule / Lark / WeCom / DingTalk）： [插件 Trigger 实现](../plugin/trigger/)
 - 数字专家主文档： [数字专家](./agent/)
-- 工具集说明： [工具集](../toolset/)
+- 工具集说明： [工具集](../toolset/toolset/)
 - 知识库说明： [知识库](../knowledge-base/)

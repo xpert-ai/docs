@@ -9,6 +9,7 @@ sidebar_position: 7
 
 当前 `@xpert-ai/plugin-dingtalk` 支持：
 
+- Stream 模式长连接接收钉钉机器人消息和卡片回调
 - HTTP 回调接收钉钉消息事件
 - 单聊消息处理
 - 群聊 `@机器人` 消息处理
@@ -16,9 +17,9 @@ sidebar_position: 7
 - 通知中间件更新消息
 - 通知中间件撤回人与机器人会话（OTO）消息
 
-当前版本限制：
+当前使用限制：
 
-- 仅支持 **HTTP 回调**，不支持 Stream 模式
+- 推荐优先使用 **钉钉-Stream模式**；只有无法使用 Stream 模式时，再使用 **钉钉-HTTP模式**
 - 群聊中仅处理 `@机器人` 消息
 - 撤回能力当前只覆盖 OTO（人与机器人会话）消息
 - 群聊列表查询在不同租户的可用性不稳定，不建议依赖自动拉取群列表
@@ -32,6 +33,8 @@ sidebar_position: 7
 3. 一个公网可访问的 Xpert 服务地址
 4. 回调安全参数（`callbackToken`、`callbackAesKey`）
 
+如果使用 Stream 模式，不需要公网回调地址和回调安全参数，只需要服务端能够访问钉钉 Stream 网关。
+
 ## 权限要求
 
 如果需要使用用户选择器或 `dingtalk_list_users` 工具读取用户列表，必须在钉钉应用权限中开通：
@@ -42,7 +45,10 @@ sidebar_position: 7
 
 ## 在 Xpert 创建钉钉集成
 
-进入 **设置 -> 系统集成**，创建提供方为“钉钉”的集成。
+进入 **设置 -> 系统集成**，按部署方式创建钉钉集成：
+
+- 推荐：创建 **钉钉-Stream模式** 集成。
+- 备用：创建 **钉钉-HTTP模式** 集成。
 
 ### 必填配置
 
@@ -50,25 +56,28 @@ sidebar_position: 7
 | --- | --- |
 | `Client ID (AppKey)` | 钉钉应用的 AppKey（即 Client ID） |
 | `Client Secret` | 钉钉应用密钥 |
-| `启用 HTTP 回调` | 当前版本必须开启 |
-| `回调 Token` | 用于验签 |
-| `回调 AES Key` | 用于解密回调密文 |
 
 ### 推荐配置
 
 | 配置项 | 说明 |
 | --- | --- |
 | `机器人编码` | 用于主动发消息、更新消息、撤回消息 |
-| `数字专家` | 未命中触发器绑定时的兜底 Xpert |
 | `首选语言` | `zh-Hans` 或 `en` |
 
-:::tip
+HTTP 模式还需要额外填写：
+
+| 配置项 | 说明 |
+| --- | --- |
+| `回调 Token` | 用于验签 |
+| `回调 AES Key` | 用于解密回调密文 |
+
+<Tip>
 `Client ID` 与钉钉控制台中的 `AppKey` 是同一个值。
-:::
+</Tip>
 
 ## 配置钉钉回调
 
-集成保存后，可在系统集成“测试”中拿到回调地址：
+如果使用 HTTP 模式，集成保存后可在系统集成“测试”中拿到回调地址：
 
 ```text
 POST /api/dingtalk/webhook/:integrationId
@@ -86,9 +95,9 @@ https://api.xpertai.cn/api/dingtalk/webhook/<integrationId>
 2. 保证钉钉侧 `token/aes_key` 与 Xpert 集成配置一致。
 3. 配置接收方式为 HTTP 推送。
 
-:::tip
+<Tip>
 若配置回调时报“地址校验失败”，优先检查：公网可访问性、反向代理转发、证书链是否完整。
-:::
+</Tip>
 
 ## 搭建自动回复机器人（MyCoder 场景）
 
@@ -102,7 +111,13 @@ https://api.xpertai.cn/api/dingtalk/webhook/<integrationId>
 
 1. 已有会话绑定
 2. 钉钉触发器绑定（`integrationId -> xpertId`）
-3. 集成配置中的 `xpertId` 兜底
+
+如果两者都不存在，消息无法找到处理目标。
+
+更完整的接入配置请参考：
+
+- [钉钉集成](../plugin/integration/dingtalk-integration/)
+- [钉钉触发器](../plugin/trigger/dingtalk-trigger/)
 
 ## 钉钉通知中间件
 

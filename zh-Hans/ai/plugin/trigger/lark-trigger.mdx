@@ -3,13 +3,17 @@ title: 飞书触发器
 sidebar_position: 21
 ---
 
-`Lark Trigger` 用于将飞书消息事件接入数字专家工作流，实现“在飞书中发消息，数字专家在 Xpert 中执行”的触发链路。
+`Lark Trigger` 用于把一个飞书集成绑定到数字专家工作流，实现“用户在飞书单聊或群聊中发消息，Xpert AI 路由到指定数字专家执行”的触发链路。
+
+飞书集成负责保存 App ID、App Secret、Webhook 或长连接配置；飞书触发器负责决定消息进入哪个数字专家。
 
 ## 适用场景
 
 - 在飞书群聊或单聊中 @ 机器人触发数字专家
 - 将企业 IM 作为数字专家统一入口
-- 需要将外部消息事件映射为工作流输入
+- 需要限制哪些单聊用户或群聊可以触发数字专家
+- 用户习惯连续发送多条短消息，需要先汇总再交给数字专家处理
+- 需要在会话中读取飞书消息上下文或图片资源
 
 ## 关键配置
 
@@ -17,18 +21,89 @@ Lark Trigger 的核心配置包括：
 
 - `enabled`：是否启用触发器
 - `integrationId`：飞书集成实例 ID（必填）
+- `sessionTimeoutSeconds`：会话超时时间，默认 `3600` 秒
+- `summaryWindowSeconds`：消息汇总时间，默认 `0` 秒
+- `singleChatScope`：单聊范围，支持 `all_users` 和 `selected_users`
+- `singleChatUserOpenIds`：当单聊范围为指定用户时，允许触发的用户 Open ID 列表
+- `allowedGroupScope`：群聊范围，支持 `all_chats` 和 `selected_chats`
+- `allowedGroupChatIds`：当群聊范围为指定群聊时，允许触发的群聊 ID 列表
+- `groupReplyStrategy`：群内回复策略，支持 `mention_only` 和 `all_messages`
 
 发布前会校验：
 
 1. 是否选择了有效的飞书集成；
-2. 当前集成是否已绑定到其他数字专家（避免冲突）。
+2. 当前集成是否已绑定到其他数字专家；
+3. 触发器启用时，同一个飞书集成同一时间只能绑定一个数字专家。
+
+## 配置流程
+
+1. 先创建并测试 [飞书集成](../integration/lark-integration/)。
+2. 打开目标数字专家的工作流。
+3. 添加 **Lark Trigger（飞书触发器）**。
+4. 选择刚创建的飞书集成。
+5. 按需设置单聊范围、群聊范围、群内回复策略、会话超时和消息汇总时间。
+6. 将触发器连接到后续 Agent、工具集或知识库节点。
+7. 发布数字专家工作流。
+
+发布成功后，平台会写入 `integrationId -> xpertId` 绑定。飞书消息到达时，会先按这个绑定找到数字专家，再进入工作流执行。
 
 ## 运行机制
 
-1. **publish 阶段**：写入 `integrationId -> xpertId` 绑定关系，并注册内存回调。
-2. **消息到达阶段**：按 `integrationId` 找到已绑定数字专家。
-3. **回调可用时**：直接构建 handoff 消息并推进当前流程。
-4. **回调不可用时（例如重启后）**：进入持久化分发队列，保证消息不丢失。
+1. **publish 阶段**：
+   - 校验飞书集成是否存在；
+   - 检查同一个集成是否已被其他数字专家占用；
+   - 写入或更新飞书触发器绑定；
+   - 注册当前运行时回调。
+2. **消息到达阶段**：
+   - Webhook 模式由 `POST /api/lark/webhook/<integrationId>` 接收飞书事件；
+   - 长连接模式由飞书长连接服务接收 `im.message.receive_v1` 和 `card.action.trigger` 事件；
+   - 系统解析会话 ID、发送者 Open ID、消息内容和图片/文件资源。
+3. **路由阶段**：
+   - 根据 `integrationId` 找到触发器绑定；
+   - 再按单聊范围、群聊范围和群内回复策略判断是否允许触发；
+   - 未命中或不允许时不会进入数字专家。
+4. **执行阶段**：
+   - 运行时回调存在时直接推进当前工作流；
+   - 回调不存在时进入持久化 handoff 队列；
+   - 数字专家执行完成后通过飞书上下文回复用户。
+
+## 会话与消息汇总
+
+`sessionTimeoutSeconds` 控制飞书会话与数字专家会话的续接时间。用户超过该空闲时间后再次发消息，会开启新的数字专家会话。
+
+`summaryWindowSeconds` 用于合并连续短消息：
+
+- 设置为 `0`：每条消息立即触发数字专家。
+- 设置为大于 `0`：同一会话在该时间窗口内收到的消息先暂存，最终合并成一条输入发送给数字专家。
+
+汇总期间如果又收到新消息，系统会刷新汇总版本，只分发最新版本，避免旧窗口重复触发。
+
+## 群聊触发策略
+
+飞书群聊默认使用 `mention_only`，即只有 @ 机器人时才触发。若改为 `all_messages`，群内所有消息都会进入触发判断，适合专用机器人群，不适合大群随意打开。
+
+如果只希望部分群可以触发，请把 `allowedGroupScope` 设置为 `selected_chats`，并在 `allowedGroupChatIds` 中选择允许的群。
+
+## 常见问题
+
+### 保存了飞书集成但机器人没有回复
+
+优先检查：
+
+- 目标数字专家是否已经添加并发布飞书触发器；
+- 触发器是否启用，并选择了当前飞书机器人实际使用的集成；
+- 群聊中是否 @ 了机器人，或 `groupReplyStrategy` 是否设置为 `all_messages`；
+- 飞书应用是否订阅了 `im.message.receive_v1` 事件；
+- Webhook 模式下回调地址是否公网可访问；
+- 长连接模式下状态页是否显示 connected。
+
+### 指定用户或指定群聊选择器为空
+
+选择器依赖飞书集成读取通讯录和群聊列表。如果为空，请检查飞书应用权限是否包含通讯录/群聊读取能力，并重新发布飞书应用。
+
+### 图片消息没有进入模型
+
+飞书图片会通过消息资源读取并转成数字专家可见的文件输入。请确认应用具备读取消息资源的权限，并且目标模型支持视觉输入。
 
 ## 启动恢复策略
 
@@ -43,5 +118,5 @@ Lark Trigger 使用 `bootstrap.mode = skip`：
 
 - 触发器节点总览： [工作流触发器](../../workflow/trigger/)
 - 数字专家多 Channel 接入： [数字专家](../../agent/agent/)
-- 飞书插件与接入背景： [Lark 插件文档](../lark/)
+- 飞书集成配置： [飞书集成](../integration/lark-integration/)
 - 源码地址： [xpert-plugins / lark integration](https://github.com/xpert-ai/xpert-plugins/tree/main/xpertai/integrations/lark)
