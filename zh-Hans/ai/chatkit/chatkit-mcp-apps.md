@@ -378,7 +378,7 @@ ChatKit 只把安全的 MCP App component metadata 写入聊天历史。后端�
 
 ## 相关文档
 
-- [MCP 工具](../toolset/mcp-tools/mcp-tools)
+- [MCP 工具](../agent/toolset/mcp-tools/mcp-tools)
 - [ChatKit Widgets](./chatkit-widgets)
 - [客户端工具](./chatkit-tool)
 - [技能和插件](./chatkit-runtime-capabilities)

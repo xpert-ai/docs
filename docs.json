@@ -179,6 +179,39 @@
                       "en/ai/agent/ai-assistant/roles",
                       "en/ai/agent/ai-assistant/configure-ai-assistant"
                     ]
+                  },
+                  {
+                    "group": "Toolset",
+                    "pages": [
+                      "en/ai/agent/toolset/built-in-toolset",
+                      "en/ai/agent/toolset/custom-toolset",
+                      "en/ai/agent/toolset/scheduled-tasks",
+                      "en/ai/agent/toolset/feishu",
+                      "en/ai/agent/toolset/dingtalk",
+                      "en/ai/agent/toolset/planning-tasks",
+                      "en/ai/agent/toolset/coding-expert",
+                      "en/ai/agent/toolset/bi-toolset/bi-toolset",
+                      "en/ai/agent/toolset/bi-toolset/modeling",
+                      "en/ai/agent/toolset/bi-toolset/indicators",
+                      "en/ai/agent/toolset/bi-toolset/dashboard",
+                      "en/ai/agent/toolset/bi-toolset/data-governance",
+                      "en/ai/agent/toolset/chatbi-toolset/app",
+                      "en/ai/agent/toolset/chatbi-toolset/bot",
+                      "en/ai/agent/toolset/chatbi-toolset/models",
+                      "en/ai/agent/toolset/chatbi-toolset/webpage",
+                      "en/ai/agent/toolset/chatbi-toolset/chatbi",
+                      "en/ai/agent/toolset/mcp-tools/index",
+                      "en/ai/agent/toolset/mcp-tools/crawl4ai",
+                      "en/ai/agent/toolset/virtual-environment/bash-command-execution",
+                      "en/ai/agent/toolset/virtual-environment/file-tools",
+                      "en/ai/agent/toolset/virtual-environment/code-project",
+                      "en/ai/agent/toolset/virtual-environment/python-execution",
+                      "en/ai/agent/toolset/virtual-environment/browser-use-tools",
+                      "en/ai/agent/toolset/virtual-environment/browser-tools",
+                      "en/ai/agent/toolset/virtual-environment/computer-tools",
+                      "en/ai/agent/toolset/virtual-environment/git-tools",
+                      "en/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
                   }
                 ]
               },
@@ -224,64 +257,6 @@
                       "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-4-upload-files",
                       "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-5-manage-use-knowledge-base",
                       "en/ai/knowledge-base/create-knowledge-base-via-pipeline/data-source-authorization"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Toolset",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/ai/toolset/built-in-toolset",
-                      "en/ai/toolset/custom-toolset",
-                      "en/ai/toolset/scheduled-tasks",
-                      "en/ai/toolset/feishu",
-                      "en/ai/toolset/dingtalk",
-                      "en/ai/toolset/planning-tasks",
-                      "en/ai/toolset/coding-expert"
-                    ]
-                  },
-                  {
-                    "group": "Bi Toolset",
-                    "pages": [
-                      "en/ai/toolset/bi-toolset/bi-toolset",
-                      "en/ai/toolset/bi-toolset/modeling",
-                      "en/ai/toolset/bi-toolset/indicators",
-                      "en/ai/toolset/bi-toolset/dashboard",
-                      "en/ai/toolset/bi-toolset/data-governance"
-                    ]
-                  },
-                  {
-                    "group": "Chatbi Toolset",
-                    "pages": [
-                      "en/ai/toolset/chatbi-toolset/app",
-                      "en/ai/toolset/chatbi-toolset/bot",
-                      "en/ai/toolset/chatbi-toolset/models",
-                      "en/ai/toolset/chatbi-toolset/webpage",
-                      "en/ai/toolset/chatbi-toolset/chatbi"
-                    ]
-                  },
-                  {
-                    "group": "Mcp Tools",
-                    "pages": [
-                      "en/ai/toolset/mcp-tools/index",
-                      "en/ai/toolset/mcp-tools/crawl4ai"
-                    ]
-                  },
-                  {
-                    "group": "Virtual Environment",
-                    "pages": [
-                      "en/ai/toolset/virtual-environment/bash-command-execution",
-                      "en/ai/toolset/virtual-environment/file-tools",
-                      "en/ai/toolset/virtual-environment/code-project",
-                      "en/ai/toolset/virtual-environment/python-execution",
-                      "en/ai/toolset/virtual-environment/browser-use-tools",
-                      "en/ai/toolset/virtual-environment/browser-tools",
-                      "en/ai/toolset/virtual-environment/computer-tools",
-                      "en/ai/toolset/virtual-environment/git-tools",
-                      "en/ai/toolset/virtual-environment/slideshow-tools"
                     ]
                   }
                 ]
@@ -1030,6 +1005,36 @@
                       "zh-Hans/ai/agent/ai-assistant/configure-ai-assistant",
                       "zh-Hans/ai/agent/ai-assistant/ai-assitant"
                     ]
+                  },
+                  {
+                    "group": "工具集",
+                    "pages": [
+                      "zh-Hans/ai/agent/toolset/built-in-toolset",
+                      "zh-Hans/ai/agent/toolset/custom-toolset",
+                      "zh-Hans/ai/agent/toolset/scheduled-tasks",
+                      "zh-Hans/ai/agent/toolset/feishu",
+                      "zh-Hans/ai/agent/toolset/dingtalk",
+                      "zh-Hans/ai/agent/toolset/planning-tasks",
+                      "zh-Hans/ai/agent/toolset/coding-expert",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/data-modeling",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/indicator-management",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/dashboard",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/data-governance",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/self-built-app-configuration",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/dialogue-model",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/dialogue-robot",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/quick-application",
+                      "zh-Hans/ai/agent/toolset/mcp-tools/crawl4ai",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/bash-command-execution",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/file-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/code-project",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/python-execution",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/browser-use-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/browser-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/computer-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
                   }
                 ]
               },
@@ -1074,61 +1079,6 @@
                       "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-4-upload-files",
                       "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-5-manage-use-knowledge-base",
                       "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/data-source-authorization"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "工具集",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/ai/toolset/built-in-toolset",
-                      "zh-Hans/ai/toolset/custom-toolset",
-                      "zh-Hans/ai/toolset/scheduled-tasks",
-                      "zh-Hans/ai/toolset/feishu",
-                      "zh-Hans/ai/toolset/dingtalk",
-                      "zh-Hans/ai/toolset/planning-tasks",
-                      "zh-Hans/ai/toolset/coding-expert"
-                    ]
-                  },
-                  {
-                    "group": "BI 工具集",
-                    "pages": [
-                      "zh-Hans/ai/toolset/bi-toolset/data-modeling",
-                      "zh-Hans/ai/toolset/bi-toolset/indicator-management",
-                      "zh-Hans/ai/toolset/bi-toolset/dashboard",
-                      "zh-Hans/ai/toolset/bi-toolset/data-governance"
-                    ]
-                  },
-                  {
-                    "group": "ChatBI 工具集",
-                    "pages": [
-                      "zh-Hans/ai/toolset/chatbi-toolset/self-built-app-configuration",
-                      "zh-Hans/ai/toolset/chatbi-toolset/dialogue-model",
-                      "zh-Hans/ai/toolset/chatbi-toolset/dialogue-robot",
-                      "zh-Hans/ai/toolset/chatbi-toolset/quick-application"
-                    ]
-                  },
-                  {
-                    "group": "MCP 工具",
-                    "pages": [
-                      "zh-Hans/ai/toolset/mcp-tools/crawl4ai"
-                    ]
-                  },
-                  {
-                    "group": "虚拟环境",
-                    "pages": [
-                      "zh-Hans/ai/toolset/virtual-environment/bash-command-execution",
-                      "zh-Hans/ai/toolset/virtual-environment/file-tools",
-                      "zh-Hans/ai/toolset/virtual-environment/code-project",
-                      "zh-Hans/ai/toolset/virtual-environment/python-execution",
-                      "zh-Hans/ai/toolset/virtual-environment/browser-use-tools",
-                      "zh-Hans/ai/toolset/virtual-environment/browser-tools",
-                      "zh-Hans/ai/toolset/virtual-environment/computer-tools",
-                      "zh-Hans/ai/toolset/virtual-environment/git-tools",
-                      "zh-Hans/ai/toolset/virtual-environment/slideshow-tools"
                     ]
                   }
                 ]

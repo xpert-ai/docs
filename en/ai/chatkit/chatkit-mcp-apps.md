@@ -378,7 +378,7 @@ For local development, non-production environments enable MCP Apps by default an
 
 ## See Also
 
-- [MCP Tools](../toolset/mcp-tools/index)
+- [MCP Tools](../agent/toolset/mcp-tools/index)
 - [ChatKit Widgets](./chatkit-widgets)
 - [Client Tools](./chatkit-tool)
 - [Skills and Plugins](./chatkit-runtime-capabilities)

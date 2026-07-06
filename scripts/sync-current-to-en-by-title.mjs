@@ -33,7 +33,7 @@ const PAIRS = {
   conversation: { srcRel: "current/ai/chat", dstRel: "en/ai/agent/conversation" },
   digitalExpert: { srcRel: "current/ai/xpert", dstRel: "en/ai/agent" },
   knowledge: { srcRel: "current/ai/knowledge", dstRel: "en/ai/knowledge-base" },
-  toolset: { srcRel: "current/ai/tool", dstRel: "en/ai/toolset" },
+  toolset: { srcRel: "current/ai/tool", dstRel: "en/ai/agent/toolset" },
   troubleshooting: { srcRel: "current/ai/troubleshooting", dstRel: "en/ai/troubleshooting" },
   workflow: { srcRel: "current/ai/workflow", dstRel: "en/ai/workflow" },
   pluginDev: { srcRel: "current/plugin", dstRel: "en/ai/plugin-development" },
@@ -344,4 +344,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

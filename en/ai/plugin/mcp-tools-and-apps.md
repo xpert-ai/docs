@@ -546,7 +546,7 @@ Cover these cases before shipping:
 ## See Also
 
 - [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)
-- [MCP Tools](../toolset/mcp-tools/index)
+- [MCP Tools](../agent/toolset/mcp-tools/index)
 - [Remote Component Plugins](./remote-component)
 - [Plugin Development Steps](./develop)
 - [Publishing and Usage](./install)
