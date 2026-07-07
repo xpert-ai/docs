@@ -1,0 +1,78 @@
+---
+title: 管理员接入与配置
+sidebar_position: 3
+---
+
+Xpert Tag 的管理员配置目标是让企业先把 IM 平台接入 Xpert，再把群、数字专家、知识库、工具、权限和预算配置到同一个产品入口中。
+
+<Tip>
+当前版本需要通过系统集成、插件触发器和数字专家工作流组合完成接入。独立的 Tag 管理后台为 `未实现（规划）`。
+</Tip>
+
+## 接入流程
+
+1. 在租户级安装对应通信插件。
+2. 在系统集成中创建 [飞书](../plugin/integration/lark-integration)、[钉钉](../plugin/integration/dingtalk-integration) 或[企业微信](../plugin/integration/wecom-integration)集成。
+3. 在目标数字专家工作流中添加对应 Trigger。
+4. 选择集成实例，配置会话超时、消息汇总、群聊范围或单聊范围。
+5. 连接后续 Agent、知识库、工具集、技能和业务流程节点。
+6. 发布数字专家。
+7. 把机器人加入目标群或打开单聊测试。
+
+未来 Tag 管理后台应把第 2 到第 6 步收敛为“创建 Tag 应用 -> 选择 IM -> 选择群 -> 绑定数字专家 -> 绑定能力包 -> 测试发布”。
+
+## 平台准备
+
+| 平台 | 当前接入方式 | 关键配置 | 相关文档 |
+| --- | --- | --- | --- |
+| [飞书 / Lark](../plugin/integration/lark-integration) | 自建应用机器人，支持 Webhook 或长连接。推荐长连接。 | `App ID`、`App Secret`、事件订阅、机器人权限、可用范围。 | [飞书集成](../plugin/integration/lark-integration)、[飞书触发器](../plugin/trigger/lark-trigger) |
+| [钉钉](../plugin/integration/dingtalk-integration) | 企业内部应用机器人，支持 Stream 或 HTTP。推荐 Stream。 | `Client ID/AppKey`、`Client Secret`、`Robot Code`、Stream 或回调配置。 | [钉钉集成](../plugin/integration/dingtalk-integration)、[钉钉触发器](../plugin/trigger/dingtalk-trigger) |
+| [企业微信](../plugin/integration/wecom-integration) | 短连接回调或长连接智能机器人。推荐长连接。 | `Token/EncodingAESKey` 或 `Bot ID/Secret`。 | [企业微信集成](../plugin/integration/wecom-integration)、[企业微信触发器](../plugin/trigger/wecom-trigger) |
+
+## 数字专家绑定
+
+当前触发器采用明确绑定模型：
+
+- [飞书](../plugin/trigger/lark-trigger)、[钉钉](../plugin/trigger/dingtalk-trigger)、[企业微信](../plugin/trigger/wecom-trigger) 触发器会将一个 `integrationId` 绑定到一个 `xpertId`。
+- 同一个 IM 集成同一时间通常只能绑定一个数字专家，避免一个机器人消息同时触发多个专家。
+- 会话绑定优先于触发器绑定，已有会话在超时时间内会继续进入原数字专家上下文。
+- 用户可以通过平台支持的结束会话按钮或 `/new` 类命令开启新会话，具体取决于 IM 插件。
+
+Tag 产品化后，应支持在“群/频道”维度配置默认数字专家，并允许通过 @ 不同专家、命令或技能路由到不同能力。
+
+## 推荐试点配置
+
+| 试点类型 | 推荐配置 | 说明 |
+| --- | --- | --- |
+| 项目群 | 一个项目管理数字专家 + 项目知识库 + 文档生成工具。 | 验证群总结、待办追踪、PRD/周报生成。 |
+| 支持群 | 一个支持分流专家 + FAQ 知识库 + 工单创建工具。 | 验证问题回答、重复请求识别、工单草稿。 |
+| 数据群 | 一个数据分析专家 + ChatBI/BI 工具集 + 只读数据连接。 | 验证指标问答、图表和日报。 |
+| 运维群 | 一个告警分析专家 + 监控/日志/工单工具。 | 验证告警摘要、初步排障和升级建议。 |
+| 代码群 | 一个 Coding Expert + 代码平台连接。 | 验证仓库问答、代码审查、Issue/PR 辅助。 |
+
+## 后续 Tag 管理后台
+
+以下能力为 `未实现（规划）`：
+
+| 能力 | 目标 |
+| --- | --- |
+| Tag 应用列表 | 查看所有 IM 平台、机器人、绑定群、状态和最近错误。 |
+| 群/频道绑定 | 按组织、IM 工作区、群、单聊或线程配置数字专家。 |
+| Access Bundle | 将知识库、工具集、业务系统凭证、域名白名单、模型、指令和预算组合成可复用能力包。 |
+| 能力预检 | 发布前检查 IM 权限、机器人是否在群内、知识库和工具凭证是否可用。 |
+| 测试消息 | 从后台向目标群发送测试消息并查看回执。 |
+| 会话管理 | 查看、重置、取消或恢复 Tag session。 |
+| 用量与成本 | 按平台、群、专家、工具、模型统计用量和成本。 |
+| 审计导出 | 导出消息输入、工具调用、结果、操作者和错误记录。 |
+
+## 发布检查
+
+上线一个群前，管理员应确认：
+
+- IM 应用已经发布，机器人能力启用，事件订阅和回调/长连接可用。
+- 机器人已加入目标群，群聊触发策略符合预期。
+- 触发器已经发布，并选择正确集成。
+- 数字专家绑定了必要知识库、工具集和技能。
+- 写操作工具默认需要确认或审批。
+- 敏感数据、文件和图片输入符合企业合规要求。
+- 试点群成员知道哪些能力已经上线，哪些仍是 `未实现（规划）`。

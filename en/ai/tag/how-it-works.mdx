@@ -1,0 +1,83 @@
+---
+title: How Xpert Tag Works
+sidebar_position: 2
+---
+
+The core of Xpert Tag is turning an IM request into a traceable Agent session. The session is bound to the source platform, group or direct message, sender, digital expert, context, and access configuration.
+
+## Request Lifecycle
+
+| Stage | Behavior | Status |
+| --- | --- | --- |
+| Trigger | A user mentions a bot in a group, sends a DM, or an event/schedule starts work. | Available foundation |
+| Normalize | The IM plugin converts platform events into Xpert messages, files, and runtime context. | Available foundation |
+| Route | The trigger resolves the target digital expert from the `integrationId -> xpertId` binding. | Available foundation |
+| Continue conversation | External conversation, sender, and expert bindings keep context until timeout. | Available foundation |
+| Execute | The digital expert workflow calls knowledge bases, toolsets, skills, code, or business systems. | Available foundation |
+| Show progress | Text, cards, or message updates show execution progress. | Partially available |
+| Return result | Text, Markdown, cards, files, images, or business links are sent back to the IM conversation. | Partially available |
+| Unified Tag audit | A single session record captures inputs, context, tools, cost, and output. | Planned |
+
+## Triggers
+
+| Trigger | Description | Status |
+| --- | --- | --- |
+| Group mention | A user mentions the bot in a [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), or [WeCom](../plugin/integration/wecom-integration) group chat. | Available foundation |
+| Direct message | A user sends a message directly to the bot. | Available foundation |
+| Thread or conversation continuation | Messages continue into the existing expert context before timeout. | Available foundation |
+| Message aggregation window | Short consecutive messages can be merged through `summaryWindowSeconds`. | Available foundation |
+| Scheduled trigger | Schedule Trigger starts work from a Cron schedule. | Available foundation |
+| Card button | Supported platforms can continue or end a conversation through card callbacks. | Partially available |
+| Group message watch | Watch selected group messages and proactively start work. | Planned |
+| Natural-language routine creation | A user says “summarize this group every day at 9” and creates a routine. | Planned |
+| PR or ticket follow-up | Subscribe to PR, CI, ticket, or approval updates and post back to the group. | Planned |
+
+## Context Package
+
+A Tag session should build a unified context package. Current behavior comes from individual IM plugins and Xpert workflows; productization should make this a cross-platform model.
+
+| Context | Current capability | Status |
+| --- | --- | --- |
+| Current triggering message | IM triggers read message text, sender, and conversation details. | Available foundation |
+| Direct/group conversation | Conversation binding tables map external conversations to Xpert conversations. | Available foundation |
+| Attachments | [Lark](../plugin/integration/lark-integration) can read message resources; [WeCom](../plugin/integration/wecom-integration) supports image input; [DingTalk](../plugin/integration/dingtalk-integration) handles attachments according to platform capability. | Partially available |
+| Group message history | [Lark](../plugin/integration/lark-integration) has message history and resource tools; [DingTalk](../plugin/integration/dingtalk-integration) and [WeCom](../plugin/integration/wecom-integration) depend on platform capability. | Partially available |
+| Knowledge retrieval | Digital experts can bind knowledge bases and retrieval nodes. | Available foundation |
+| Tools and skills | Workflows, toolsets, and Skills Middleware can participate in execution. | Available foundation |
+| Group memory | Stable group rules, project facts, and output formats. | Planned |
+| Group-level Access Bundle | A group-scoped package of knowledge, tools, credentials, model policy, and budget. | Planned |
+
+## Progress Display
+
+Current IM plugins already support some message update patterns, but Xpert does not yet have a unified Xpert Tag live checklist.
+
+| Platform | Current display | Target display |
+| --- | --- | --- |
+| [Lark / Feishu](../plugin/integration/lark-integration) | Text, rich text, interactive cards, message updates, streaming update window. | Unified Tag progress card, step state, tool-call summary, cancel/continue buttons. |
+| [DingTalk](../plugin/integration/dingtalk-integration) | Text, Markdown, interactive cards, card callbacks, update/recall. | Unified Tag progress card and long-task status. |
+| [WeCom](../plugin/integration/wecom-integration) | Thinking hints, long-connection streaming replies, template cards, card updates. | Status, result, reset, and continuation controls according to platform capabilities. |
+
+The common live checklist/progress renderer is **Partially available**. The future Xpert Tag runtime should emit platform-neutral progress events, and each IM adapter should render them in the best platform-native shape.
+
+## Result Forms
+
+Xpert Tag results should not be limited to chat replies. Target result forms include:
+
+- Text summaries, conclusions, and recommendations: available foundation.
+- Markdown, rich text, and cards: partially available, platform-dependent.
+- Images, files, attachments, and document links: partially available.
+- BI charts, metric analysis, and data reports: partially available through Agentic BI and toolsets.
+- Tickets, approvals, CRM, ERP, or PLM operation results: partially available depending on plugins and workflows.
+- Code changes, PRs, CI tracking, and code review: partially available through Coding Expert and code platform connections.
+
+## Session Boundary
+
+Current IM plugins usually maintain conversation bindings by `integrationId + external conversation + sender` or a similar key. Xpert Tag should add a unified Tag session concept:
+
+- One task in a group or thread maps to one Tag session.
+- The session locks the digital expert, tools, knowledge, model, and access snapshot at creation time.
+- Later admin configuration changes apply to new sessions, while running sessions continue with their creation snapshot.
+- Final results, external artifacts, audit records, and group memory can persist after the session ends.
+- Temporary sandbox files and intermediate state should not be treated as durable assets unless saved to workspace, documents, repositories, or files.
+
+The unified Tag session lifecycle is **Planned**.

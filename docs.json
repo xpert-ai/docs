@@ -216,6 +216,23 @@
                 ]
               },
               {
+                "tab": "Tag",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/tag/index",
+                      "en/ai/tag/how-it-works",
+                      "en/ai/tag/admin-setup",
+                      "en/ai/tag/access-and-security",
+                      "en/ai/tag/memory-and-routines",
+                      "en/ai/tag/use-cases",
+                      "en/ai/tag/capability-status"
+                    ]
+                  }
+                ]
+              },
+              {
                 "tab": "Skill",
                 "groups": [
                   {
@@ -1034,6 +1051,23 @@
                       "zh-Hans/ai/agent/toolset/virtual-environment/computer-tools",
                       "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
                       "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Tag",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/tag/index",
+                      "zh-Hans/ai/tag/how-it-works",
+                      "zh-Hans/ai/tag/admin-setup",
+                      "zh-Hans/ai/tag/access-and-security",
+                      "zh-Hans/ai/tag/memory-and-routines",
+                      "zh-Hans/ai/tag/use-cases",
+                      "zh-Hans/ai/tag/capability-status"
                     ]
                   }
                 ]

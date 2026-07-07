@@ -1,0 +1,183 @@
+---
+title: Use Cases
+sidebar_position: 6
+---
+
+Xpert Tag matters because it places digital experts inside the chats where teams already work. The scenarios below combine current Xpert foundations with future Xpert Tag product goals.
+
+## Scenario Matrix
+
+| Scenario | Users | Required capabilities | Status |
+| --- | --- | --- | --- |
+| Request triage | IT, legal, design, admin, support | Group mention, knowledge base, ticketing tool, group rules. | Partially available |
+| Group catch-up and tracking | PMs, team leads | Group context, summarization, todo detection, Schedule Trigger. | Partially available |
+| Docs and tickets | Product, delivery, support | Discussion summary, document templates, ticket/document tools. | Partially available |
+| Project status | PM, delivery, customer success | Project group context, tickets, approvals, calendars, report routine. | Partially available |
+| Data questions | Business, operations, data teams | BI toolset, semantic model, read-only data connection, chart output. | Partially available |
+| Knowledge lookup | Everyone | Knowledge base, document sources, citations. | Available foundation |
+| Document review | Compliance, procurement, presales, legal | File input, knowledge base, checklist, review report. | Partially available |
+| Sales state | Sales, customer success | CRM, calls, deals, customer knowledge base. | Planned |
+| Monitoring alerts | SRE, operations, engineering | Monitoring/log/ticket tools, group watch, scheduled checks. | Planned |
+| Bugs and GitHub | Engineering, QA, product | Coding Expert, code platform, CI, PR follow-up. | Partially available |
+
+## Request Triage
+
+Good for `#ask-it`, design support, legal help, and customer support groups.
+
+Example:
+
+```text
+@Xpert does this request already have a process? If yes, answer directly; if not, draft a ticket and suggest an owner.
+```
+
+Available today:
+
+- Group mention and DM triggers.
+- Knowledge base Q&A.
+- Ticketing tools or custom workflows.
+- Message aggregation window.
+
+Planned:
+
+- Group memory for “how to triage requests”.
+- Group message watch for unhandled requests.
+- Unified duplicate detection and weekly theme rollups.
+
+## Group Catch-Up And Tracking
+
+Good for project, release, and customer delivery groups.
+
+Example:
+
+```text
+@Xpert summarize this week’s key progress, risks, blockers, and todos, grouped by owner.
+```
+
+Available today:
+
+- [Lark](../plugin/integration/lark-integration) message history and resource tools.
+- Trigger conversation context.
+- Schedule Trigger.
+- Text or card result rendering.
+
+Partially available:
+
+- Group history capability differs by IM platform.
+- Live checklist and unified progress display are not yet common.
+
+Planned:
+
+- Group-level routine management.
+- Group memory for report format and project rules.
+
+## Docs And Tickets
+
+Good for requirement discussions, customer feedback, incident reviews, and meeting notes.
+
+Example:
+
+```text
+@Xpert turn this discussion into a one-page PRD: background, users, scope, non-goals, acceptance criteria, and open questions.
+```
+
+Available today:
+
+- Digital experts can generate structured document drafts.
+- Knowledge bases, toolsets, and templates.
+- Some platforms support files, cards, or links.
+
+Planned:
+
+- Tag artifact management page.
+- Unified “turn into ticket/doc/approval” buttons from group chat.
+- Unified audit linking outputs to the Tag session.
+
+## Data Questions
+
+Good for operations, business analysis, and sales management groups.
+
+Example:
+
+```text
+@Xpert check this week’s new leads and conversion rate by region, generate a chart, and call out anomalies.
+```
+
+Available today:
+
+- BI toolset, ChatBI, semantic models, and indicator management.
+- Digital experts can call tools and produce analysis.
+
+Partially available:
+
+- Returning charts and files reliably in IM depends on platform capability.
+- Group-level read-only data Access Bundle is not productized yet.
+
+## Knowledge Lookup
+
+Good for policy Q&A, product manuals, implementation manuals, and presales material.
+
+Example:
+
+```text
+@Xpert what are the current procurement approval thresholds? Include the source.
+```
+
+Available today:
+
+- Knowledge base retrieval.
+- Document-source integrations such as [Lark](../plugin/integration/lark-integration) documents.
+- Digital experts can answer with sources.
+
+Recommendations:
+
+- Start pilots with read-only knowledge bases.
+- Require sources or citations in answers.
+- Move stable rules into skills or group memory.
+
+## Monitoring Alerts
+
+Good for SRE, operations, and engineering incident groups.
+
+Example:
+
+```text
+@Xpert investigate this alert using recent deploys, error logs, and metric trends. Diagnosis only; do not change code.
+```
+
+Available today:
+
+- Toolsets or custom plugins can connect monitoring, logs, and tickets.
+- Digital experts can generate diagnosis steps and summaries.
+
+Planned:
+
+- Group watch to trigger alert analysis automatically.
+- Monitoring Access Bundle.
+- Default-deny network egress and credential proxy.
+- Alert routine state management.
+
+## Bugs And GitHub
+
+Good for engineering, QA, and code review groups.
+
+Example:
+
+```text
+@Xpert check whether this bug exists in acme/data-pipeline. If it is a bug, propose a fix and prepare a draft PR; if not, explain the current code behavior.
+```
+
+Available today:
+
+- [Coding Expert](../agent/toolset/coding-expert) supports mainstream code platform connections and issue/PR workflows.
+- Virtual environment, Git tools, and code execution tools can support code analysis.
+
+Partially available:
+
+- Full code-platform tasks from IM groups require combining digital experts and toolsets.
+- “Open PR, follow CI, and post updates back to the group” is not yet a unified Tag flow.
+
+Planned:
+
+- Group-level GitHub repository grants.
+- PR follow routines.
+- Bidirectional links between PRs and Tag sessions with unified audit.

@@ -1,0 +1,105 @@
+---
+title: Memory And Routines
+sidebar_position: 5
+---
+
+Memory and routines move Xpert Tag from “passive chat bot” to “long-term participant in team work”. Xpert already has long-term memory, file memory, skills, Schedule Trigger, and scheduled-task tools, but group-level memory and natural-language routines are not yet productized.
+
+## Group Memory
+
+Group memory stores rules, facts, preferences, and decisions that remain useful for a group.
+
+| Memory type | Example | Status |
+| --- | --- | --- |
+| Group rule | “Answer with the conclusion first, then evidence.” | Planned |
+| Output format | “Daily reports must include progress, risks, blockers, and next steps.” | Planned |
+| Project fact | “The current customer is Huayu Sanden.” | Planned |
+| Decision record | “Quote at 2000 per person-day.” | Planned |
+| Forbidden content | “Do not show internal product code names in customer groups.” | Planned |
+| Tool preference | “Use the acme/data-pipeline repository for code tasks by default.” | Planned |
+
+Target interaction:
+
+```text
+@Xpert remember: daily reports in this group should use a table and include risks and owners.
+@Xpert what do you remember about this group?
+@Xpert forget the old quoting process.
+@Xpert correct this: our release window is Wednesday, not Friday.
+```
+
+## Memory Boundaries
+
+The default Xpert Tag memory model should be conservative:
+
+- Private group memory is visible only to that group.
+- Public group memory also writes only to that group by default.
+- Organization admins can explicitly enable public group memory sharing.
+- Group members can add ordinary memories.
+- Group admins can delete, lock, or correct group memories.
+- All memory changes are audited.
+
+All of the above is `Planned`. Current [long-term memory](../agent/long-term-memory) and [file memory](../agent/file-memory-dreaming) foundations can be reused, but they are not yet a group-scoped Tag memory store.
+
+## Routines
+
+A routine is standing work created and managed from a group. It uses that group’s bound digital expert, knowledge, tools, and access.
+
+| Routine type | Example | Status |
+| --- | --- | --- |
+| Scheduled job | Every weekday at 9, summarize unresolved issues in this group. | Partially available |
+| Group message watch | Watch for “urgent”, “incident”, or “customer complaint” and summarize automatically. | Planned |
+| External event subscription | Post back when PR, CI, ticket, or approval state changes. | Planned |
+| Follow-up task | Track a contract, approval, PR, or issue until it closes. | Planned |
+| Natural-language creation | A user creates a routine with one sentence in the group. | Planned |
+
+Xpert can already run fixed scheduled work through [Schedule Trigger](../plugin/trigger/schedule-trigger) and scheduled-task tools. It does not yet have a unified group experience for creating, listing, editing, pausing, resuming, and deleting routines from natural language.
+
+## Routine Management Commands
+
+Target commands:
+
+```text
+@Xpert every weekday at 9, summarize unresolved issues from yesterday and list owners.
+@Xpert every day at 5pm, summarize today’s project progress, blockers, and tomorrow’s plan.
+@Xpert watch this group for “urgent”, “incident”, and “customer complaint”; summarize and mention the owner when they appear.
+@Xpert list this group’s routines.
+@Xpert pause the Friday weekly report.
+@Xpert resume the daily standup summary.
+```
+
+Management status:
+
+| Capability | Status |
+| --- | --- |
+| Trigger a digital expert on Cron | Available foundation |
+| Create scheduled work from group natural language | Planned |
+| List this group’s routines | Planned |
+| Edit time and output format | Planned |
+| Pause, resume, delete routines | Planned |
+| View recent execution history | Planned |
+| Failure retry and exception notification | Partially available |
+
+## PR And Ticket Follow-Up
+
+Engineering routines should support:
+
+- Subscribe to a PR and post when CI finishes, review arrives, or it merges.
+- Start from a group bug report, analyze code, and open a draft PR when needed.
+- Track ticket status and remind owners when blocked.
+- Turn group discussion into issues, requirements, or approval drafts.
+
+[Coding Expert](../agent/toolset/coding-expert) already provides code platform, issue, PR, and code-task foundations, so GitHub/GitLab/Gitee/Yunxiao workflows are **Partially available**. The complete Xpert Tag flow for “create PR follow routine from group chat and keep posting updates” is `Planned`.
+
+## Relationship To Skills
+
+Group memory stores short, stable, group-shared facts. Skills store reusable processes, templates, and task instructions.
+
+| Content | Put it in |
+| --- | --- |
+| “Daily reports in this group use tables.” | Group memory |
+| “Customer-facing plans must not mention internal code names.” | Group memory |
+| “Full presales proposal SOP.” | Skill |
+| “Code review rules and PR template.” | Skill or repository rules |
+| “Approval flow and ticket field mapping.” | Workflow or plugin configuration |
+
+When a memory becomes long, complex, or reusable across groups, turn it into a skill or workflow template.

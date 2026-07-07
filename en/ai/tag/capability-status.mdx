@@ -1,0 +1,71 @@
+---
+title: Capability Status
+sidebar_position: 7
+---
+
+This page summarizes the current foundations, partially available features, and planned capabilities for Xpert Tag. Status labels support product communication and roadmap planning. They do not mean every capability behaves identically across every IM platform.
+
+## Status Labels
+
+| Status | Meaning |
+| --- | --- |
+| Available foundation | Existing Xpert or plugin capability can be configured and composed today. |
+| Partially available | Some platforms, plugins, or tools support it, but the unified Tag product experience is missing. |
+| Planned | Product goal for Xpert Tag that still requires new product, backend, frontend, or governance work. |
+
+## IM Integration
+
+| Capability | [Lark/Feishu](../plugin/integration/lark-integration) | [DingTalk](../plugin/integration/dingtalk-integration) | [WeCom](../plugin/integration/wecom-integration) |
+| --- | --- | --- | --- |
+| Webhook inbound | Available foundation | Available foundation | Available foundation |
+| Long connection / Stream | Available foundation | Available foundation | Available foundation |
+| Group mention trigger | Available foundation | Available foundation | Partially available |
+| Direct message trigger | Available foundation | Available foundation | Available foundation |
+| Conversation binding | Available foundation | Available foundation | Available foundation |
+| Message aggregation window | Available foundation | Available foundation | Available foundation |
+| Card callback | Partially available | Available foundation | Partially available |
+| Message update/recall | Partially available | Available foundation | Partially available |
+| Attachment input | Partially available | Partially available | Partially available |
+| Proactive notification | Available foundation | Available foundation | Partially available |
+
+## Xpert Platform Capabilities
+
+| Capability | Status | Notes |
+| --- | --- | --- |
+| Digital experts | Available foundation | The executor users mention in chats. |
+| Workflows | Available foundation | Triggers, Agents, tools, knowledge, and business processes. |
+| Knowledge Base | Available foundation | Q&A, retrieval, and document evidence. |
+| Toolsets | Available foundation | Custom tools, built-in tools, and external systems. |
+| Skills | Available foundation | Reusable instructions, templates, and task processes. |
+| Schedule Trigger | Available foundation | Cron-triggered digital experts. |
+| Virtual environment and sandbox tools | Available foundation | File, code, browser, Git, slideshow, and related tools. |
+| Coding Expert | Partially available | Code platform tasks are available, but not yet a complete group-level Tag flow. |
+| Agentic BI | Partially available | Supports data Q&A and charts, but IM output should be unified. |
+
+## Xpert Tag Product Capabilities
+
+| Capability | Status | Future delivery goal |
+| --- | --- | --- |
+| Dedicated Tag product page and admin entry | Planned | Add a Tag product entry under AI to manage platforms, groups, experts, and status. |
+| Cross-IM Tag configuration model | Planned | Abstract groups, channels, DMs, threads, trigger rules, and reply strategies. |
+| Tag session | Planned | Record one group task’s context, progress, tools, result, and audit. |
+| Group/channel Access Bundle with inherited scopes | Planned | Package knowledge, tools, credentials, model policy, and budget by organization, workspace, group, or thread. |
+| Service account governance | Partially available | Existing integration credentials and technical users can be reused, but a unified model is needed. |
+| Tool Gateway / Credential Proxy | Planned | Boundary credential injection, default-deny egress, host/path/method control. |
+| Common live checklist/progress renderer | Partially available | Emit common progress events and let each IM adapter render cards or text. |
+| Group memory and manageable memory store | Planned | Save group rules, facts, decisions, and output formats with view, correct, delete, and audit. |
+| Natural-language routine/watch/PR follow creation from group chat | Planned | Group members can create, list, pause, and edit standing work in natural language. |
+| Group message watch | Planned | Watch keywords, topics, or events and proactively trigger experts. |
+| GitHub group repository Q&A, bug fixing, PR creation, CI tracking | Partially available | Reuse Coding Expert; add group grants, PR follow, and group audit. |
+| Group audit, usage, cost, and failure-rate dashboards | Planned | Show operational quality and cost by platform, group, expert, tool, and model. |
+
+## Recommended Development Order
+
+1. **Ship the Tag tab and docs**: publish the current product boundary and roadmap.
+2. **Tag management model**: define schemas for platform, group, expert, trigger policy, and session.
+3. **Capability status page**: show current IM integrations, trigger bindings, connection state, and recent errors in the admin UI.
+4. **Access Bundle v1**: start with knowledge bases, toolsets, model, write switch, and budget.
+5. **Unified progress events**: define progress events that [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), and [WeCom](../plugin/integration/wecom-integration) can render natively.
+6. **Group memory v1**: support remember, list, correct, delete, and audit.
+7. **Routine v1**: start from Schedule Trigger, then add natural-language creation and group management.
+8. **Audit and usage**: complete Tag-session-level audit, cost, and failure analysis.

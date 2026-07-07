@@ -1,0 +1,83 @@
+---
+title: Xpert Tag 如何工作
+sidebar_position: 2
+---
+
+Xpert Tag 的核心是把一次 IM 请求转换成一个可追踪的 Agent session。这个 session 绑定到来源平台、群聊或单聊、发送者、数字专家、上下文和权限配置。
+
+## 请求生命周期
+
+| 阶段 | 行为 | 当前状态 |
+| --- | --- | --- |
+| 触发 | 用户在群聊 @ 机器人、单聊发送消息，或外部事件/定时任务触发。 | 已实现基础能力 |
+| 标准化 | IM 插件把平台消息转换为 Xpert 可处理的消息、附件和运行上下文。 | 已实现基础能力 |
+| 路由 | 触发器根据 `integrationId -> xpertId` 绑定找到目标数字专家。 | 已实现基础能力 |
+| 会话续接 | 按平台会话、发送者和数字专家维护会话绑定，支持超时后新建会话。 | 已实现基础能力 |
+| 执行 | 数字专家工作流调用知识库、工具集、技能、代码或业务系统。 | 已实现基础能力 |
+| 进度展示 | 文本、卡片或消息更新展示执行过程。 | 部分实现 |
+| 结果返回 | 将文本、Markdown、卡片、文件、图片或业务链接返回 IM 会话。 | 部分实现 |
+| Tag session 统一审计 | 以统一 session 记录输入、上下文、工具、成本和结果。 | 未实现（规划） |
+
+## 触发方式
+
+| 触发方式 | 说明 | 状态 |
+| --- | --- | --- |
+| 群聊 @ 机器人 | 在 [飞书](../plugin/integration/lark-integration)、[钉钉](../plugin/integration/dingtalk-integration)、[企业微信](../plugin/integration/wecom-integration) 群聊中通过 @ 机器人触发数字专家。 | 已实现基础能力 |
+| 单聊直接发送 | 用户在机器人单聊中发送消息，直接进入数字专家。 | 已实现基础能力 |
+| 线程或会话续接 | 同一会话在超时时间内继续进入已有数字专家上下文。 | 已实现基础能力 |
+| 消息汇总窗口 | 连续短消息可在 `summaryWindowSeconds` 内合并后再交给数字专家。 | 已实现基础能力 |
+| 定时触发 | 使用 Schedule Trigger 按 Cron 触发数字专家。 | 已实现基础能力 |
+| 卡片按钮 | [钉钉](../plugin/integration/dingtalk-integration)、[飞书](../plugin/integration/lark-integration)、[企业微信](../plugin/integration/wecom-integration) 可通过卡片回调继续或结束会话。 | 部分实现 |
+| 群消息 watch | 监听指定群内符合条件的消息并主动触发任务。 | 未实现（规划） |
+| 自然语言创建 routine | 用户在群里说“每天 9 点总结本群”即可创建例行任务。 | 未实现（规划） |
+| PR / 工单跟踪 | 订阅 PR、CI、工单、审批状态并回群更新。 | 未实现（规划） |
+
+## 上下文包
+
+一次 Tag session 应构建统一上下文包。当前能力来自各 IM 插件和 Xpert 工作流，后续需要产品化为跨平台统一模型。
+
+| 上下文 | 当前能力 | 状态 |
+| --- | --- | --- |
+| 当前触发消息 | 各 IM 触发器可读取消息正文、发送者和会话信息。 | 已实现基础能力 |
+| 单聊/群聊会话 | 会话绑定表维护外部会话与 Xpert conversation 的关系。 | 已实现基础能力 |
+| 附件 | [飞书](../plugin/integration/lark-integration) 可读取消息资源；[企业微信](../plugin/integration/wecom-integration) 支持图片输入；[钉钉](../plugin/integration/dingtalk-integration) 依平台能力处理附件。 | 部分实现 |
+| 群历史消息 | [飞书](../plugin/integration/lark-integration) 已有消息历史与资源读取工具；[钉钉](../plugin/integration/dingtalk-integration) 和[企业微信](../plugin/integration/wecom-integration) 依能力差异处理。 | 部分实现 |
+| 知识库检索 | 数字专家可绑定知识库和检索节点。 | 已实现基础能力 |
+| 工具和技能 | 工作流、工具集、技能中间件可参与执行。 | 已实现基础能力 |
+| 群记忆 | 群规则、项目事实、输出格式等长期记忆。 | 未实现（规划） |
+| 群级 Access Bundle | 以群为单位组合知识库、工具、凭证、模型和预算。 | 未实现（规划） |
+
+## 进度展示
+
+现有 IM 插件已经具备部分消息更新能力，但尚未形成统一的 Xpert Tag live checklist。
+
+| 平台 | 当前可用展示 | 目标展示 |
+| --- | --- | --- |
+| [飞书 / Lark](../plugin/integration/lark-integration) | 文本、富文本、互动卡片、消息更新、流式更新窗口。 | 统一 Tag 进度卡片、步骤状态、工具调用摘要、取消/继续按钮。 |
+| [钉钉](../plugin/integration/dingtalk-integration) | 文本、Markdown、交互卡片、卡片回调、消息更新/撤回。 | 统一 Tag 进度卡片和长任务状态。 |
+| [企业微信](../plugin/integration/wecom-integration) | 思考提示、长连接流式回复、模板卡片、卡片更新。 | 按平台能力展示状态、结果和重置/继续操作。 |
+
+通用 live checklist/progress renderer 当前为 **部分实现**。后续应由 Xpert Tag runtime 统一生成状态事件，再由各 IM adapter 渲染为对应平台最合适的消息形态。
+
+## 结果形态
+
+Xpert Tag 的结果不应只是一段聊天回复。目标结果包括：
+
+- 文本摘要、结论和建议：已实现基础能力。
+- Markdown、富文本和卡片：部分实现，取决于平台。
+- 图片、文件、附件和文档链接：部分实现。
+- BI 图表、指标分析和数据报告：部分实现，可复用 Agentic BI 与工具集。
+- 工单、审批、CRM、ERP 或 PLM 操作结果：部分实现，依插件和工作流配置。
+- 代码修改、PR、CI 跟踪和代码审查：部分实现，依 Coding Expert 与代码平台连接。
+
+## 会话边界
+
+当前 IM 插件通常按 `integrationId + 外部会话 + sender` 或类似 key 维护对话绑定。Xpert Tag 后续应在此基础上增加统一的 Tag session 概念：
+
+- 一个群或线程中的一次任务对应一个 Tag session。
+- session 创建时锁定当时的数字专家、工具、知识库、模型和权限快照。
+- 管理员后续改配置时，新 session 生效，运行中的 session 继续使用创建时的配置快照。
+- session 结束后，最终结果、外部 artifact、审计记录和群记忆可以长期保留。
+- 临时沙箱文件和临时中间状态不应被视为长期资产，除非已经保存到工作区、文档、代码仓库或文件系统。
+
+统一 Tag session 生命周期为 **未实现（规划）**。

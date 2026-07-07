@@ -76,6 +76,40 @@
           ]
         },
         {
+          "slug": "tag",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "how-it-works",
+                "admin-setup",
+                "access-and-security",
+                "memory-and-routines",
+                "use-cases",
+                "capability-status"
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "skill",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "marketplace",
+                "skill-repository-registration-and-use",
+                "workspace",
+                "use-in-agent",
+                "administration",
+                "skill-package-format"
+              ]
+            }
+          ]
+        },
+        {
           "slug": "conversation",
           "groups": []
         },

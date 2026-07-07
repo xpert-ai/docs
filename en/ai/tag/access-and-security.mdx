@@ -1,0 +1,110 @@
+---
+title: Access And Security
+sidebar_position: 4
+---
+
+The access goal for Xpert Tag is to make the group the safety boundary for shared work. What a digital expert can access in a group should be configured by administrators, rather than varying with the individual who asked.
+
+## Current Access Foundation
+
+| Capability | Status | Notes |
+| --- | --- | --- |
+| IM integration credentials | Available foundation | [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), and [WeCom](../plugin/integration/wecom-integration) credentials are stored and used through system integrations. |
+| Trigger binding | Available foundation | Triggers bind an IM integration to a target digital expert. |
+| Digital expert runtime identity | Available foundation | Digital experts execute through existing platform runtime and workflow permissions. |
+| Toolset authorization | Available foundation | Toolsets, knowledge bases, and business plugins use current Xpert access models. |
+| Webhook authentication | Available foundation | Plugins protect inbound routes with guards, signatures, tokens, or encrypted callbacks. |
+| Group-level Access Bundle | Planned | There is no cross-IM group capability package model yet. |
+| Unified Tag audit | Planned | There is no single Tag-session-centered audit page yet. |
+| Credential Proxy | Planned | There is no unified credential proxy with default-deny egress yet. |
+
+## Group-Level Access Bundle
+
+Access Bundle is the most important future governance object for Xpert Tag. It should package reusable capabilities and bind them to an organization, IM workspace, group, or channel.
+
+| Configuration | Example | Status |
+| --- | --- | --- |
+| Knowledge scope | Company policies, project materials, product docs. | Planned |
+| Toolsets and plugins | Ticketing, CRM, BI, code platform, approval, documents. | Planned |
+| Business credentials | Service-account API keys, OAuth clients, read-only database accounts. | Planned |
+| Allowed domains | API hosts, document hosts, code platform hosts. | Planned |
+| Default instructions | Output format, risk notes, citation requirements, forbidden content. | Planned |
+| Write policy | Read-only, confirmation required, approval required, or auto-write allowed. | Planned |
+| Model policy | Default model, allowed model switching, cost limits. | Planned |
+| Budget and usage | Group budget, daily limits, anomaly alerts. | Planned |
+
+Recommended bundle patterns:
+
+- `project-readonly`: project knowledge, read-only docs, read-only tickets.
+- `support-triage`: support knowledge, ticket creation, customer-state lookup.
+- `bi-readonly`: semantic metrics and read-only data queries.
+- `code-review`: repository read, PR comments, CI state read.
+- `code-write`: repository write and PR creation, approval required by default.
+
+## Service Account Principle
+
+The target Xpert Tag identity model is: shared group work uses administrator-configured service accounts or platform technical users by default, not the requester’s personal credentials.
+
+| Scenario | Recommended identity | Status |
+| --- | --- | --- |
+| IM send/receive | IM bot application identity. | Available foundation |
+| Digital expert background execution | The platform runtime identity for the target expert. | Available foundation |
+| Business-system read/write | Dedicated service account or governed API credential. | Partially available |
+| Personal private tasks | User personal connections and permissions. | Planned |
+
+Service accounts provide:
+
+- Consistent group capabilities regardless of who asked.
+- Clear external audit logs showing what the Xpert Tag service account did.
+- Central revocation, rotation, and scope reduction without affecting personal accounts.
+- Central confirmation, approval, and risk limits for write operations.
+
+## Credentials And Network Egress
+
+Today, plugins and tools use credentials through existing Xpert integration and tool mechanisms. Xpert Tag should add a unified Credential Proxy.
+
+| Capability | Goal | Status |
+| --- | --- | --- |
+| Write-only credentials | Do not show saved secret values again. | Partially available |
+| Boundary credential injection | Inject credentials only at a controlled runtime boundary. | Planned |
+| Default-deny network egress | Block hosts not allowed by bundle or environment. | Planned |
+| Host/path/method controls | Restrict exact APIs the agent can reach. | Planned |
+| Credentialless allowlist | Allow public hosts without injecting credentials. | Planned |
+| Internal and metadata protection | Block private networks, metadata services, and sensitive addresses. | Planned |
+
+## Audit Requirements
+
+Unified Tag audit is `Planned`. The target audit record should include at least:
+
+- Source platform, group, DM, thread, and message ID.
+- Triggering user, visible member scope, and digital expert.
+- Effective Access Bundle, model, knowledge bases, tools, and skills.
+- Input summary, attachment summary, and context sources.
+- Tool name, parameter summary, result summary, and errors.
+- Write confirmation, approval status, and external record IDs.
+- Output summary, artifact links, and final status.
+- Token usage, cost, duration, and retry records.
+
+## Risk Controls
+
+Xpert Tag should include these built-in controls:
+
+| Risk | Control | Status |
+| --- | --- | --- |
+| Group members overreach into business systems | Group-level Access Bundle and least-privilege service accounts. | Planned |
+| Sensitive output posted to a large group | Sensitive filters, pre-send checks, group-level forbidden content. | Partially available |
+| Accidental write operations | Confirmation, approval workflow, read-only defaults, rollback logs. | Partially available |
+| Long task runs away | Cancel button, budget limits, timeout, retry limits. | Partially available |
+| Plugin credential leak | Write-only credentials, proxy injection, redacted logs. | Partially available |
+| Audit gaps | Unified Tag session audit. | Planned |
+
+## Recommended Defaults
+
+Before full Xpert Tag productization, pilot with conservative defaults:
+
+- Group chats respond only to explicit bot mentions by default.
+- Group history reading is off by default and enabled explicitly per group.
+- Write operations require human confirmation by default.
+- High-risk tools start read-only.
+- New bundles are first attached to private pilot groups.
+- [WeCom](../plugin/integration/wecom-integration) should degrade according to platform capability instead of promising full parity with other platforms.

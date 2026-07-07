@@ -1,0 +1,71 @@
+---
+title: Xpert Tag
+sidebar_position: 1
+---
+
+Xpert Tag brings Xpert digital experts into enterprise IM group chats and direct messages. Team members can mention a bot in [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), or [WeCom](../plugin/integration/wecom-integration), hand work to a digital expert, and receive progress and results back in the same conversation.
+
+<Tip>
+Xpert already has the IM integration, trigger, conversation, aggregation, card/notification, and partial context-reading foundations. Features marked `Planned` are Xpert Tag product goals, not current production behavior.
+</Tip>
+
+## Product Positioning
+
+Xpert Tag is not a simple IM webhook bot, and it does not mean rewriting [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), and [WeCom](../plugin/integration/wecom-integration) into one plugin. It is a governed group-agent product experience built on the existing communication plugins and Xpert platform capabilities:
+
+- **Groups become workspaces**: project, support, alert, sales, and requirement groups can each have their own expert.
+- **Access follows the group**: administrators decide which knowledge bases, tools, plugins, and business systems a group can use.
+- **Work is visible to the team**: progress, key tool calls, results, and traceability return to the original chat or thread.
+- **Results are more than chat**: outputs can be summaries, docs, tickets, charts, metric analysis, code recommendations, or pull request links.
+- **Team behavior can accumulate**: rules, output formats, routines, and repeated workflows can become memory, routines, and skills.
+
+## Relationship To Existing IM Plugins
+
+| Platform | Current foundation | Xpert Tag product direction |
+| --- | --- | --- |
+| [Lark / Feishu](../plugin/integration/lark-integration) | Long connection or webhook, group mentions, DMs, conversation binding, group scopes, message aggregation, cards/updates, message history/resource reading, document-source support. | Configure experts, knowledge, tools, memory, routines, and audit at the group/channel level. |
+| [DingTalk](../plugin/integration/dingtalk-integration) | Stream or HTTP, group mentions, DMs, conversation binding, aggregation, text/Markdown/interactive cards, card callbacks, update/recall. | Use a unified Tag session, progress card, and group-level access model for long-running tasks. |
+| [WeCom](../plugin/integration/wecom-integration) | Short or long connection, DMs/groups, conversation binding, aggregation, template cards, streaming/thinking hints, image input, `/new` reset. | Provide Tag behavior according to platform capabilities and clearly degrade unsupported group experiences. |
+
+## Reused Xpert Capabilities
+
+| Xpert capability | Role in Xpert Tag | Status |
+| --- | --- | --- |
+| Digital experts | The task executor users mention in chats. | Available foundation |
+| Workflows | Governed business flows, routing, approval, extraction, and tool calls. | Available foundation |
+| Knowledge Base | Grounded answers, policy lookup, project materials, and document review. | Available foundation |
+| Toolsets | External APIs, data analysis, notifications, files, code, browser, and virtual environments. | Available foundation |
+| Skills | Reusable team processes, output templates, and task rules. | Available foundation |
+| Schedule Trigger | Daily reports, checks, syncs, and scheduled jobs. | Available foundation |
+| Coding Expert | GitHub, GitLab, Gitee, and Yunxiao issue, PR, and code tasks. | Partially available |
+| Group-level Access Bundle | Reusable packages of knowledge, tools, credentials, model policy, budget, and write policy. | Planned |
+| Group memory | Group rules, project facts, decisions, and output formats. | Planned |
+| Tag admin console | A dedicated place for group, expert, access, memory, routine, audit, and usage management. | Planned |
+
+## Typical Experience
+
+A project-group member sends:
+
+```text
+@Xpert summarize this requirement discussion, draft a PRD, and list open questions.
+```
+
+The target Xpert Tag experience is:
+
+1. Create a Tag session bound to the group or thread.
+2. Read the current message, reply chain, authorized group context, attachments, knowledge, and tool configuration.
+3. Acknowledge the task and show a progress list or card.
+4. Call knowledge, data, ticketing, document, or code tools.
+5. Return the PRD draft, source summary, open questions, and next-action buttons in the group.
+6. Record the task, tool calls, results, and cost in audit and usage views.
+
+Steps 1, 2, and 4 can already be composed from current IM triggers and digital expert capabilities. Unified Tag sessions, group access, live checklist, group memory, routines, and usage audit are productization goals.
+
+## Related Pages
+
+- [How Xpert Tag works](./how-it-works)
+- [Administrator setup](./admin-setup)
+- [Access and security](./access-and-security)
+- [Memory and routines](./memory-and-routines)
+- [Use cases](./use-cases)
+- [Capability status](./capability-status)

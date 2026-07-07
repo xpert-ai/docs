@@ -1,0 +1,78 @@
+---
+title: Administrator Setup
+sidebar_position: 3
+---
+
+The administrator setup goal for Xpert Tag is to connect enterprise IM platforms to Xpert, then configure groups, digital experts, knowledge, tools, access, and budget in one product area.
+
+<Tip>
+Today, setup is done by combining system integrations, plugin triggers, and digital expert workflows. A dedicated Tag admin console is `Planned`.
+</Tip>
+
+## Setup Flow
+
+1. Install the communication plugin at tenant level.
+2. Create a [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), or [WeCom](../plugin/integration/wecom-integration) system integration.
+3. Add the matching Trigger to the target digital expert workflow.
+4. Select the integration and configure session timeout, message aggregation, group scope, or DM scope.
+5. Connect downstream Agent, knowledge, toolset, skill, and business-process nodes.
+6. Publish the digital expert.
+7. Invite the bot into the target group or test a direct message.
+
+The future Tag admin console should compress steps 2 through 6 into “create Tag app -> choose IM -> choose group -> bind expert -> bind capability package -> test and launch”.
+
+## Platform Preparation
+
+| Platform | Current integration path | Key configuration | Related docs |
+| --- | --- | --- | --- |
+| [Lark / Feishu](../plugin/integration/lark-integration) | Custom app bot with webhook or long connection. Long connection is recommended. | `App ID`, `App Secret`, event subscription, bot permissions, availability scope. | [Lark integration](../plugin/integration/lark-integration), [Lark Trigger](../plugin/trigger/lark-trigger) |
+| [DingTalk](../plugin/integration/dingtalk-integration) | Internal app bot with Stream or HTTP. Stream is recommended. | `Client ID/AppKey`, `Client Secret`, `Robot Code`, Stream or callback configuration. | [DingTalk integration](../plugin/integration/dingtalk-integration), [DingTalk Trigger](../plugin/trigger/dingtalk-trigger) |
+| [WeCom](../plugin/integration/wecom-integration) | Short callback or long-connection AI bot. Long connection is recommended. | `Token/EncodingAESKey` or `Bot ID/Secret`. | [WeCom integration](../plugin/integration/wecom-integration), [WeCom Trigger](../plugin/trigger/wecom-trigger) |
+
+## Bind Digital Experts
+
+Current triggers use an explicit binding model:
+
+- [Lark](../plugin/trigger/lark-trigger), [DingTalk](../plugin/trigger/dingtalk-trigger), and [WeCom](../plugin/trigger/wecom-trigger) triggers bind one `integrationId` to one `xpertId`.
+- A single IM integration usually binds to one digital expert at a time, preventing one bot message from triggering multiple experts.
+- Conversation bindings take priority over trigger bindings, so an active conversation continues with the same expert until timeout.
+- Users can end or reset conversations through supported card actions or `/new`-style commands, depending on the plugin.
+
+After Tag productization, administrators should be able to configure the default digital expert at group/channel level, and route to different experts through mentions, commands, or skills.
+
+## Recommended Pilots
+
+| Pilot | Recommended configuration | Purpose |
+| --- | --- | --- |
+| Project group | Project manager expert + project knowledge base + document generation tools. | Validate group summaries, task tracking, PRD/weekly report drafting. |
+| Support group | Support triage expert + FAQ knowledge base + ticket creation tool. | Validate answers, duplicate detection, ticket drafts. |
+| Data group | Data analysis expert + ChatBI/BI tools + read-only data connection. | Validate metric Q&A, charts, and reports. |
+| Operations group | Alert analysis expert + monitoring/log/ticket tools. | Validate alert summary, first-pass diagnosis, and escalation suggestions. |
+| Code group | Coding Expert + code platform connection. | Validate repository questions, code review, and issue/PR assistance. |
+
+## Future Tag Admin Console
+
+These capabilities are `Planned`:
+
+| Capability | Goal |
+| --- | --- |
+| Tag app list | View all IM platforms, bots, bound groups, status, and recent errors. |
+| Group/channel binding | Configure experts by organization, IM workspace, group, DM, or thread. |
+| Access Bundle | Package knowledge, toolsets, business credentials, allowed domains, model policy, instructions, and budget. |
+| Capability preflight | Check IM permissions, bot group membership, knowledge availability, and tool credentials before launch. |
+| Test message | Send a test message from the admin console and inspect delivery. |
+| Session management | View, reset, cancel, or resume Tag sessions. |
+| Usage and cost | Analyze usage and cost by platform, group, expert, tool, and model. |
+| Audit export | Export message input, tool calls, results, actors, and errors. |
+
+## Launch Checklist
+
+Before enabling a group, administrators should confirm:
+
+- The IM app is published, bot capability is enabled, and webhook/long connection works.
+- The bot has joined the target group and the group trigger strategy matches expectations.
+- The trigger is published and points to the correct integration.
+- The digital expert has the required knowledge bases, toolsets, and skills.
+- Write tools require confirmation or approval by default.
+- Sensitive data, files, and images comply with company policy.
+- Pilot users know which features are live and which are `Planned`.
