@@ -1,0 +1,117 @@
+---
+sidebar_position: 8
+title: 实时协作
+description: 让用户、智能体和系统进程在插件应用中安全地共同编辑同一份实时文档。
+---
+
+# 实时协作
+
+Xpert Collaboration 是面向插件应用的平台级实时协作能力。它让多个用户、多个智能体和系统任务可以同时操作同一份业务文档，并由平台统一处理实时同步、持久化、在线状态、断线恢复和跨节点传播。
+
+插件继续定义自己的业务模型和编辑体验，例如演示文稿的幻灯片结构、白板的图形树或表格的单元格；平台负责稳定运行协作基础设施。Presentation Studio 是首个使用这一能力的 Agentic App。
+
+<Tip>
+Collaboration 管理的是实时工作状态，不是业务版本历史。保存版本、发布、审批和导出仍由插件通过显式业务动作决定。
+</Tip>
+
+## 产品能力
+
+- **多人实时编辑**：不同用户的修改通过 Yjs CRDT 合并，同一字段冲突也能确定性收敛。
+- **人与 Agent 共同编辑**：Agent 工具操作使用同一份权威文档，并作为虚拟协作者显示在协作者列表和操作位置上。
+- **实时光标与选区**：插件可以展示页面位置、归一化鼠标坐标、元素焦点、文本相对选区和当前视口。
+- **自动恢复连接**：客户端重连后使用 state vector 拉取缺失差量，定期同步用于补偿临时网络或消息丢失。
+- **跨节点协作**：平台通过 Redis pub/sub 把更新和在线状态即时传播到其他 API 节点；Redis 暂时不可用时，单节点编辑仍可继续。
+- **业务视图物化**：平台保存权威 Yjs 状态，插件将其投影为便于搜索、导出和业务查询的实体。
+- **插件自主管理模型**：每个插件通过 Provider 定义权限、初始文档和物化逻辑，不需要自建 WebSocket Gateway、session 或 Redis presence。
+
+## 协作者
+
+Collaboration 统一支持三类协作者：
+
+| 类型 | 典型来源 | 展示方式 |
+| --- | --- | --- |
+| `user` | 通过 Workbench 或 Remote Component 编辑的用户 | 显示安全的姓名、头像、颜色、光标和选区。 |
+| `agent` | Xpert Agent 调用插件 middleware tools | 显示 Agent 名称、正在执行的操作、目标页面或元素。 |
+| `system` | 后台自动化或平台任务 | 显示系统操作状态，不伪造鼠标轨迹。 |
+
+Presence 是短期运行状态，不写入协作文档、业务版本或审计正文。Agent 没有真实鼠标坐标时，插件应显示页面级或元素级标识，而不是生成虚假的连续光标。
+
+## 工作方式
+
+```text
+Plugin UI + Agent tools
+          │ Yjs updates / presence
+          ▼
+platform.collaboration
+          │
+          ├── 权威 Yjs 完整状态与 state vector
+          ├── 单调 sequence 与幂等 update journal
+          ├── 安全 session 与统一 WebSocket Gateway
+          ├── Redis 跨节点 update / presence
+          └── Provider materialization
+                         │
+                         ▼
+                Plugin business entity
+```
+
+每个协作资源由 `providerKey + resourceId + tenant/organization scope` 唯一标识。首次访问时，平台调用插件 Provider 初始化文档；之后每个唯一更新在数据库事务中锁定文档、合并 Yjs update、递增 sequence 并保存完整状态。事务提交后，平台广播更新并调用 Provider 物化业务视图。
+
+物化失败不会撤销已经接受的协作更新。平台把文档标记为待恢复或失败，并通过托管队列重新物化最新状态。因此，实时文档保持权威，插件导出或保存版本等强一致操作应先读取平台当前状态。
+
+## 在线状态与操作位置
+
+Presence 可以包含：
+
+- 当前页面或幻灯片；
+- 归一化鼠标坐标；
+- 当前操作的元素、文本字段或控件；
+- 基于 Yjs Relative Position 的文本光标与选区；
+- 编辑模式和视口信息；
+- Agent 的 `thinking`、`editing`、`done`、`failed` 状态；
+- 工具名和面向用户的操作说明。
+
+客户端默认每 5 秒发送心跳，离线状态会自动过期。Presence 有严格的大小和字段长度限制，不能携带文档正文、平台 token 或任意业务 JSON。
+
+## 可靠性
+
+- 本地更新会在短窗口内合并，减少高频输入产生的网络请求。
+- 每个唯一 update 通过内容哈希去重，重试不会重复递增 sequence。
+- state vector 只传输客户端缺少的 Yjs 差量。
+- 破坏性或顺序敏感操作可以使用 `expectedSequence` 做比较并交换；普通 CRDT 编辑不需要 revision 锁。
+- 平台始终保存完整 Yjs 状态，同时只保留有限的近期 update journal。
+- 插件物化视图落后时，读取会触发修复；失败任务也会进入托管队列重试。
+
+## 安全与隔离
+
+- 所有操作先通过平台租户和组织作用域，再调用插件 Provider 的资源级授权。
+- 浏览器只收到单用户、单文档、指定读写权限的短期 session，不接收平台 token、tenant ID 或 organization ID。
+- 协作连接地址由后端公开 base URL 生成，插件不能从 `window.location` 推导后端地址。
+- session 只保存客户端密钥哈希，并使用恒定时间比较验证。
+- update、完整文档和 presence 都有平台大小限制。
+- 协作者使用不透明 `presenceId`，不向其他客户端暴露真实用户主键。
+
+## 插件如何接入
+
+插件通过 `@xpert-ai/plugin-sdk` 的 `platform.collaboration` capability 接入，并注册一个 `@CollaborationDocumentProvider()`：
+
+1. 在 Provider 中实现资源授权。
+2. 把现有业务状态转换为初始 Yjs update。
+3. 把平台权威状态幂等物化到业务实体。
+4. 服务端通过 capability 创建文档、提交更新和签发协作 session。
+5. 浏览器使用 SDK 客户端适配调用方自己的 `Y.Doc` 和 Socket.IO 实例。
+
+SDK 只在 runtime capability 边界传递 base64 DTO，不传递 `Y.Doc` 实例，也不强制插件打包 React、Yjs 或 Socket.IO。这避免服务端 bundle 膨胀和多个 Yjs runtime 之间的类型冲突。
+
+## 当前边界
+
+- 首版协作引擎为 Yjs，接口保留未来扩展其他 CRDT 的空间。
+- 平台不提供通用评论、审批、业务版本或 React 编辑器组件。
+- 插件负责自己的 Yjs schema、UI、版本策略、导出语义和冲突提示。
+- Workspace Files 不用于保存实时 Yjs 状态；文件产物和对外分享应使用 Workspace Files 与 Artifacts。
+
+## 相关资源
+
+- [Remote Component 插件](./remote-component)
+- [托管队列](./managed-queues)
+- [Artifacts](../agent/artifacts/index)
+
