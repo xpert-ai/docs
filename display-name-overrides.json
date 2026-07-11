@@ -2,6 +2,7 @@
   "en": {
     "ai": "AI",
     "agent": "Agent",
+    "artifacts": "Artifacts",
     "tag": "Tag",
     "how-it-works": "How It Works",
     "admin-setup": "Administrator Setup",
@@ -49,6 +50,7 @@
   "zh-Hans": {
     "ai": "AI",
     "agent": "智能体",
+    "artifacts": "Artifacts",
     "tag": "Tag",
     "how-it-works": "工作机制",
     "admin-setup": "管理员接入",

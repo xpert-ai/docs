@@ -212,6 +212,12 @@
                       "en/ai/agent/toolset/virtual-environment/git-tools",
                       "en/ai/agent/toolset/virtual-environment/slideshow-tools"
                     ]
+                  },
+                  {
+                    "group": "Artifacts",
+                    "pages": [
+                      "en/ai/agent/artifacts/index"
+                    ]
                   }
                 ]
               },
@@ -1051,6 +1057,12 @@
                       "zh-Hans/ai/agent/toolset/virtual-environment/computer-tools",
                       "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
                       "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
+                  },
+                  {
+                    "group": "Artifacts",
+                    "pages": [
+                      "zh-Hans/ai/agent/artifacts/index"
                     ]
                   }
                 ]

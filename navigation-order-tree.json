@@ -72,6 +72,12 @@
                 "configure-ai-assistant",
                 "ai-assitant"
               ]
+            },
+            {
+              "slug": "artifacts",
+              "pages": [
+                "index"
+              ]
             }
           ]
         },

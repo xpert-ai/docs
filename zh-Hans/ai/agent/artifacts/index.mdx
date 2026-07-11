@@ -1,0 +1,242 @@
+---
+title: Artifacts
+sidebar_position: 1
+description: 将智能体和插件产出沉淀为可持久化、可版本化、可预览、可下载和可分享的结果。
+---
+
+# Artifacts
+
+Artifacts（产物）把 Xpert 智能体和插件生成的工作结果，转化为可以长期打开、回看、下载和分享的持久对象。
+
+一个 Artifact 拥有稳定的产品身份。它的内容以不可变版本保存在 Workspace Files 中，访问入口则由独立的 Artifact Link 管理。因此，一份报告可以持续发布新版本而不改变自身身份；分享链接既可以始终指向最新版本，也可以固定在某个确定版本。
+
+<Tip>
+Artifact 不只是一条文件链接。Artifact 管理结果的身份和生命周期；Artifact Version 表示一次不可变内容快照；Artifact Link 决定谁可以访问哪个版本。
+</Tip>
+
+## 什么时候使用 Artifact
+
+当聊天文本不适合承载结果，或者结果需要跨越一次智能体运行长期存在时，应使用 Artifact。典型场景包括：
+
+- 交互式 HTML 报告和数据看板；
+- Presentation Studio 生成的演示文稿；
+- Sites 生成的静态站点快照；
+- PDF 报告、PPTX、图片、CSV 和其他可下载文件；
+- 方案对比、带批注的评审、时间线和任务清单；
+- 插件后续会通过追加版本持续更新的业务结果。
+
+例如，Presentation Studio 中的演示文稿可以继续在 Workbench 中协同编辑，每次 HTML 导出则成为一个 Artifact Version。用户既可以发布一条“始终分享最新版本”的链接，也可以把链接固定在评审时使用的确切版本。
+
+## Artifact 不是什么
+
+Artifact 是发布后的工作结果，不是完整的托管应用运行时。
+
+- 它不会向访问者暴露插件后端或平台凭证。
+- 它不能替代带数据库、多路由和服务端逻辑的应用。
+- 分享 Artifact 不会让访问者获得协同编辑权限。
+- 交互式 HTML 可以运行安全策略允许的客户端交互，但不应在访问时依赖外部服务或平台 API。
+- 版本更新会被持久保存，但已经打开的页面目前需要刷新，才能让 `latest` 链接解析到新版本。
+
+如果产品需要鉴权后的后端操作、持久化表单、多路由或实时协作，应使用 Agentic App 或 Sites 部署。
+
+## 核心模型
+
+| 对象 | 作用 | 可变性 |
+| --- | --- | --- |
+| **Artifact** | 生成结果的稳定容器，保存来源、类型、作用域、标题、描述和当前版本。 | 元数据和生命周期可以变化。 |
+| **Artifact Version** | 一次内容快照，通过可移植 Workspace Files 引用保存，并记录 MIME、校验和、大小和来源版本。 | 创建后不可变。 |
+| **Artifact Link** | 带短码的访问入口，管理访问范围、过期时间、下载策略，以及跟随最新版本或固定版本的行为。 | 可修改访问与展示策略，也可以撤销。 |
+| **Artifact Access Log** | 记录访问、下载、拒绝、过期、撤销、归档和删除事件。 | 只追加审计数据。 |
+
+内容字节仍保存在 Workspace Files 中。Artifacts 服务只保存可移植文件引用和产品元数据，不保存本地绝对路径，也不复制平台凭证。
+
+## 创建 Artifact
+
+Artifact 通常由 Xpert Agentic App 或插件在生成有价值的结果后创建。标准产品流程是：
+
+1. 生成或导出内容。
+2. 把内容写入 Workspace Files。
+3. 使用插件的业务资源身份创建或查找稳定的 Artifact 容器。
+4. 添加一个引用 Workspace Files 对象的不可变 Artifact Version。
+5. 按需创建预览链接或分享链接。
+
+创建 Artifact 不等于对外公开。在创建链接之前，它只是当前租户和组织作用域中的私有平台对象。
+
+## 更新 Artifact
+
+发布更新内容时会创建新的 Artifact Version，已有版本不会被覆盖。
+
+每个 Artifact 都有 `currentVersionId`。新版本默认成为当前版本；插件也可以只创建版本而不更新当前指针，从而支持评审和分阶段发布。
+
+Artifact Link 有两种版本模式：
+
+| 模式 | 行为 |
+| --- | --- |
+| `latest` | 每次打开链接时解析 Artifact 的当前版本，适合“始终分享最新版本”。 |
+| `version` | 固定解析一个不可变的 `artifactVersionId`，适合审批、审计证据和可复现交付。 |
+
+内容变化不会静默改写旧版本。如果要让固定版本链接展示新内容，必须显式调整链接目标或创建新链接。
+
+## 预览 Artifact
+
+正式发布前，可以使用 signed preview 进行临时预览。signed preview：
+
+- 使用 `signed_preview` 访问模式；
+- 在 `xpert_artifact_preview` 查询参数中携带不透明 token；
+- 默认 15 分钟后过期；
+- 可在平台允许范围内设置更短或更长 TTL；
+- 不能作为长期公开 URL 保存。
+
+预览 token 只在创建链接时返回。平台持久化的是 token 哈希，而不是 token 明文。
+
+## 分享 Artifact
+
+分享是施加在 Artifact Link 上的一次显式访问决策。公开 URL 中不会包含底层对话、智能体运行状态、插件工作区、租户 ID 或 Workspace Files 路径。
+
+规范的公开访问路由是：
+
+```text
+https://<xpert-public-base>/artifacts/share/<artifact-link-slug>
+```
+
+下载路由是：
+
+```text
+https://<xpert-public-base>/artifacts/share/<artifact-link-slug>/download
+```
+
+slug 是随机生成的 12 位紧凑短码，是 Artifact Link 的公开标识，不是 Artifact ID 或数据库 UUID。插件必须复制平台返回的 `publicUrl`，不能根据浏览器当前地址自行拼接链接。
+
+### 访问模式
+
+| 访问模式 | 可以访问的人 | 典型用途 |
+| --- | --- | --- |
+| `owner_only` | Artifact 所有者。 | 私有预览。 |
+| `workspace_all` | 当前工作空间作用域内的授权成员。 | 项目团队交付。 |
+| `organization_all` | 当前组织中的授权成员。 | 组织内发布。 |
+| `custom_principals` | 同租户、同组织中明确选择的访问主体。 | 小范围评审。 |
+| `public_link` | 互联网上任何获得链接的人。 | 对外分享。 |
+| `signed_preview` | 持有未过期预览 token 的人。 | 短时预览。 |
+
+<Warning>
+创建 `public_link` 必须获得用户显式确认。智能体和插件不能静默把结果发布到公开网络。公开分享只暴露 Artifact 内容，对话和插件工作区仍保持私有。
+</Warning>
+
+链接还可以控制内容是浏览器内打开还是作为附件下载，以及是否允许使用专门的下载路由。
+
+## 撤销、归档和删除
+
+- 当 Artifact 仍需内部保留，但某条访问入口必须失效时，使用**撤销链接**。撤销立即生效。
+- 当 Artifact 不应继续处于活动状态，但需要保留平台历史和审计记录时，使用**归档 Artifact**。
+- **删除 Artifact**会把 Artifact 标记为已删除，并撤销其所有链接。插件如果拥有底层 Workspace Files 文件，还应单独执行自己的文件保留或删除策略。
+
+遇到已撤销、已过期、已归档或已删除内容时，平台会返回明确的访问错误，不会回退到其他版本或其他文件。
+
+## 支持的内容
+
+Artifact 的产品类型与 MIME 类型相互独立。支持的类型包括 `html`、`markdown`、`pdf`、`pptx`、`image`、`file`、`site` 和 `presentation`。
+
+推荐的展示行为：
+
+| 内容 | 推荐行为 |
+| --- | --- |
+| 自包含 HTML、站点和演示文稿 | 使用选定的 HTML 安全 profile 在浏览器内打开。 |
+| PDF 和支持的图片 | 浏览器支持对应 MIME 时直接打开，并可按策略允许下载。 |
+| Markdown、文本、JSON 和 CSV | 由产品界面决定按文本展示或下载。 |
+| PPTX、ZIP 和通用文件 | 优先下载。 |
+
+平台会校验声明的 MIME 类型和被引用的 Workspace Files 对象。如果调用方提供了大小或 SHA-256，它们必须与实际存储内容一致。
+
+## HTML 安全策略
+
+HTML Artifact 会带有 `nosniff`、`no-referrer`、`no-store`、安全的 Content-Disposition 和内容安全策略（CSP）。表单不能提交，文档不能设置 base URL，Artifact 也不能被其他页面嵌入。
+
+| Profile | 适用场景 | 行为 |
+| --- | --- | --- |
+| `strict` | 不需要 JavaScript 的报告、文档和静态演示。 | 禁止脚本和网络访问；允许内联样式及 data/blob 媒体。 |
+| `interactive` | 自包含图表、交互控件和演示播放。 | 允许内联客户端脚本及 data/blob 资源；不允许任意外部来源。 |
+
+Artifact 内容不能包含平台 token、租户或组织标识、Workspace Files 路径、签名 URL 或其他凭证。插件在发布前应校验用户输入的 HTML、SVG、URL 和媒体内容。
+
+## 插件接入 Artifacts
+
+插件通过 `@xpert-ai/plugin-sdk` 提供的 `platform.artifacts` runtime capability 使用平台能力。Workspace Files 仍负责内容存储；Artifacts 负责身份、版本、访问、安全策略和审计。
+
+```ts
+import {
+  ArtifactsRuntimeCapability,
+  WorkspaceFilesRuntimeCapability
+} from '@xpert-ai/plugin-sdk'
+
+const files = runtimeCapabilities.require(WorkspaceFilesRuntimeCapability)
+const artifacts = runtimeCapabilities.require(ArtifactsRuntimeCapability)
+
+const file = await files.writeRuntimeBuffer({
+  tenantId,
+  userId,
+  catalog: 'xperts',
+  scopeId: xpertId,
+  xpertId,
+  folder: 'reports',
+  fileName: 'quarterly-report.html',
+  originalName: 'quarterly-report.html',
+  mimeType: 'text/html',
+  buffer: Buffer.from(html, 'utf8')
+})
+
+const artifact = await artifacts.createArtifact({
+  source: {
+    pluginName: '@xpert-ai/plugin-example',
+    resourceType: 'quarterly_report',
+    resourceId: reportId
+  },
+  kind: 'html',
+  title: '季度报告'
+})
+
+const version = await artifacts.createArtifactVersion({
+  artifactId: artifact.id,
+  workspaceFileRef: file.reference,
+  mimeType: 'text/html',
+  fileName: 'quarterly-report.html'
+})
+
+const link = await artifacts.createArtifactLink({
+  artifactId: artifact.id,
+  artifactVersionId: version.id,
+  versionMode: 'version',
+  access: {
+    mode: 'public_link',
+    userConfirmedPublicLink: true
+  },
+  presentation: {
+    disposition: 'inline',
+    allowDownload: true,
+    safeHtmlProfile: 'strict'
+  }
+})
+
+console.log(link.publicUrl)
+```
+
+该 capability 提供创建、追加版本、查询、列表、归档和删除 Artifact 的操作，也支持创建 signed preview、创建或更新链接，以及撤销链接。
+
+### 插件职责
+
+- 使用稳定的 `pluginName + resourceType + resourceId` 标识 Artifact 容器。
+- 通过 Workspace Files 保存内容，只持久化可移植文件引用。
+- 创建新版本，不替换已经发布的内容字节。
+- 创建公开链接前取得用户显式确认。
+- 返回并复制平台提供的 `publicUrl`。
+- 删除插件拥有的导出文件前先撤销相关链接。
+- 不在工具结果和日志中放入大文件正文、HTML、token 或私有标识。
+
+## 当前版本边界
+
+当前平台能力已经提供 Artifact 数据模型、不可变版本、基于 Workspace Files 的内容、作用域链接与公开链接、signed preview、访问计数和审计记录。平台级 Artifact Gallery、页面内自动实时更新、组织保留策略和合规管理界面可以在同一模型上继续建设；如果当前 Xpert 部署没有显式提供这些产品界面，不应假设它们已经可用。
+
+## 相关资源
+
+- [插件开发](../../plugin/overview)
+- [Remote Component 与 Agentic App](../../plugin/remote-component)
+- [Claude Code Artifacts](https://code.claude.com/docs/en/artifacts)，Xpert Artifacts 产品概念的参考来源
