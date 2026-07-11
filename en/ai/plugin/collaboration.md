@@ -8,7 +8,7 @@ description: Let users, agents, and system processes safely co-edit the same liv
 
 Xpert Collaboration is a platform capability for real-time collaboration in plugin applications. Multiple users, Agents, and system jobs can operate on the same business document while the platform handles synchronization, persistence, presence, reconnect recovery, and cross-node propagation.
 
-Plugins continue to define their own business model and editing experience, such as the slide structure of a presentation, the shape tree of a canvas, or spreadsheet cells. The platform operates the shared collaboration infrastructure. Presentation Studio is the first Agentic App built on this capability.
+Plugins continue to define their own business model and editing experience, such as the slide structure of a presentation, the shape tree of a canvas, or spreadsheet cells. The platform operates the shared collaboration infrastructure. Presentation Studio and Pencil are reference Agentic Apps built on this capability.
 
 <Tip>
 Collaboration manages live working state, not business version history. Saving versions, publishing, approvals, and exports remain explicit plugin business actions.
@@ -35,6 +35,16 @@ Collaboration supports three actor types:
 | `system` | Background automation or a platform job | System activity without a fabricated mouse trajectory. |
 
 Presence is short-lived runtime state. It is not written into the collaboration document, plugin versions, or audit content. When an Agent has no physical pointer, the UI should show a page- or element-level badge instead of inventing continuous cursor movement.
+
+## Actor identity and client sessions
+
+Collaboration distinguishes a stable actor from each live connection:
+
+- `presenceId` identifies a user, Agent, or system actor without exposing its platform primary key.
+- `clientId` identifies one browser tab, device, or virtual presence session.
+- `selfClientId` identifies the exact Socket connection receiving a presence snapshot.
+
+One actor may have several active sessions. For example, the same user can open a document in two tabs. A participant list should deduplicate sessions by `presenceId` and still include the local actor. Cursor, selection, and canvas overlays should use remote sessions and exclude only `selfClientId`. Filtering every item with the local `presenceId` would incorrectly hide the user's other tabs and can remove the entire participant list when no other user is connected.
 
 ## How it works
 
@@ -70,7 +80,7 @@ Presence can include:
 - Agent `thinking`, `editing`, `done`, or `failed` status;
 - tool name and a user-facing operation label.
 
-Clients send a heartbeat every five seconds by default and offline presence expires automatically. Presence has strict size and field limits and must never carry document content, platform tokens, or arbitrary business JSON.
+Clients send a heartbeat every five seconds by default and offline presence expires automatically. Each client connection has its own server-side expiry, so one active tab cannot keep a disconnected tab alive. The browser client also removes silent remote sessions locally as a fallback when a removal event is lost. Presence has strict size and field limits and must never carry document content, platform tokens, or arbitrary business JSON.
 
 ## Reliability
 
@@ -99,6 +109,7 @@ Plugins use the `platform.collaboration` capability from `@xpert-ai/plugin-sdk` 
 3. Materialize authoritative platform state into business entities idempotently.
 4. Use the server-side capability to ensure documents, submit updates, and issue collaboration sessions.
 5. Use the SDK browser client with caller-owned `Y.Doc` and Socket.IO instances.
+6. Use `createCollaborationPresenceStore` to derive deduplicated collaborators and connection-specific remote sessions for the UI.
 
 The runtime capability boundary transports base64 DTOs instead of `Y.Doc` instances. The SDK also does not force React, Yjs, or Socket.IO into plugin bundles. This avoids server bundle growth and conflicts between multiple Yjs runtimes.
 
@@ -114,4 +125,3 @@ The runtime capability boundary transports base64 DTOs instead of `Y.Doc` instan
 - [Remote Component plugins](./remote-component)
 - [Managed Queues](./managed-queues)
 - [Artifacts](../agent/artifacts/index)
-

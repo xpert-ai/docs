@@ -8,7 +8,7 @@ description: 让用户、智能体和系统进程在插件应用中安全地共�
 
 Xpert Collaboration 是面向插件应用的平台级实时协作能力。它让多个用户、多个智能体和系统任务可以同时操作同一份业务文档，并由平台统一处理实时同步、持久化、在线状态、断线恢复和跨节点传播。
 
-插件继续定义自己的业务模型和编辑体验，例如演示文稿的幻灯片结构、白板的图形树或表格的单元格；平台负责稳定运行协作基础设施。Presentation Studio 是首个使用这一能力的 Agentic App。
+插件继续定义自己的业务模型和编辑体验，例如演示文稿的幻灯片结构、白板的图形树或表格的单元格；平台负责稳定运行协作基础设施。Presentation Studio 和 Pencil 是使用这一能力的参考 Agentic App。
 
 <Tip>
 Collaboration 管理的是实时工作状态，不是业务版本历史。保存版本、发布、审批和导出仍由插件通过显式业务动作决定。
@@ -35,6 +35,16 @@ Collaboration 统一支持三类协作者：
 | `system` | 后台自动化或平台任务 | 显示系统操作状态，不伪造鼠标轨迹。 |
 
 Presence 是短期运行状态，不写入协作文档、业务版本或审计正文。Agent 没有真实鼠标坐标时，插件应显示页面级或元素级标识，而不是生成虚假的连续光标。
+
+## 协作者身份与客户端会话
+
+Collaboration 会区分稳定的协作者身份和每一条实时连接：
+
+- `presenceId` 标识用户、Agent 或系统协作者，但不暴露平台真实主键。
+- `clientId` 标识一个浏览器标签页、设备或虚拟 presence 会话。
+- `selfClientId` 标识接收当前 presence snapshot 的准确 Socket 连接。
+
+同一个协作者可以拥有多个活动会话，例如同一用户在两个标签页中打开同一份文档。协作者列表应按 `presenceId` 去重，并始终包含当前用户；光标、选区和画布覆盖层应使用远端会话，并且只排除 `selfClientId`。如果按本地用户的 `presenceId` 过滤所有数据，会错误隐藏该用户的其他标签页，并可能在没有其他用户时让整个协作者列表消失。
 
 ## 工作方式
 
@@ -70,7 +80,7 @@ Presence 可以包含：
 - Agent 的 `thinking`、`editing`、`done`、`failed` 状态；
 - 工具名和面向用户的操作说明。
 
-客户端默认每 5 秒发送心跳，离线状态会自动过期。Presence 有严格的大小和字段长度限制，不能携带文档正文、平台 token 或任意业务 JSON。
+客户端默认每 5 秒发送心跳，离线状态会自动过期。服务端为每个客户端连接维护独立过期时间，因此一个仍在线的标签页不会让已经断开的标签页继续存活；浏览器客户端也会在丢失移除事件时主动清理长时间无更新的远端会话。Presence 有严格的大小和字段长度限制，不能携带文档正文、平台 token 或任意业务 JSON。
 
 ## 可靠性
 
@@ -99,6 +109,7 @@ Presence 可以包含：
 3. 把平台权威状态幂等物化到业务实体。
 4. 服务端通过 capability 创建文档、提交更新和签发协作 session。
 5. 浏览器使用 SDK 客户端适配调用方自己的 `Y.Doc` 和 Socket.IO 实例。
+6. 使用 `createCollaborationPresenceStore` 为界面生成按协作者去重的列表，以及按连接区分的远端会话。
 
 SDK 只在 runtime capability 边界传递 base64 DTO，不传递 `Y.Doc` 实例，也不强制插件打包 React、Yjs 或 Socket.IO。这避免服务端 bundle 膨胀和多个 Yjs runtime 之间的类型冲突。
 
@@ -114,4 +125,3 @@ SDK 只在 runtime capability 边界传递 base64 DTO，不传递 `Y.Doc` 实例
 - [Remote Component 插件](./remote-component)
 - [托管队列](./managed-queues)
 - [Artifacts](../agent/artifacts/index)
-
