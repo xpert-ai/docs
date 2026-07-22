@@ -197,7 +197,7 @@ Common scopes:
 | Scope | Scope key | Who can see it | Typical use |
 | --- | --- | --- | --- |
 | Organization | `<organizationId>` | One organization | Normal business plugins, organization-specific integrations, custom workflows |
-| Tenant global | `global` or `tenant:<tenantId>:global` | All organizations inside one tenant | Tenant-wide defaults shared by that tenant |
+| Tenant global | `global` or `tenant:<tenantId>:global` | All organizations inside one tenant | Tenant-wide defaults; may host organization-level or tenant-level plugins |
 | System global | `system:global` | All tenants | Platform singleton plugins that provide system-wide modules, entities, or default capabilities |
 | Built-in global | `builtin:global` | All tenants | Host-code fallback providers; not an installed plugin |
 
@@ -209,13 +209,28 @@ organization -> tenant-global -> system-global -> builtin-global
 
 This means an organization plugin can override a tenant-global plugin, a tenant-global plugin can override a system plugin, and a system plugin can override only built-in host providers.
 
-Use `meta.level = 'system'` only when the plugin must be a platform singleton. Examples include plugins that define system-level database entities or modules that cannot safely exist in multiple tenant copies. System plugins are managed differently:
+Xpert supports three plugin levels:
 
-* They can be installed or updated only by a Super Admin in the Default tenant.
-* The host stores them once under `system:global`; repeated installs update the same singleton instance.
-* Ordinary tenants can see and use the resulting capabilities, but cannot install, uninstall, or configure the system instance from their organization view.
+| Level | Capability and visibility | Administration | Runtime behavior |
+| --- | --- | --- | --- |
+| `system` | Platform singleton shared by all tenants | Super Admin in the Default tenant only | Install, update, and uninstall take effect after an API restart |
+| `tenant` | May register process-level modules, controllers, providers, and TypeORM entities, but is visible only to its owning tenant | Super Admin in the owning tenant | Installed into that tenant's global scope; changes take effect after an API restart |
+| `organization` | Normal organization or tenant-global business capabilities | Administrator of the target scope | Can load at organization or tenant-global scope |
 
-Most plugins should keep the default organization level. Even if a plugin is visible across a tenant, its own business data should still be scoped by tenant and organization when those fields are available.
+Use `meta.level = 'tenant'` when a plugin registers Nest modules, controllers, TypeORM entities, or other process-level infrastructure but the product must serve only one customer tenant. A tenant-level plugin combines:
+
+* **Process-level technical capabilities**: it can register server modules, routes, and entities like a system plugin.
+* **Tenant-level product isolation**: plugin discovery, configuration, providers, strategies, frontend assets, and controller APIs are available only to the owning tenant.
+
+Tenant-level plugins also follow these constraints:
+
+* A plugin name can belong to only one tenant, preventing duplicate registration of controllers, entities, and process-level providers.
+* A non-Default tenant uses `tenant:<tenantId>:global`; the Default tenant uses `global`.
+* Controllers carry installation-scope metadata, and the host's global guard rejects requests from other tenants or organizations.
+* Install and update stage a new version for the next API restart; uninstall also requires an API restart to remove the runtime module.
+* The plugin must declare a stable `artifactNamespace` and derive database tables, controller routes, and other process-level identifiers from it.
+
+Use `meta.level = 'system'` only for a true platform capability shared by every tenant. Most plugins that do not register process-level infrastructure should keep the default `organization` level. Regardless of level, plugin business tables should still persist and enforce tenant and organization boundaries where applicable.
 
 ---
 
@@ -226,4 +241,4 @@ Most plugins should keep the default organization level. Even if a plugin is vis
 * **Enhancement points (Strategy)** are the core for plugins to extend host system functionality
 * All plugins form extensible and maintainable modules via **lifecycle + strategy interfaces + config schema**
 * Plugin resources can be initialized into **Workspace** or **Xpert** targets with tracked installation state
-* Plugin scope controls visibility and management; `system` plugins are platform singletons installed only from the Default tenant
+* Plugin scope controls installation placement, while level controls capability and lifecycle; a `tenant` plugin is a process-level plugin owned by one tenant

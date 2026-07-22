@@ -21,6 +21,7 @@ The plugin system is built on the **[NestJS](https://nestjs.com/) + [TypeORM](ht
 4. **Enhancement Points**: The host system defines several enhancement points (strategies). Plugins only need to implement the corresponding interfaces to seamlessly extend system capabilities.
 5. **Security and Configuration**: Based on `zod` configuration schemas, plugins can declare required parameters (such as API Key, URL, etc.) and manage them securely via the system interface or configuration files.
 6. **Resource Packaging**: A plugin can also ship installable resources such as `Skills`, `MCP`, `Apps`, and `Hooks`. The host can initialize them into a workspace or an existing Xpert based on the target.
+7. **Multi-level isolation**: Plugins support `organization`, `tenant`, and `system` levels. A tenant-level plugin can register process-level modules, controllers, and entities while restricting product visibility and access to one customer tenant. See [Plugin Scope and Level](./concepts#210-plugin-scope-and-level).
 
 ### Why Plugin Architecture?
 

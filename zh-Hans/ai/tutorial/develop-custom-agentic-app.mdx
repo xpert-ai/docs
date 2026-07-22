@@ -51,7 +51,8 @@ flowchart TD
 在 BOM 插件中，`XpertPlugin` 的核心信息包括：
 
 - `meta.name`：插件包名，例如 `@acme/plugin-contract-review`。
-- `meta.level`：系统级、全局级或组织级插件。
+- `meta.level`：`system`、`tenant` 或 `organization`。BOM 这类拥有服务端模块但只服务一个客户租户的应用应使用 `tenant`。
+- `meta.artifactNamespace`：进程级插件的稳定制品命名空间，用于派生表名、路由和注册表 key。
 - `meta.targetApps`：插件要出现在哪些上层应用中，例如 `data-xpert`。
 - `meta.targetAppMeta["data-xpert"].types`：上层应用使用的业务类型，例如 `workbench-view`、`assistant-tool`、`business-app`。
 - `meta.targetAppMeta["data-xpert"].capabilities`：可被插件中心、模板和治理逻辑识别的业务能力。
@@ -68,12 +69,14 @@ import { MyAgenticAppPlugin } from './lib/my-agentic-app.plugin'
 const ConfigSchema = z.object({
   defaultKnowledgebaseId: z.string().optional()
 })
+const PLUGIN_ARTIFACT_NAMESPACE = 'contract_review' as const
 
 const plugin: XpertPlugin<z.infer<typeof ConfigSchema>> = {
   meta: {
     name: '@acme/plugin-contract-review',
     version: '0.1.0',
-    level: 'system',
+    level: 'tenant',
+    artifactNamespace: PLUGIN_ARTIFACT_NAMESPACE,
     category: 'middleware',
     targetApps: ['data-xpert'],
     targetAppMeta: {
@@ -102,6 +105,7 @@ export default plugin
 
 - 把 `targetAppMeta` 当作上层应用的能力合同，不要把业务能力只写在描述文本里。
 - 如果插件需要在 data-xpert 插件中心展示，必须声明 `targetApps: ['data-xpert']` 和非空的 `targetAppMeta["data-xpert"].types`。
+- Tenant-level 插件的 `package.json` 必须声明相同的 `level` 和 `artifactNamespace`；安装、更新或卸载后需要重启 API。
 - 配置项只放真正需要部署或管理员调整的内容，例如默认资源 ID、召回方式、外部服务地址。
 
 ## 步骤 2：注册服务端模块、实体和生命周期
@@ -326,6 +330,12 @@ export const templates = [
   "version": "0.1.0",
   "main": "dist/index.cjs.js",
   "types": "dist/index.d.ts",
+  "xpert": {
+    "plugin": {
+      "level": "tenant",
+      "artifactNamespace": "contract_review"
+    }
+  },
   "peerDependencies": {
     "@xpert-ai/plugin-sdk": "^3.8.0"
   }
@@ -345,16 +355,16 @@ pnpm nx build plugin-contract-review
 export PLUGIN_WORKSPACE_ROOTS="/abs/path/to/xpert-plugins"
 ```
 
-然后通过插件安装接口或项目提供的安装脚本，把独立插件包注册到当前组织：
+然后通过插件安装接口或项目提供的部署脚本，把独立插件包注册到目标 tenant：
 
 ```bash
-pnpm plugin:install:local \
-  --workspace-path /abs/path/to/xpert-plugins/acme/contract-review \
-  --org-id <your-org-id> \
-  --token <your-token>
+pnpm plugin:deploy:local \
+  --plugin-dir /abs/path/to/xpert-plugins/acme/contract-review \
+  --scope tenant \
+  --tenant-id <your-tenant-id>
 ```
 
-代码变更后，重新构建插件包，再重新安装或重新加载插件。这样可以避免宿主应用和插件仓库之间出现重复的运行时依赖。
+Tenant-level 插件部署完成后应按平台提示重启 API，再验证目标 tenant 可用且其他 tenant 不可见。代码变更后，重新构建并部署插件，重启 API 激活新版本。这样可以避免宿主应用和插件仓库之间出现重复的运行时依赖。
 
 发布到生产环境时，通常有两种方式：
 

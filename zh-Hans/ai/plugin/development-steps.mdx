@@ -138,6 +138,51 @@ packages/
 * `meta.name` 使用 scoped package 名称（例如 `@xpert-ai/my-plugin`），与 `package.json` 保持一致。
 * `icon` 建议使用 svg 字符串或数据 URL，便于前端渲染。
 
+### 4.1 选择插件 Level
+
+开发前先根据能力边界选择 level：
+
+* `organization`：默认选择。适合普通工具、集成、工作流和不注册进程级基础设施的业务插件。
+* `tenant`：适合只属于一个客户 tenant，但需要注册 Nest Module、Controller、TypeORM Entity 或其他进程级 Provider 的行业应用。
+* `system`：仅用于所有 tenant 共享的平台级单例能力。
+
+Tenant-level 插件必须在运行时入口和包元数据中同时声明 level 与稳定的制品命名空间：
+
+```ts
+export const PLUGIN_ARTIFACT_NAMESPACE = 'contract_review' as const
+
+const plugin: XpertPlugin = {
+  meta: {
+    name: '@acme/plugin-contract-review',
+    version: '1.0.0',
+    level: 'tenant',
+    artifactNamespace: PLUGIN_ARTIFACT_NAMESPACE
+  },
+  register() {
+    return { module: ContractReviewPlugin, global: true }
+  }
+}
+```
+
+对应的 `package.json`：
+
+```json
+{
+  "name": "@acme/plugin-contract-review",
+  "version": "1.0.0",
+  "xpert": {
+    "plugin": {
+      "level": "tenant",
+      "artifactNamespace": "contract_review"
+    }
+  }
+}
+```
+
+两个元数据面必须保持一致。`artifactNamespace` 只能使用小写字母、数字和下划线，并且发布后应保持稳定。数据库表建议使用 `plugin_<artifactNamespace>_<tableKey>`，Controller 路由、注册表 key、队列和缓存标识也应从同一个常量派生，避免不同插件之间发生全局命名冲突。
+
+Tenant-level 与 system-level 都属于进程级插件。它们的安装、更新和卸载不会直接修改正在运行的 Nest 模块图，而是在重启 API 后激活或卸载。开发和验收时必须把“重启后验证”纳入测试步骤。
+
 ---
 
 ## 5. 实现插件模块（`MyPlugin`）与生命周期钩子

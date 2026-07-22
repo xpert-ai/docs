@@ -45,13 +45,59 @@ When the host starts, it will automatically parse the `PLUGINS` environment vari
 
 ## Installation Scope
 
-Installed plugins have an explicit scope:
+Every installed plugin has an explicit level and scope. Level controls capability and lifecycle; scope controls installation placement:
 
-* **Organization plugins** are installed into the current organization and can be managed from that organization.
-* **Tenant-global plugins** are shared by all organizations in the current tenant.
-* **System plugins** declare `meta.level = 'system'` and are installed once for the whole platform under `system:global`.
+| Level | Installation scope | Who can manage it | Who can use it |
+| --- | --- | --- | --- |
+| `organization` | Current organization, or the current tenant's global scope | Administrator of that scope | Current organization, or current tenant |
+| `tenant` | `global` or `tenant:<tenantId>:global` | Super Admin in the owning tenant | Owning tenant only |
+| `system` | `system:global` | Super Admin in the Default tenant | Every tenant |
 
-System plugins are platform singletons. They can be installed or updated only by a Super Admin in the Default tenant. Other tenants may see and use the capabilities provided by system plugins, but they cannot install, uninstall, or configure the system instance from their own organization or tenant view.
+**Tenant level** means more than installing a normal plugin into tenant-global scope. The plugin may register system-level technical capabilities such as controllers, TypeORM entities, and process-level providers, while product ownership and access remain limited to one tenant.
+
+### Install a Tenant-Level Plugin
+
+Before installation, verify that runtime `meta` and `package.json` declare the same level and namespace:
+
+```json
+{
+  "xpert": {
+    "plugin": {
+      "level": "tenant",
+      "artifactNamespace": "contract_review"
+    }
+  }
+}
+```
+
+Installation flow:
+
+1. Sign in as a Super Admin of the target tenant.
+2. Open the Plugins page in tenant administration scope and install the package.
+3. Restart the API service when the installation result requests it.
+4. Return to the target tenant and verify plugin status, configuration, Workbench views, and APIs.
+5. Switch to another tenant and verify that the plugin and business entry points are absent; direct plugin API requests must be denied.
+
+Tenant-level plugins use these safeguards:
+
+* A plugin name can belong to only one tenant; a second tenant cannot install another copy.
+* Install and update stage the artifact, and the new controllers, entities, and providers load after an API restart.
+* Uninstall first deactivates the persisted registration; runtime removal completes after an API restart.
+* Only a Super Admin in the owning tenant can manage its configuration.
+* `artifactNamespace` must remain stable to prevent table, route, and registry collisions with other process-level plugins.
+
+### Migrate from System Level to Tenant Level
+
+Do not change a plugin directly from system to tenant level while the old system registration is active. That could register two copies of process-level modules. Use this sequence:
+
+1. In the Default tenant, have a Super Admin uninstall the old system plugin.
+2. Restart the API and verify that the old runtime module has been removed.
+3. Publish or prepare a new plugin version that declares `level = 'tenant'`.
+4. Install the new version as a Super Admin in the target tenant.
+5. Restart the API again to activate the tenant-level plugin.
+6. Validate business data and configuration in the target tenant, then run a cross-tenant isolation check.
+
+Back up existing plugin configuration before migration. A system instance and a tenant instance have different owners and scopes, so the platform does not automatically copy every system configuration value into the target tenant.
 
 At runtime, the platform resolves plugin capabilities in this order:
 
@@ -59,7 +105,7 @@ At runtime, the platform resolves plugin capabilities in this order:
 organization -> tenant-global -> system-global -> built-in
 ```
 
-So tenant or organization plugins can intentionally override a system default without creating a second system instance.
+So organization or tenant plugins can intentionally override a system default without creating a second system instance.
 
 ## Initialize Plugin Resources
 

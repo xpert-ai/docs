@@ -45,13 +45,59 @@ PLUGINS=@xpert-ai/my-plugin1,@xpert-ai/my-plugin2
 
 ## 安装 Scope
 
-已安装插件都有明确 scope：
+已安装插件都有明确的 level 和 scope。Level 决定能力及生命周期，scope 决定安装位置：
 
-* **Organization 插件** 安装到当前组织，可在该组织中管理。
-* **Tenant-global 插件** 由当前租户内的所有组织共享。
-* **System 插件** 声明 `meta.level = 'system'`，全平台只安装一份，scope 为 `system:global`。
+| Level | 安装 Scope | 谁可以管理 | 谁可以使用 |
+| --- | --- | --- | --- |
+| `organization` | 当前 organization，或当前 tenant 的 global scope | 对应作用域管理员 | 当前组织，或当前 tenant |
+| `tenant` | `global` 或 `tenant:<tenantId>:global` | 所属 tenant 的 Super Admin | 仅所属 tenant |
+| `system` | `system:global` | Default tenant 的 Super Admin | 所有 tenant |
 
-System 插件是平台单例。它只能由 Default tenant 中的 Super Admin 安装或更新。其他租户可以看到并使用 system 插件提供的能力，但不能在自己的组织或租户视图中安装、卸载或配置系统实例。
+这里的 **tenant level** 不只是把普通插件安装到 tenant-global scope。它表示插件可以注册 Controller、TypeORM Entity 和进程级 Provider 等 system-level 技术能力，但产品归属和访问边界只限一个 tenant。
+
+### 安装 Tenant-level 插件
+
+安装前确认插件运行时 `meta` 与 `package.json` 都声明了相同的 level 和命名空间：
+
+```json
+{
+  "xpert": {
+    "plugin": {
+      "level": "tenant",
+      "artifactNamespace": "contract_review"
+    }
+  }
+}
+```
+
+安装流程：
+
+1. 使用目标 tenant 的 Super Admin 登录。
+2. 进入 tenant 管理作用域的插件页面并安装插件包。
+3. 安装成功后按照页面提示重启 API 服务。
+4. 重启后回到目标 tenant，确认插件状态、配置、工作台和 API 可用。
+5. 切换到另一个 tenant，确认插件列表和业务入口不可见；直接访问插件 API 应返回无权访问。
+
+Tenant-level 插件采用以下保护规则：
+
+* 同名插件只能归属于一个 tenant，不能在另一个 tenant 再安装一份。
+* 安装与更新只暂存制品，重启 API 后才会装载新的 Controller、Entity 和 Provider。
+* 卸载先停用持久化注册，重启 API 后才完成运行时卸载。
+* 已锁定到某个 tenant 的插件配置只能由该 tenant 的 Super Admin 管理。
+* `artifactNamespace` 必须稳定，避免表名、路由和注册表标识与其他进程级插件冲突。
+
+### 从 System Level 迁移到 Tenant Level
+
+不能在旧 system 注册仍生效时直接把同一插件改成 tenant level，否则两份进程级模块可能同时注册。正确迁移顺序是：
+
+1. 在 Default tenant 中由 Super Admin 卸载旧的 system 插件。
+2. 重启 API，确认旧运行时模块已经卸载。
+3. 发布或准备声明 `level = 'tenant'` 的新插件版本。
+4. 使用目标 tenant 的 Super Admin 安装新版本。
+5. 再次重启 API，完成 tenant-level 插件激活。
+6. 在目标 tenant 验证业务数据和配置，并执行一次跨 tenant 隔离检查。
+
+迁移前应备份旧插件配置。System 实例与 tenant 实例具有不同的归属和 scope，平台不会自动把所有 system 配置复制到目标 tenant。
 
 运行时插件能力按以下顺序解析：
 
@@ -59,7 +105,7 @@ System 插件是平台单例。它只能由 Default tenant 中的 Super Admin �
 organization -> tenant-global -> system-global -> built-in
 ```
 
-因此租户或组织插件可以按需覆盖系统默认能力，但不会创建第二份 system 实例。
+因此 organization 或 tenant 插件可以按需覆盖系统默认能力，但不会创建第二份 system 实例。
 
 ## 初始化插件资源
 

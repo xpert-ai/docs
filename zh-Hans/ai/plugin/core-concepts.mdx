@@ -197,7 +197,7 @@ export class IntegrationStrategyRegistry
 | Scope | Scope key | 谁可见 | 典型用途 |
 | --- | --- | --- | --- |
 | Organization | `<organizationId>` | 单个组织 | 普通业务插件、组织级集成、自定义工作流 |
-| Tenant global | `global` 或 `tenant:<tenantId>:global` | 同一租户内的所有组织 | 某个租户共享的默认能力 |
+| Tenant global | `global` 或 `tenant:<tenantId>:global` | 同一租户内的所有组织 | 某个租户共享的默认能力；可以承载 organization level 或 tenant level 插件 |
 | System global | `system:global` | 所有租户 | 提供系统级模块、实体或默认能力的平台单例插件 |
 | Built-in global | `builtin:global` | 所有租户 | 宿主代码内置 Provider fallback，不是已安装插件 |
 
@@ -209,13 +209,28 @@ organization -> tenant-global -> system-global -> builtin-global
 
 这意味着 organization 插件可以覆盖 tenant-global 插件，tenant-global 插件可以覆盖 system 插件，而 system 插件只能覆盖宿主内置 Provider。
 
-只有当插件必须作为平台单例存在时，才使用 `meta.level = 'system'`。典型场景包括定义系统级数据库实体，或提供不能在多个租户中重复安装的系统模块。System 插件采用特殊管理规则：
+Xpert 支持三种插件 level：
 
-* 只能由 Default tenant 中的 Super Admin 安装或更新。
-* 宿主只会把它保存为 `system:global` 下的一份单例；重复安装会更新同一个实例。
-* 普通租户可以看到并使用它提供的能力，但不能在自己的组织视图中安装、卸载或配置系统实例。
+| Level | 能力与可见范围 | 管理权限 | 运行时行为 |
+| --- | --- | --- | --- |
+| `system` | 平台级单例，所有 tenant 共享 | 仅 Default tenant 的 Super Admin | 安装、更新和卸载均需重启 API 后生效 |
+| `tenant` | 具备进程级模块、Controller、Provider 和 TypeORM Entity 能力，但仅所属 tenant 可见 | 所属 tenant 的 Super Admin | 安装到该 tenant 的 global scope；变更需重启 API 后生效 |
+| `organization` | 普通组织或 tenant-global 业务能力 | 对应作用域的管理员 | 可按组织或 tenant-global scope 加载 |
 
-大多数插件应保持默认的 organization level。即使插件能力在租户内可见，插件自己的业务数据也仍应在可用时按 tenant 和 organization 进行隔离。
+当插件注册了 Nest Module、Controller、TypeORM Entity 或其他进程级基础设施，但业务上只应服务一个客户 tenant 时，使用 `meta.level = 'tenant'`。Tenant-level 插件兼顾两件事：
+
+* **进程级技术能力**：可以像 system 插件一样注册服务端模块、路由和实体。
+* **租户级产品边界**：插件列表、配置、Provider、Strategy、前端资源和 Controller API 都只对所属 tenant 可见。
+
+Tenant-level 插件还遵循以下约束：
+
+* 同一个插件名称只能归属一个 tenant，避免 Controller、Entity 和进程级 Provider 被重复注册。
+* 非 Default tenant 的安装 scope 为 `tenant:<tenantId>:global`；Default tenant 使用 `global`。
+* Controller 会带安装 scope 元数据，宿主的全局 Guard 会拒绝其他 tenant 或 organization 的请求。
+* 安装和更新只会暂存新版本，API 重启后加载；卸载也要在 API 重启后完成运行时卸载。
+* 必须声明稳定的 `artifactNamespace`，并用它派生数据库表、Controller 路由和其他进程级标识。
+
+只有真正需要向所有 tenant 提供统一平台能力时，才使用 `meta.level = 'system'`。大多数不注册进程级基础设施的插件应保持默认的 `organization` level。无论使用哪种 level，插件业务表仍应在适用时保存并校验 tenant 和 organization 边界。
 
 ---
 
@@ -226,4 +241,4 @@ organization -> tenant-global -> system-global -> builtin-global
 * **增强出口点（Strategy）** 是插件扩展宿主系统功能的核心
 * 所有插件都通过 **生命周期 + 策略接口 + 配置 Schema** 形成可扩展、可维护的模块
 * 插件资源可按 **Workspace / Xpert** 两种目标初始化，并在宿主中保持可追踪的安装状态
-* 插件 scope 控制可见性和管理边界；`system` 插件是平台单例，只能从 Default tenant 安装
+* 插件 scope 控制安装位置，level 控制能力和生命周期；`tenant` 插件是只服务一个 tenant 的进程级插件
