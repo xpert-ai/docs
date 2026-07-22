@@ -51,7 +51,8 @@ The [plugin entry](../plugin/develop) declares plugin metadata, config schema, t
 In the BOM plugin, the `XpertPlugin` entry includes:
 
 - `meta.name`: the plugin package name, such as `@acme/plugin-contract-review`.
-- `meta.level`: system, global, or organization scope.
+- `meta.level`: `system`, `tenant`, or `organization`. A BOM-style app with server modules that serves one customer tenant should use `tenant`.
+- `meta.artifactNamespace`: the stable artifact namespace for a process-level plugin, used to derive table names, routes, and registry keys.
 - `meta.targetApps`: the product surfaces where the plugin should appear, such as `data-xpert`.
 - `meta.targetAppMeta["data-xpert"].types`: app-specific business types, such as `workbench-view`, `assistant-tool`, and `business-app`.
 - `meta.targetAppMeta["data-xpert"].capabilities`: business capabilities used by plugin centers, templates, and governance rules.
@@ -68,12 +69,14 @@ import { MyAgenticAppPlugin } from './lib/my-agentic-app.plugin'
 const ConfigSchema = z.object({
   defaultKnowledgebaseId: z.string().optional()
 })
+const PLUGIN_ARTIFACT_NAMESPACE = 'contract_review' as const
 
 const plugin: XpertPlugin<z.infer<typeof ConfigSchema>> = {
   meta: {
     name: '@acme/plugin-contract-review',
     version: '0.1.0',
-    level: 'system',
+    level: 'tenant',
+    artifactNamespace: PLUGIN_ARTIFACT_NAMESPACE,
     category: 'middleware',
     targetApps: ['data-xpert'],
     targetAppMeta: {
@@ -102,6 +105,7 @@ Design guidance:
 
 - Treat `targetAppMeta` as the capability contract for the upper-level app. Do not hide business capabilities only in description text.
 - To show the plugin in the data-xpert plugin center, declare `targetApps: ['data-xpert']` and non-empty `targetAppMeta["data-xpert"].types`.
+- A tenant-level plugin's `package.json` must declare the same `level` and `artifactNamespace`; restart the API after install, update, or uninstall.
 - Keep config for values that really need deployment-time or admin control, such as default resource IDs, retrieval modes, or external service endpoints.
 
 ## Step 2: Register Server Modules, Entities, and Lifecycle Hooks
@@ -326,6 +330,12 @@ At minimum, each plugin package should declare its package name, build entry, an
   "version": "0.1.0",
   "main": "dist/index.cjs.js",
   "types": "dist/index.d.ts",
+  "xpert": {
+    "plugin": {
+      "level": "tenant",
+      "artifactNamespace": "contract_review"
+    }
+  },
   "peerDependencies": {
     "@xpert-ai/plugin-sdk": "^3.8.0"
   }
@@ -345,16 +355,16 @@ The build output should include the plugin entry, type declarations, runtime cod
 export PLUGIN_WORKSPACE_ROOTS="/abs/path/to/xpert-plugins"
 ```
 
-Then register the independent plugin package into the current organization through the plugin install API or the project's install helper script:
+Then register the independent plugin package into the target tenant through the plugin install API or the platform deployment command:
 
 ```bash
-pnpm plugin:install:local \
-  --workspace-path /abs/path/to/xpert-plugins/acme/contract-review \
-  --org-id <your-org-id> \
-  --token <your-token>
+pnpm plugin:deploy:local \
+  --plugin-dir /abs/path/to/xpert-plugins/acme/contract-review \
+  --scope tenant \
+  --tenant-id <your-tenant-id>
 ```
 
-After code changes, rebuild the plugin package and reinstall or reload it. This keeps the host application and plugin repository from sharing duplicated runtime dependencies accidentally.
+After deploying a tenant-level plugin, restart the API as requested, then verify that it works in the target tenant and remains invisible to other tenants. After code changes, rebuild and deploy the package again, then restart the API to activate the new version. This also keeps the host application and plugin repository from sharing duplicated runtime dependencies accidentally.
 
 For production delivery, there are usually two paths:
 

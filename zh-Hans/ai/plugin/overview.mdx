@@ -24,6 +24,7 @@ Xpert AI 插件系统旨在为开发者提供一种**可扩展、可复用、低
 4. **增强出口点（Enhancement Points）**：宿主系统预定义了一些增强点（策略），插件只需实现对应接口，即可无缝扩展系统能力。
 5. **安全与配置**：基于 `zod` 的配置 Schema，插件可声明所需参数（如 API Key、URL 等），并在系统界面或配置文件中进行安全管理。
 6. **资源化分发**：插件除了提供服务端能力，还可以内置可初始化资源，例如 `Skills`、`MCP`、`Apps` 和 `Hooks`，由宿主在工作空间或已有 Xpert 中按目标初始化。
+7. **多级隔离**：插件支持 `organization`、`tenant` 和 `system` 三种 level。Tenant-level 插件可注册进程级模块、Controller 和 Entity，同时把产品可见性与访问权限限制在一个客户租户内，详见[插件 Scope 与 Level](./core-concepts#210-插件-scope-与-level)。
 
 ### 为什么需要插件化？
 

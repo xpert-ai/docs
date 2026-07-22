@@ -137,6 +137,51 @@ Recommendations:
 * Use a scoped package name for `meta.name` (e.g., `@xpert-ai/my-plugin`) and keep it consistent with `package.json`.
 * Prefer using an SVG string or data URL for `icon` to ease front-end rendering.
 
+### 4.1 Choose a Plugin Level
+
+Choose the level from the capability boundary before implementation:
+
+* `organization`: the default. Use it for normal tools, integrations, workflows, and business plugins that do not register process-level infrastructure.
+* `tenant`: use it for an industry application owned by one customer tenant that must register Nest modules, controllers, TypeORM entities, or other process-level providers.
+* `system`: reserve it for a platform singleton shared by every tenant.
+
+A tenant-level plugin must declare its level and stable artifact namespace in both the runtime entry and package metadata:
+
+```ts
+export const PLUGIN_ARTIFACT_NAMESPACE = 'contract_review' as const
+
+const plugin: XpertPlugin = {
+  meta: {
+    name: '@acme/plugin-contract-review',
+    version: '1.0.0',
+    level: 'tenant',
+    artifactNamespace: PLUGIN_ARTIFACT_NAMESPACE
+  },
+  register() {
+    return { module: ContractReviewPlugin, global: true }
+  }
+}
+```
+
+Matching `package.json` metadata:
+
+```json
+{
+  "name": "@acme/plugin-contract-review",
+  "version": "1.0.0",
+  "xpert": {
+    "plugin": {
+      "level": "tenant",
+      "artifactNamespace": "contract_review"
+    }
+  }
+}
+```
+
+These metadata surfaces must match. `artifactNamespace` may contain only lowercase letters, numbers, and underscores, and it should remain stable after release. Prefer `plugin_<artifactNamespace>_<tableKey>` for database tables, and derive controller routes, registry keys, queues, and cache identifiers from the same constant to avoid global naming collisions.
+
+Tenant-level and system-level plugins are process-level plugins. Their install, update, and uninstall operations do not mutate the live Nest module graph; activation or removal happens after an API restart. Include restart-based verification in development and acceptance testing.
+
 ---
 
 ## 5. Implement the plugin module (`MyPlugin`) and lifecycle hooks
