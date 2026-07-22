@@ -36,6 +36,12 @@ title: 🧩插件开发
 6. **保护 Webhook 路由**：使用 `PluginWebhookAuthGuard` 和 per-Integration webhook credential
 7. **编写测试用例**
 
+### 平台运行时能力
+
+* 使用[托管队列](./managed-queues)获得平台统一的后台调度、重试和租户上下文
+* 使用[Sandbox Jobs](./sandbox-jobs)执行需要隔离 Runner 的注册制重型任务，例如 Chromium 导出
+* 通过 Workspace Files portable references 传递文件，不在队列中保存原始 buffer
+
 ### [5. 插件示例：飞书文档集成](./lark)
 
 * 飞书文档插件介绍

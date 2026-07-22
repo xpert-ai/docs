@@ -41,6 +41,12 @@ title: 🧩 Plugin Development
 * Expose model-visible MCP tools and app-only tools
 * Return `ui://` MCP App resources for ChatKit inline rendering
 
+### Platform Runtime Capabilities
+
+* Use [Managed Queues](./managed-queues) for platform-owned background scheduling and retries
+* Use [Sandbox Jobs](./sandbox-jobs) for registered heavyweight actions that require an isolated Runner, such as Chromium export
+* Combine both with portable Workspace Files references instead of queueing raw buffers
+
 ### [6. Plugin Example: Feishu Docs Integration](./feishu-document-example/index)
 
 * Introduction to the Feishu Docs plugin

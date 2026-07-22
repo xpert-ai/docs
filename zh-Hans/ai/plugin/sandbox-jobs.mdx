@@ -1,0 +1,123 @@
+---
+sidebar_position: 9
+title: Sandbox Jobs 与 Browser Runtime
+description: 了解插件如何通过 Xpert 统一 Browser Runtime 的内置默认值和能力告警执行 PDF/PPTX 等隔离后台任务。
+---
+
+# Sandbox Jobs 与 Browser Runtime
+
+Sandbox Jobs 让插件把浏览器渲染、PDF/PPTX 导出和文档转换交给短生命周期、受资源限制的隔离环境。Chromium 由 Xpert 的统一 Browser Runtime 提供，不安装在 API 容器中，也不复用当前智能体会话的 Sandbox。
+
+Presentation Studio 的 PDF/PPTX 导出是首个使用该能力的产品功能。
+
+## 用户会看到什么
+
+1. 用户从 Workbench 或智能体发起导出。
+2. 插件创建业务导出记录，浏览器专用任务池开始排队。
+3. 有容量后，Xpert 启动一次性的 Browser Runtime Sandbox。
+4. 插件的 Presentation Action 与平台 Chromium 在 Sandbox 内组合执行。
+5. Xpert 校验 PDF/PPTX，写回当前 Project 或 Xpert Workspace。
+6. 导出记录显示下载信息，临时容器立即回收。
+
+该流程不要求原对话保持活跃。即使交互式智能体 Sandbox 被关闭，系统级导出仍可独立启用。
+
+## 与智能体 Sandbox 的区别
+
+| 能力 | 智能体会话 Sandbox | Sandbox Job |
+| --- | --- | --- |
+| 生命周期 | 会话或环境 | 一次任务一个临时实例 |
+| 作用域 | user/project/environment | job |
+| 用途 | 交互式工具和命令 | 注册过的后台 Action |
+| 重试 | 通常由对话控制 | 托管队列 + 幂等 Job |
+| 输出 | 当前运行时 workspace | Workspace Files portable reference |
+
+Sandbox Jobs 不提供任意 shell。插件只声明 Action 名称和版本，不能传入镜像、命令、entrypoint、environment、Docker 参数或宿主路径。
+
+## 平台与插件如何分工
+
+| 部分 | 由谁维护 | 示例 |
+| --- | --- | --- |
+| Sandbox Runtime Suite | Xpert 平台 | 镜像 Catalog、版本和发布流程 |
+| Browser Runtime | Xpert 平台 | Node、Playwright、Chromium、Noto 字体、Runner Host |
+| Runtime Definition | Xpert OSS Runtime Suite | profile 名称、固定 Runner、版本、资源和安全要求；不包含 Provider/image |
+| Runtime Binding / Provider | Pro 或社区实现 | 将 Definition 绑定到不可变 artifact，并创建隔离实例 |
+| Sandbox Action Bundle | system-level 插件 | Presentation Runner、Dashi 主题/模板、Action manifest |
+
+因此插件不需要自行维护 Docker image。Browser、字体和安全基线由平台复用；插件只发布自己的业务 Action。新的 Office、Python 或 Agent Sandbox Runtime 可以沿用同一 Runtime Suite 管理方式。
+
+## Presentation Studio 可用性
+
+HTML 导出不依赖 Browser Runtime，PDF/PPTX 则根据 Action health 分别显示可用性：
+
+| 原因 | 含义 | 管理员处理 |
+| --- | --- | --- |
+| `ACTION_MISSING` | 插件发布物中没有匹配 Action | 检查插件版本和安装包 |
+| `ACTION_INVALID` | Action manifest 或 bundle hash 无效 | 校验最终 npm tarball，重新构建/安装插件并重启 API |
+| `PROFILE_MISSING` | Browser Runtime Definition 缺失 | 升级 Xpert Runtime Suite |
+| `RUNTIME_UNBOUND` | API 没有兼容 Provider Binding | Pro 安装 Docker Provider；OSS 可安装社区 Provider |
+| `VERSION_MISMATCH` | Action 与 Runtime contract/Playwright 不兼容 | 升级或回滚对应版本 |
+| `PROFILE_UNHEALTHY` | 镜像 manifest 或安全 smoke 失败 | 检查 digest 和 Provider 日志 |
+| `PROVIDER_UNAVAILABLE` | 已注册 Provider 无法枚举 Binding | 检查 Provider 与执行引擎健康状态 |
+| `WORKER_UNAVAILABLE` | API 浏览器池 consumer 被关闭或不健康 | 恢复 API 队列 consumer 与 Redis 连接 |
+
+平台异常时应保持 HTML 可用，不要在 API 容器内临时下载 Chrome。
+
+## 导出请求如何被接受
+
+Workbench 和服务端导出接口会在创建浏览器导出记录或队列任务前组合两项独立检查：
+
+1. Sandbox Jobs `getActionHealth()` 检查 Action、Runtime Definition、API 本地 Binding、不可变 artifact、Provider 和 Runtime manifest。
+2. Managed Queue `getExecutionPoolHealth({ executionPool: 'sandbox-browser' })` 检查浏览器执行池是否有存活 consumer。
+
+只有两项都通过时，PDF/PPTX 才可用。任一检查失败时，菜单展示最具体的 warning；服务端还会重复检查，避免前端缓存的旧状态创建永久排队的导出任务。这些检查属于自动能力探测，不是用户需要配置的开关。
+
+接单后，导出会依次进入 `queued`、容量 `waiting`、`starting`、`running`，最终到达 `succeeded`、`failed` 或 `cancelled`。容量等待不消耗重试次数；幂等重试会返回既有成功结果或重新附着到运行中任务，只有新的 attempt 才能重新选择健康的 Runtime Binding。
+
+## 默认启用与生产部署
+
+1. 通过 Xpert version release 发布 Sandbox Runtime Suite。
+2. Pro 在 API 进程同时注册专用 `DockerSandboxRuntimeProvider` 与独立的交互式 `DockerSandboxProvider`。OSS 可安装其他公开 SPI Provider 发行物。
+3. Provider release 使用随包生成的不可变 Runtime Suite lock，不要求用户配置 image/profile/provider。
+4. 检查 Browser Runtime、Presentation Action、API 本地 Provider health 和 execution pool health。
+
+PDF/PPTX 能力探测默认开启，不再要求租户功能开关。任一前置条件不满足时，Workbench 会显示结构化 warning、不创建浏览器队列任务，同时保留 HTML 导出。
+
+OSS Compose 不挂载 Docker socket，也不拉取 Browser Runtime artifact。它的 API 消费浏览器队列，但没有生产 Binding，因此 health 返回 `RUNTIME_UNBOUND`。Pro 在同一个 Docker Sandbox 模块中分别维护 `DockerSandboxProvider` 与 `DockerSandboxRuntimeProvider` 两个策略类并在 API 同时注册；两者共享 Docker engine 层，不共享生命周期契约。`xpert-plugins` 不包含第二套 Docker 实现 package。生产 artifact 由 Pro 模块的 `runtime-suite.lock.json` 固定为 `repository@sha256:<digest>`；不接受 `latest`、`main` 或版本 tag，也没有 `SANDBOX_BROWSER_RUNTIME_IMAGE` 配置项。
+
+## 开源版与 Pro 版
+
+| 发行版 | 默认包含 | PDF/PPTX 行为 |
+| --- | --- | --- |
+| OSS | Jobs Core、Runtime Definition、Action、Provider SPI、健康证据和文件/审计能力；不含生产 Provider | 显示 `RUNTIME_UNBOUND`；HTML 正常，且不入队浏览器任务 |
+| Pro | OSS 能力 + 专用 DockerSandboxRuntimeProvider、共享 Docker engine adapter 和 immutable lock | API 使用随包默认值，artifact health 就绪后 PDF/PPTX 自动可用 |
+| 社区扩展 | OSS + 作为 system infrastructure 注册的 Podman/Kubernetes/Remote Provider | 由 API 本地 Provider 与 Binding health 决定 |
+
+平台不会以内置本地进程 Provider 代替生产隔离。OSS API 不挂载 Docker socket；Pro 或社区 API 只获得其已安装 Provider 所需的引擎访问权限。PDF/PPTX 是默认健康驱动的能力；条件未满足时菜单展示具体原因和修复建议，而不是静默灰掉。`RUNTIME_UNBOUND` 表示 API 执行器无法提供兼容 Binding。
+
+`Sandbox Action bundle hash mismatch` 不是运行时配置项缺失。它表示安装后的 Action 文件与 manifest 记录的 hash 不一致：构建方应让 Action 自有依赖位于 `bundle/runtime-modules` 等普通目录，禁止嵌套 `node_modules`，并在发布前实际执行 `npm pack`、解压 tarball、从解压内容复算 hash。运维侧升级或重新安装修复后的 Presentation Studio package，再重启 API 以刷新 Action Registry；无需增加 image、profile、Provider 或 `CHROME_PATH` 环境变量。
+
+## 资源、容量和安全
+
+Browser Runtime 默认使用 2 CPU、4 GiB 内存、1 GiB `/dev/shm`、4 GiB 临时空间，任务超时 300 秒，容器 hard deadline 360 秒。
+
+容器以非 root、只读根文件系统、drop all capabilities、`no-new-privileges` 和默认禁网运行。只有当前 Job 的 `/workspace` 可写；插件目录和宿主 `node_modules` 不会挂载。
+
+容量默认限制为全局 20、单租户 4、单用户 2。达到上限时任务保持 `waiting`，不会创建半初始化容器，也不会消耗业务重试次数。
+
+## 文件、重试与取消
+
+队列只传递业务标识。Handler 从业务记录读取固定版本或 snapshot，并使用 Workspace Files portable references 传递素材；平台校验 tenant、size、SHA-256 和路径。输出校验成功后返回 portable references，不把 buffer/base64 写入队列。
+
+相同业务 ID 与不可变 checksum 会复用成功结果或重新附着正在运行的 Job。容量服务、Provider 启动、浏览器启动、超时和 OOM 属于可重试故障；Action/Profile/版本、输入和输出结构错误不重试。
+
+用户取消时，平台同时取消 Managed Queue 任务和已启动的 Sandbox Job。成功、失败或取消后容器与临时 Job Volume 都会回收；遗留任务由 cleanup scheduler 补偿。
+
+## 当前边界
+
+- v1 只允许 system-level 插件声明可执行 Action。
+- 每个 PDF/PPTX 导出使用新的短生命周期容器，不跨 Job 或租户复用。
+- 当前单 Job 输入和输出分别限制为 350 MiB。
+- 生产环境不会在 Job 启动时安装 npm 包或下载浏览器。
+- `CHROME_PATH` 和本地 backend 仅用于 development/test。
+
+插件开发者请参阅 Xpert Plugin Development skill 中的 Sandbox Action Bundle 指南。
