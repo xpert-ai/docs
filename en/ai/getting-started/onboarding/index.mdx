@@ -1,48 +1,46 @@
 ---
 title: Onboarding Wizard
 sidebar_position: 3
+description: Create the super administrator, default organization, and primary AI model when starting Xpert AI for the first time.
 ---
 
-When first entering the Xpert AI platform, you need to perform some initialization settings to ensure the system runs smoothly. This document will guide you through these settings.
+When you start an Xpert AI instance that has not been initialized, the onboarding wizard helps you create the super administrator and default organization, with an optional step for configuring the primary AI model.
 
-<figure>
-  <img src="/img/deploy/welcome.jpeg" alt="Welcome Page" className="shadow-md" />
-  <figcaption>Welcome Page</figcaption>
-</figure>
+<Info>
+The current onboarding flow consists of a welcome page followed by three initialization steps. The legacy **Generate demo data** and **Add data source** steps are no longer part of first-time setup; you can complete those tasks after entering the platform when needed.
+</Info>
 
-## Administrator and Company Information
+## Open the welcome page
 
-Upon first entering the system, the first step is to select the language environment. Then, you need to input administrator and company information. The email will serve as the administrator's login account, and the password will serve as the login password. 
-The company information is the organization created by default, and more organizations can be created after entering the system. This administrator's role is a super administrator, with the highest authority in the system.
+After confirming that the welcome page loads correctly, use the language menu in the upper-right corner to change the interface language. The selected language is also applied to the new administrator and default organization.
 
-<figure>
-  <img src="/img/deploy/admin.jpeg" alt="Input Administrator and Company Information" className="shadow-md" />
-  <figcaption>Input Administrator and Company Information</figcaption>
-</figure>
+Click **Let's get started** to open the initialization wizard.
 
-## Generate Demo Samples
+## Step 1: Create the super administrator and default organization
 
-After inputting the administrator and company information, you can choose to let the system generate some demo data to help you understand the system's functions and usage methods more quickly. Domestic users choose to download demo data files from the aliyun network, while international users choose to download from the github network.
+Enter the following information:
 
-<figure>
-  <img src="/img/deploy/demo.jpeg" alt="Generate Demo Samples" className="shadow-md" />
-  <figcaption>Generate Demo Samples</figcaption>
-</figure>
+| Field | Description |
+| --- | --- |
+| First name and last name | The display name of the super administrator. |
+| Email | Required. This becomes the super administrator's login account. |
+| Company or team name | Required. Xpert AI uses this name to create the default organization. |
+| Password and confirmation | Required. The password must contain at least eight characters, and both entries must match. |
 
-## Add Data Sources
+After you click **Next**, Xpert AI initializes the tenant, creates the super administrator and default organization, adds the administrator to that organization, and signs you in automatically.
 
-Once the system initialization is complete, you need to add your own data sources. Data sources are the core of the Xpert AI platform, and you can add various types of data sources, including MySQL, Doris, StarRocks, XMLA, etc.
+## Step 2: Configure the AI model
 
-<figure>
-  <img src="/img/deploy/data-source.png" alt="Add Data Sources" className="shadow-md" />
-  <figcaption>Add Data Sources</figcaption>
-</figure>
+Use this step to configure the platform's primary AI assistant:
 
-## Setup Complete
+1. Select an AI model provider and configure its authorization information.
+2. Select the default large language model.
+3. Click **Save and Next**.
 
-After all settings are complete, you can proceed to the main interface of the system. Here, you can begin your data analysis journey.
+If model credentials are not available yet, click **Skip**. You can finish the setup later in system settings. For details, see [AI Assistant Settings](/en/ai/agent/ai-assistant/settings).
 
-<figure>
-  <img src="/img/deploy/all-done.png" alt="Setup Complete" className="shadow-md" />
-  <figcaption>Setup Complete</figcaption>
-</figure>
+## Step 3: Complete the wizard
+
+After saving or skipping AI model configuration, the wizard displays the completion page. Click **Take me to Xpert AI Platform** to open the chat home page.
+
+The onboarding wizard is shown only when the system does not yet have a tenant. If initialization has already been completed, visiting the onboarding route redirects you to the platform home page.
