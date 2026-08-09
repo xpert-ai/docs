@@ -27,6 +27,14 @@ Beyond fixed retrieval nodes, XpertAI also supports registering the knowledge ba
 You can add a "Knowledgebase Node" to the agent—
 this node allows the agent to proactively access the knowledge base to supplement knowledge or verify information as needed.
 
+For each agent-to-knowledge-base binding, you can configure both:
+
+* a **fixed filter** that limits the domain, project, folder, or document status and cannot be changed by the agent;
+* **Allow agent automatic filtering**, which lets the agent use file names, file types, folders, and metadata to further narrow the current request;
+* **Vector retrieval**, with intelligent filtering fully supported on PGVector and Milvus.
+
+If the agent cannot infer a reliable condition, it omits the dynamic filter, while the fixed boundary remains active. See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering).
+
 **Advantages:**
 
 * Enhances agent autonomy and contextual flexibility;
@@ -44,11 +52,18 @@ This enables your project team to:
 
 ---
 
-## 4. Coming Soon: Agents Autonomously Orchestrating Knowledge Pipelines
+## 4. Sharing one knowledge base with fixed and agent-generated filters
 
-With the release of **XpertAI 3.6**, the knowledge base feature will be fully upgraded to a **Knowledge Pipeline**. In future versions, agents will be able to autonomously orchestrate the pipeline, dynamically acquiring applicable knowledge based on task objectives and context, achieving **real-time, on-demand knowledge access**.
+When several teams share a large knowledge base, you do not need to duplicate the documents for every domain. Configure a different fixed filter on each agent or workflow binding, then enable agent filtering where it adds value.
 
-This feature will make knowledge the agent’s “long-term memory,” enabling enterprises to truly build a **trustworthy and explainable knowledge intelligence system**.
+For example:
+
+* a water-resources quoting agent is fixed to `metadata.domain = water-resources`;
+* a logistics quoting agent is fixed to `metadata.domain = logistics`;
+* each agent can add a year, region, file type, or file-name keyword found in the user's question;
+* all results remain subject to organization permissions, disabled-content checks, and the fixed boundary.
+
+This approach combines knowledge reuse, business isolation, and retrieval precision while keeping each filtering decision traceable in debug logs.
 
 ---
 
@@ -57,5 +72,6 @@ This feature will make knowledge the agent’s “long-term memory,” enabling 
 | Usage Method           | Features                  | Typical Scenarios                |
 | ---------------------- | ------------------------ | -------------------------------- |
 | Knowledge Retrieval Node | Explicit call, stable and controllable | Q&A, report interpretation, summarization |
-| Knowledge Base Tool Node | Agent autonomously calls as needed | Conversational reasoning, multi-turn task execution |
+| Knowledge Base Tool Node | Agent calls as needed and can generate dynamic filters | Conversational reasoning, multi-turn task execution |
 | Project General Knowledge Base | Automatic sharing, no configuration needed | Team knowledge collaboration, general Q&A |
+| Multi-agent Shared Knowledge Base | Fixed boundaries with request-specific precision | Multi-domain quoting, compliance, project retrieval |

@@ -1,109 +1,89 @@
 ---
-title: Introduction
+title: Knowledge Base Overview
 sidebar_position: 2
+description: Turn enterprise documents into manageable, searchable, and citable knowledge for agents.
 ---
 
-In AI conversational knowledge retrieval, the core functionalities of the knowledge base typically include document text embedding, Chunk retrieval, query optimization, and real-time updates. Below are common functionalities, with a focus on document text embedding and Chunk retrieval:
+XpertAI Knowledge Base turns enterprise documents, web pages, and business material into trusted knowledge that digital experts and workflows can use. It handles content extraction, chunking, embedding, structured filtering, retrieval, and citation so agent answers remain grounded in traceable source material.
 
-## Funtions
+A knowledge base can be exposed as a tool that an agent calls autonomously or as an explicit retrieval step in a workflow. One knowledge base can serve several business domains, while fixed and agent-generated filters on each agent-to-knowledge-base binding control the scope used for a particular application.
 
-### 1. **Document Text Embedding**
-   - **Text Vectorization**: Using deep learning models (such as BERT, OpenAI Embeddings) to embed text into high-dimensional vectors, enabling similarity matching through vector retrieval. This forms the foundation for fast retrieval in the knowledge base and is suitable for various text types, such as documents, web pages, FAQs, etc.
-   - **Multilingual Support**: For texts in different languages, the corresponding embedding models are used to ensure the accuracy of multilingual retrieval.
-   - **Data Preprocessing**: Cleaning, tokenizing, and denoising the text in documents to generate high-quality vectors for embedding.
-   - **Context-Aware Embedding**: Ensuring that the embedding model can recognize the context within the text to enhance the accuracy of responses in conversations.
+## Core capabilities
 
-### 2. **Chunk Retrieval**
-   - **Document Chunking**: Breaking large documents into smaller chunks to improve retrieval accuracy and efficiency. Each Chunk typically consists of a few sentences or a paragraph, ensuring the system finds the most relevant specific information during retrieval rather than the entire document.
-   - **Embedding and Indexing Chunks**: Generating independent vectors for each Chunk and storing them in a vector database for indexing. This allows the system to quickly find the Chunks most similar to the user's query during retrieval.
-![Rag indexing](/public/img/ai/rag_indexing.png)
+| Capability | Product value |
+| --- | --- |
+| Multi-source ingestion | Upload PDF, DOCX, Markdown, TXT, HTML, XLSX, PPTX, CSV, and other files, or import content from web pages and knowledge pipelines. |
+| Parsing and chunking | Clean content and create chunks with configurable strategies and parent-child context. |
+| Semantic vector retrieval | Match the meaning of a question instead of relying only on identical keywords. |
+| Intelligent retrieval filtering | Narrow candidates by file name, logical folder, file type, MIME type, and business metadata before vector ranking. |
+| Typed metadata | Define string, enum, number, datetime, boolean, array, and object fields at document or chunk scope. |
+| Autonomous agent retrieval | Let agents decide when to search and generate request-specific conditions inside administrator-defined boundaries. |
+| Testing, citations, and audit | Inspect retrieved chunks, source documents, effective filters, candidate counts, hit counts, and retrieval latency. |
+| Live maintenance | Apply file-name, logical-folder, and metadata changes to filtering without recomputing embeddings. |
 
-### 3. **Query Optimization**
-   - **Semantic Retrieval**: Using semantic search technology to convert user queries into vectors that are then matched for similarity with the embedded knowledge base content. Compared to traditional keyword retrieval, semantic retrieval better understands user intent.
-   - **Fuzzy Matching**: Even if a query does not match the wording in a document exactly, the system can still return relevant results based on vector similarity.
-   - **Search Result Reordering**: (todo) Reordering returned results to ensure the most relevant answers appear first. This is typically based on vector similarity scores or other user interaction data (such as click-through rates).
-![Rag retrieval](/public/img/ai/rag_retrieval_generation.png)
+## From document to grounded answer
 
-### 4. **Document Update and Management**
-   - **Real-Time Updates**: Supports dynamic updates to the knowledge base, ensuring the latest information can be retrieved promptly. An automated document upload and embedding update process ensures the knowledge base content is always up to date.
-   - **Document Type Support**: The knowledge base typically supports various document formats, including PDF, Word, Markdown, plain text, etc., ensuring knowledge can be imported from different document sources.
-   - **Metadata Management**: (todo) Adding metadata (such as creation time, document type, author, etc.) to documents and Chunks, allowing the system to perform more precise retrieval based on metadata.
+1. **Ingest content**: upload files, scrape web pages, or connect business document sources through a knowledge pipeline.
+2. **Parse and chunk**: extract and clean text, then create chunks suitable for retrieval.
+3. **Embed and index**: use the configured embedding model and write vectors to the vector database.
+4. **Constrain candidates**: apply access boundaries, enabled-content checks, fixed filters, and agent-generated filters.
+5. **Rank semantically**: rank the remaining chunks by vector similarity and apply TopK and score thresholds.
+6. **Generate with citations**: pass the results to downstream models while preserving traceable document sources.
 
-### 5. **Knowledge Base Q&A**
-   - **Document-Based QA System**: Using retrieved text Chunks, combined with models like GPT, to generate direct answers to user questions. This method usually provides fact-based, accurate responses.
-   - **Step-by-Step Q&A and Context Tracking**: The system can retain context in continuous conversations, providing more coherent responses and adjusting retrieval results based on previous dialogues.
+![RAG indexing](/public/img/ai/rag_indexing.png)
 
-### 6. **Extension and Integration**
-   - **External Data Source Integration**: The knowledge base can be integrated with external data sources (such as databases, APIs) to provide dynamic data query support.
-   - **Vector Database**: (todo) Utilizing vector databases like FAISS, Milvus, Pinecone, which can effectively manage and retrieve large-scale embedded data.
+## Intelligent filtering for multi-domain knowledge
 
-:::warning 🚧
-In Development
-:::
+When engineering, water-resources, logistics, and other material share one knowledge base, unrestricted semantic matching may retrieve similar but inapplicable content. XpertAI can apply structured conditions before vector search:
 
-These functionalities will help make the knowledge retrieval module in Xpert AI more efficient and intelligent, especially in scenarios involving large amounts of documents and text. When designing the knowledge base retrieval system, you can optimize the speed and accuracy of Chunk retrieval by choosing the appropriate embedding models and vector databases.
+- administrators define **fixed filters** for a domain, project, folder, or document-status boundary that the agent cannot change;
+- when **Allow agent automatic filtering** is enabled, the agent can infer a year, file format, region, or keyword from the question and add request-specific conditions;
+- both layers are always combined with `AND`, so the agent can narrow but never bypass the fixed scope;
+- if no reliable dynamic condition can be inferred, the agent omits it and still searches within the fixed scope.
 
-## Detailed Settings for the Knowledge Base
+For example, an administrator can constrain a quoting agent to “water resources + effective documents.” For “2025 PDF rate schedules,” the agent can additionally filter for `file extension = pdf`, `effective year = 2025`, and `file name contains rate schedule`.
 
-Below are the detailed configurations for the knowledge base settings:
+See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering) for fields, operators, configuration steps, runtime behavior, and the support matrix.
 
-| Configuration Item | Description                                      |
-|--------------------|--------------------------------------------------|
-| **Avatar**         | The identifying icon for the knowledge base, usually a logo or representative image. |
-| **Name**           | The name of the knowledge base, used to identify and differentiate between different knowledge bases. |
-| **Description**    | A brief description of the knowledge base, summarizing its content and purpose. |
-| **Language**       | The primary language used in the knowledge base, such as Chinese, English, etc. |
-| **Permissions**    | Access permission settings for the knowledge base, options include: <br /> - _Private_ <br /> - _Within Organization_ <br /> - _Public_ |
-| **Intelligent Assistant** | The intelligent assistant providing text embedding capabilities, specifying the AI provider used. |
-| **Embedding Model** | The AI model used for text embedding, depending on the chosen intelligent assistant (i.e., AI provider). |
-| **Embedding Batch Size** | The number of text embeddings processed at once, affecting processing efficiency and performance. |
-| **Chunk Size**     | The size of each Chunk when dividing documents, typically by sentence or paragraph. |
-| **Chunk Overlap**  | Specifies the overlapping part between adjacent Chunks to maintain context coherence. |
-| **Similarity Threshold** | When retrieving text blocks, filter results based on a similarity threshold to determine which Chunks to return. |
+## Document and metadata management
 
-## Documents
+XpertAI automatically maintains these system attributes:
 
-Here is a detailed introduction to document and parsing functionalities, including document upload, document parsing, and related operation configurations:
+- file name and logical knowledge base folder path;
+- file extension and MIME type;
+- document category and source type;
+- creation and update timestamps.
 
-### 1. Uploading Documents
-Users can upload various formats of documents to the knowledge base. Supported document types include:
-- **Markdown**: Used for lightweight markup language documents, easy to read and edit.
-- **PDF**: Suitable for preserving formatted documents, ideal for long articles and reports.
-- **EPUB**: An e-book format that supports reading on various devices.
-- **DOCX**: Microsoft Word documents, widely used for text editing and formatting.
+Teams can define business fields in the metadata schema and supply typed values during upload, document editing, chunk editing, or bulk maintenance. Document-scoped fields apply to the whole document; chunk-scoped fields distinguish sections or content categories inside a document.
 
-### 2. Document Parsing
-Uploaded documents need to be parsed to extract their content and store it in the knowledge base. The parsing process can be configured as follows:
+Renaming or moving a file and updating metadata refresh retrieval attributes without regenerating vectors, so day-to-day classification changes take effect quickly. See [Maintaining Documents](/en/ai/knowledge-base/maintain-documents).
 
-| Configuration Item | Description                                   |
-|--------------------|-----------------------------------------------|
-| **Chunk Size**     | Size setting for each text chunk (number of words or sentences) used to split document content into smaller pieces for retrieval. |
-| **Chunk Overlap**  | Defines the overlap in words between adjacent text chunks, ensuring contextual coherence and avoiding information loss. |
-| **Delimiter**      | Defines how to separate chunks in the document, such as by paragraph, newline characters, or specific characters. |
+## Ways to retrieve knowledge
 
-### 3. Start Parsing
-Once the configuration is complete, users can start the parsing process. The parsing task will run on the server-side, and the system will execute the following steps:
-- **Read Document**: Load the uploaded document and perform format parsing.
-- **Extract Content**: Based on the configured chunk size, chunk overlap, and delimiter, split the document content into multiple text chunks.
-- **Generate Embeddings**: Call the AI model to generate vector embeddings for each text chunk for subsequent retrieval and query use.
+| Method | Best for |
+| --- | --- |
+| Agent knowledge base tool | Letting an agent decide whether to search and whether a dynamic filter is useful. |
+| Workflow Knowledge Retrieval node | Running retrieval at an explicit point and passing chunks to model, decision, or formatting nodes. |
+| Project-shared knowledge | Giving several project agents a consistent source for Q&A, analysis, and content generation. |
+| Knowledgebase Workbench | Browsing folders, previewing documents, asking questions, and tracing citations in one workspace. |
+| External knowledge base connection | Reusing services such as RAGFlow, Dify, or FastGPT. Available capabilities depend on the provider interface. |
 
-### 4. Re-parse or Delete Documents
-- **Re-parse**: Users can choose to re-parse a document at any time to update its configuration or content. This will re-execute the parsing process and replace old document chunks.
-- **Delete Document**: Users can delete documents no longer needed, and the system will automatically delete all associated document chunks. This ensures the knowledge base content remains clean and accurate.
+See [Ways to Use the Knowledge Base](/en/ai/knowledge-base/ways-to-use-knowledge-base) and [Knowledgebase Workbench](/en/ai/knowledge-base/knowledge-workbench).
 
-## Retrieval Testing
+## Testing and observability
 
-The retrieval testing feature is used to validate the effectiveness and accuracy of the knowledge base retrieval, ensuring the system can effectively retrieve relevant information from the knowledge base. Below are detailed parameter introductions for this feature:
+Recall testing validates queries, filters, TopK, and similarity thresholds before release. Debug views distinguish fixed, test, and agent-generated filters and show the effective filter, candidate documents, candidate chunks, final hits, backend, and timing.
 
-| Parameter         | Description                                   |
-|--------------------|-----------------------------------------------|
-| **Similarity Threshold** | Set a minimum similarity value, only retrieval results with similarity above this value will be returned. |
-| **Top N**         | Specify the number of results to return; the system will sort results based on similarity from high to low and return the top N most relevant results. |
-| **Input**         | User-input query text to trigger the retrieval feature. The system will analyze this input and calculate its similarity with the content in the knowledge base to find relevant text blocks or information. |
+Retrieval log access follows knowledge base permissions, and logs do not contain document body text. Normal agent answers show only content and citations by default, not internal filtering decisions. See [Recall Test](/en/ai/knowledge-base/recall-test).
 
-### Function Flow:
-1. **Input**: The user enters a query in the input box.
-2. **Similarity Calculation**: The system vectorizes the user's input text and calculates similarity with all text blocks in the knowledge base.
-3. **Filtering**: Based on the set similarity threshold, filter out text blocks with similarity below the threshold.
-4. **Sorting**: Sort the remaining text blocks by similarity and return the most relevant results.
-5. **Return Results**: The system returns the specified number of retrieval results based on the "Top N" setting.
+## Current support
+
+The first release of intelligent filtering applies to **Vector** retrieval and fully supports PGVector and Milvus. Milvus Server 2.6.2 or later is required. Graph, Hybrid, Chroma, and Weaviate return an explicit unsupported error when the new filters are configured; XpertAI never silently degrades to an unrestricted search.
+
+## Recommended reading
+
+1. [Maintain documents and metadata](/en/ai/knowledge-base/maintain-documents)
+2. [Configure intelligent retrieval filtering](/en/ai/knowledge-base/intelligent-filtering)
+3. [Test recall](/en/ai/knowledge-base/recall-test)
+4. [Choose a knowledge base usage pattern](/en/ai/knowledge-base/ways-to-use-knowledge-base)
+5. [Create a knowledge base through a pipeline](/en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline)

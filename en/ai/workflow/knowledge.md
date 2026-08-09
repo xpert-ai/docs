@@ -12,6 +12,7 @@ The **Knowledge Retrieval** node is a core capability in the XpertAI agent workf
 | 🔍 Semantic Matching | Automatically identifies the core intent of user input and retrieves the most semantically relevant knowledge snippets |
 | 📂 Content Support   | Supports retrieval of structured and unstructured document content, such as policy documents, FAQs, product manuals, etc. |
 | 🎯 Precise Recall    | Supports recall of multiple relevant content items, enabling comprehensive judgment by downstream nodes |
+| 🧭 Intelligent Filtering | Enforces a fixed business boundary and lets the agent narrow retrieval with registered system and metadata fields |
 | 🔄 Composability     | Can be flexibly combined with any language model node (e.g., reasoning models) to form complex task flows |
 | 🔗 Multi-Knowledge Source Support | Configurable to access multiple knowledge bases for cross-business or multi-domain information retrieval |
 
@@ -27,7 +28,20 @@ The Knowledge Retrieval node accepts input from upstream nodes, typically a user
 }
 ```
 
-### 2. Output Structure
+### 2. Retrieval and filter configuration
+
+Each Knowledge Retrieval node stores an independent configuration for every bound knowledge base:
+
+- **Retrieval mode**: intelligent filtering currently applies to Vector mode;
+- **Fixed filter**: configured by the workflow designer with constants or workflow variables and cannot be changed by the agent at runtime;
+- **Allow agent automatic filtering**: lets the agent add valid request-specific conditions inferred from the question;
+- **Multiple knowledge bases**: each binding retains its own fixed filter and agent-filter switch.
+
+Fixed, caller, and agent-generated filters are always combined with `AND`. A missing or mistyped fixed variable stops retrieval. An invalid dynamic filter is discarded as a whole, and retrieval continues with the fixed filter.
+
+See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering) for fields, operators, zero-hit behavior, and the support matrix.
+
+### 3. Output Structure
 
 The Knowledge Retrieval node returns a list of documents in the format of Langchain's `Document` object. Each document contains two parts:
 
@@ -84,6 +98,7 @@ The Knowledge Retrieval node is typically used with the following nodes to form 
 * Ensure the relevant knowledge base is populated and available
 * For multilingual content, pre-configure support for the corresponding language in the knowledge base
 * The amount of retrieved content can be customized in node settings (e.g., return top 3 or top 5 results)
+* When fixed or agent filtering is configured, use Vector mode with PGVector or Milvus
 
 ---
 
@@ -95,4 +110,4 @@ The **Knowledge Retrieval** node serves as a bridge between "user questions" and
 
 It not only provides factual evidence but also offers reliable semantic support for the agent's understanding and expression. In the XpertAI workflow, Knowledge Retrieval enhances your agent's contextual awareness and business expertise.
 
-For more details on building and maintaining a knowledge base, refer to [Knowledge Base Management](/docs/ai/knowledge/).
+For more details on building and maintaining a knowledge base, see [Knowledge Base Overview](/en/ai/knowledge-base/index).

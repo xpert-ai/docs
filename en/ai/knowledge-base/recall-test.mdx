@@ -42,6 +42,8 @@ On the details page, the left side shows the parent chunk information, and the r
 In the **Records** panel, you can view the history of recall test queries.
 If the knowledge base is linked to a digital expert or other AI application, queries triggered within the application will also be displayed here, making it easy to track recall logs and effectiveness in one place.
 
+When intelligent filtering is enabled, authorized users can also inspect the fixed, test, and agent-generated filters; the effective filter; candidate document and chunk counts; final hits; vector backend; and stage timing. Logs do not contain document body text, and access follows knowledge base permissions.
+
 ---
 
 ## Adjusting Text Retrieval Methods
@@ -52,11 +54,32 @@ To make global changes, go to **"Knowledge Base Settings > Retrieval Settings"**
 
 ---
 
+## Testing structured filters
+
+The recall test panel accepts typed conditions for the current test. Test conditions are combined with system boundaries and fixed filters using `AND`; they cannot expand the scope granted by the agent binding.
+
+Test these cases separately:
+
+1. **Fixed filter only**: confirm that results remain inside the administrator-defined scope when no dynamic filter is supplied.
+2. **System fields**: combine file name, logical folder, extension, and MIME type.
+3. **Business metadata**: verify document-scoped and chunk-scoped fields produce the intended candidates.
+4. **Zero hits**: confirm that the server does not automatically broaden a valid filter.
+5. **Invalid conditions**: verify that unknown fields, wrong value types, and unsupported operators show a structured reason.
+6. **Disabled content**: confirm that disabled documents and chunks never appear.
+
+For example, with a fixed “water resources + effective document” boundary, add `document.fileExtension = pdf` and `metadata.effectiveYear = 2025`, then verify that every hit, chunk, and citation satisfies the conditions.
+
+See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering) for the field catalog, operators, and agent behavior.
+
+---
+
 ## Recommended Steps for Recall Testing
 
 1. **Prepare a test set**: Design a set of test questions covering common user scenarios to ensure diversity.
-2. **Choose a retrieval strategy**: Select the appropriate retrieval mode based on content characteristics and application scenarios (e.g., Q&A, multilingual corpus, etc.).
-3. **Tune parameters**: Adjust the number of recalls (TopK) and similarity threshold (Score) to balance recall relevance and completeness.
+2. **Validate retrieval boundaries**: Confirm fixed filters and disabled-content rules before testing conditions an agent may generate.
+3. **Choose a retrieval strategy**: Intelligent filtering currently applies to Vector mode; select a vector backend that fits the deployment.
+4. **Tune parameters**: Adjust the number of recalls (TopK) and similarity threshold (Score) to balance recall relevance and completeness.
+5. **Inspect diagnostics**: Monitor candidate counts, zero-hit rate, filter latency, and dynamic-filter fallback reasons.
 
 ---
 

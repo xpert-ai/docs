@@ -264,6 +264,7 @@
                     "pages": [
                       "en/ai/knowledge-base/index",
                       "en/ai/knowledge-base/maintain-documents",
+                      "en/ai/knowledge-base/intelligent-filtering",
                       "en/ai/knowledge-base/api",
                       "en/ai/knowledge-base/connect-external-knowledge-base",
                       "en/ai/knowledge-base/recall-test",
@@ -1111,6 +1112,7 @@
                     "pages": [
                       "zh-Hans/ai/knowledge-base/index",
                       "zh-Hans/ai/knowledge-base/maintain-documents",
+                      "zh-Hans/ai/knowledge-base/intelligent-filtering",
                       "zh-Hans/ai/knowledge-base/api",
                       "zh-Hans/ai/knowledge-base/connect-external-knowledge-base",
                       "zh-Hans/ai/knowledge-base/recall-test",

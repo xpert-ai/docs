@@ -70,6 +70,41 @@ Before chunking, XpertAI provides powerful text preprocessing features to ensure
 - **Overlap Setting**: Keep "Chunk Overlap" between 50-150 characters to balance contextual continuity and performance.  
 - **Preprocessing Optimization**: If a document contains significant formatting noise (e.g., excessive line breaks or URLs), enable preprocessing rules to improve chunking quality.
 
+## Managing system attributes and business metadata
+
+In addition to document content, XpertAI maintains structured attributes for precise retrieval.
+
+### Automatically maintained system attributes
+
+XpertAI automatically maintains the file name, logical knowledge base folder path, file extension, MIME type, document category, source type, creation time, and update time. A folder path represents the hierarchy inside the knowledge base and never exposes a server storage path.
+
+Renaming or moving a folder updates the logical paths of its descendant documents. Renaming a file, moving a folder, or updating metadata changes retrieval attributes without recomputing embeddings.
+
+### Defining the metadata schema
+
+Administrators can register business fields in the knowledge base metadata schema. Each field contains:
+
+| Setting | Description |
+| --- | --- |
+| Key | Stable identifier such as `domain`, `effectiveYear`, or `region`. |
+| Type | String, enum, number, datetime, boolean, string array, number array, or object. |
+| Scope | `document` for a document-level field or `chunk` for a chunk-level field. |
+| Enum values | Allowed values for an enum field. |
+| Label and description | Guidance that helps administrators and agents interpret the field correctly. |
+
+The server validates actual values against the schema. For example, a year should be stored as a number, an effective flag as a boolean, and a timestamp as an ISO-8601 datetime. Do not convert every business value to a string.
+
+### Maintaining metadata
+
+Business metadata can be supplied during document upload or updated from document details, chunk editing, and bulk-maintenance operations:
+
+- document-scoped fields apply to the entire document and all of its chunks;
+- chunk-scoped fields apply only to the corresponding chunk;
+- metadata updates become available to PGVector or Milvus filtering immediately;
+- if validation reports inconsistent historical values, correct the data before using that field in a production filter.
+
+See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering) to use these attributes in retrieval boundaries.
+
 ## Managing Chunks
 
 - **Chunk Viewing and Status Management**: Each chunk is presented in a concise card or list item format, including features like chunk number and character count, content preview, enable/disable status, and editing options.  

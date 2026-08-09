@@ -1,0 +1,175 @@
+---
+title: Intelligent Retrieval Filtering
+sidebar_position: 4
+description: Combine fixed boundaries, agent-generated filters, and typed metadata so one knowledge base can safely serve multiple business domains.
+---
+
+**Intelligent retrieval filtering** in XpertAI combines structured conditions with vector semantic search in a single query. Engineering, water resources, logistics, policies, and other document collections can live in one knowledge base while file names, logical folders, file types, and business metadata narrow the candidate set before semantic ranking.
+
+The feature provides two complementary filter layers:
+
+- **Fixed filters** are configured by an administrator and form a boundary that an agent cannot change.
+- **Agent-generated filters** are added when the agent can infer useful conditions from the current question and conversation context.
+
+Every search also remains inside the tenant, organization, knowledge base permission, and enabled-content boundaries. An agent can only narrow a fixed scope; it cannot override or bypass it.
+
+## When to use it
+
+Intelligent filtering is especially useful when:
+
+- one knowledge base contains documents from several domains or projects;
+- multiple agents share the same content but must retrieve different scopes;
+- quoting, compliance, or support applications require structured eligibility rules before semantic matching;
+- questions frequently include a year, region, format, document status, or category;
+- operators need to reconstruct why a particular set of chunks was retrieved.
+
+For example, a single construction-cost knowledge base can contain water resources, logistics, and building documents. A water-resources quoting agent can be fixed to `metadata.domain = water-resources` and `metadata.documentStatus = effective`. When a user asks for “2025 PDF rate schedules,” the agent can add year, PDF, and file-name conditions for that request.
+
+## How the two layers work together
+
+| Layer | Configured by | Purpose | Can the agent change it? |
+| --- | --- | --- | --- |
+| Fixed filter | Administrator or workflow designer | Defines business scope, access boundaries, and long-lived constraints | No |
+| Agent-generated filter | Agent | Narrows candidates for the current question | The agent only decides whether to add valid conditions |
+
+When the agent cannot determine a reliable condition, it omits the dynamic filter and searches only within the fixed scope. Fixed filters are never exposed as tool arguments.
+
+### Effective filter
+
+The effective search scope can be understood as:
+
+```text
+tenant / organization / knowledge base boundary
+AND enabled documents and chunks
+AND fixed filter
+AND caller or test filter
+AND agent-generated filter
+```
+
+Fixed and agent-generated filters are always combined with `AND`. Each layer can contain nested `AND` and `OR` groups, allowing expressions such as “effective documents in either East China or South China.”
+
+## Filterable fields
+
+### System fields
+
+| Field | Description | Example |
+| --- | --- | --- |
+| `document.fileName` | File name | `Water_Resources_Rate_Schedule_2025.pdf` |
+| `document.folderPath` | Logical folder inside the knowledge base | `/Cost/Water-Resources/East-China` |
+| `document.fileExtension` | Normalized extension | `pdf` |
+| `document.mimeType` | MIME type | `application/pdf` |
+| `document.category` | Content category | `text` |
+| `document.sourceType` | Document source type | `local-file` |
+| `document.createdAt` | Document creation time | `2025-01-15T08:00:00Z` |
+| `document.updatedAt` | Document update time | `2025-06-01T12:30:00Z` |
+
+`document.folderPath` is the logical path inside the knowledge base, not a server storage path. The **under** operator matches the selected folder and its descendants using complete path segments, so `/water` does not accidentally match `/water-archive`.
+
+### Business metadata
+
+The metadata schema can declare document-scoped and chunk-scoped fields:
+
+- `metadata.<field>` applies to a document and all its chunks, such as domain, year, region, or document status.
+- `chunk.metadata.<field>` applies only to the matching chunk, such as section type, specialty code, or bill-item category.
+
+Fields can be strings, enums, numbers, datetimes, booleans, string arrays, number arrays, or objects. Administrators can also provide a label, description, and allowed enum values. Agents can only use registered fields whose values satisfy the declared type.
+
+<Tip>
+Model stable attributes that frequently participate in retrieval as metadata, such as `domain`, `effectiveYear`, `region`, `documentStatus`, and `specialtyCode`.
+</Tip>
+
+## Operators
+
+XpertAI offers operators based on the selected field type, preventing invalid comparisons.
+
+| Field type | Common operators |
+| --- | --- |
+| String and enum | equals, not equals, in, not in, contains, does not contain, starts with, ends with, exists |
+| Folder path | String operators plus under, which includes the folder and descendants |
+| Number and datetime | equals, not equals, greater than, greater than or equal, less than, less than or equal, between, in, exists |
+| Boolean | equals, not equals, exists |
+| String or number array | contains, contains any, contains all, is empty, exists |
+| Object | JSON contains, exists |
+
+Equality and membership operators use exact matching. Text contains, starts-with, and ends-with comparisons are case-insensitive. Datetimes use ISO-8601 UTC.
+
+## Configure a fixed filter
+
+Fixed filters belong to the **binding between an agent or workflow node and a knowledge base**. They are not global knowledge base policies. This lets several agents safely reuse one knowledge base with different boundaries.
+
+1. In Studio, open an agent Knowledge Base node or a workflow Knowledge Retrieval node.
+2. Add or select a knowledge base and set the retrieval mode to **Vector**.
+3. Add fields, operators, and values in **Fixed filter**.
+4. Create `AND` or `OR` groups when required.
+5. Save the configuration and validate it in the test panel.
+
+A fixed value can be a constant or an agent/workflow variable. For example:
+
+```text
+metadata.domain equals "water-resources"
+AND metadata.documentStatus equals "effective"
+AND document.folderPath is under {{input.regionFolder}}
+```
+
+If a fixed variable is missing, has the wrong type, or references an invalid field, retrieval stops before the vector store is queried. XpertAI never ignores a broken fixed boundary and falls back to an unrestricted search.
+
+## Allow the agent to filter automatically
+
+Enable **Allow agent automatic filtering** on the same binding to make all registered system and metadata fields available to the Knowledge Retriever tool, together with their types, enum values, and allowed operators.
+
+For the question:
+
+> Find the 2025 PDF water-resources rate schedule.
+
+the agent can add:
+
+```text
+document.fileExtension in ["pdf"]
+AND metadata.effectiveYear equals 2025
+AND document.fileName contains "rate schedule"
+```
+
+These conditions only narrow the water-resources and effective-document scope configured by the administrator.
+
+### Invalid filters and zero results
+
+- If a dynamic filter contains an unknown field, wrong value type, or unsupported operator, the complete dynamic filter is discarded. XpertAI searches with the fixed filter and records `invalid_dynamic_filter`.
+- If a valid dynamic filter returns no results, the server does not automatically broaden the search.
+- The tool reports the zero-hit result and indicates that a call without the dynamic filter is possible. The agent decides whether retrying is appropriate.
+- Disabled documents and chunks are excluded from every retrieval path.
+
+## Test and diagnose filtering
+
+The knowledge base test panel and agent debugger show:
+
+- the fixed, caller/test, and agent-generated filters;
+- the effective filter and the source of each condition;
+- candidate document count, candidate chunk count, and final hit count;
+- vector backend, filter latency, and vector-search latency;
+- whether an invalid dynamic filter was discarded and why.
+
+Normal end-user answers continue to show only the answer and citations by default, not internal filtering decisions.
+
+Retrieval logs retain normalized conditions, summaries, counts, backend information, and timing for auditing, but never document body text. Access to these logs follows knowledge base permissions.
+
+## Support matrix
+
+| Capability | Current support |
+| --- | --- |
+| Vector mode | Supported |
+| PGVector | Fully supported |
+| Milvus | Fully supported; Milvus Server 2.6.2 or later is required |
+| Graph / Hybrid mode | Rejects intelligent filter configuration with an explicit error |
+| Chroma / Weaviate | Rejects the new filter conditions with an explicit error |
+| External knowledge bases | Depends on the provider API; XpertAI does not silently pass through or ignore the new filter DSL |
+
+## Best practices
+
+- Use fixed filters for security boundaries, domain ownership, document status, and project scope.
+- Enable agent filtering only for reliable fields that commonly appear in user questions.
+- Prefer enums over free text for controlled business attributes.
+- Store years as numbers, effective timestamps as datetimes, and flags as booleans instead of converting every value to a string.
+- Use folders for content organization and metadata for stable business semantics; they can be combined.
+- Before release, test queries with and without dynamic filters, zero-hit cases, and missing fixed variables.
+
+Continue with [Maintaining documents and metadata](/en/ai/knowledge-base/maintain-documents), [Recall testing](/en/ai/knowledge-base/recall-test), and [Ways to use a knowledge base](/en/ai/knowledge-base/ways-to-use-knowledge-base).
