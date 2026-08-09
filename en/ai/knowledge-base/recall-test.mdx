@@ -52,6 +52,16 @@ Click the **retrieval configuration icon** in the upper right corner of the inpu
 The modified settings only apply to the current recall test, allowing developers to compare the effects of different retrieval strategies.
 To make global changes, go to **"Knowledge Base Settings > Retrieval Settings"** to save.
 
+### Compare GraphRAG retrieval modes
+
+When GraphRAG is enabled and its status is Ready, run the same relationship-oriented question in all three modes:
+
+- **Vector** checks whether chunk semantics alone find the right source;
+- **Graph** checks seed-entity matching, neighborhood expansion, and evidence-backed chunk recall;
+- **Hybrid** checks whether combining vector and graph scores improves ranking.
+
+Review matched entities and relationships as well as the returned chunks and citations. If Graph misses the expected source, inspect the visual graph before increasing Entity Top K or Neighbor Hops—the entity, relationship, or evidence may be absent from the index. See [Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag).
+
 ---
 
 ## Testing structured filters
@@ -68,6 +78,15 @@ Test these cases separately:
 6. **Disabled content**: confirm that disabled documents and chunks never appear.
 
 For example, with a fixed “water resources + effective document” boundary, add `document.fileExtension = pdf` and `metadata.effectiveYear = 2025`, then verify that every hit, chunk, and citation satisfies the conditions.
+
+### Testing a folder boundary
+
+1. Add `document.folderPath` as a test condition.
+2. Choose **equals** to test only one folder, or **is under** to include all of its descendants.
+3. Select the folder from the value list. The panel submits the canonical logical path, such as `Water Resources/East China`; do not copy a storage `filePath`.
+4. Run the test and inspect the candidate document count, candidate chunk count, and effective filter in diagnostics.
+
+The root option represents an empty logical folder path. Folder paths have no leading or trailing slash, although **is under** normalizes those slashes when validating API input.
 
 See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering) for the field catalog, operators, and agent behavior.
 

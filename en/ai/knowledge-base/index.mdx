@@ -14,10 +14,12 @@ A knowledge base can be exposed as a tool that an agent calls autonomously or as
 | --- | --- |
 | Multi-source ingestion | Upload PDF, DOCX, Markdown, TXT, HTML, XLSX, PPTX, CSV, and other files, or import content from web pages and knowledge pipelines. |
 | Parsing and chunking | Clean content and create chunks with configurable strategies and parent-child context. |
+| PDF layout analysis and linked preview | Extract pages, tables, images, formulas, and coordinates through document converter plugins, then navigate between source PDF regions and analysis blocks. |
 | Semantic vector retrieval | Match the meaning of a question instead of relying only on identical keywords. |
 | Intelligent retrieval filtering | Narrow candidates by file name, logical folder, file type, MIME type, and business metadata before vector ranking. |
 | Typed metadata | Define string, enum, number, datetime, boolean, array, and object fields at document or chunk scope. |
 | Autonomous agent retrieval | Let agents decide when to search and generate request-specific conditions inside administrator-defined boundaries. |
+| [Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag) | Extract evidence-backed entities and relationships, explore and curate the graph, and convert graph discoveries into cited chunk retrieval. |
 | Testing, citations, and audit | Inspect retrieved chunks, source documents, effective filters, candidate counts, hit counts, and retrieval latency. |
 | Live maintenance | Apply file-name, logical-folder, and metadata changes to filtering without recomputing embeddings. |
 
@@ -27,10 +29,17 @@ A knowledge base can be exposed as a tool that an agent calls autonomously or as
 2. **Parse and chunk**: extract and clean text, then create chunks suitable for retrieval.
 3. **Embed and index**: use the configured embedding model and write vectors to the vector database.
 4. **Constrain candidates**: apply access boundaries, enabled-content checks, fixed filters, and agent-generated filters.
-5. **Rank semantically**: rank the remaining chunks by vector similarity and apply TopK and score thresholds.
-6. **Generate with citations**: pass the results to downstream models while preserving traceable document sources.
+5. **Explore relationships when useful**: for GraphRAG-enabled knowledge bases, let the agent discover entities and relations before forming the final retrieval query.
+6. **Rank semantically**: rank the remaining chunks by vector similarity and apply TopK and score thresholds.
+7. **Generate with citations**: pass the results to downstream models while preserving traceable document sources.
 
 ![RAG indexing](/public/img/ai/rag_indexing.png)
+
+## PDF processing and source linking
+
+For scans, engineering manuals, contracts, and complex table PDFs, the Baidu PaddleOCR‑VL document converter can preserve paged layouts, tables, images, coordinates, and source maps. After processing, document details provide a side-by-side analysis preview: the original PDF and layout bounds appear on the left, while Markdown, structure, tables, images, and JSON appear on the right. Scrolling, active pages, and selected analysis blocks synchronize in both directions.
+
+Baidu Unlimited‑OCR focuses on long-document Markdown extraction. MinerU supports both its official Precise Parsing API and self-hosted services, with OCR, formula, table, and VLM/pipeline options. The Pdfium **PDF to Markdown** tool lets an agent process a task attachment temporarily. See [PDF Processing and Linked Analysis Preview](/en/ai/knowledge-base/pdf-processing-and-preview) to choose and configure the appropriate capability.
 
 ## Intelligent filtering for multi-domain knowledge
 
@@ -83,7 +92,9 @@ The first release of intelligent filtering applies to **Vector** retrieval and f
 ## Recommended reading
 
 1. [Maintain documents and metadata](/en/ai/knowledge-base/maintain-documents)
-2. [Configure intelligent retrieval filtering](/en/ai/knowledge-base/intelligent-filtering)
-3. [Test recall](/en/ai/knowledge-base/recall-test)
-4. [Choose a knowledge base usage pattern](/en/ai/knowledge-base/ways-to-use-knowledge-base)
-5. [Create a knowledge base through a pipeline](/en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline)
+2. [Process and preview PDFs](/en/ai/knowledge-base/pdf-processing-and-preview)
+3. [Build and use Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag)
+4. [Configure intelligent retrieval filtering](/en/ai/knowledge-base/intelligent-filtering)
+5. [Test recall](/en/ai/knowledge-base/recall-test)
+6. [Choose a knowledge base usage pattern](/en/ai/knowledge-base/ways-to-use-knowledge-base)
+7. [Create a knowledge base through a pipeline](/en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline)

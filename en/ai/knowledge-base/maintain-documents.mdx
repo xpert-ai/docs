@@ -32,6 +32,10 @@ After uploading files, users can click to preview the document content. For file
 
 ![Upload Documents](/public/img/ai/kb/upload-file.png)
 
+For PDF files, a knowledge pipeline can use Baidu PaddleOCR‑VL, Unlimited‑OCR, or MinerU document converter plugins. PaddleOCR‑VL preserves paged layouts, tables, images, and coordinates. MinerU supports official Precise Parsing and self-hosted services and can preserve Markdown, structured JSON, model output, and images. After PaddleOCR‑VL processing, select **Open analysis preview** from the document list to synchronize scrolling and analysis-block selection between the original PDF and parsed result.
+
+The **Analysis preview** in document details represents pre-split layout blocks, while **Chunks** represents final index chunks produced by the chunker. See [PDF Processing and Linked Analysis Preview](/en/ai/knowledge-base/pdf-processing-and-preview) for configuration, support boundaries, and reprocessing behavior.
+
 #### Web Pages
 
 Scraping online web pages supports two tools: Playwright and Firecrawl.  
@@ -76,9 +80,9 @@ In addition to document content, XpertAI maintains structured attributes for pre
 
 ### Automatically maintained system attributes
 
-XpertAI automatically maintains the file name, logical knowledge base folder path, file extension, MIME type, document category, source type, creation time, and update time. A folder path represents the hierarchy inside the knowledge base and never exposes a server storage path.
+XpertAI automatically maintains the file name, logical knowledge base folder path, file extension, MIME type, document category, source type, creation time, and update time. A folder path represents the hierarchy inside the knowledge base and never exposes a server storage path. For example, **Water Resources > East China** is stored as `Water Resources/East China`, without leading or trailing slashes; the root folder is stored as an empty value.
 
-Renaming or moving a folder updates the logical paths of its descendant documents. Renaming a file, moving a folder, or updating metadata changes retrieval attributes without recomputing embeddings.
+Renaming or moving a folder updates the logical paths of its descendant documents. Renaming a file, moving a folder, or updating metadata changes retrieval attributes without recomputing embeddings. The separate `filePath` storage identifier can remain unchanged and must not be used as `document.folderPath`.
 
 ### Defining the metadata schema
 
@@ -106,6 +110,8 @@ Business metadata can be supplied during document upload or updated from documen
 See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering) to use these attributes in retrieval boundaries.
 
 ## Managing Chunks
+
+When a document converter provides a source map, final chunks retain their source-page range, contributing layout block IDs, and related assets. For PaddleOCR‑VL PDFs, this provenance comes from the Markdown source map produced during analysis and supports later citations and diagnostics.
 
 - **Chunk Viewing and Status Management**: Each chunk is presented in a concise card or list item format, including features like chunk number and character count, content preview, enable/disable status, and editing options.  
 - **Editing Chunks**  

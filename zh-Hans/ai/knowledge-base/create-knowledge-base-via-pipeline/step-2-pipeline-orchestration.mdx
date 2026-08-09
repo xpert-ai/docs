@@ -69,7 +69,7 @@ XpertAI 的数据处理分为两大部分：**文档转换器（Document Transfo
 文档转换器负责将 PDF、Word、Excel 等多种格式文件转化为可供模型理解的结构化内容。
 它支持图片、表格、文本等多模态内容的抽取，是知识流中的“第一道工序”。
 
-你可以选择 **XpertAI 内置转换器** 或 **插件市场（Marketplace）** 中的其他转换器（如 Unstructured、MinerU 等）。
+你可以选择 **XpertAI 内置转换器** 或 **插件市场（Marketplace）** 中的其他转换器（如百度 PaddleOCR‑VL、百度 Unlimited‑OCR、Unstructured、MinerU 等）。
 
 #### 特点
 
@@ -77,6 +77,19 @@ XpertAI 的数据处理分为两大部分：**文档转换器（Document Transfo
 * 自动提取图片并生成可用的 URL；
 * 支持异步任务和批量转换；
 * 支持 OCR 与结构化表格抽取。
+
+#### PDF 转换插件与解析预览
+
+需要处理扫描件、复杂表格或图文混排 PDF 时，可以安装 `@xpert-ai/plugin-baidu-ocr`，配置“百度 OCR”系统集成，并在转换节点中选择：
+
+* **百度 PaddleOCR‑VL**：输出 Markdown、分页版式、表格、图片和坐标，支持原 PDF 与解析结果的双栏联动预览；
+* **百度 Unlimited‑OCR**：面向长文档输出 Markdown，当前不提供坐标叠加预览。
+
+PaddleOCR‑VL 的版式结果会在分块前保存为完整性校验的分页解析快照，同时生成 Markdown 来源映射。后续分块可以保留源页范围和原始版式块 ID。对于超过单任务 500 页限制的 PDF，插件会在能够读取原文件时自动分批，并把结果重新映射到全局页码。
+
+配置选项、上传方式、联动操作和 Pdfium Agent 工具的区别参阅[PDF 处理与解析联动预览](/zh-Hans/ai/knowledge-base/pdf-processing-and-preview)。
+
+如需使用 MinerU，可安装 `@xpert-ai/plugin-mineru`，创建 MinerU 系统集成，并选择官方精准解析 API 或自托管 mineru-api / mineru-router。官方模式支持工作区文件预签名上传和公开 URL；超过 200 页或 200 MB 的 PDF 会自动拆分为有界部分。MinerU 支持 OCR、公式、表格、VLM/pipeline 模型和原始结果归档，但当前不提供 PDF 坐标叠加联动预览。
 
 ---
 

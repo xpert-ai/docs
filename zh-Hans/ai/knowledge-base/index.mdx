@@ -14,10 +14,12 @@ XpertAI 知识库将企业文档、网页和业务资料转化为可供数字专
 | --- | --- |
 | 多来源文档接入 | 上传 PDF、DOCX、Markdown、TXT、HTML、XLSX、PPTX、CSV 等文件，或从网页和知识流水线导入内容。 |
 | 文档解析与分块 | 清洗内容并按可配置策略生成分块，支持父子上下文，兼顾定位精度与语义完整性。 |
+| PDF 版式解析与联动预览 | 通过文档转换插件识别页面、表格、图片、公式与坐标，在原 PDF 和解析块之间双向定位。 |
 | 语义向量检索 | 理解用户问题的语义，而不仅依赖完全一致的关键词。 |
 | 智能过滤检索 | 按文件名、逻辑文件夹、文件类型、MIME 和业务 metadata 缩小候选范围，再进行向量排序。 |
 | 类型化元数据 | 为文档或分块定义字符串、枚举、数值、日期时间、布尔、数组和对象字段。 |
 | Agent 自主检索 | Agent 可以判断何时查询知识库，并在管理员固定边界内按问题生成动态过滤条件。 |
+| [知识图谱与 GraphRAG](/zh-Hans/ai/knowledge-base/knowledge-graph-graphrag) | 抽取带证据的实体与关系，浏览和治理图谱，并将图谱发现转为带引用的分块检索。 |
 | 测试、引用与审计 | 查看召回片段、原文来源、有效过滤条件、候选数量、命中数量和检索耗时。 |
 | 实时维护 | 文件名、逻辑目录和 metadata 变更后立即用于过滤，无需重新计算 embedding。 |
 
@@ -27,10 +29,17 @@ XpertAI 知识库将企业文档、网页和业务资料转化为可供数字专
 2. **解析与分块**：提取文本、清洗内容，并生成适合检索的文档分块。
 3. **嵌入与索引**：使用配置的嵌入模型将分块转换为向量并写入向量数据库。
 4. **限定候选范围**：应用权限边界、启用状态、固定条件和 Agent 动态条件。
-5. **语义排序**：对范围内分块进行向量相似度排序，并应用 TopK 与相似度阈值。
-6. **生成与引用**：将命中内容交给下游模型，生成回答并保留可追溯的文档来源。
+5. **按需探索关系**：知识库启用 GraphRAG 时，Agent 可先发现实体和关系，再组织最终检索词。
+6. **语义排序**：对范围内分块进行向量相似度排序，并应用 TopK 与相似度阈值。
+7. **生成与引用**：将命中内容交给下游模型，生成回答并保留可追溯的文档来源。
 
 ![RAG indexing](/public/img/ai/rag_indexing.png)
+
+## PDF 处理与原文联动
+
+对于扫描件、工程图文手册、合同和复杂表格 PDF，XpertAI 可以通过百度 PaddleOCR‑VL 文档转换器保存分页版式、表格、图片、坐标和来源映射。处理完成后，文档详情提供双栏解析预览：左侧显示原始 PDF 与版式边界，右侧显示 Markdown、结构、表格、图片和 JSON；滚动、页码和解析块选择可以双向联动。
+
+百度 Unlimited‑OCR 面向长文档 Markdown 解析；MinerU 同时支持官方精准解析 API 和自托管服务，可配置 OCR、公式、表格以及 VLM/pipeline 模型；Pdfium “PDF 转 Markdown”工具则供 Agent 临时处理任务附件。不同能力的适用位置和配置方式参阅[PDF 处理与解析联动预览](/zh-Hans/ai/knowledge-base/pdf-processing-and-preview)。
 
 ## 智能过滤：让一个知识库服务多个领域
 
@@ -83,7 +92,9 @@ XpertAI 自动维护以下系统属性：
 ## 推荐阅读顺序
 
 1. [维护文档与元数据](/zh-Hans/ai/knowledge-base/maintain-documents)
-2. [智能过滤检索](/zh-Hans/ai/knowledge-base/intelligent-filtering)
-3. [召回测试](/zh-Hans/ai/knowledge-base/recall-test)
-4. [使用知识库的方式](/zh-Hans/ai/knowledge-base/ways-to-use-knowledge-base)
-5. [通过知识流水线创建知识库](/zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline)
+2. [PDF 处理与解析联动预览](/zh-Hans/ai/knowledge-base/pdf-processing-and-preview)
+3. [构建和使用知识图谱与 GraphRAG](/zh-Hans/ai/knowledge-base/knowledge-graph-graphrag)
+4. [智能过滤检索](/zh-Hans/ai/knowledge-base/intelligent-filtering)
+5. [召回测试](/zh-Hans/ai/knowledge-base/recall-test)
+6. [使用知识库的方式](/zh-Hans/ai/knowledge-base/ways-to-use-knowledge-base)
+7. [通过知识流水线创建知识库](/zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline)

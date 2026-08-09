@@ -65,7 +65,7 @@ Data processing nodes are the core of the knowledge pipeline. They parse, transf
 
 The document transformer converts various file formats (PDF, Word, Excel, etc.) into structured content understandable by models. It supports extraction of images, tables, and text, serving as the "first step" in the knowledge flow.
 
-You can choose the **built-in XpertAI transformer** or other transformers from the **Marketplace** (such as Unstructured, MinerU, etc.).
+You can choose the **built-in XpertAI transformer** or other transformers from the **Marketplace**, including Baidu PaddleOCR‑VL, Baidu Unlimited‑OCR, Unstructured, and MinerU.
 
 #### Features
 
@@ -73,6 +73,19 @@ You can choose the **built-in XpertAI transformer** or other transformers from t
 * Automatically extracts images and generates usable URLs
 * Supports asynchronous tasks and batch conversion
 * Supports OCR and structured table extraction
+
+#### PDF converter plugins and analysis preview
+
+For scanned, table-heavy, or mixed-layout PDFs, install `@xpert-ai/plugin-baidu-ocr`, configure a **Baidu OCR** system integration, and select one of these converters:
+
+* **Baidu PaddleOCR‑VL** produces Markdown, paged layouts, tables, images, and coordinates and supports a side-by-side linked preview of the original PDF and analysis result.
+* **Baidu Unlimited‑OCR** produces Markdown for long documents and does not currently provide coordinate overlays.
+
+Before chunking, PaddleOCR‑VL layout output is stored as an integrity-checked, paged analysis snapshot and a Markdown source map. Final chunks can retain source page ranges and original layout block IDs. When XpertAI can read the source file, PDFs above the 500-page per-task limit are split into bounded tasks and rebased to global source page numbers.
+
+See [PDF Processing and Linked Analysis Preview](/en/ai/knowledge-base/pdf-processing-and-preview) for converter options, upload modes, linked-preview behavior, and the distinction from the Pdfium agent tool.
+
+To use MinerU, install `@xpert-ai/plugin-mineru`, create a MinerU integration, and select either the official Precise Parsing API or a self-hosted mineru-api / mineru-router service. Official mode supports signed workspace-file upload and public URLs, and PDFs above 200 pages or 200 MB are divided into bounded parts. MinerU supports OCR, formulas, tables, VLM/pipeline models, and raw-output archiving, but it does not currently provide PDF coordinate-overlay synchronization.
 
 ---
 
@@ -180,4 +193,3 @@ Trigger (Runtime Inputs) → Data Source → Document Transformer
 ```
 
 This system not only simplifies knowledge base construction but also ensures cross-document consistency, context traceability, and maximized retrieval performance.
-

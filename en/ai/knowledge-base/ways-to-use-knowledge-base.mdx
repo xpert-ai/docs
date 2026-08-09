@@ -31,6 +31,8 @@ For each agent-to-knowledge-base binding, you can configure both:
 
 * a **fixed filter** that limits the domain, project, folder, or document status and cannot be changed by the agent;
 * **Allow agent automatic filtering**, which lets the agent use file names, file types, folders, and metadata to further narrow the current request;
+* a live **knowledge filter options** tool, which lets the agent inspect valid folders and metadata values instead of guessing them;
+* a **knowledge graph explorer** when GraphRAG is enabled, allowing the agent to find entities, follow relationships, inspect bounded evidence, and then turn the discovered terms into a source-chunk retrieval;
 * **Vector retrieval**, with intelligent filtering fully supported on PGVector and Milvus.
 
 If the agent cannot infer a reliable condition, it omits the dynamic filter, while the fixed boundary remains active. See [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering).
@@ -73,5 +75,6 @@ This approach combines knowledge reuse, business isolation, and retrieval precis
 | ---------------------- | ------------------------ | -------------------------------- |
 | Knowledge Retrieval Node | Explicit call, stable and controllable | Q&A, report interpretation, summarization |
 | Knowledge Base Tool Node | Agent calls as needed and can generate dynamic filters | Conversational reasoning, multi-turn task execution |
+| Graph-assisted Agent retrieval | Iterative entity search, relationship expansion, then cited chunk retrieval | Ambiguous terminology, supplier/product/policy relationship discovery |
 | Project General Knowledge Base | Automatic sharing, no configuration needed | Team knowledge collaboration, general Q&A |
 | Multi-agent Shared Knowledge Base | Fixed boundaries with request-specific precision | Multi-domain quoting, compliance, project retrieval |

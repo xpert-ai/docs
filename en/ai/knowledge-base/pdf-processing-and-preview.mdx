@@ -1,0 +1,283 @@
+---
+title: PDF Processing and Linked Analysis Preview
+sidebar_position: 5
+description: Extract layouts, tables, and images with PDF document converter plugins, then inspect linked source pages and analysis blocks.
+---
+
+XpertAI provides two complementary types of PDF capability:
+
+- **Knowledge-ingestion converters** turn PDFs into Markdown and structured layout data that can be chunked and indexed. Baidu PaddleOCR‑VL can also power the linked PDF analysis preview.
+- **Agent PDF tools** let a digital expert convert a task-specific PDF into Markdown and page images on demand. They do not automatically ingest the result into a knowledge base.
+
+Understanding this distinction helps you choose the correct processing path.
+
+| Capability | Where it runs | Primary purpose | Directly enters the knowledge pipeline |
+| --- | --- | --- | --- |
+| Baidu PaddleOCR‑VL document converter | Knowledge pipeline | Complex PDFs, scans, tables, images, formulas, and layout extraction | Yes |
+| Baidu Unlimited‑OCR document converter | Knowledge pipeline | Long-document Markdown extraction | Yes |
+| MinerU document converter | Knowledge pipeline | Official Precise Parsing or self-hosted PDF processing with OCR, formulas, tables, and raw-output archiving | Yes |
+| Pdfium: PDF to Markdown | Agent toolset | Temporary agent access to PDF text and rendered page images | No, unless a later workflow step explicitly ingests the output |
+
+## Baidu OCR document converter plugin
+
+`@xpert-ai/plugin-baidu-ocr` registers one Baidu OCR system integration and two document converters in XpertAI. Both reuse the platform's credential storage, file permissions, background document tasks, chunkers, and indexing pipeline instead of creating a separate processing path.
+
+### Converter choices
+
+| Converter | Output and characteristics | Recommended use | Linked PDF preview |
+| --- | --- | --- | --- |
+| Baidu PaddleOCR‑VL | Markdown, paged structure, layout blocks, tables, images, rectangles, polygons, and optional line boxes | Scanned PDFs, complex layouts, technical manuals, tables, and mixed text/image content | Supported |
+| Baidu Unlimited‑OCR | Stable Markdown with optional preservation of provider files | Long documents where the text result is the priority | No coordinate overlay in the current release |
+
+<Note>
+The side-by-side PDF preview requires a converter that emits paged layout data and coordinates. PaddleOCR‑VL provides that contract. Unlimited‑OCR consumes its stable Markdown result and does not make assumptions about undocumented JSON structures.
+</Note>
+
+### Supported input
+
+The plugin follows the current Baidu document parsing contract for PDF, JPG/JPEG, PNG, BMP, TIF/TIFF, OFD, DOC/DOCX, TXT, WPS, and PPT/PPTX.
+
+This page focuses on PDF. Other formats can use the same conversion pipeline, but source coordinate overlays are currently rendered only when the original file is a PDF.
+
+### Configure a Baidu OCR connection
+
+1. Have an organization administrator install and enable `@xpert-ai/plugin-baidu-ocr`.
+2. Open **Settings > Integrations** and create a **Baidu OCR** connection.
+3. Enter the API Key and Secret Key of a Baidu Cloud OCR application.
+4. Select an upload mode, polling interval, and task timeout, then save and validate the connection.
+
+The API Key and Secret Key use the platform credential mechanism and are never written to document metadata or task logs.
+
+#### Upload modes
+
+| Mode | Description |
+| --- | --- |
+| Auto | Recommended. Uses Base64 when local bytes are available and handles large PDFs within provider limits. |
+| Base64 | Uploads file content directly when XpertAI can read the source file. |
+| Public URL | Gives the provider an externally reachable URL. The URL must be accessible from Baidu Cloud. |
+
+The default polling interval is 7 seconds and the default task timeout is 1,800 seconds. Adjust them for document size and provider response time when necessary.
+
+### Use the converters in a knowledge pipeline
+
+1. Open the **Document Transformer** node in a knowledge pipeline.
+2. Select **Baidu PaddleOCR‑VL** or **Baidu Unlimited‑OCR**.
+3. Select the Baidu OCR integration connection.
+4. Configure conversion options and complete the chunker, embedding, and knowledge base nodes.
+5. Test and publish the pipeline, then upload or reprocess a PDF.
+
+PaddleOCR‑VL provides these options:
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| Analyze charts | Off | Ask the provider to recognize and describe statistical charts. |
+| Merge cross-page tables | On | Merge continuous tables that span pages. |
+| Infer title levels | On | Infer heading levels and produce more structured Markdown. |
+| Recognize seals | Off | Recognize seal regions in the document. |
+| Return line coordinates | On | Preserve more granular text-line locations. |
+| Preserve raw output | On | Store Markdown, structured JSON, and task responses for diagnostics and preview reconstruction. |
+| Preserve parsed images | On | Download parsed image assets while signed provider URLs remain valid. |
+
+Unlimited‑OCR currently exposes **Preserve raw output**, which stores Markdown, available JSON, and task responses.
+
+### Large PDFs
+
+The current Baidu API accepts at most 500 PDF pages in one parsing task. For a larger PDF whose source bytes are available to XpertAI, the plugin:
+
+1. splits it into bounded, ordered tasks by page count and upload size;
+2. submits and waits for each task;
+3. rebases every result to the original PDF's global page numbers;
+4. merges Markdown, layout blocks, image assets, and source maps;
+5. retains batch indexes, source page ranges, task IDs, and log IDs for diagnostics.
+
+If one batch fails, the error identifies its batch number and original page range. XpertAI does not silently index a partial document.
+
+## MinerU document converter plugin
+
+`@xpert-ai/plugin-mineru` connects MinerU to the XpertAI knowledge pipeline and supports both the **MinerU official Precise Parsing API** and a **self-hosted mineru-api / mineru-router** deployment. It reuses XpertAI integrations, credentials, workspace files, background tasks, chunking, and indexing.
+
+### Service modes
+
+| Mode | API and characteristics | Authentication |
+| --- | --- | --- |
+| Official API | Uses the Precise Parsing API at `https://mineru.net/api/v4`, with signed file upload, public URL, and polled batch tasks | Access Token required |
+| Self-hosted | Uses the synchronous `/file_parse` endpoint exposed by current mineru-api or mineru-router services | Token is optional and depends on the gateway |
+
+The plugin does not use the official lightweight Agent API. Knowledge ingestion needs larger document limits and structured result archives, so official mode uses the Precise Parsing API.
+
+### Configure a MinerU connection
+
+1. Have an organization administrator install and enable `@xpert-ai/plugin-mineru`.
+2. Open **Settings > Integrations** and create a MinerU connection.
+3. Select **Official API** or **Self-hosted**.
+4. Enter the service URL and Access Token. Official mode uses the default v4 URL when no URL is provided.
+5. In official mode, select a source mode and configure polling, task, and per-request timeouts.
+6. Save and validate the connection, then select MinerU in a knowledge pipeline Document Transformer node.
+
+#### Official source modes
+
+| Mode | Description |
+| --- | --- |
+| Auto | Recommended. Uploads a workspace file through MinerU signed URLs and falls back to a public URL only when no local file is available. |
+| File upload | Requires the workspace source file and uploads it through a signed URL. |
+| Public URL | Creates a parsing task from an externally reachable document URL. |
+
+Official mode defaults to a 5-second polling interval, a 1,800-second task timeout, and a 1,200-second request timeout. The Access Token uses the platform credential mechanism and is not written to task logs or document metadata.
+
+### Transformer options
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| OCR | On | Run OCR for scanned content. |
+| Formula recognition | On | Extract and preserve formulas. |
+| Table recognition | On | Parse document tables. |
+| Language | `ch` | Select the MinerU OCR language pack. |
+| Model version | `vlm` | Select `vlm` or `pipeline`. |
+| Self-hosted backend | `pipeline` | Select pipeline, hybrid, VLM, or the corresponding HTTP-client backend. |
+| Self-hosted model server URL | Empty | Set the model service for an HTTP-client backend. |
+| Parse method | `auto` | In self-hosted mode, select `auto`, `txt`, or `ocr`. |
+| Preserve raw output | On | Store Markdown, structured JSON, model output, and image assets. |
+
+### Official PDF workflow
+
+In the recommended Auto mode, the plugin reads the PDF from the XpertAI workspace, obtains signed upload URLs from the MinerU batch API, uploads the file, polls the parsing result, and downloads the complete result archive into the knowledge workspace.
+
+The current MinerU Precise Parsing API limit is 200 pages and 200 MB per file. A larger PDF is divided into:
+
+- parts of at most 200 pages;
+- parts targeted below approximately 190 MiB;
+- upload batches of at most 50 parts;
+- result metadata that retains source page ranges, batch IDs, batch indexes, and total batch count.
+
+Explicit Public URL mode uses the official URL task API. Self-hosted mode is called synchronously through `/file_parse` from the existing XpertAI background document task, so the plugin does not create a private queue.
+
+### Output and security
+
+MinerU returns Markdown to the existing chunker and can archive:
+
+- `content_list.json` and the stable `content_list_v2.json`;
+- `middle.json`, `layout.json`, and model output;
+- images and other result assets referenced by Markdown;
+- server type, model, backend, batch, and source-page metadata.
+
+Image references in Markdown and HTML are rewritten to XpertAI workspace URLs. When extracting a downloaded result archive, the plugin validates ZIP paths and bounds extraction size to prevent path traversal and unbounded writes.
+
+<Note>
+MinerU currently preserves structured outputs and source page ranges but does not yet emit the paged coordinate contract required by the XpertAI linked PDF analysis preview. Therefore, MinerU documents do not show source coordinate overlays or side-by-side block synchronization in the current release. Their Markdown and final Chunks are still ingested, searchable, and manageable. A future converter that emits the common layout contract can use the same preview framework.
+</Note>
+
+## Linked PDF analysis preview
+
+After a PDF has been fully processed with PaddleOCR‑VL, click **Open analysis preview** from the document list or open the **Analysis preview** tab in document details to inspect the original PDF and parsed result together.
+
+### Side-by-side workspace
+
+- **Original pane**: renders the source PDF and overlays recognized rectangles or polygons.
+- **Analysis result pane**: shows Markdown, structure, tables, images, and JSON by page.
+- **Resizable split**: drag the divider to resize the panes or use the keyboard arrow keys.
+- **Mobile layout**: switch between the Original and Analysis result panes.
+
+The source toolbar provides previous and next page actions, direct page entry, zoom, and fit-to-width. The supported zoom range is 50% to 300%.
+
+### Layout types
+
+Analysis blocks use provider-neutral categories:
+
+```text
+text, title, table, image, formula, header, footer, footnote,
+page number, seal, other
+```
+
+Use the type chips above the source to show or hide overlays. The Tables and Images tabs appear only when the document contains those block types.
+
+### Click and scroll synchronization
+
+- Scrolling the original PDF moves the analysis result to the same page and a similar within-page position.
+- Scrolling the analysis result synchronizes the original pane in the other direction.
+- Clicking a source overlay selects the corresponding analysis block and scrolls the result pane to it.
+- Clicking an analysis block highlights the corresponding region on the source page.
+- The active page and selected block are stored in the page URL, allowing position restoration after refresh or when an authorized user opens the link.
+
+Synchronization uses **page number plus relative progress within the page**, so the panes remain meaningfully aligned even when their rendered heights differ.
+
+### Analysis views
+
+| View | Description |
+| --- | --- |
+| Markdown | Renders each block's Markdown in reading order and displays preserved images. |
+| Structure | Shows block type, provider type, reading order, and coordinates. |
+| Tables | Shows only table blocks. |
+| Images | Shows only image blocks and archived image assets. |
+| JSON | Loads raw structured data by page for advanced diagnostics. |
+
+### Relationship to final knowledge chunks
+
+**Analysis preview** shows layout blocks recognized by the converter before text splitting. The **Chunks** tab shows the final knowledge chunks created by the configured chunker for indexing and retrieval. They remain distinct data views.
+
+When PaddleOCR‑VL merges layout content into Markdown, it creates a source map. After splitting, a final chunk can retain:
+
+- `pageStart` and `pageEnd` source-page boundaries;
+- `page` for a single-page chunk;
+- source layout block IDs contributing to the chunk;
+- related assets such as parsed images.
+
+This provenance provides a stable basis for citations, diagnostics, and more precise source navigation. In the current UI, direct visual click synchronization is primarily between the **original PDF and analysis layout blocks**; final knowledge chunks continue to be managed separately in the Chunks tab.
+
+### Large-document performance
+
+The preview does not load an entire large document at once:
+
+- it first reads a lightweight page index;
+- analysis pages load in a window around the active page;
+- only a bounded PDF page range is rendered;
+- raw JSON loads when the JSON tab and page are reached;
+- the original PDF supports byte-range reads.
+
+This keeps continuous scrolling practical without making the browser and server hold every page payload simultaneously.
+
+### Security and consistency
+
+- Original PDFs, analysis pages, and image assets use knowledge base access control.
+- Clients receive opaque asset IDs rather than server file paths.
+- Paged analysis snapshots are checked by size and hash.
+- A source-content change or failed snapshot integrity check prevents the old preview from being presented as valid. After changing converter settings, run a full reprocess to create a matching new preview.
+- If rendered PDF proportions do not match recognition coordinates, XpertAI hides overlays and shows a warning instead of presenting misleading boxes.
+
+If analysis preview is unavailable or stale, run **Convert and process** for a full reprocess. **Re-chunk only** is appropriate for chunker changes but does not run the document converter again.
+
+## Pdfium agent tool plugin
+
+`@xpert-ai/plugin-pdfium` is an agent tool plugin. After it is enabled, add the **PDF to Markdown** built-in toolset to a digital expert. Its tool name is `pdf_to_markdown`.
+
+The agent can read a PDF from:
+
+- a file URL;
+- a workspace file path;
+- Base64, Buffer, or Uint8Array content;
+- one file object or a list of file objects.
+
+The tool extracts the PDF text layer page by page and renders a PNG image for each page at a configurable scale. The default scale is 2.0. Its artifact output contains:
+
+- aggregate Markdown with page images and extractable text;
+- `result.md`;
+- `page-1.png`, `page-2.png`, and other page images;
+- file paths, workspace URLs when available, MIME types, and image page numbers.
+
+The plugin requires no external account or API key. It is useful when an agent needs to inspect a task attachment, generate page images, or pass PDF content to another tool.
+
+<Warning>
+Pdfium extracts the PDF's existing text layer; it is not an OCR service. A scanned page without extractable text still produces a page image, but its text is not recognized automatically. Use a knowledge-ingestion converter such as PaddleOCR‑VL for scanned-document OCR, table recognition, or coordinate-linked preview.
+</Warning>
+
+## Choosing a PDF capability
+
+| Requirement | Recommended capability |
+| --- | --- |
+| Persist a PDF in a knowledge base for retrieval | Knowledge pipeline document converter |
+| Scans, complex layout, tables, and source-coordinate linking | Baidu PaddleOCR‑VL |
+| Long-document Markdown extraction | Baidu Unlimited‑OCR |
+| MinerU Precise Parsing, VLM/pipeline models, or a self-hosted parser | MinerU |
+| Temporary agent access to a regular text PDF | Pdfium: PDF to Markdown |
+| Other parsing services | Unstructured and other converters; coordinate preview depends on whether the converter emits the XpertAI layout contract |
+
+Continue with [Maintaining Documents](/en/ai/knowledge-base/maintain-documents), [Knowledge Pipeline Orchestration](/en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-2-pipeline-orchestration), and [Recall Test](/en/ai/knowledge-base/recall-test).

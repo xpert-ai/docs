@@ -55,7 +55,7 @@ Fixed and agent-generated filters are always combined with `AND`. Each layer can
 | Field | Description | Example |
 | --- | --- | --- |
 | `document.fileName` | File name | `Water_Resources_Rate_Schedule_2025.pdf` |
-| `document.folderPath` | Logical folder inside the knowledge base | `/Cost/Water-Resources/East-China` |
+| `document.folderPath` | Logical folder inside the knowledge base | `Cost/Water-Resources/East-China` |
 | `document.fileExtension` | Normalized extension | `pdf` |
 | `document.mimeType` | MIME type | `application/pdf` |
 | `document.category` | Content category | `text` |
@@ -63,7 +63,21 @@ Fixed and agent-generated filters are always combined with `AND`. Each layer can
 | `document.createdAt` | Document creation time | `2025-01-15T08:00:00Z` |
 | `document.updatedAt` | Document update time | `2025-06-01T12:30:00Z` |
 
-`document.folderPath` is the logical path inside the knowledge base, not a server storage path. The **under** operator matches the selected folder and its descendants using complete path segments, so `/water` does not accidentally match `/water-archive`.
+`document.folderPath` is the logical path inside the knowledge base, not a server storage path. The **under** operator matches the selected folder and its descendants using complete path segments, so `water` does not accidentally match `water-archive`.
+
+### Folder path values and matching
+
+XpertAI derives a folder path from the knowledge base directory tree. A breadcrumb such as **Water Resources > East China** has the canonical value `Water Resources/East China`.
+
+- Canonical paths use `/` between directory names and do not have a leading or trailing slash.
+- A document stored directly in the knowledge base root has an empty folder path. The recall-test folder picker displays this as **/ (root)**.
+- **equals (`eq`)** matches only the exact current folder. `Water Resources/East China` does not include `Water Resources/East China/Archive`.
+- **is under (`under`)** matches the selected folder and every descendant. It normalizes leading and trailing slashes, then compares complete path segments.
+- The recall-test panel lists existing folders and submits their canonical values, avoiding mismatches caused by manually copied breadcrumbs.
+
+Do not use a document's `filePath` value as a filter. `filePath` identifies an internal or external storage object and may contain generated directories, identifiers, or file names. It is deliberately excluded from the public filter field registry and does not have to change when a logical folder is renamed or moved.
+
+Folder creation, rename, and move operations update the logical path of the folder and its descendants. The updated attributes are synchronized to PGVector or Milvus without recomputing embeddings. During an upgrade, existing logical paths are rebuilt from parent-child relationships rather than inferred from storage paths.
 
 ### Business metadata
 
@@ -131,6 +145,68 @@ AND document.fileName contains "rate schedule"
 
 These conditions only narrow the water-resources and effective-document scope configured by the administrator.
 
+### Let the agent discover live filter values
+
+Folder names, file types, and business metadata values are live knowledge base data, so the agent is not expected to guess them from the conversation. When agent automatic filtering is enabled, XpertAI also registers a read-only **knowledge filter options** tool for that knowledge base.
+
+The agent can first call the tool without a field to inspect every discoverable field, its type, allowed operators, and option kind. It can then query a selected field to:
+
+- list actual file names, extensions, MIME types, categories, source types, enum values, booleans, and string values;
+- inspect distinct number and datetime values together with their current minimum and maximum;
+- expand string-array and number-array metadata into selectable member values;
+- compare eligible and existing document/chunk counts for fields that primarily support `exists`;
+- search values by partial, case-insensitive text, or page through the complete list;
+- copy a returned value exactly into the Retriever tool's dynamic filter.
+
+Document-scoped metadata returns document and chunk counts; chunk-scoped metadata is counted against the matching chunks and their source documents. Configured enum values remain visible in the field catalog, while the value query shows which values currently occur inside the effective boundary.
+
+Folder paths receive additional handling: the tool lists canonical logical paths, distinguishes the knowledge base root (`""`), reports direct and descendant document counts, and includes useful ancestor paths for the `under` operator.
+
+For example, a request mentioning “the East China folder” can produce the following sequence:
+
+```text
+1. Inspect filter fields, then query document.folderPath for "East China"
+2. Receive document.folderPath = "Water Resources/East China"
+3. Retrieve with document.folderPath under "Water Resources/East China"
+```
+
+The tool returns knowledge base-relative logical paths only, never server `filePath` values. Every live value and count is calculated after tenant, organization, knowledge base, enabled-content, and administrator-managed fixed boundaries are applied. Fixed conditions remain hidden, and a missing fixed-filter variable stops option discovery just as it stops retrieval. Empty folders and folders without eligible chunks are omitted; ancestor folders can still be returned because they are valid choices for the `under` operator.
+
+### Explore GraphRAG before retrieving chunks
+
+When GraphRAG is enabled for the bound knowledge base, XpertAI also gives the agent a read-only **knowledge graph explorer** tool. This tool is useful when the user knows a concept or relationship but does not know the exact terminology used in the documents. Instead of forcing one graph query to produce a final answer, the agent can explore in several small calls:
+
+1. Call `search` with the question or a short concept to find semantically related seed entities.
+2. Call `neighbors` with a returned entity ID to follow relevant relationships for one or two hops.
+3. Call `evidence` for a promising entity to inspect bounded supporting references.
+4. Repeat the exploration when the relationship is still unclear, or pass `suggestedRetrievalQuery` to the knowledge Retriever to retrieve the final source chunks and citations.
+
+For example:
+
+```text
+search("pump-station supplier")
+→ entity GOODSPRINGS
+
+neighbors(entity GOODSPRINGS)
+→ GOODSPRINGS -- SUPPLIES --> Pump station equipment
+
+evidence(entity GOODSPRINGS)
+→ supporting document/chunk references and a suggested retrieval query
+
+Retriever("pump-station supplier GOODSPRINGS pump station equipment")
+→ source chunks and citations used in the answer
+```
+
+The graph tool intentionally uses a compact parameter schema: `action`, `query`, `entityId`, `depth`, and `take`. Entity IDs are returned by earlier calls, so the agent does not have to construct nested graph expressions or guess internal identifiers.
+
+Graph exploration and filter-option discovery complement each other. The filter-options tool discovers current structured values such as folders, file types, years, and metadata; the graph explorer discovers current entities, names, and relationships extracted from document content. The agent can use both outputs before making the Retriever call.
+
+Every graph result is checked against tenant, organization, knowledge base, enabled-content, and fixed-filter boundaries. An entity is returned only when it has eligible chunk evidence in the effective scope; a relationship is returned only when its supporting evidence is also in scope. When a fixed filter is active, global entity descriptions, summaries, aliases, and aggregate counts are not exposed because they may have been built from documents outside that binding. Missing fixed variables fail closed before graph exploration begins.
+
+Graph evidence is an exploration clue, not the final answer source. The agent is instructed to finish with the Retriever so normal answers still use full chunks and traceable citations. This auxiliary tool does not enable filtered **Graph** or **Hybrid** retrieval mode: the final filtered retrieval remains **Vector** in the current release.
+
+See [Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag) for graph extraction, indexing, visual curation, retrieval modes, and operational guidance.
+
 ### Invalid filters and zero results
 
 - If a dynamic filter contains an unknown field, wrong value type, or unsupported operator, the complete dynamic filter is discarded. XpertAI searches with the fixed filter and records `invalid_dynamic_filter`.
@@ -159,6 +235,7 @@ Retrieval logs retain normalized conditions, summaries, counts, backend informat
 | Vector mode | Supported |
 | PGVector | Fully supported |
 | Milvus | Fully supported; Milvus Server 2.6.2 or later is required |
+| Graph-assisted exploration | Supported when GraphRAG is enabled; final filtered chunk retrieval remains Vector |
 | Graph / Hybrid mode | Rejects intelligent filter configuration with an explicit error |
 | Chroma / Weaviate | Rejects the new filter conditions with an explicit error |
 | External knowledge bases | Depends on the provider API; XpertAI does not silently pass through or ignore the new filter DSL |
