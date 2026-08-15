@@ -27,10 +27,10 @@ For example, a single construction-cost knowledge base can contain water resourc
 
 ## How the two layers work together
 
-| Layer | Configured by | Purpose | Can the agent change it? |
-| --- | --- | --- | --- |
-| Fixed filter | Administrator or workflow designer | Defines business scope, access boundaries, and long-lived constraints | No |
-| Agent-generated filter | Agent | Narrows candidates for the current question | The agent only decides whether to add valid conditions |
+| Layer                  | Configured by                      | Purpose                                                               | Can the agent change it?                               |
+| ---------------------- | ---------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------ |
+| Fixed filter           | Administrator or workflow designer | Defines business scope, access boundaries, and long-lived constraints | No                                                     |
+| Agent-generated filter | Agent                              | Narrows candidates for the current question                           | The agent only decides whether to add valid conditions |
 
 When the agent cannot determine a reliable condition, it omits the dynamic filter and searches only within the fixed scope. Fixed filters are never exposed as tool arguments.
 
@@ -52,16 +52,16 @@ Fixed and agent-generated filters are always combined with `AND`. Each layer can
 
 ### System fields
 
-| Field | Description | Example |
-| --- | --- | --- |
-| `document.fileName` | File name | `Water_Resources_Rate_Schedule_2025.pdf` |
-| `document.folderPath` | Logical folder inside the knowledge base | `Cost/Water-Resources/East-China` |
-| `document.fileExtension` | Normalized extension | `pdf` |
-| `document.mimeType` | MIME type | `application/pdf` |
-| `document.category` | Content category | `text` |
-| `document.sourceType` | Document source type | `local-file` |
-| `document.createdAt` | Document creation time | `2025-01-15T08:00:00Z` |
-| `document.updatedAt` | Document update time | `2025-06-01T12:30:00Z` |
+| Field                    | Description                              | Example                                  |
+| ------------------------ | ---------------------------------------- | ---------------------------------------- |
+| `document.fileName`      | File name                                | `Water_Resources_Rate_Schedule_2025.pdf` |
+| `document.folderPath`    | Logical folder inside the knowledge base | `Cost/Water-Resources/East-China`        |
+| `document.fileExtension` | Normalized extension                     | `pdf`                                    |
+| `document.mimeType`      | MIME type                                | `application/pdf`                        |
+| `document.category`      | Content category                         | `text`                                   |
+| `document.sourceType`    | Document source type                     | `local-file`                             |
+| `document.createdAt`     | Document creation time                   | `2025-01-15T08:00:00Z`                   |
+| `document.updatedAt`     | Document update time                     | `2025-06-01T12:30:00Z`                   |
 
 `document.folderPath` is the logical path inside the knowledge base, not a server storage path. The **under** operator matches the selected folder and its descendants using complete path segments, so `water` does not accidentally match `water-archive`.
 
@@ -89,21 +89,23 @@ The metadata schema can declare document-scoped and chunk-scoped fields:
 Fields can be strings, enums, numbers, datetimes, booleans, string arrays, number arrays, or objects. Administrators can also provide a label, description, and allowed enum values. Agents can only use registered fields whose values satisfy the declared type.
 
 <Tip>
-Model stable attributes that frequently participate in retrieval as metadata, such as `domain`, `effectiveYear`, `region`, `documentStatus`, and `specialtyCode`.
+  Model stable attributes that frequently participate in retrieval as metadata,
+  such as `domain`, `effectiveYear`, `region`, `documentStatus`, and
+  `specialtyCode`.
 </Tip>
 
 ## Operators
 
 XpertAI offers operators based on the selected field type, preventing invalid comparisons.
 
-| Field type | Common operators |
-| --- | --- |
-| String and enum | equals, not equals, in, not in, contains, does not contain, starts with, ends with, exists |
-| Folder path | String operators plus under, which includes the folder and descendants |
-| Number and datetime | equals, not equals, greater than, greater than or equal, less than, less than or equal, between, in, exists |
-| Boolean | equals, not equals, exists |
-| String or number array | contains, contains any, contains all, is empty, exists |
-| Object | JSON contains, exists |
+| Field type             | Common operators                                                                                            |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------- |
+| String and enum        | equals, not equals, in, not in, contains, does not contain, starts with, ends with, exists                  |
+| Folder path            | String operators plus under, which includes the folder and descendants                                      |
+| Number and datetime    | equals, not equals, greater than, greater than or equal, less than, less than or equal, between, in, exists |
+| Boolean                | equals, not equals, exists                                                                                  |
+| String or number array | contains, contains any, contains all, is empty, exists                                                      |
+| Object                 | JSON contains, exists                                                                                       |
 
 Equality and membership operators use exact matching. Text contains, starts-with, and ends-with comparisons are case-insensitive. Datetimes use ISO-8601 UTC.
 
@@ -203,7 +205,7 @@ Graph exploration and filter-option discovery complement each other. The filter-
 
 Every graph result is checked against tenant, organization, knowledge base, enabled-content, and fixed-filter boundaries. An entity is returned only when it has eligible chunk evidence in the effective scope; a relationship is returned only when its supporting evidence is also in scope. When a fixed filter is active, global entity descriptions, summaries, aliases, and aggregate counts are not exposed because they may have been built from documents outside that binding. Missing fixed variables fail closed before graph exploration begins.
 
-Graph evidence is an exploration clue, not the final answer source. The agent is instructed to finish with the Retriever so normal answers still use full chunks and traceable citations. This auxiliary tool does not enable filtered **Graph** or **Hybrid** retrieval mode: the final filtered retrieval remains **Vector** in the current release.
+Graph evidence is an exploration clue, not the final answer source. The agent is instructed to finish with the Retriever so normal answers still use full chunks and traceable citations. The final Retriever may use **Vector**, **Graph**, or **Hybrid**; each mode enforces the same effective Knowledge Filter boundary before returning chunks.
 
 See [Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag) for graph extraction, indexing, visual curation, retrieval modes, and operational guidance.
 
@@ -230,15 +232,16 @@ Retrieval logs retain normalized conditions, summaries, counts, backend informat
 
 ## Support matrix
 
-| Capability | Current support |
-| --- | --- |
-| Vector mode | Supported |
-| PGVector | Fully supported |
-| Milvus | Fully supported; Milvus Server 2.6.2 or later is required |
-| Graph-assisted exploration | Supported when GraphRAG is enabled; final filtered chunk retrieval remains Vector |
-| Graph / Hybrid mode | Rejects intelligent filter configuration with an explicit error |
-| Chroma / Weaviate | Rejects the new filter conditions with an explicit error |
-| External knowledge bases | Depends on the provider API; XpertAI does not silently pass through or ignore the new filter DSL |
+| Capability                 | Current support                                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Vector mode                | Supported                                                                                                           |
+| PGVector                   | Fully supported                                                                                                     |
+| Milvus                     | Fully supported; Milvus Server 2.6.2 or later is required                                                           |
+| Graph-assisted exploration | Supported when GraphRAG is enabled; entities and relationships require eligible in-scope evidence                   |
+| Graph mode                 | Supported; filters seed eligibility, relationship expansion, and final evidence chunks                              |
+| Hybrid mode                | Supported; filters Vector and Graph independently before merge, with filtered-Vector-only fallback on graph failure |
+| Chroma / Weaviate          | Rejects the new filter conditions with an explicit error                                                            |
+| External knowledge bases   | Depends on the provider API; XpertAI does not silently pass through or ignore the new filter DSL                    |
 
 ## Best practices
 

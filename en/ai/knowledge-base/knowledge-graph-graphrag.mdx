@@ -169,10 +169,10 @@ Vector mode searches document-chunk embeddings directly. It is the recommended m
 Graph mode performs these steps:
 
 1. Semantically search the entity-vector index for seed entities.
-2. Keep active entities and expand their active relationships by the configured Neighbor Hops.
-3. Resolve entity and relationship mentions back to document chunks.
-4. Calculate graph relevance using entity similarity and evidence confidence.
-5. Return the highest-ranked source chunks with matched entity and relationship metadata.
+2. Progressively scan a bounded set of candidates and keep only active entities with eligible evidence inside the effective Knowledge Filter scope.
+3. Expand only active relationships that have eligible evidence inside the same scope, up to the configured Neighbor Hops and graph safety limits.
+4. Resolve eligible entity and relationship mentions back to enabled source chunks that satisfy the same document-and-chunk filter expression.
+5. Calculate graph relevance using entity similarity and evidence confidence, then return the highest-ranked source chunks with matched entity and relationship metadata.
 
 Graph mode works well for explicit relationship questions, but it depends on graph extraction coverage.
 
@@ -182,12 +182,18 @@ Hybrid mode runs Vector and Graph retrieval, deduplicates results by chunk, and 
 
 Use Hybrid when both semantic wording and entity relationships matter. Start with the default Graph Weight of `0.35`, then compare representative questions in Recall Test.
 
-<Warning>
-  Knowledge Filter V2 conditions currently support final retrieval in **Vector**
-  mode only. When fixed, request, or Agent-generated filters are configured,
-  Graph and Hybrid modes return an explicit unsupported-mode error instead of
-  ignoring the conditions.
-</Warning>
+### Knowledge Filters in Graph and Hybrid
+
+Knowledge Filter V2 supports Vector, Graph, and Hybrid retrieval. The effective boundary is always the tenant, organization, knowledge base, enabled-content state, fixed filter, caller filter, and valid Agent dynamic filter combined with `AND`.
+
+- **Graph** applies the boundary to seed eligibility, relationship expansion, and final evidence chunks.
+- **Hybrid** applies the same boundary independently to both Vector and Graph before deduplication and score fusion.
+- A missing or invalid fixed-filter variable stops retrieval before graph seed search; it is never ignored.
+- An invalid Agent dynamic filter is discarded as one unit, and Graph or Hybrid continues with the fixed and caller boundaries while recording `invalid_dynamic_filter`.
+- A valid dynamic filter with zero hits is not automatically relaxed. The Agent decides whether to call again without the dynamic condition.
+- Graph errors fail Graph mode explicitly. Hybrid may fall back only to the already-filtered Vector branch and records the graph fallback reason.
+
+The graph path uses parameterized PostgreSQL joins across graph mentions, documents, and chunks. A mixed document/chunk `AND` or `OR` expression is therefore evaluated against the same evidence row, and disabled documents or chunks cannot re-enter through graph expansion.
 
 ## Let an Agent explore the graph
 
@@ -215,13 +221,13 @@ Graph exploration and [live filter-option discovery](/en/ai/knowledge-base/intel
 
 - use filter options to discover current folders, file types, years, statuses, and metadata values;
 - use graph exploration to discover entities, aliases, relationships, and evidence from document content;
-- combine the discoveries in the final Vector Retriever query and dynamic filter.
+- combine the discoveries in the final Retriever query and optional dynamic filter, regardless of whether that binding uses Vector, Graph, or Hybrid.
 
 ### Boundary enforcement
 
 Agent graph exploration applies tenant, organization, knowledge-base, enabled-content, and administrator fixed-filter boundaries before returning evidence. An entity or relationship is returned only when it has eligible chunk evidence inside that scope.
 
-When a fixed filter is active, global entity descriptions, summaries, aliases, and aggregate counts are not exposed because they may have been aggregated from documents outside the binding. Missing fixed variables fail closed before graph exploration starts. Graph quotes are exploration clues; the Agent is instructed to use the Retriever for final chunks and citations.
+When a fixed filter is active, global entity descriptions, summaries, aliases, and aggregate counts are not exposed because they may have been aggregated from documents outside the binding. Missing fixed variables fail closed before graph exploration starts. If Agent automatic filtering is enabled, the graph explorer may also add a literal-only dynamic filter; invalid dynamic conditions fall back to the fixed boundary and are reported. Graph quotes are exploration clues; the Agent is instructed to use the Retriever for final chunks and citations.
 
 ## Test GraphRAG
 
@@ -234,7 +240,7 @@ Use **Recall Test** to switch between Vector, Graph, and Hybrid for the same que
 5. documents with similar keywords but different relationships;
 6. questions that compare Vector, Graph, and Hybrid ranking.
 
-Inspect returned chunk content, graph score, matched entities, matched relationships, citations, and latency. Also verify graph results in the visual workspace before increasing Entity Top K or Neighbor Hops. See [Recall Test](/en/ai/knowledge-base/recall-test).
+Inspect returned chunk content, graph score, matched entities, matched relationships, citations, and latency. Filter diagnostics also show the global entity candidates scanned, scan rounds and cap, eligible seed entities, eligible relationships and mentions, candidate chunks, per-branch hit counts, graph-stage latency, truncation, and any Hybrid graph fallback. Also verify graph results in the visual workspace before increasing Entity Top K or Neighbor Hops. See [Recall Test](/en/ai/knowledge-base/recall-test).
 
 ## Security and governance
 
@@ -254,6 +260,7 @@ Inspect returned chunk content, graph score, matched entities, matched relations
 - Use manual or curated graph items for durable business semantics, but keep document evidence as the final answer source.
 - Rebuild after enabling GraphRAG, after major extraction-model changes, or when source coverage is inconsistent.
 - Monitor failed jobs, zero-result graph queries, entity duplication, weak evidence quotes, and Hybrid latency.
-- Use Vector mode when structured Knowledge Filters are required; use the Agent graph explorer as a boundary-aware planning step.
+- Entity vectors remain knowledge-base-wide. Filtered Graph retrieval progressively scans global candidates up to a hard cap and then gates them by eligible evidence. Returned entities, relationships, and chunks remain strictly in scope, but an in-scope seed ranked beyond the scan cap can be missed. A truncation flag is available in diagnostics; raise Entity Top K carefully or use Hybrid when this affects recall.
+- Use the Agent graph explorer as a boundary-aware planning step when the best entity names or relationships are not yet known.
 
 Continue with [Intelligent Retrieval Filtering](/en/ai/knowledge-base/intelligent-filtering), [Recall Test](/en/ai/knowledge-base/recall-test), and [Knowledgebase Workbench](/en/ai/knowledge-base/knowledge-workbench).

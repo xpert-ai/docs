@@ -10,18 +10,18 @@ A knowledge base can be exposed as a tool that an agent calls autonomously or as
 
 ## Core capabilities
 
-| Capability | Product value |
-| --- | --- |
-| Multi-source ingestion | Upload PDF, DOCX, Markdown, TXT, HTML, XLSX, PPTX, CSV, and other files, or import content from web pages and knowledge pipelines. |
-| Parsing and chunking | Clean content and create chunks with configurable strategies and parent-child context. |
-| PDF layout analysis and linked preview | Extract pages, tables, images, formulas, and coordinates through document converter plugins, then navigate between source PDF regions and analysis blocks. |
-| Semantic vector retrieval | Match the meaning of a question instead of relying only on identical keywords. |
-| Intelligent retrieval filtering | Narrow candidates by file name, logical folder, file type, MIME type, and business metadata before vector ranking. |
-| Typed metadata | Define string, enum, number, datetime, boolean, array, and object fields at document or chunk scope. |
-| Autonomous agent retrieval | Let agents decide when to search and generate request-specific conditions inside administrator-defined boundaries. |
-| [Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag) | Extract evidence-backed entities and relationships, explore and curate the graph, and convert graph discoveries into cited chunk retrieval. |
-| Testing, citations, and audit | Inspect retrieved chunks, source documents, effective filters, candidate counts, hit counts, and retrieval latency. |
-| Live maintenance | Apply file-name, logical-folder, and metadata changes to filtering without recomputing embeddings. |
+| Capability                                                                     | Product value                                                                                                                                              |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Multi-source ingestion                                                         | Upload PDF, DOCX, Markdown, TXT, HTML, XLSX, PPTX, CSV, and other files, or import content from web pages and knowledge pipelines.                         |
+| Parsing and chunking                                                           | Clean content and create chunks with configurable strategies and parent-child context.                                                                     |
+| PDF layout analysis and linked preview                                         | Extract pages, tables, images, formulas, and coordinates through document converter plugins, then navigate between source PDF regions and analysis blocks. |
+| Semantic vector retrieval                                                      | Match the meaning of a question instead of relying only on identical keywords.                                                                             |
+| Intelligent retrieval filtering                                                | Narrow Vector, Graph, or Hybrid candidates by file name, logical folder, file type, MIME type, and business metadata before ranking and merge.             |
+| Typed metadata                                                                 | Define string, enum, number, datetime, boolean, array, and object fields at document or chunk scope.                                                       |
+| Autonomous agent retrieval                                                     | Let agents decide when to search and generate request-specific conditions inside administrator-defined boundaries.                                         |
+| [Knowledge Graph and GraphRAG](/en/ai/knowledge-base/knowledge-graph-graphrag) | Extract evidence-backed entities and relationships, explore and curate the graph, and convert graph discoveries into cited chunk retrieval.                |
+| Testing, citations, and audit                                                  | Inspect retrieved chunks, source documents, effective filters, candidate counts, hit counts, and retrieval latency.                                        |
+| Live maintenance                                                               | Apply file-name, logical-folder, and metadata changes to filtering without recomputing embeddings.                                                         |
 
 ## From document to grounded answer
 
@@ -69,12 +69,12 @@ Renaming or moving a file and updating metadata refresh retrieval attributes wit
 
 ## Ways to retrieve knowledge
 
-| Method | Best for |
-| --- | --- |
-| Agent knowledge base tool | Letting an agent decide whether to search and whether a dynamic filter is useful. |
-| Workflow Knowledge Retrieval node | Running retrieval at an explicit point and passing chunks to model, decision, or formatting nodes. |
-| Project-shared knowledge | Giving several project agents a consistent source for Q&A, analysis, and content generation. |
-| Knowledgebase Workbench | Browsing folders, previewing documents, asking questions, and tracing citations in one workspace. |
+| Method                             | Best for                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Agent knowledge base tool          | Letting an agent decide whether to search and whether a dynamic filter is useful.                            |
+| Workflow Knowledge Retrieval node  | Running retrieval at an explicit point and passing chunks to model, decision, or formatting nodes.           |
+| Project-shared knowledge           | Giving several project agents a consistent source for Q&A, analysis, and content generation.                 |
+| Knowledgebase Workbench            | Browsing folders, previewing documents, asking questions, and tracing citations in one workspace.            |
 | External knowledge base connection | Reusing services such as RAGFlow, Dify, or FastGPT. Available capabilities depend on the provider interface. |
 
 See [Ways to Use the Knowledge Base](/en/ai/knowledge-base/ways-to-use-knowledge-base) and [Knowledgebase Workbench](/en/ai/knowledge-base/knowledge-workbench).
@@ -87,7 +87,7 @@ Retrieval log access follows knowledge base permissions, and logs do not contain
 
 ## Current support
 
-The first release of intelligent filtering applies to **Vector** retrieval and fully supports PGVector and Milvus. Milvus Server 2.6.2 or later is required. Graph, Hybrid, Chroma, and Weaviate return an explicit unsupported error when the new filters are configured; XpertAI never silently degrades to an unrestricted search.
+Intelligent filtering supports **Vector**, **Graph**, and **Hybrid** retrieval. PGVector and Milvus are the supported vector branches; Milvus Server 2.6.2 or later is required. Graph applies the filter to seed eligibility, relationship expansion, and evidence chunks. Hybrid filters both branches before merge and can fall back only to its already-filtered Vector branch. Chroma and Weaviate still return an explicit unsupported error for new vector filter conditions; XpertAI never silently degrades to an unrestricted search.
 
 ## Recommended reading
 
