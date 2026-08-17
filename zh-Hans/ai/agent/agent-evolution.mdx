@@ -1,0 +1,233 @@
+---
+title: 智能体进化
+sidebar_position: 10
+description: 从真实执行反馈中发现改进机会，并通过评测、审批、Shadow、Canary 和回滚安全发布新的能力版本。
+---
+
+智能体进化（Agent Evolution）用于持续改进智能体在真实业务中的 Prompt、策略、规则和领域能力。它把运行反馈转化为可验证的候选版本，并在隔离环境中完成评测和分阶段发布。
+
+<Warning>
+智能体进化不是让 Agent 直接修改生产 Prompt、规则、代码或业务表。Agent 只能生成建议和 Candidate；Candidate 通过评测、审批和发布治理后，才会成为新的不可变 Production Capability Version。
+</Warning>
+
+## 适用场景
+
+当智能体的行为可以被声明、版本化和回放时，可以将它接入智能体进化。例如：
+
+- 字段映射、别名和抽取策略
+- 归一化规则、单位映射和字典
+- 路由权重、阈值和召回策略
+- Prompt、Skill 或模型选择策略
+
+具体可进化内容由领域插件提供。平台只负责通用的学习、评测、审批、发布、版本和审计能力，不理解领域业务语义。
+
+## 开始之前
+
+你需要满足以下条件：
+
+- 当前租户和组织已经安装提供 Evolution Target 的插件。
+- 你拥有智能体进化查看权限；创建 Candidate、评测和发布操作还需要管理权限。
+- 领域运行时已经上报 Learning Event 和运行观测。
+- 插件已经同步至少一个 Target 及其当前生产基线。
+
+进入 **智能体进化** 后，页面自动使用当前选择的租户和组织范围。你无需再次选择数据范围，也不能在页面中跨范围混合事件、评测集或发布包。
+
+## 页面结构
+
+智能体进化包含四个固定页签：
+
+| 页签 | 用途 |
+| --- | --- |
+| **概览** | 查看目标健康度、待处理信号、Candidate、评测、部署和当前生产版本 |
+| **学习与建议** | 审核 Learning Event，完成归因、聚类并生成改进建议 |
+| **候选与评测** | 构建 Candidate、冻结 Golden Dataset Snapshot 并运行 Golden Replay |
+| **发布与运行** | 审批后安装不可变版本，执行 Shadow、Canary、生产激活和回滚 |
+
+页面顶部的 Target 选择器只筛选当前租户和组织范围内的目标。Target 的风险等级和能力标识决定页面允许执行哪些操作。
+
+## 完整生命周期
+
+```text
+Learning Event
+  → Diagnosis / Cluster
+  → Proposal
+  → Candidate
+  → Golden Replay
+  → 人工审批
+  → 安装不可变版本
+  → Shadow
+  → Canary 5% → 25% → 50%
+  → Production
+  → Stable / Rollback
+  → Experience
+```
+
+每个阶段都会保留输入、版本、操作者和结果。失败的 Candidate 不会被就地修改；调整 Change Set 后需要创建新的 Candidate。
+
+## 1. 审核学习信号
+
+在 **学习与建议** 中选择一个 Target，然后查看待归因信号。
+
+一个 Learning Event 至少包含：
+
+- 发生决策的 Target 和 Decision Point
+- 执行、主体和能力版本包引用
+- 预测摘要和最终结果摘要
+- 置信度、原因码、信任等级和脱敏状态
+
+你可以执行以下操作：
+
+- **标记为黄金证据**：允许该事件成为后续建议和数据集的证据来源。
+- **移出黄金证据**：保留事件，但不再将其作为黄金证据。
+- **忽略此信号**：从待处理队列移除，不删除审计记录。
+- **生成改进建议**：按相同 Target、范围和纠正特征聚合证据。
+
+默认情况下，Proposal 至少需要最近 90 天内的 3 个 L2 及以上事件，并覆盖 2 个不同业务主体。证据必须属于同一个 Target 和精确相同的范围。
+
+## 2. 构建 Candidate
+
+Proposal 只描述“为什么要改”和“建议改什么”。点击构建 Candidate 后，领域 Provider 会根据当前生产基线和结构化 Change Set 生成一个真正可执行的候选制品。
+
+Candidate 固定引用：
+
+- 基线能力版本
+- Proposal ID 和修订号
+- 证据事件
+- 适用范围
+- Provider 及其版本
+- Artifact Schema、URI 和哈希
+- 依赖的能力版本
+
+<Info>
+Candidate Artifact 与 Production Artifact 使用独立版本引用。创建 Candidate 不会修改生产能力，也不会切换 Active Pointer。
+</Info>
+
+表单字段由领域 Provider 声明。平台只负责渲染，不会解释字段含义或把某个领域的规则写入 Evolution Core。
+
+## 3. 创建 Golden Dataset 并评测
+
+在 **候选与评测** 中选择 Ready Candidate 和同 Target、同范围的数据集，然后冻结 Golden Dataset Snapshot。Snapshot 固定案例修订、评测器版本、指标定义和哈希，确保生产基线与 Candidate 使用完全相同的输入、随机种子和评测条件。
+
+默认 Golden Replay 门禁要求：
+
+| 门禁 | 默认要求 |
+| --- | --- |
+| Golden Dataset | 至少 50 个案例 |
+| 受影响切片 | 至少 20 个案例 |
+| 高风险切片 | 至少 10 个案例 |
+| 严重错误 | 0 |
+| 关键指标 | Candidate 必须优于生产基线 |
+
+评测页面会展示：
+
+- Production 与 Candidate 的指标对比
+- 每个案例的双版本输出和期望结果
+- 切片指标、阻断原因、延迟和成本
+- 可审计的 Trace 引用
+
+通过 Golden Replay 只表示 Candidate 可以进入治理流程，不表示它已经发布。
+
+## 4. 提交审批
+
+评测通过后，填写审批意见并提交审批。
+
+普通用户遵循多人多角色门禁：
+
+| 风险等级 | 默认审批要求 |
+| --- | --- |
+| R1、R2 | 2 个不同用户、不同角色 |
+| R3、R4 | 3 个不同用户、不同角色 |
+
+`SUPER_ADMIN` 或 `ADMIN` 具有管理员审批权限，可以由一个管理员完成审批。系统仍会冻结 Candidate 哈希、评测运行、审批意见、管理员身份和时间，后续发布包必须引用这份审批证据。
+
+审批通过后才能创建 Release Package。Release Package 会冻结 Candidate、目标版本、回滚版本、制品哈希、审批记录和当时生效的发布门禁策略。
+
+## 5. 安装与 Shadow
+
+点击 **安装不可变版本** 只会让 Provider 安装一个新的 Capability Version，不会改变生产 Active Pointer。
+
+安装完成后启动 Shadow：
+
+- 生产请求仍由当前生产版本返回结果和执行副作用。
+- Candidate 使用同一输入并行执行，但其输出不会写回业务结果。
+- Production 和 Candidate 的成功率、严重错误、延迟和成本会记录为运行观测。
+
+标准门禁要求 Shadow 至少持续 72 小时、获得 100 个有效观测且严重错误为 0。
+
+## 6. Canary 灰度发布
+
+Shadow 通过后，依次启动 Canary 5%、25% 和 50%。每次扩量都需要人工操作。
+
+Canary 使用 `deploymentId + subjectKey` 进行确定性分流：
+
+- 同一个主体在同一部署阶段会稳定命中同一版本。
+- 5% 表示哈希空间中的 5%，不保证前 20 次请求恰好出现 1 次。
+- 只有分配给 Candidate 的请求才计入当前 Canary 档位的样本。
+- 严重错误会触发自动暂停；系统可以执行预授权回滚，但不能自动扩大流量。
+
+标准门禁要求每个 Canary 档位至少持续 24 小时、获得 30 个有效观测且严重错误为 0。生产激活还要求 50% Canary 满足同样门禁。
+
+### 管理员一次性强制命中 Candidate
+
+在非生产环境使用 `manual_test` 门禁时，管理员可以为准确的 `subjectKey` 创建一次性 Candidate 命中，用于快速验证真实领域运行时。
+
+该能力具有以下约束：
+
+- 仅 `SUPER_ADMIN` 或 `ADMIN` 可以创建。
+- 仅对当前 `manual_test` Release Package 和正在运行的 Canary 生效。
+- 必须填写准确的 `subjectKey`、审计原因和 1–120 分钟的有效期。
+- 精确匹配一次后立即消费，不能重复使用。
+- 执行计划会标记 `manual_test_override`，创建和消费都会写入审计日志。
+- 生产环境不可用，不能替代正常的确定性分流测试。
+
+`subjectKey` 由领域运行时提供。例如某个插件可以使用 Case ID，但 Evolution Core 不理解 Case，也不依赖 BOM 语义。
+
+## 7. 激活生产与回滚
+
+生产激活会完成两件事：
+
+1. Provider 激活已安装的不可变 Capability Version。
+2. Evolution Core 使用 CAS 校验并切换生产 Active Pointer。
+
+系统不会覆盖历史版本。新请求解析到新版本，已经开始的 Execution 继续使用启动时固定的 Capability Version Bundle。
+
+发生异常时，管理员可以回滚到 Release Package 冻结的回滚版本。回滚同样通过 CAS 切换 Active Pointer，并保留完整审计记录。
+
+## 标准门禁与手动测试门禁
+
+| 策略 | 使用范围 | Shadow | 每档 Canary | 生产前 50% Canary |
+| --- | --- | --- | --- | --- |
+| `standard` | 生产和正式验收 | 72 小时 / 100 观测 | 24 小时 / 30 观测 | 24 小时 / 30 观测 |
+| `manual_test` | 仅非生产管理员手动验证 | 默认 0 小时 / 1 观测 | 默认 0 小时 / 1 观测 | 默认 0 小时 / 1 观测 |
+
+门禁策略在创建 Release Package 时冻结。生产环境即使配置了 `manual_test`，平台也会强制恢复 `standard`。
+
+<Warning>
+`manual_test` 用于缩短手动验收等待时间，不会放宽严重错误为 0、人工扩量、权限、审计、Candidate 隔离和 Active Pointer CAS 等安全约束。
+</Warning>
+
+## 权限与数据隔离
+
+- 查看页面需要 `EVOLUTION_VIEW` 或兼容的智能体编辑权限。
+- 创建 Proposal、Candidate、评测和发布操作需要 `EVOLUTION_MANAGE`。
+- 数据按租户和组织隔离；Target、事件、数据集、Candidate 和 Release Package 不能跨范围混用。
+- 机密事件必须先脱敏。不要把客户名称、合同正文、附件原文或密钥写入摘要。
+- Agent 不具备生产激活、Canary 扩量或主动生产回滚权限。
+
+## 常见问题
+
+| 现象 | 检查项 |
+| --- | --- |
+| 页面没有 Target | 确认插件已安装、Provider 已注册，并点击 **同步目标** |
+| 业务复核后没有信号 | 检查业务事务是否写入 Outbox、后台任务是否成功，以及事件 Target 和组织范围是否正确 |
+| 无法生成 Proposal | 检查是否满足 3 个 L2+ 事件、2 个主体和 90 天窗口 |
+| 无法运行 Golden Replay | Candidate 必须 Ready，数据集必须 Ready，且 Target 与范围必须一致 |
+| 安装后生产结果没有变化 | 这是正常行为；安装不会切换生产 Active Pointer |
+| Canary 5% 多次未命中 | 确定性哈希不保证少量请求均匀分布；更换主体或在非生产环境使用一次性管理员测试命中 |
+| 无法扩量或激活 | 查看发布门禁阈值、有效观测、持续时间、严重错误和当前档位 |
+
+## 领域插件示例
+
+BOM Lifecycle 是 Agent Evolution 的一个领域接入示例：Feature Binding 和 Normalization 可以完成评测与发布闭环，PBOM Matching 可按插件能力限制在 Replay，OCR Routing 可以只采集事件。
+
+这些 Target 不属于 Evolution Core 的固定定义。其他插件可以用相同机制接入自己的声明式能力。开发接入方法请参阅[在插件中接入智能体进化](../plugin/agent-evolution)。

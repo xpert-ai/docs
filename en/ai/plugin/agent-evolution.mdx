@@ -1,0 +1,522 @@
+---
+title: Integrate Agent Evolution into a plugin
+sidebar_position: 8
+description: Use Evolution Providers, Runtime Capability, Transactional Outbox, and Managed Queue to build an evaluable, releasable, and reversible evolution lifecycle for plugin capabilities.
+---
+
+This guide explains how to integrate a plugin's prompts, rules, or policies with Xpert Agent Evolution. After integration, the plugin interprets domain Artifacts and executes domain logic, while Xpert Platform manages learning, evaluation, approval, release, version pointers, permissions, and audit.
+
+<Warning>
+A plugin cannot bypass Evolution Core to approve a Candidate, expand Canary, switch the production Active Pointer, or allow an Agent to modify production prompts, rules, code, or business tables.
+</Warning>
+
+## Architecture and dependency direction
+
+```text
+Xpert Platform
+├── Evolution Core
+├── @xpert-ai/contracts
+├── @xpert-ai/plugin-sdk
+├── Xpert Cloud /agent-evolution
+└── Managed Queue
+              ▲
+              │ Provider + Runtime Capability
+Domain plugin
+├── EvolutionTargetProvider
+├── Declarative Artifact storage and domain executor
+├── Transactional Outbox
+└── Runtime Observation Adapter
+```
+
+The dependency direction is always:
+
+```text
+Domain plugin → contracts / plugin-sdk → Evolution Core
+```
+
+Evolution Core does not depend on plugin packages and must not contain a plugin's domain enums, form fields, or business table schemas. A plugin does not need to build a page for Agent Evolution. Xpert Cloud `/agent-evolution` is the only management interface.
+
+## What to implement
+
+A complete integration normally includes:
+
+1. Convert the evolvable capability into an immutable, validated, declarative Artifact.
+2. Implement `EvolutionTargetProvider` and declare the Target's risk level and supported stages.
+3. Resolve and pin the Capability Execution Plan at the beginning of every domain Execution.
+4. Write a dedicated Evolution Outbox record inside the business transaction.
+5. Ingest Learning Events asynchronously through Managed Queue.
+6. Report Shadow and Canary runtime observations.
+7. Implement installation, activation, and rollback without directly modifying the Active Pointer.
+
+## 1. Design an Evolution Target
+
+A Target should represent one decision capability that can be versioned, evaluated, and rolled back independently. Do not define the entire plugin as one Target, and do not create a Target for every business record.
+
+Common boundaries include:
+
+| Capability | Recommended Target type | Artifact example |
+| --- | --- | --- |
+| Prompt or extraction rule | `extraction_policy` | Prompt template, aliases, priorities, conflict policy |
+| Routing and selection policy | `routing_policy` | Weights, thresholds, features, and algorithm version references |
+| General policy | `prompt_policy` | System instructions and safety constraints |
+| Provider self-test | `test_fixture` | Fixed test artifacts for conformance and demonstrations only |
+
+The Target's `capabilities` must reflect the real implementation. For example, a Target that only collects events must set Candidate, Replay, and release capabilities to `false`. A Replay-only Target must not expose `releaseProvider`.
+
+## 2. Implement the Provider
+
+Import stable contracts from `@xpert-ai/contracts` and the Provider decorator from `@xpert-ai/plugin-sdk`:
+
+```ts
+import { Injectable } from '@nestjs/common'
+import type {
+  EvolutionBaselineExporter,
+  EvolutionCandidateBuilder,
+  EvolutionReleaseProvider,
+  EvolutionReplayEvaluator,
+  EvolutionTargetProvider,
+  EvolutionTargetDescriptor
+} from '@xpert-ai/contracts'
+import { EvolutionTargetProviderStrategy } from '@xpert-ai/plugin-sdk'
+
+const descriptor: EvolutionTargetDescriptor = {
+  targetId: 'catalog.attribute_mapping',
+  targetType: 'extraction_policy',
+  displayName: 'Catalog Attribute Mapping',
+  providerKey: 'catalog.attribute-mapping',
+  providerVersion: '1.0.0',
+  artifactSchemaVersion: '1.0.0',
+  supportedScopes: ['organization'],
+  riskLevel: 'R2',
+  metricSetId: 'catalog.attribute-mapping.v1',
+  candidateForm: {
+    description: {
+      zh_Hans: '把已审核别名加入不可变字段映射制品。',
+      en_US: 'Add reviewed aliases to an immutable mapping artifact.'
+    },
+    fields: [
+      {
+        key: 'sourceAliases',
+        label: { zh_Hans: '来源字段别名', en_US: 'Source aliases' },
+        type: 'string_array',
+        required: true
+      },
+      {
+        key: 'targetAttribute',
+        label: { zh_Hans: '目标属性', en_US: 'Target attribute' },
+        type: 'string',
+        required: true
+      }
+    ]
+  },
+  capabilities: {
+    candidateBuild: true,
+    replay: true,
+    shadow: true,
+    canary: true,
+    install: true,
+    rollback: true
+  },
+  status: 'active'
+}
+
+@Injectable()
+@EvolutionTargetProviderStrategy('catalog.attribute_mapping')
+export class AttributeMappingEvolutionProvider implements EvolutionTargetProvider {
+  readonly descriptor = descriptor
+
+  readonly baselineExporter: EvolutionBaselineExporter = {
+    exportBaseline: async (request) => this.exportBaseline(request)
+  }
+
+  readonly candidateBuilder: EvolutionCandidateBuilder = {
+    buildCandidate: async (request) => this.buildCandidate(request),
+    validateCandidate: async (request) => this.validateCandidate(request)
+  }
+
+  readonly replayEvaluator: EvolutionReplayEvaluator = {
+    runReplayCase: async (request) => this.runReplayCase(request),
+    evaluateResult: async (request, result) => this.evaluateResult(request, result)
+  }
+
+  readonly releaseProvider: EvolutionReleaseProvider = {
+    install: async (request) => this.install(request),
+    activate: async (request) => this.activate(request),
+    rollback: async (request) => this.rollback(request)
+  }
+
+  // Domain implementation omitted
+}
+```
+
+`candidateForm` uses i18n text. The platform uses this descriptor to generate a domain-neutral Change Set form without interpreting the values.
+
+### Provider responsibilities by stage
+
+| Interface | Plugin responsibility | Prohibited behavior |
+| --- | --- | --- |
+| `exportBaseline` | Export the current declarative baseline for the requested scope | Return a mutable business table reference as an Artifact |
+| `buildCandidate` | Apply a structured Change Set and write to separate Artifact storage | Modify production rules or business tables |
+| `validateCandidate` | Validate Schema, conflicts, dependencies, and safety constraints | Activate the Candidate as a side effect of validation |
+| `runReplayCase` | Run Production and Candidate with fixed inputs | Produce business side effects |
+| `evaluateResult` | Return domain metrics and blocking flags | Bypass generic platform gates |
+| `install` | Install a new immutable Capability Version | Switch the production Active Pointer |
+| `activate` | Make an installed version loadable by the domain runtime | Decide approval or traffic expansion independently |
+| `rollback` | Restore availability of the Provider-side stable version | Delete historical Artifacts |
+
+## 3. Design an immutable Artifact
+
+Store Candidate Artifacts in a separate version store, not in production business tables. A recommended manifest contains:
+
+```json
+{
+  "schemaVersion": "1.0.0",
+  "baseVersionId": "catalog.attribute_mapping:v7",
+  "changes": [
+    {
+      "operation": "add_alias",
+      "source": "rated output",
+      "target": "rated_power"
+    }
+  ],
+  "scope": {
+    "type": "organization",
+    "key": "ORG-001"
+  },
+  "evidenceEventIds": ["EVT-001", "EVT-002", "EVT-003"]
+}
+```
+
+The Provider returns an `EvolutionArtifactRef`:
+
+```ts
+{
+  uri: 'plugin-artifact://catalog/attribute-mapping/CAND-001.json',
+  hash: 'sha256:...',
+  schemaVersion: '1.0.0',
+  mediaType: 'application/json'
+}
+```
+
+Requirements:
+
+- The same input produces the same `buildInputsHash`.
+- Artifact content maps one-to-one to its hash and cannot be overwritten after release.
+- The URI must not contain a temporary file path or state local to the current Pod.
+- Provider and dependency versions must be recorded in the Candidate and Capability Version.
+- Any modification to the original Candidate creates a new Candidate.
+
+## 4. Register the Provider
+
+Add the Provider to the server-side plugin module's `providers`. Xpert discovers it through `@EvolutionTargetProviderStrategy()` metadata:
+
+```ts
+@XpertServerPlugin({
+  imports: [TypeOrmModule.forFeature([EvolutionOutboxEntity])],
+  providers: [
+    AttributeMappingEvolutionProvider,
+    DomainEvolutionRuntimeService,
+    EvolutionOutboxService,
+    EvolutionEventJobHandler
+  ]
+})
+export class CatalogPluginModule {}
+```
+
+After installing or refreshing the plugin, click **Sync Targets** in **Agent Evolution**. Synchronization registers only the Target descriptor and baseline; it does not create a domain-specific page.
+
+## 5. Resolve and pin the execution version closure
+
+At the beginning of a domain Execution, obtain the Evolution Runtime from the runtime capability registry:
+
+```ts
+import { Inject, Injectable } from '@nestjs/common'
+import {
+  EvolutionRuntimeCapability,
+  type RuntimeCapabilityRegistry,
+  XPERT_RUNTIME_CAPABILITIES_TOKEN
+} from '@xpert-ai/plugin-sdk'
+
+@Injectable()
+export class DomainEvolutionRuntimeService {
+  constructor(
+    @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
+    private readonly capabilities: RuntimeCapabilityRegistry,
+    private readonly executions: DomainExecutionRepository
+  ) {}
+
+  async resolveAndPin(input: {
+    tenantId: string
+    organizationId: string
+    executionId: string
+    subjectKey: string
+  }) {
+    const existing = await this.executions.findCapabilityPlan(input.executionId)
+    if (existing) return existing
+
+    const plan = await this.capabilities.require(EvolutionRuntimeCapability).resolveExecutionPlan({
+      tenantId: input.tenantId,
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      subjectKey: input.subjectKey,
+      targetIds: ['catalog.attribute_mapping'],
+      scope: { type: 'organization', key: input.organizationId }
+    })
+
+    await this.executions.saveCapabilityPlan(input.executionId, plan)
+    return plan
+  }
+}
+```
+
+`subjectKey` is a stable domain subject identifier, such as a Case ID, order ID, or document ID. Evolution Core only uses it for deterministic assignment and audit; it does not understand its business semantics.
+
+Persist the complete execution plan, or at least:
+
+- `bundleId` and `bundleHash`
+- Each Target's `versionId`, Artifact Hash, and Channel
+- `deploymentId` and selection reason
+- Shadow Bundle and Shadow Assignment
+- `manualTestOverrideId`, when present
+
+Do not resolve the Active Pointer again during the same Execution. Doing so could mix versions and make the result impossible to replay.
+
+## 6. Execute Production, Shadow, and Canary at runtime
+
+Read `assignments` to determine the primary execution version:
+
+- `production`: Use the current production version.
+- `canary`: The subject was deterministically assigned to the Candidate, so Candidate output may become the primary result.
+- `manual_test_override`: A non-production administrator created a one-time Candidate assignment. It still executes as Canary and carries an audit marker.
+
+If the plan contains `shadowAssignments`, run the Shadow Candidate with the same input, but always:
+
+- Discard Candidate business output and side effects.
+- Never write to production business tables.
+- Record Production and Candidate metrics separately.
+- Associate both executions with the same `executionId` and `subjectKey`.
+
+Domain code must not calculate Canary percentages itself. Evolution Runtime performs assignment centrally using `deploymentId + subjectKey`.
+
+## 7. Capture Learning Events through an Outbox
+
+A Learning Event must originate from a committed business fact. Use this flow:
+
+```text
+Business transaction
+  ├── Save business result
+  └── Write EvolutionOutbox
+             ↓
+      Outbox Dispatcher
+             ↓
+        Managed Queue
+             ↓
+      Plugin Job Handler
+             ↓
+  ingestLearningEvent()
+```
+
+Do not reuse a command idempotency Outbox. Evolution Outbox needs independent delivery status, retries, and retention.
+
+Write only a redacted event draft inside the business transaction:
+
+```ts
+await evolutionOutbox.append(manager, {
+  tenantId,
+  organizationId,
+  aggregateType: 'catalog-review',
+  aggregateId: reviewId,
+  idempotencyKey: `catalog-review-${reviewId}-${revision}`,
+  payload: {
+    idempotencyKey: `catalog-review-${reviewId}-${revision}`,
+    eventType: 'prediction_reviewed',
+    schemaVersion: '1.0.0',
+    eventTime: new Date().toISOString(),
+    targetId: 'catalog.attribute_mapping',
+    decisionPoint: 'attribute_mapping_review',
+    executionId: executionPlan.executionId,
+    subjectRef: `catalog-item:${itemId}`,
+    inputFingerprint,
+    predictionSummary: 'source=Rated Output; predicted=UNKNOWN',
+    finalOutcomeSummary: 'source=Rated Output; reviewed=rated_power',
+    confidence: 0.94,
+    reasonCodes: ['human_corrected_mapping'],
+    capabilityVersionBundleId: executionPlan.bundle.bundleId,
+    bundleHash: executionPlan.bundle.bundleHash,
+    trustLevel: 'L2',
+    classification: 'internal',
+    redactionStatus: 'redacted',
+    scope: { type: 'organization', key: organizationId }
+  }
+})
+```
+
+The event must include the correct `targetId`, scope, capability version bundle, and subject reference. `predictionSummary` and `finalOutcomeSummary` should be presentable structured summaries. Do not display an arbitrary object by applying `JSON.stringify()` to it.
+
+## 8. Deliver events through Managed Queue
+
+Plugin background tasks must use the platform [Managed Queue](./managed-queues). Do not create a plugin-private BullMQ or Redis connection.
+
+Include tenant, organization, and a stable Job ID when enqueueing:
+
+```ts
+await managedQueue.enqueue({
+  pluginName: '@acme/plugin-catalog',
+  queueName: 'catalog.evolution',
+  jobName: 'ingest-learning-event',
+  payload: { outboxId },
+  tenantId,
+  organizationId,
+  scopeKey: organizationId,
+  jobId: `catalog-evolution-${outboxId}`,
+  attempts: 5,
+  backoffMs: { type: 'exponential', delay: 1_000 }
+})
+```
+
+Declare the Processor:
+
+```ts
+import { Injectable } from '@nestjs/common'
+import { PluginJobProcessor, type ManagedQueueJob } from '@xpert-ai/plugin-sdk'
+
+@PluginJobProcessor({
+  pluginName: '@acme/plugin-catalog',
+  queueName: 'catalog.evolution',
+  jobName: 'ingest-learning-event',
+  concurrency: 4
+})
+@Injectable()
+export class EvolutionEventJobHandler {
+  constructor(private readonly outbox: EvolutionOutboxService) {}
+
+  async handle(job: ManagedQueueJob<{ outboxId: string }>) {
+    await this.outbox.deliver(job.data.outboxId)
+  }
+}
+```
+
+`deliver()` should read the Outbox within the same tenant and organization scope, call `ingestLearningEvent()`, and mark the record as delivered only after success. Repeated execution must be safely deduplicated using the event `idempotencyKey`.
+
+## 9. Report runtime observations
+
+After a primary or Shadow execution completes, report aggregatable runtime metrics:
+
+```ts
+await evolution.recordRuntimeObservation({
+  tenantId,
+  organizationId,
+  observation: {
+    targetId: assignment.targetId,
+    scope: executionScope,
+    executionId,
+    bundleId: plan.bundle.bundleId,
+    deploymentId: assignment.deploymentId,
+    subjectKey: plan.subjectKey,
+    channel: assignment.channel,
+    success: true,
+    severeError: false,
+    latencyMs: 18,
+    cost: 0,
+    correctionRequired: false,
+    observedAt: new Date().toISOString()
+  }
+})
+```
+
+Only valid observations from the current deployment advance Shadow or Canary gates. Do not present Golden Replay, development simulations, or historical statistics as production runtime observations.
+
+## 10. Implement release operations
+
+`install()`, `activate()`, and `rollback()` must be idempotent and return a `ReleaseProviderReceipt`.
+
+Recommended semantics:
+
+- `install()`: Validate the Artifact hash and Schema, write to immutable plugin version storage, and make the version loadable.
+- `activate()`: Confirm that the version is installed and allow the domain runtime to read it; do not switch the platform Active Pointer directly.
+- `rollback()`: Restore Provider-side availability of the previous stable version; do not delete the failed version or audit information.
+
+After Provider operations succeed, Evolution Core switches the production Active Pointer through CAS. If the pointer revision or rollback version no longer matches the values frozen in the Release Package, the platform rejects activation to prevent one concurrent release from overwriting another.
+
+## 11. SDK version compatibility
+
+In the repository source, Evolution contracts are exported by `@xpert-ai/contracts`, while Provider decorators and runtime capabilities are exported by `@xpert-ai/plugin-sdk`. If the published packages used by your plugin do not yet contain these exports:
+
+1. Create one clearly named compatibility file, such as `evolution-sdk.compat.ts`.
+2. Define only the minimum types and tokens currently required in that file.
+3. Make all other business code import from the compatibility file; do not scatter duplicate definitions across the plugin.
+4. Annotate the official package version that will replace the compatibility layer.
+5. After upgrading, change the compatibility file to official re-exports, then delete the mocked types.
+
+The compatibility layer only addresses a compile-time contract lag. It must not simulate Evolution Core approval, Active Pointer management, runtime resolution, or audit permissions.
+
+## 12. Security and governance checklist
+
+Before release, confirm that:
+
+- Every query and unique key includes the tenant, and an organization-scoped Target also includes the organization.
+- The Target's declared `supportedScopes` match its real access boundary.
+- Confidential Learning Events are redacted before ingestion.
+- Candidate Builder accepts only declared fields and rejects unknown keys, path traversal, and executable code.
+- Artifact Hash, Schema Version, and Provider Version are validated.
+- Replay and Shadow produce no business side effects.
+- The Agent has no tools for approval, release, traffic expansion, production activation, or proactive rollback.
+- Every background task uses Managed Queue and its handler does not depend on HTTP Request Context.
+- User-visible text uses i18n, and the server returns stable error codes or localizable messages.
+
+## 13. Test checklist
+
+Cover at least the following tests.
+
+### Provider contract
+
+- The same input produces the same Artifact Hash and `buildInputsHash`.
+- Invalid Change Sets, Schemas, dependencies, and hashes are rejected.
+- `install()`, `activate()`, and `rollback()` are idempotent.
+- Undeclared capabilities do not appear in Target actions.
+
+### Runtime
+
+- The version closure is resolved only once in the same Execution.
+- Canary assignment is stable for the same `deploymentId + subjectKey`.
+- Shadow output does not change production results or business tables.
+- A one-time administrator test assignment is consumed once and carries an audit marker in the plan.
+- After rollback, new requests use the previous stable version while historical executions still reference their original versions.
+
+### Event pipeline
+
+- A rolled-back business transaction leaves no Outbox event.
+- Delivery can be retried after a Dispatcher crash.
+- Duplicate delivery does not create duplicate Learning Events.
+- Cross-tenant and cross-organization events are rejected.
+- Confidential but unredacted events are rejected.
+
+### Release governance
+
+- A Candidate cannot directly affect Production.
+- A Release Package cannot be created before evaluation and approval pass.
+- Installing a version does not change the Active Pointer.
+- Shadow, Canary, and production gates use the frozen policy.
+- A severe error triggers pause, and a CAS conflict prevents activation or rollback.
+
+Use neutral identifiers in test data, such as `ORG-001`, `CASE-001`, and `AUTO-MOTOR-001`. Do not commit real customer or project names to the repository.
+
+## 14. Local deployment and acceptance
+
+After completing build and tests according to the [plugin development workflow](./develop), refresh the plugin through the platform's local plugin deployment flow:
+
+```bash
+corepack pnpm plugin:deploy:local
+```
+
+End-to-end acceptance must prove at least that:
+
+1. The plugin Target can be synchronized in **Agent Evolution**.
+2. A business review creates a real Learning Event through Outbox and Managed Queue.
+3. Candidate construction does not modify production business tables or the production Artifact.
+4. Golden Replay compares Production and Candidate against the same Snapshot.
+5. The production Active Pointer remains unchanged after installation.
+6. Shadow has no business side effects, and Canary uses the runtime assignment result.
+7. New requests resolve to the new Production Capability Version only after all gates and human governance have completed.
+
+For the product workflow, see [Agent Evolution](../agent/agent-evolution).

@@ -1,0 +1,233 @@
+---
+title: Agent Evolution
+sidebar_position: 10
+description: Discover improvement opportunities from real execution feedback, then safely release new capability versions through evaluation, approval, Shadow, Canary, and rollback.
+---
+
+Agent Evolution continuously improves an agent's prompts, policies, rules, and domain capabilities based on real business execution. It turns runtime feedback into verifiable candidate versions, then evaluates and progressively releases them in isolated environments.
+
+<Warning>
+Agent Evolution does not allow an Agent to directly modify production prompts, rules, code, or business tables. An Agent can only generate proposals and Candidates. A Candidate becomes a new immutable Production Capability Version only after evaluation, approval, and release governance.
+</Warning>
+
+## When to use Agent Evolution
+
+You can integrate a capability with Agent Evolution when its behavior can be declared, versioned, and replayed. Examples include:
+
+- Field mappings, aliases, and extraction policies
+- Normalization rules, unit mappings, and dictionaries
+- Routing weights, thresholds, and retrieval policies
+- Prompt, Skill, or model selection policies
+
+The domain plugin defines what can evolve. The platform provides generic learning, evaluation, approval, release, versioning, and audit capabilities without interpreting domain semantics.
+
+## Before you begin
+
+Make sure that:
+
+- A plugin that provides an Evolution Target is installed in the current tenant and organization.
+- You have permission to view Agent Evolution. Creating Candidates, running evaluations, and releasing versions also require management permission.
+- The domain runtime is reporting Learning Events and runtime observations.
+- The plugin has synchronized at least one Target and its current production baseline.
+
+When you open **Agent Evolution**, the page automatically uses the currently selected tenant and organization scope. You do not need to select a scope again, and you cannot mix events, evaluation datasets, or release packages across scopes.
+
+## Page structure
+
+Agent Evolution contains four fixed tabs:
+
+| Tab | Purpose |
+| --- | --- |
+| **Overview** | Review Target health, pending signals, Candidates, evaluations, deployments, and current production versions |
+| **Learning & Proposals** | Review Learning Events, attribute and cluster them, and generate improvement proposals |
+| **Candidates & Evaluation** | Build Candidates, freeze Golden Dataset Snapshots, and run Golden Replay |
+| **Release & Runtime** | Install immutable versions after approval, then run Shadow, Canary, production activation, and rollback |
+
+The Target selector in the page header only filters Targets within the current tenant and organization. A Target's risk level and capability flags determine which actions are available.
+
+## Complete lifecycle
+
+```text
+Learning Event
+  → Diagnosis / Cluster
+  → Proposal
+  → Candidate
+  → Golden Replay
+  → Human approval
+  → Install immutable version
+  → Shadow
+  → Canary 5% → 25% → 50%
+  → Production
+  → Stable / Rollback
+  → Experience
+```
+
+Every stage retains its inputs, versions, actors, and results. A failed Candidate is never modified in place. Update the Change Set and create a new Candidate instead.
+
+## 1. Review learning signals
+
+In **Learning & Proposals**, select a Target and review signals awaiting attribution.
+
+A Learning Event includes at least:
+
+- The Target and Decision Point where the decision occurred
+- References to the execution, subject, and capability version bundle
+- A prediction summary and final outcome summary
+- Confidence, reason codes, trust level, and redaction status
+
+You can:
+
+- **Mark as golden evidence**: Allow the event to serve as evidence for later proposals and datasets.
+- **Remove from golden evidence**: Retain the event but stop using it as golden evidence.
+- **Ignore signal**: Remove it from the pending queue without deleting its audit record.
+- **Generate proposal**: Aggregate evidence with the same Target, scope, and correction signature.
+
+By default, a Proposal requires at least three L2-or-higher events from the last 90 days across two distinct business subjects. All evidence must belong to the same Target and exactly the same scope.
+
+## 2. Build a Candidate
+
+A Proposal only describes why a change is needed and what should change. When you build a Candidate, the domain Provider uses the current production baseline and the structured Change Set to generate an executable candidate artifact.
+
+A Candidate permanently references:
+
+- The baseline capability version
+- The Proposal ID and revision
+- Evidence events
+- Applicable scope
+- The Provider and Provider version
+- The Artifact Schema, URI, and hash
+- Dependent capability versions
+
+<Info>
+Candidate Artifacts and Production Artifacts use separate version references. Creating a Candidate does not change the production capability or switch the Active Pointer.
+</Info>
+
+The domain Provider declares the form fields. The platform renders them without interpreting field semantics or embedding domain rules in Evolution Core.
+
+## 3. Create a Golden Dataset and evaluate
+
+In **Candidates & Evaluation**, select a Ready Candidate and a dataset with the same Target and scope, then freeze a Golden Dataset Snapshot. The Snapshot fixes case revisions, evaluator versions, metric definitions, and hashes so that the production baseline and Candidate use exactly the same inputs, random seed, and evaluation conditions.
+
+Default Golden Replay gates are:
+
+| Gate | Default requirement |
+| --- | --- |
+| Golden Dataset | At least 50 cases |
+| Affected slice | At least 20 cases |
+| High-risk slice | At least 10 cases |
+| Severe errors | 0 |
+| Key metrics | The Candidate must outperform the production baseline |
+
+The evaluation page shows:
+
+- Production and Candidate metric comparisons
+- Both version outputs and the expected result for each case
+- Slice metrics, blocking reasons, latency, and cost
+- Auditable Trace references
+
+Passing Golden Replay only means that the Candidate may enter governance. It does not mean the Candidate has been released.
+
+## 4. Submit for approval
+
+After the evaluation passes, enter an approval comment and submit the Candidate for approval.
+
+Standard users follow a multi-user, multi-role gate:
+
+| Risk level | Default approval requirement |
+| --- | --- |
+| R1, R2 | 2 different users with different roles |
+| R3, R4 | 3 different users with different roles |
+
+Users with the `SUPER_ADMIN` or `ADMIN` role have administrator approval permission, so one administrator can satisfy the approval gate. The system still freezes the Candidate hash, evaluation run, approval comment, administrator identity, and time. The subsequent release package must reference this approval evidence.
+
+You can create a Release Package only after approval. The Release Package freezes the Candidate, target version, rollback version, artifact hash, approval records, and the release gate policy that was active at that time.
+
+## 5. Install and run Shadow
+
+Clicking **Install immutable version** only instructs the Provider to install a new Capability Version. It does not change the production Active Pointer.
+
+After installation, start Shadow:
+
+- Production requests continue to use the current production version for returned results and side effects.
+- The Candidate runs in parallel with the same input, but its output is not written back to business results.
+- Success rate, severe errors, latency, and cost are recorded separately for Production and Candidate.
+
+The standard gate requires Shadow to run for at least 72 hours, collect 100 valid observations, and report zero severe errors.
+
+## 6. Canary rollout
+
+After Shadow passes, start Canary at 5%, then expand to 25% and 50%. Every expansion requires a human action.
+
+Canary uses `deploymentId + subjectKey` for deterministic assignment:
+
+- The same subject remains assigned to the same version within the same deployment stage.
+- 5% means 5% of the hash space; it does not guarantee exactly one match in the first 20 requests.
+- Only requests assigned to the Candidate count toward the current Canary stage sample total.
+- A severe error triggers an automatic pause. The system can perform a pre-authorized rollback, but it cannot expand traffic automatically.
+
+The standard gate requires each Canary stage to run for at least 24 hours, collect 30 valid observations, and report zero severe errors. Production activation also requires the 50% Canary stage to satisfy the same gate.
+
+### Administrator-only one-time Candidate assignment
+
+When using the `manual_test` gate in a non-production environment, an administrator can create a one-time Candidate assignment for an exact `subjectKey` to quickly verify the real domain runtime.
+
+This capability is constrained as follows:
+
+- Only `SUPER_ADMIN` or `ADMIN` can create it.
+- It only applies to the current `manual_test` Release Package and an active Canary deployment.
+- You must enter an exact `subjectKey`, an audit reason, and a validity period from 1 to 120 minutes.
+- It is consumed immediately after one exact match and cannot be reused.
+- The execution plan is marked `manual_test_override`; both creation and consumption are written to the audit log.
+- It is unavailable in production and cannot replace normal deterministic assignment testing.
+
+The domain runtime supplies `subjectKey`. A plugin may use a Case ID, for example, but Evolution Core does not understand Case semantics and does not depend on BOM logic.
+
+## 7. Activate production and roll back
+
+Production activation performs two operations:
+
+1. The Provider activates the installed immutable Capability Version.
+2. Evolution Core validates and switches the production Active Pointer using compare-and-swap (CAS).
+
+Historical versions are never overwritten. New requests resolve to the new version, while an Execution that has already started continues to use the Capability Version Bundle pinned at startup.
+
+If an issue occurs, an administrator can roll back to the rollback version frozen in the Release Package. Rollback also switches the Active Pointer through CAS and retains a complete audit record.
+
+## Standard and manual test gates
+
+| Policy | Intended use | Shadow | Each Canary stage | 50% Canary before production |
+| --- | --- | --- | --- | --- |
+| `standard` | Production and formal acceptance | 72 hours / 100 observations | 24 hours / 30 observations | 24 hours / 30 observations |
+| `manual_test` | Non-production administrator testing only | 0 hours / 1 observation by default | 0 hours / 1 observation by default | 0 hours / 1 observation by default |
+
+The gate policy is frozen when the Release Package is created. If `manual_test` is configured in a production environment, the platform forces the policy back to `standard`.
+
+<Warning>
+`manual_test` shortens waiting time during manual acceptance. It does not relax the zero-severe-error requirement, human-controlled expansion, permissions, audit, Candidate isolation, or Active Pointer CAS safeguards.
+</Warning>
+
+## Permissions and data isolation
+
+- Viewing the page requires `EVOLUTION_VIEW` or a compatible agent editing permission.
+- Creating Proposals, Candidates, evaluations, and release operations requires `EVOLUTION_MANAGE`.
+- Data is isolated by tenant and organization. Targets, events, datasets, Candidates, and Release Packages cannot be mixed across scopes.
+- Confidential events must be redacted before ingestion. Do not put customer names, contract text, raw attachment content, or secrets in summaries.
+- An Agent never receives tools for production activation, Canary expansion, or proactive production rollback.
+
+## Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| No Target appears | Confirm the plugin is installed and its Provider is registered, then click **Sync Targets** |
+| No signal appears after a business review | Check whether the business transaction wrote to the Outbox, the background job succeeded, and the event Target and organization scope are correct |
+| A Proposal cannot be generated | Verify that the evidence satisfies 3 L2+ events, 2 subjects, and the 90-day window |
+| Golden Replay cannot run | The Candidate and dataset must both be Ready, and their Target and scope must match |
+| Production results do not change after installation | This is expected; installation does not switch the production Active Pointer |
+| Canary 5% is not selected after several requests | Deterministic hashing does not guarantee an even distribution in a small sample; use another subject or a one-time administrator test assignment in a non-production environment |
+| Traffic cannot expand or production cannot activate | Review gate thresholds, valid observations, duration, severe errors, and the current stage |
+
+## Domain plugin example
+
+BOM Lifecycle is one example of a domain integration with Agent Evolution. Feature Binding and Normalization can complete the evaluation and release lifecycle, PBOM Matching can stop at Replay according to plugin capabilities, and OCR Routing can collect events only.
+
+These Targets are not built-in definitions in Evolution Core. Other plugins can use the same mechanism for their own declarative capabilities. For implementation details, see [Integrate Agent Evolution into a plugin](../plugin/agent-evolution).

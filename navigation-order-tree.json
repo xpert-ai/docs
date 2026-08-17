@@ -35,6 +35,7 @@
                 "environment-variables",
                 "enhanced-features",
                 "release-version",
+                "agent-evolution",
                 "embed-webpage",
                 "conversation-logs",
                 "development-api",
@@ -142,6 +143,25 @@
         {
           "slug": "plugin",
           "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "overview",
+                "core-concepts",
+                "development-steps",
+                "mcp-tools-and-apps",
+                "remote-component",
+                "managed-connections",
+                "managed-queues",
+                "agent-evolution",
+                "collaboration",
+                "sandbox-jobs",
+                "publish-and-use",
+                "permission-design-guide",
+                "schema-ui-extension",
+                "plugin-development"
+              ]
+            },
             {
               "slug": "trigger",
               "pages": [

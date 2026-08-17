@@ -1,0 +1,522 @@
+---
+title: 在插件中接入智能体进化
+sidebar_position: 8
+description: 使用 Evolution Provider、Runtime Capability、Transactional Outbox 和 Managed Queue 为插件能力建立可评测、可发布、可回滚的进化闭环。
+---
+
+本指南说明如何把插件中的 Prompt、规则或策略接入 Xpert Agent Evolution。接入完成后，插件负责解释领域 Artifact 和执行领域逻辑；Xpert Platform 负责学习、评测、审批、发布、版本指针、权限和审计。
+
+<Warning>
+插件不能绕过 Evolution Core 直接审批 Candidate、扩大 Canary、切换生产 Active Pointer，或让 Agent 修改生产 Prompt、规则、代码和业务表。
+</Warning>
+
+## 架构与依赖方向
+
+```text
+Xpert Platform
+├── Evolution Core
+├── @xpert-ai/contracts
+├── @xpert-ai/plugin-sdk
+├── Xpert Cloud /agent-evolution
+└── Managed Queue
+              ▲
+              │ Provider + Runtime Capability
+领域插件
+├── EvolutionTargetProvider
+├── 声明式 Artifact 存储与领域执行器
+├── Transactional Outbox
+└── Runtime Observation Adapter
+```
+
+依赖方向始终是：
+
+```text
+领域插件 → contracts / plugin-sdk → Evolution Core
+```
+
+Evolution Core 不依赖插件包，也不能包含插件的领域枚举、表单字段或业务表结构。插件不需要为 Agent Evolution 开发页面；Xpert Cloud 的 `/agent-evolution` 是唯一管理界面。
+
+## 接入内容
+
+一个完整接入通常包含：
+
+1. 把可进化能力改造成不可变、可校验的声明式 Artifact。
+2. 实现 `EvolutionTargetProvider` 并声明 Target 的风险与支持阶段。
+3. 在每次领域 Execution 开始时解析并固定 Capability Execution Plan。
+4. 在业务事务内写入专用 Evolution Outbox。
+5. 通过 Managed Queue 异步摄取 Learning Event。
+6. 上报 Shadow 和 Canary 的运行观测。
+7. 实现安装、激活和回滚，但不直接修改 Active Pointer。
+
+## 1. 设计 Evolution Target
+
+一个 Target 应对应一个可以独立版本化、独立评测和独立回滚的决策能力。不要把整个插件定义成一个 Target，也不要为每条业务记录创建 Target。
+
+常见拆分方式：
+
+| 能力 | 推荐 Target 类型 | Artifact 示例 |
+| --- | --- | --- |
+| Prompt 或抽取规则 | `extraction_policy` | Prompt 模板、别名、优先级、冲突策略 |
+| 路由与选择策略 | `routing_policy` | 权重、阈值、特征和算法版本引用 |
+| 通用策略 | `prompt_policy` | 系统提示和安全约束 |
+| Provider 自检 | `test_fixture` | 仅用于契约与演示的固定测试制品 |
+
+Target 的 `capabilities` 必须反映真实实现。例如只支持事件采集的 Target 应把 Candidate、Replay 和发布能力全部设为 `false`；只支持 Golden Replay 的 Target 不应暴露 `releaseProvider`。
+
+## 2. 实现 Provider
+
+从 `@xpert-ai/contracts` 导入稳定契约，从 `@xpert-ai/plugin-sdk` 导入 Provider 装饰器：
+
+```ts
+import { Injectable } from '@nestjs/common'
+import type {
+  EvolutionBaselineExporter,
+  EvolutionCandidateBuilder,
+  EvolutionReleaseProvider,
+  EvolutionReplayEvaluator,
+  EvolutionTargetProvider,
+  EvolutionTargetDescriptor
+} from '@xpert-ai/contracts'
+import { EvolutionTargetProviderStrategy } from '@xpert-ai/plugin-sdk'
+
+const descriptor: EvolutionTargetDescriptor = {
+  targetId: 'catalog.attribute_mapping',
+  targetType: 'extraction_policy',
+  displayName: 'Catalog Attribute Mapping',
+  providerKey: 'catalog.attribute-mapping',
+  providerVersion: '1.0.0',
+  artifactSchemaVersion: '1.0.0',
+  supportedScopes: ['organization'],
+  riskLevel: 'R2',
+  metricSetId: 'catalog.attribute-mapping.v1',
+  candidateForm: {
+    description: {
+      zh_Hans: '把已审核别名加入不可变字段映射制品。',
+      en_US: 'Add reviewed aliases to an immutable mapping artifact.'
+    },
+    fields: [
+      {
+        key: 'sourceAliases',
+        label: { zh_Hans: '来源字段别名', en_US: 'Source aliases' },
+        type: 'string_array',
+        required: true
+      },
+      {
+        key: 'targetAttribute',
+        label: { zh_Hans: '目标属性', en_US: 'Target attribute' },
+        type: 'string',
+        required: true
+      }
+    ]
+  },
+  capabilities: {
+    candidateBuild: true,
+    replay: true,
+    shadow: true,
+    canary: true,
+    install: true,
+    rollback: true
+  },
+  status: 'active'
+}
+
+@Injectable()
+@EvolutionTargetProviderStrategy('catalog.attribute_mapping')
+export class AttributeMappingEvolutionProvider implements EvolutionTargetProvider {
+  readonly descriptor = descriptor
+
+  readonly baselineExporter: EvolutionBaselineExporter = {
+    exportBaseline: async (request) => this.exportBaseline(request)
+  }
+
+  readonly candidateBuilder: EvolutionCandidateBuilder = {
+    buildCandidate: async (request) => this.buildCandidate(request),
+    validateCandidate: async (request) => this.validateCandidate(request)
+  }
+
+  readonly replayEvaluator: EvolutionReplayEvaluator = {
+    runReplayCase: async (request) => this.runReplayCase(request),
+    evaluateResult: async (request, result) => this.evaluateResult(request, result)
+  }
+
+  readonly releaseProvider: EvolutionReleaseProvider = {
+    install: async (request) => this.install(request),
+    activate: async (request) => this.activate(request),
+    rollback: async (request) => this.rollback(request)
+  }
+
+  // 领域实现省略
+}
+```
+
+`candidateForm` 使用 i18n 文本。平台根据该描述生成领域中立的 Change Set 表单，但不会解释字段值。
+
+### Provider 各阶段职责
+
+| 接口 | 插件职责 | 不允许做的事 |
+| --- | --- | --- |
+| `exportBaseline` | 导出指定范围的当前声明式基线 | 返回可变业务表引用作为 Artifact |
+| `buildCandidate` | 应用结构化 Change Set，写入独立 Artifact 存储 | 修改生产规则或业务表 |
+| `validateCandidate` | 校验 Schema、冲突、依赖和安全约束 | 以校验为名激活 Candidate |
+| `runReplayCase` | 用固定输入分别执行生产和 Candidate | 产生业务副作用 |
+| `evaluateResult` | 返回领域指标和阻断标记 | 绕过平台的通用门禁 |
+| `install` | 安装新的不可变 Capability Version | 切换生产 Active Pointer |
+| `activate` | 让已安装版本可被领域运行时加载 | 自行决定审批或扩量 |
+| `rollback` | 恢复 Provider 侧的旧稳定版本 | 删除历史 Artifact |
+
+## 3. 设计不可变 Artifact
+
+Candidate Artifact 应保存到独立版本存储，不能写入生产业务表。一个推荐的 manifest 包含：
+
+```json
+{
+  "schemaVersion": "1.0.0",
+  "baseVersionId": "catalog.attribute_mapping:v7",
+  "changes": [
+    {
+      "operation": "add_alias",
+      "source": "rated output",
+      "target": "rated_power"
+    }
+  ],
+  "scope": {
+    "type": "organization",
+    "key": "ORG-001"
+  },
+  "evidenceEventIds": ["EVT-001", "EVT-002", "EVT-003"]
+}
+```
+
+Provider 返回 `EvolutionArtifactRef`：
+
+```ts
+{
+  uri: 'plugin-artifact://catalog/attribute-mapping/CAND-001.json',
+  hash: 'sha256:...',
+  schemaVersion: '1.0.0',
+  mediaType: 'application/json'
+}
+```
+
+要求：
+
+- 相同输入产生相同的 `buildInputsHash`。
+- Artifact 内容与哈希一一对应，发布后不可覆盖。
+- URI 不包含临时文件路径或当前 Pod 的本地状态。
+- Provider 版本和依赖版本必须进入 Candidate 与 Capability Version。
+- 对原 Candidate 的任何修改都生成新的 Candidate。
+
+## 4. 注册 Provider
+
+把 Provider 放入插件服务端模块的 `providers` 中。Xpert 会根据 `@EvolutionTargetProviderStrategy()` 元数据发现它：
+
+```ts
+@XpertServerPlugin({
+  imports: [TypeOrmModule.forFeature([EvolutionOutboxEntity])],
+  providers: [
+    AttributeMappingEvolutionProvider,
+    DomainEvolutionRuntimeService,
+    EvolutionOutboxService,
+    EvolutionEventJobHandler
+  ]
+})
+export class CatalogPluginModule {}
+```
+
+安装或刷新插件后，在 **智能体进化** 中点击 **同步目标**。同步只注册 Target 描述和基线，不创建领域专属页面。
+
+## 5. 解析并固定执行版本闭包
+
+领域 Execution 开始时，从运行时能力注册表获取 Evolution Runtime：
+
+```ts
+import { Inject, Injectable } from '@nestjs/common'
+import {
+  EvolutionRuntimeCapability,
+  type RuntimeCapabilityRegistry,
+  XPERT_RUNTIME_CAPABILITIES_TOKEN
+} from '@xpert-ai/plugin-sdk'
+
+@Injectable()
+export class DomainEvolutionRuntimeService {
+  constructor(
+    @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
+    private readonly capabilities: RuntimeCapabilityRegistry,
+    private readonly executions: DomainExecutionRepository
+  ) {}
+
+  async resolveAndPin(input: {
+    tenantId: string
+    organizationId: string
+    executionId: string
+    subjectKey: string
+  }) {
+    const existing = await this.executions.findCapabilityPlan(input.executionId)
+    if (existing) return existing
+
+    const plan = await this.capabilities.require(EvolutionRuntimeCapability).resolveExecutionPlan({
+      tenantId: input.tenantId,
+      organizationId: input.organizationId,
+      executionId: input.executionId,
+      subjectKey: input.subjectKey,
+      targetIds: ['catalog.attribute_mapping'],
+      scope: { type: 'organization', key: input.organizationId }
+    })
+
+    await this.executions.saveCapabilityPlan(input.executionId, plan)
+    return plan
+  }
+}
+```
+
+`subjectKey` 是领域稳定主体标识，例如 Case ID、订单 ID 或文档 ID。Evolution Core 只把它用于确定性分流和审计，不理解其业务语义。
+
+必须持久化完整执行计划或至少持久化以下字段：
+
+- `bundleId` 和 `bundleHash`
+- 每个 Target 的 `versionId`、Artifact Hash 和 Channel
+- `deploymentId` 和选择原因
+- Shadow Bundle 与 Shadow Assignment
+- `manualTestOverrideId`（如果存在）
+
+同一次 Execution 不得再次解析 Active Pointer，否则会混用版本，导致结果无法重放。
+
+## 6. 在运行时执行 Production、Shadow 和 Canary
+
+读取 `assignments` 决定主执行版本：
+
+- `production`：使用当前生产版本。
+- `canary`：该主体被确定性分配到 Candidate，Candidate 输出可以成为主结果。
+- `manual_test_override`：非生产管理员创建的一次性 Candidate 命中，仍按 Canary 执行并带审计标记。
+
+如果计划包含 `shadowAssignments`，用相同输入额外执行 Shadow Candidate，但必须：
+
+- 丢弃 Candidate 的业务输出和副作用。
+- 不写入生产业务表。
+- 为 Production 和 Candidate 分别记录指标。
+- 将两者关联到同一个 `executionId` 和 `subjectKey`。
+
+领域代码不能自行计算 Canary 百分比。分流由 Evolution Runtime 使用 `deploymentId + subjectKey` 统一完成。
+
+## 7. 通过 Outbox 采集 Learning Event
+
+Learning Event 必须源自已经提交的业务事实。推荐链路：
+
+```text
+业务事务
+  ├── 保存业务结果
+  └── 写入 EvolutionOutbox
+             ↓
+      Outbox Dispatcher
+             ↓
+        Managed Queue
+             ↓
+      Plugin Job Handler
+             ↓
+  ingestLearningEvent()
+```
+
+不要复用命令幂等 Outbox；Evolution Outbox 有独立的投递状态、重试和保留策略。
+
+业务事务内只写入脱敏后的事件草稿：
+
+```ts
+await evolutionOutbox.append(manager, {
+  tenantId,
+  organizationId,
+  aggregateType: 'catalog-review',
+  aggregateId: reviewId,
+  idempotencyKey: `catalog-review-${reviewId}-${revision}`,
+  payload: {
+    idempotencyKey: `catalog-review-${reviewId}-${revision}`,
+    eventType: 'prediction_reviewed',
+    schemaVersion: '1.0.0',
+    eventTime: new Date().toISOString(),
+    targetId: 'catalog.attribute_mapping',
+    decisionPoint: 'attribute_mapping_review',
+    executionId: executionPlan.executionId,
+    subjectRef: `catalog-item:${itemId}`,
+    inputFingerprint,
+    predictionSummary: 'source=Rated Output; predicted=UNKNOWN',
+    finalOutcomeSummary: 'source=Rated Output; reviewed=rated_power',
+    confidence: 0.94,
+    reasonCodes: ['human_corrected_mapping'],
+    capabilityVersionBundleId: executionPlan.bundle.bundleId,
+    bundleHash: executionPlan.bundle.bundleHash,
+    trustLevel: 'L2',
+    classification: 'internal',
+    redactionStatus: 'redacted',
+    scope: { type: 'organization', key: organizationId }
+  }
+})
+```
+
+事件必须携带准确的 `targetId`、范围、能力版本包和主体引用。`predictionSummary` 与 `finalOutcomeSummary` 应是可展示的结构化摘要，不要把任意对象直接 `JSON.stringify()` 后展示给用户。
+
+## 8. 使用 Managed Queue 投递事件
+
+插件后台任务必须使用平台 [Managed Queue](./managed-queues)，不要创建插件私有 BullMQ 或 Redis 连接。
+
+入队时带上租户、组织和稳定的 Job ID：
+
+```ts
+await managedQueue.enqueue({
+  pluginName: '@acme/plugin-catalog',
+  queueName: 'catalog.evolution',
+  jobName: 'ingest-learning-event',
+  payload: { outboxId },
+  tenantId,
+  organizationId,
+  scopeKey: organizationId,
+  jobId: `catalog-evolution-${outboxId}`,
+  attempts: 5,
+  backoffMs: { type: 'exponential', delay: 1_000 }
+})
+```
+
+声明 Processor：
+
+```ts
+import { Injectable } from '@nestjs/common'
+import { PluginJobProcessor, type ManagedQueueJob } from '@xpert-ai/plugin-sdk'
+
+@PluginJobProcessor({
+  pluginName: '@acme/plugin-catalog',
+  queueName: 'catalog.evolution',
+  jobName: 'ingest-learning-event',
+  concurrency: 4
+})
+@Injectable()
+export class EvolutionEventJobHandler {
+  constructor(private readonly outbox: EvolutionOutboxService) {}
+
+  async handle(job: ManagedQueueJob<{ outboxId: string }>) {
+    await this.outbox.deliver(job.data.outboxId)
+  }
+}
+```
+
+`deliver()` 应在同一租户和组织范围内读取 Outbox，调用 `ingestLearningEvent()`，成功后再标记已投递。重复执行必须由事件 `idempotencyKey` 安全去重。
+
+## 9. 上报运行观测
+
+主执行或 Shadow 执行完成后，上报可聚合的运行指标：
+
+```ts
+await evolution.recordRuntimeObservation({
+  tenantId,
+  organizationId,
+  observation: {
+    targetId: assignment.targetId,
+    scope: executionScope,
+    executionId,
+    bundleId: plan.bundle.bundleId,
+    deploymentId: assignment.deploymentId,
+    subjectKey: plan.subjectKey,
+    channel: assignment.channel,
+    success: true,
+    severeError: false,
+    latencyMs: 18,
+    cost: 0,
+    correctionRequired: false,
+    observedAt: new Date().toISOString()
+  }
+})
+```
+
+只有当前部署的有效观测才会推进 Shadow 或 Canary 门禁。不要把 Golden Replay、开发模拟或历史统计伪装成生产运行观测。
+
+## 10. 实现发布操作
+
+`install()`、`activate()` 和 `rollback()` 必须幂等，并返回 `ReleaseProviderReceipt`。
+
+推荐语义：
+
+- `install()`：验证 Artifact 哈希和 Schema，写入插件不可变版本存储，状态变为可加载。
+- `activate()`：确认版本已安装并允许领域运行时读取；不直接切换平台 Active Pointer。
+- `rollback()`：恢复 Provider 侧的旧版本可用状态；不删除失败版本和审计信息。
+
+生产激活由 Evolution Core 在 Provider 操作成功后使用 CAS 切换 Active Pointer。如果指针修订号或回滚版本与 Release Package 冻结值不一致，平台会拒绝激活，避免并发发布覆盖。
+
+## 11. SDK 版本兼容
+
+仓库源码中的 Evolution 契约位于 `@xpert-ai/contracts`，Provider 装饰器和运行时能力位于 `@xpert-ai/plugin-sdk`。如果你的插件使用的已发布版本尚未包含这些导出：
+
+1. 只创建一个明确命名的兼容文件，例如 `evolution-sdk.compat.ts`。
+2. 在该文件中模拟当前需要的最小类型和 token。
+3. 其他业务代码只能从该兼容文件导入，不能散落重复定义。
+4. 标注待替换的正式包版本。
+5. 升级后把兼容文件改为正式 re-export，再删除模拟类型。
+
+兼容层只能解决编译期契约滞后，不能模拟 Evolution Core 的审批、Active Pointer、运行时解析或审计权限。
+
+## 12. 安全与治理检查
+
+上线前确认：
+
+- 所有查询和唯一键都包含租户，组织级 Target 还包含组织。
+- Target 声明的 `supportedScopes` 与真实访问边界一致。
+- 机密 Learning Event 在摄取前已经脱敏。
+- Candidate Builder 只接受声明字段，拒绝未知键、路径穿越和可执行代码。
+- Artifact Hash、Schema Version 和 Provider Version 都经过校验。
+- Replay、Shadow 不产生业务副作用。
+- Agent 没有审批、发布、扩量、生产激活和主动回滚工具。
+- 所有后台任务通过 Managed Queue，并且 handler 不依赖 HTTP Request Context。
+- 前端可见文本使用 i18n；后端返回稳定错误码或可本地化消息。
+
+## 13. 测试清单
+
+至少覆盖以下测试：
+
+### Provider 契约
+
+- 相同输入产生相同 Artifact Hash 和 `buildInputsHash`。
+- 非法 Change Set、Schema、依赖和哈希被拒绝。
+- `install()`、`activate()`、`rollback()` 幂等。
+- 未声明的能力不会出现在 Target 操作中。
+
+### Runtime
+
+- 同一 Execution 只解析一次版本闭包。
+- 同一 `deploymentId + subjectKey` 的 Canary 分配稳定。
+- Shadow 输出不改变生产结果和业务表。
+- 一次性管理员测试命中只消费一次，并在计划中带审计标记。
+- 回滚后新请求使用旧稳定版本，历史执行仍引用原版本。
+
+### 事件链路
+
+- 业务事务回滚时不会留下 Outbox 事件。
+- Dispatcher 崩溃后可以重试。
+- 重复投递不会产生重复 Learning Event。
+- 跨租户或跨组织事件被拒绝。
+- 机密但未脱敏的事件被拒绝。
+
+### 发布治理
+
+- Candidate 不能直接影响 Production。
+- 未通过评测或审批不能创建 Release Package。
+- 安装版本不改变 Active Pointer。
+- Shadow、Canary 和生产门禁按冻结策略执行。
+- 严重错误触发暂停，CAS 冲突阻止激活或回滚。
+
+测试数据使用中性标识，例如 `ORG-001`、`CASE-001` 和 `AUTO-MOTOR-001`，不要把真实客户或项目名称提交到仓库。
+
+## 14. 本地部署与验收
+
+按[插件开发步骤](./development-steps)完成构建和测试后，使用平台的本地插件部署流程刷新插件：
+
+```bash
+corepack pnpm plugin:deploy:local
+```
+
+端到端验收至少证明：
+
+1. 插件 Target 能在 **智能体进化** 中同步出来。
+2. 业务复核通过 Outbox 和 Managed Queue 生成真实 Learning Event。
+3. Candidate 构建不会修改生产业务表或生产 Artifact。
+4. Golden Replay 使用相同 Snapshot 比较 Production 和 Candidate。
+5. 安装后生产 Active Pointer 保持不变。
+6. Shadow 无业务副作用，Canary 使用运行时分配结果。
+7. 只有门禁满足并完成人工治理后，新请求才解析到新的 Production Capability Version。
+
+产品侧操作流程请参阅[智能体进化](../agent/agent-evolution)。
