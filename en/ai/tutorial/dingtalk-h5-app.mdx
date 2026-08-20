@@ -1,0 +1,264 @@
+---
+title: Configure a DingTalk H5 Workbench Application
+sidebar_position: 3
+tags:
+  - DingTalk
+  - H5
+  - Digital Expert
+---
+
+This tutorial explains how to add a published Xpert Digital Expert to the DingTalk workbench.
+
+Choose the setup method that matches your environment:
+
+- **Xpert online system**: The system administrator has already configured DingTalk SSO. You create a DingTalk H5 micro-application and integration for your own Digital Expert.
+- **Local or private Xpert deployment**: The administrator configures DingTalk SSO first, and each Digital Expert creator then configures their own DingTalk H5 micro-application.
+
+<Note>
+This tutorial configures a DingTalk H5 workbench application. To send and receive messages through a bot in a DingTalk group, see [DingTalk bot integration](/en/ai/plugin/integration/dingtalk-integration).
+</Note>
+
+## Method 1: Use an Xpert online system with DingTalk SSO
+
+Use this method when the Xpert administrator has already configured DingTalk SSO for the online system.
+
+DingTalk SSO is managed centrally by the administrator. You still need to create your own DingTalk H5 micro-application and create a DingTalk integration for it in Xpert.
+
+<Note>
+The DingTalk SSO integration and H5 micro-application integration are separate configurations. For the H5 integration, use your micro-application's Client ID, Client Secret, and the Corp ID of the enterprise that owns the micro-application.
+</Note>
+
+### Before you start: Ask the administrator to confirm the SSO callback URL
+
+The DingTalk SSO callback URL is configured in the SSO application managed by the administrator. Digital Expert creators usually cannot add this URL themselves. Do not add this callback URL to your own H5 micro-application.
+
+1. Ask the Xpert administrator for the complete SSO callback URL, for example:
+
+```text
+https://<Xpert online domain>/api/dingtalk-identity/callback
+```
+
+2. Ask the administrator to add this URL to the login callback URL list of the DingTalk SSO application.
+3. Wait for the administrator to confirm the change before continuing.
+
+<Warning>
+If the callback uses a temporary domain, the administrator must add the new URL whenever the domain changes. Use a fixed HTTPS domain for production.
+</Warning>
+
+### Step 1: Create your DingTalk H5 micro-application
+
+1. Sign in to the [DingTalk Open Platform](https://open.dingtalk.com/).
+2. Create an internal enterprise application.
+3. Enable the H5 micro-application or web application capability.
+4. Record the application's **Client ID (AppKey)** and **Client Secret (AppSecret)**.
+5. Copy the **Corp ID** of the enterprise that owns the micro-application from DingTalk enterprise administration.
+6. Set the application's visibility scope.
+
+### Step 2: Create your DingTalk integration in Xpert
+
+1. Sign in to the Xpert online system.
+2. Open **System Integration** for the current organization.
+3. Create a DingTalk integration.
+4. Enter the Client ID, Client Secret, and Corp ID of your H5 micro-application.
+5. Save the integration and confirm that its status is healthy.
+
+This integration belongs to your H5 micro-application. It is not the DingTalk SSO integration configured by the administrator.
+
+### Step 3: Publish the Digital Expert
+
+1. Open the Digital Expert that you want to embed in DingTalk.
+2. Complete its model, knowledge base, tools, and welcome message configuration.
+3. Publish it and confirm that it can respond in Xpert.
+
+### Step 4: Enable the DingTalk workbench entry
+
+1. Open the Digital Expert's **Chat App** settings.
+2. Enable **DingTalk workbench app**.
+3. Select the DingTalk integration that you created in Step 2.
+4. Save the settings.
+5. Publish the Digital Expert again so the application settings take effect.
+
+### Step 5: Copy the DingTalk H5 URL
+
+After publishing, copy the generated DingTalk workbench URL, for example:
+
+```text
+https://<Xpert online domain>/x-chatkit/h5/dingtalk/<Digital Expert identifier>
+```
+
+### Step 6: Configure the H5 micro-application home page
+
+1. Return to the internal DingTalk application that you created.
+2. Open its H5 micro-application or web application settings.
+3. Enter the URL from the previous step as the application home page URL.
+4. Add the Xpert online domain to the application's security domain or JSAPI security domain.
+5. Confirm the application visibility scope.
+6. Publish the application version.
+7. Add the application to the enterprise workbench.
+
+### Step 7: Verify the application in DingTalk
+
+1. Sign in to DingTalk with an employee account included in the visibility scope.
+2. Open the application from the workbench.
+3. Confirm that the expected Digital Expert is displayed.
+4. Send a message in the input box.
+5. Confirm that the Digital Expert responds.
+
+On first use, follow the page instructions if you are asked to sign in or bind an account. After binding, you can open the Digital Expert directly from the DingTalk workbench.
+
+## Method 2: Use a local or private Xpert deployment
+
+Use this method when Xpert is deployed on your own server. Complete the following steps in order.
+
+### Step 1: Prepare a public HTTPS domain
+
+Prepare an HTTPS domain that the DingTalk client can access, for example:
+
+```text
+https://xpert.example.com
+```
+
+After deployment, confirm that the address opens successfully in a regular browser.
+
+### Step 2: Configure the public Xpert URLs
+
+Set the deployment environment variables to the public domain:
+
+```dotenv
+CLIENT_BASE_URL=https://xpert.example.com
+API_BASE_URL=https://xpert.example.com
+WEBAPP_API_BASE_URL=same-origin
+VITE_CHATKIT_FRAME_URL=/chatkit
+```
+
+Redeploy or restart the Xpert services after applying the configuration.
+
+<Note>
+A production deployment does not require changes to the frontend `project.json` or adding the production domain to the development server's `allowedHosts`.
+</Note>
+
+### Step 3: Install the DingTalk plugins
+
+1. Sign in to Xpert as an administrator.
+2. Open plugin management.
+3. Install and enable the DingTalk plugin.
+4. Install and enable the DingTalk SSO plugin.
+5. Restart the Xpert services as required by your deployment and confirm that both plugins are active.
+
+### Step 4: Have the administrator create a DingTalk SSO application
+
+1. Sign in to the [DingTalk Open Platform](https://open.dingtalk.com/).
+2. Create an internal enterprise application.
+3. Record the application's **Client ID (AppKey)** and **Client Secret (AppSecret)**.
+4. Grant the permissions required for sign-in and user identity.
+5. Set the application visibility scope.
+
+### Step 5: Have the administrator configure DingTalk SSO in Xpert
+
+1. Open **Xpert Settings > System Integration**.
+2. Create a DingTalk login or DingTalk SSO integration.
+3. Enter the Client ID and Client Secret from the previous step.
+4. Save the integration.
+5. Copy the callback URL displayed by Xpert. If you need to enter it manually, use:
+
+```text
+https://xpert.example.com/api/dingtalk-identity/callback
+```
+
+6. Return to the DingTalk Open Platform and add this URL as a login callback URL for the application.
+
+Configure only one valid DingTalk SSO integration for each Xpert tenant.
+
+If the Xpert administrator cannot manage the DingTalk SSO application, send the complete callback URL to that application's administrator and ask them to add it.
+
+<Warning>
+If the deployment's public URL changes, update the callback URL in the DingTalk SSO application. Use a fixed HTTPS domain for production.
+</Warning>
+
+### Step 6: Have the Digital Expert creator create an H5 micro-application
+
+1. Sign in to the DingTalk Open Platform.
+2. Create an internal enterprise application.
+3. Enable the H5 micro-application or web application capability.
+4. Record the H5 micro-application's Client ID and Client Secret.
+5. Copy the Corp ID of the enterprise that owns the H5 micro-application from DingTalk enterprise administration.
+6. Set the H5 micro-application's visibility scope.
+
+### Step 7: Have the Digital Expert creator configure a DingTalk integration
+
+1. Open the Xpert organization that will use the application.
+2. Open **System Integration**.
+3. Create a DingTalk integration.
+4. Enter the Client ID, Client Secret, and Corp ID of your H5 micro-application.
+5. Save the integration and confirm that its status is healthy.
+
+The H5 micro-application integration and the administrator's SSO integration are separate configurations. You do not need to compare their Corp IDs.
+
+### Step 8: Publish the Digital Expert
+
+1. Create or open the Digital Expert that you want to embed in DingTalk.
+2. Complete its configuration and publish it once.
+3. Open the Digital Expert's **Chat App** settings.
+4. Enable **DingTalk workbench app**.
+5. Select the DingTalk integration created in Step 7.
+6. Save the settings and publish the Digital Expert again.
+
+### Step 9: Configure the H5 micro-application home page
+
+1. Copy the DingTalk H5 URL generated after publishing the Digital Expert, for example:
+
+```text
+https://xpert.example.com/x-chatkit/h5/dingtalk/<Digital Expert identifier>
+```
+
+2. Return to your H5 micro-application settings in the DingTalk Open Platform.
+3. Enter the URL as the application home page URL.
+4. Add `xpert.example.com` to the application's security domain or JSAPI security domain.
+5. Confirm the application visibility scope.
+6. Publish the application version.
+7. Add the application to the enterprise workbench.
+
+### Step 10: Complete the first account binding
+
+1. Sign in to DingTalk with an employee account included in the visibility scope.
+2. Open the application from the workbench.
+3. If the page asks you to sign in or bind an account, follow the instructions once.
+4. After binding, close the application and reopen it from the workbench.
+
+### Step 11: Verify the complete setup
+
+Confirm each of the following:
+
+- The application is visible and opens from the DingTalk workbench.
+- The page displays the Digital Expert that you published.
+- The input box accepts both English and Chinese text normally.
+- The Digital Expert responds after you send a message.
+- Views opened by the Digital Expert load successfully.
+
+## Troubleshooting
+
+### The page does not open in DingTalk
+
+Confirm that the application home page uses HTTPS, the domain is publicly accessible, and the domain has been added to the DingTalk application's security domain.
+
+### The application is missing from the workbench
+
+Confirm that the application version has been published, the application has been added to the workbench, and the current employee is included in its visibility scope.
+
+### The wrong Digital Expert opens
+
+Copy the DingTalk H5 URL generated for the intended Digital Expert again, and confirm that the DingTalk application home page is not configured with another Digital Expert's URL.
+
+### The page opens but cannot send messages
+
+Confirm that the Digital Expert is published, the DingTalk workbench app is enabled, and the correct DingTalk integration is selected. First-time users must also complete account binding.
+
+### A Digital Expert view remains on the loading screen
+
+Confirm that `/chatkit` is accessible in the deployment and that the server uses the ChatKit package required by the current Xpert version.
+
+## References
+
+- [DingTalk tutorial center](https://open.dingtalk.com/tutorial/)
+- [Create an internal enterprise application](https://open.dingtalk.com/document/org/configure-orgapp)
+- [Get user profile information](https://open.dingtalk.com/document/orgapp/tutorial-obtaining-user-personal-information)
