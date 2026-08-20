@@ -463,6 +463,7 @@
                   {
                     "group": "Integrations",
                     "pages": [
+                      "en/ai/tutorial/dingtalk-h5-app",
                       "en/ai/tutorial/integrate-with-mcp-dify",
                       "en/ai/tutorial/wechat-work-integration"
                     ]
@@ -1317,6 +1318,7 @@
                   {
                     "group": "集成",
                     "pages": [
+                      "zh-Hans/ai/tutorial/dingtalk-h5-app",
                       "zh-Hans/ai/tutorial/integrate-with-mcp-dify"
                     ]
                   },
