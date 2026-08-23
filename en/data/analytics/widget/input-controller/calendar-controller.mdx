@@ -1,0 +1,21 @@
+---
+title: Calendar Controller
+sidebar_position: 1
+---
+
+Select a **Calendar** type dimension from the "**Dimension**" in the main settings box of the input controller property settings interface, and the input controller will automatically use a time component to display input control.
+The system will automatically display different time component types based on the calendar dimension's time granularity property (or manually select time granularity in property settings).
+Common time granularities include: year, quarter, month, week, day, etc.
+
+After selecting time, the component will convert the time into calendar dimension member key values according to the date formatting format configured for the calendar dimension.
+
+Other calendar-related properties:
+
+| Name | Description |
+| ---------------- | -------------------------------------------------------------- |
+| Type | Type of time selection, either **Single Value** or **Range** |
+| Time Granularity | Default time granularity of the current time component. The system will find the formatting string at the corresponding time granularity level on the dimension based on this time granularity, and format the currently selected time into the corresponding string value. For calendar settings of models, refer to [Calendar Dimension](../../../../models/mdx-modeling/calendar-dimension) or [Creating Semantic Enhancement for Third-Party Multidimensional Models](../../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube) |
+| Time Granularity Sequence | In addition to the default time granularity, you can set other optional time granularities, i.e., this property is a time granularity sequence |
+| Time Format | Format the current time into dimension members. If not set, the system will find the time format from the corresponding level of the dimension, otherwise use the default formatting format |
+| Default Date Function | Default displayed date function. The function will calculate the corresponding date based on the current time settings, which determines the calendar dimension value formatted by time granularity |
+| Default Date | After selecting the default date function, this property will display the corresponding function name. If you want to specify a specific fixed date, you can fill in a date in the format `yyyy-MM-dd`, such as: `2022-06-06` |

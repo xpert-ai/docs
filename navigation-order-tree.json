@@ -264,6 +264,35 @@
           ]
         },
         {
+          "slug": "analytics",
+          "groups": [
+            {
+              "slug": "semantic-model",
+              "pages": []
+            },
+            {
+              "slug": "indicator-management",
+              "pages": []
+            },
+            {
+              "slug": "story-dashboard",
+              "pages": []
+            },
+            {
+              "slug": "widget",
+              "pages": []
+            },
+            {
+              "slug": "website-features",
+              "pages": []
+            },
+            {
+              "slug": "tutorial",
+              "pages": []
+            }
+          ]
+        },
+        {
           "slug": "integrations",
           "groups": [
             {
@@ -340,35 +369,10 @@
               "pages": []
             },
             {
-              "slug": "data-and-analytics",
+              "slug": "analytics",
               "pages": []
             }
           ]
-        }
-      ]
-    },
-    {
-      "slug": "bi",
-      "tabs": [
-        {
-          "slug": "semantic-model",
-          "groups": []
-        },
-        {
-          "slug": "indicator-management",
-          "groups": []
-        },
-        {
-          "slug": "story-dashboard",
-          "groups": []
-        },
-        {
-          "slug": "widget",
-          "groups": []
-        },
-        {
-          "slug": "website-features",
-          "groups": []
         }
       ]
     },

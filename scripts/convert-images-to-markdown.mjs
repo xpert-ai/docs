@@ -13,7 +13,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const TARGET_DIR = "en/bi";
+const TARGET_DIR = "en/data/analytics";
 
 // 支持的 Markdown 文件扩展名
 const MARKDOWN_EXTS = new Set([".md", ".mdx"]);
@@ -266,4 +266,3 @@ main().catch((error) => {
   console.error("❌ 脚本执行失败:", error);
   process.exit(1);
 });
-

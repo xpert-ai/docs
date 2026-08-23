@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * 将 en/bi/widget 目录下的所有中文内容翻译成英文
+ * 将 en/data/analytics/widget 目录下的所有中文内容翻译成英文
  * 
  * 功能：
- * 1. 递归遍历 en/bi/widget 目录下的所有 MDX 文件
+ * 1. 递归遍历 en/data/analytics/widget 目录下的所有 MDX 文件
  * 2. 识别并提取中文内容（保留 frontmatter 中的 title，但会翻译 body）
  * 3. 使用翻译 API 将中文翻译成英文
  * 4. 替换原文件中的中文内容
@@ -22,7 +22,7 @@ import path from "node:path";
 
 const argv = process.argv.slice(2);
 const isDryRun = argv.includes("--dry-run") || !argv.includes("--write");
-const TARGET_DIR = "en/bi/widget";
+const TARGET_DIR = "en/data/analytics/widget";
 
 // 支持的 Markdown 文件扩展名
 const MARKDOWN_EXTS = new Set([".md", ".mdx"]);
@@ -255,4 +255,3 @@ main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
-

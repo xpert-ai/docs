@@ -176,48 +176,46 @@
                       "en/ai/agent/ai-assistant/configure-ai-assistant",
                       "en/ai/agent/ai-assistant/index",
                       "en/ai/agent/ai-assistant/settings",
-                      "en/ai/agent/ai-assistant/command",
-                      "en/ai/agent/ai-assistant/roles",
-                      "en/ai/agent/ai-assistant/configure-ai-assistant"
-                    ]
-                  },
-                  {
-                    "group": "Toolset",
-                    "pages": [
-                      "en/ai/agent/toolset/built-in-toolset",
-                      "en/ai/agent/toolset/custom-toolset",
-                      "en/ai/agent/toolset/scheduled-tasks",
-                      "en/ai/agent/toolset/feishu",
-                      "en/ai/agent/toolset/dingtalk",
-                      "en/ai/agent/toolset/planning-tasks",
-                      "en/ai/agent/toolset/coding-expert",
-                      "en/ai/agent/toolset/bi-toolset/bi-toolset",
-                      "en/ai/agent/toolset/bi-toolset/modeling",
-                      "en/ai/agent/toolset/bi-toolset/indicators",
-                      "en/ai/agent/toolset/bi-toolset/dashboard",
-                      "en/ai/agent/toolset/bi-toolset/data-governance",
-                      "en/ai/agent/toolset/chatbi-toolset/app",
-                      "en/ai/agent/toolset/chatbi-toolset/bot",
-                      "en/ai/agent/toolset/chatbi-toolset/models",
-                      "en/ai/agent/toolset/chatbi-toolset/webpage",
-                      "en/ai/agent/toolset/chatbi-toolset/chatbi",
-                      "en/ai/agent/toolset/mcp-tools/index",
-                      "en/ai/agent/toolset/mcp-tools/crawl4ai",
-                      "en/ai/agent/toolset/virtual-environment/bash-command-execution",
-                      "en/ai/agent/toolset/virtual-environment/file-tools",
-                      "en/ai/agent/toolset/virtual-environment/code-project",
-                      "en/ai/agent/toolset/virtual-environment/python-execution",
-                      "en/ai/agent/toolset/virtual-environment/browser-use-tools",
-                      "en/ai/agent/toolset/virtual-environment/browser-tools",
-                      "en/ai/agent/toolset/virtual-environment/computer-tools",
-                      "en/ai/agent/toolset/virtual-environment/git-tools",
-                      "en/ai/agent/toolset/virtual-environment/slideshow-tools"
+                      "en/ai/agent/ai-assistant/roles"
                     ]
                   },
                   {
                     "group": "Artifacts",
                     "pages": [
                       "en/ai/agent/artifacts/index"
+                    ]
+                  },
+                  {
+                    "group": "Toolset",
+                    "pages": [
+                      "en/ai/agent/toolset/mcp-tools/index",
+                      "en/ai/agent/toolset/virtual-environment/bash-command-execution",
+                      "en/ai/agent/toolset/virtual-environment/file-tools",
+                      "en/ai/agent/toolset/chatbi-toolset/app",
+                      "en/ai/agent/toolset/built-in-toolset",
+                      "en/ai/agent/toolset/virtual-environment/code-project",
+                      "en/ai/agent/toolset/mcp-tools/crawl4ai",
+                      "en/ai/agent/toolset/chatbi-toolset/bot",
+                      "en/ai/agent/toolset/chatbi-toolset/models",
+                      "en/ai/agent/toolset/bi-toolset/bi-toolset",
+                      "en/ai/agent/toolset/bi-toolset/modeling",
+                      "en/ai/agent/toolset/custom-toolset",
+                      "en/ai/agent/toolset/chatbi-toolset/webpage",
+                      "en/ai/agent/toolset/bi-toolset/indicators",
+                      "en/ai/agent/toolset/virtual-environment/python-execution",
+                      "en/ai/agent/toolset/chatbi-toolset/chatbi",
+                      "en/ai/agent/toolset/bi-toolset/dashboard",
+                      "en/ai/agent/toolset/scheduled-tasks",
+                      "en/ai/agent/toolset/bi-toolset/data-governance",
+                      "en/ai/agent/toolset/feishu",
+                      "en/ai/agent/toolset/virtual-environment/browser-use-tools",
+                      "en/ai/agent/toolset/dingtalk",
+                      "en/ai/agent/toolset/planning-tasks",
+                      "en/ai/agent/toolset/virtual-environment/browser-tools",
+                      "en/ai/agent/toolset/virtual-environment/computer-tools",
+                      "en/ai/agent/toolset/coding-expert",
+                      "en/ai/agent/toolset/virtual-environment/git-tools",
+                      "en/ai/agent/toolset/virtual-environment/slideshow-tools"
                     ]
                   }
                 ]
@@ -251,8 +249,7 @@
                       "en/ai/skill/workspace",
                       "en/ai/skill/use-in-agent",
                       "en/ai/skill/administration",
-                      "en/ai/skill/skill-package-format",
-                      "en/ai/agent/ai-assistant/roles"
+                      "en/ai/skill/skill-package-format"
                     ]
                   }
                 ]
@@ -266,9 +263,9 @@
                       "en/ai/knowledge-base/index",
                       "en/ai/knowledge-base/maintain-documents",
                       "en/ai/knowledge-base/intelligent-filtering",
+                      "en/ai/knowledge-base/api",
                       "en/ai/knowledge-base/knowledge-graph-graphrag",
                       "en/ai/knowledge-base/pdf-processing-and-preview",
-                      "en/ai/knowledge-base/api",
                       "en/ai/knowledge-base/connect-external-knowledge-base",
                       "en/ai/knowledge-base/recall-test",
                       "en/ai/knowledge-base/ways-to-use-knowledge-base",
@@ -358,11 +355,7 @@
                   {
                     "group": "Default",
                     "pages": [
-                      "en/ai/plugin/index",
                       "en/ai/plugin/overview",
-                      "en/ai/plugin/concepts",
-                      "en/ai/plugin/develop",
-                      "en/ai/plugin/assistant-workspace-catalogs",
                       "en/ai/plugin/mcp-tools-and-apps",
                       "en/ai/plugin/remote-component",
                       "en/ai/plugin/managed-connections",
@@ -370,9 +363,41 @@
                       "en/ai/plugin/agent-evolution",
                       "en/ai/plugin/collaboration",
                       "en/ai/plugin/sandbox-jobs",
+                      "en/ai/plugin/index",
+                      "en/ai/plugin/concepts",
+                      "en/ai/plugin/assistant-workspace-catalogs",
+                      "en/ai/plugin/develop",
                       "en/ai/plugin/install",
                       "en/ai/plugin/permissions",
                       "en/ai/plugin/schema"
+                    ]
+                  },
+                  {
+                    "group": "Trigger",
+                    "pages": [
+                      "en/ai/plugin/trigger/index",
+                      "en/ai/plugin/trigger/schedule-trigger",
+                      "en/ai/plugin/trigger/lark-trigger",
+                      "en/ai/plugin/trigger/wecom-trigger",
+                      "en/ai/plugin/trigger/dingtalk-trigger"
+                    ]
+                  },
+                  {
+                    "group": "Integration",
+                    "pages": [
+                      "en/ai/plugin/integration/index",
+                      "en/ai/plugin/integration/lark-integration",
+                      "en/ai/plugin/integration/wecom-integration",
+                      "en/ai/plugin/integration/dingtalk-integration"
+                    ]
+                  },
+                  {
+                    "group": "Feishu Document Example",
+                    "pages": [
+                      "en/ai/plugin/feishu-document-example/index",
+                      "en/ai/plugin/feishu-document-example/integration",
+                      "en/ai/plugin/feishu-document-example/source",
+                      "en/ai/plugin/feishu-document-example/transformer"
                     ]
                   },
                   {
@@ -392,15 +417,6 @@
                       "en/ai/plugin/integration/lark-integration",
                       "en/ai/plugin/integration/wecom-integration",
                       "en/ai/plugin/integration/dingtalk-integration"
-                    ]
-                  },
-                  {
-                    "group": "Feishu Document Example",
-                    "pages": [
-                      "en/ai/plugin/feishu-document-example/index",
-                      "en/ai/plugin/feishu-document-example/integration",
-                      "en/ai/plugin/feishu-document-example/source",
-                      "en/ai/plugin/feishu-document-example/transformer"
                     ]
                   }
                 ]
@@ -425,6 +441,12 @@
                     ]
                   },
                   {
+                    "group": "Sdk",
+                    "pages": [
+                      "en/ai/chatkit/sdk/integrate-xpertai-api"
+                    ]
+                  },
+                  {
                     "group": "SDK",
                     "pages": [
                       "en/ai/chatkit/sdk/integrate-xpertai-api"
@@ -446,6 +468,22 @@
               {
                 "tab": "Tutorial",
                 "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/tutorial/workflow-and-agent",
+                      "en/ai/tutorial/develop-custom-agentic-app",
+                      "en/ai/tutorial/wechat-work-integration",
+                      "en/ai/tutorial/dingtalk-h5-app",
+                      "en/ai/tutorial/integrate-with-mcp-dify",
+                      "en/ai/tutorial/agentic-bi-end-to-end-analysis",
+                      "en/ai/tutorial/build-agentic-chatbi-from-scratch",
+                      "en/ai/tutorial/echarts-mcp-app",
+                      "en/ai/tutorial/project-group-single-vs-multi-agent",
+                      "en/ai/tutorial/chatkit-browser-extension",
+                      "en/ai/tutorial/tutorial"
+                    ]
+                  },
                   {
                     "group": "Agentic Apps",
                     "pages": [
@@ -568,6 +606,162 @@
                 ]
               },
               {
+                "tab": "Data and Analytics",
+                "groups": [
+                  {
+                    "group": "Semantic Model",
+                    "pages": [
+                      "en/data/analytics/semantic-model/multidimensional-model-introduction",
+                      "en/data/analytics/semantic-model/manage-semantic-model",
+                      "en/data/analytics/semantic-model/semantic-modeling-workspace",
+                      "en/data/analytics/semantic-model/query-lab",
+                      "en/data/analytics/semantic-model/dimension-designer/dimension-designer",
+                      "en/data/analytics/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer",
+                      "en/data/analytics/semantic-model/dimension-member-retrieval",
+                      "en/data/analytics/semantic-model/ai-assistant",
+                      "en/data/analytics/semantic-model/query-log",
+                      "en/data/analytics/semantic-model/sql-multidimensional-model",
+                      "en/data/analytics/semantic-model/mdx-multidimensional-model"
+                    ]
+                  },
+                  {
+                    "group": "Indicator Management",
+                    "pages": [
+                      "en/data/analytics/indicator-management/indicator-registration",
+                      "en/data/analytics/indicator-management/indicator-business-domain",
+                      "en/data/analytics/indicator-management/indicator-certification",
+                      "en/data/analytics/indicator-management/derived-indicator",
+                      "en/data/analytics/indicator-management/indicator-management",
+                      "en/data/analytics/indicator-management/qualification-condition",
+                      "en/data/analytics/indicator-management/indicator-market",
+                      "en/data/analytics/indicator-management/indicator-application",
+                      "en/data/analytics/indicator-management/ai-assistant",
+                      "en/data/analytics/indicator-management/indicator-measure"
+                    ]
+                  },
+                  {
+                    "group": "Story Dashboard",
+                    "pages": [
+                      "en/data/analytics/story-dashboard/projects",
+                      "en/data/analytics/story-dashboard/create-story",
+                      "en/data/analytics/story-dashboard/workspace",
+                      "en/data/analytics/story-dashboard/preferences",
+                      "en/data/analytics/story-dashboard/story-details",
+                      "en/data/analytics/story-dashboard/page-layout",
+                      "en/data/analytics/story-dashboard/device",
+                      "en/data/analytics/story-dashboard/mobile",
+                      "en/data/analytics/story-dashboard/sort-ranking",
+                      "en/data/analytics/story-dashboard/advanced-styles",
+                      "en/data/analytics/story-dashboard/dimension-selector",
+                      "en/data/analytics/story-dashboard/calculated-measures",
+                      "en/data/analytics/story-dashboard/parameters",
+                      "en/data/analytics/story-dashboard/slicer",
+                      "en/data/analytics/story-dashboard/combined-slicer",
+                      "en/data/analytics/story-dashboard/advanced-slicer",
+                      "en/data/analytics/story-dashboard/explorer",
+                      "en/data/analytics/story-dashboard/share",
+                      "en/data/analytics/story-dashboard/story-templates",
+                      "en/data/analytics/story-dashboard/large-screen",
+                      "en/data/analytics/story-dashboard/execution-explanation",
+                      "en/data/analytics/story-dashboard/access-authorization",
+                      "en/data/analytics/story-dashboard/ai-assistant",
+                      "en/data/analytics/story-dashboard/association-analysis"
+                    ]
+                  },
+                  {
+                    "group": "Widget",
+                    "pages": [
+                      "en/data/analytics/widget/input-controller/calendar-controller",
+                      "en/data/analytics/widget/input-controller/parameter-controller",
+                      "en/data/analytics/widget/filter-bar/tree-selector",
+                      "en/data/analytics/widget/analysis-table/flat-table",
+                      "en/data/analytics/widget/analysis-card/analysis-card",
+                      "en/data/analytics/widget/filter-bar/member-selector",
+                      "en/data/analytics/widget/analysis-table/pivot-table",
+                      "en/data/analytics/widget/analysis-card/bar-chart",
+                      "en/data/analytics/widget/filter-bar/dropdown-selector",
+                      "en/data/analytics/widget/filter-bar/filter-bar",
+                      "en/data/analytics/widget/analysis-card/line-chart",
+                      "en/data/analytics/widget/analysis-card/pie-chart",
+                      "en/data/analytics/widget/filter-bar/calendar-selector",
+                      "en/data/analytics/widget/analysis-card/scatter-chart",
+                      "en/data/analytics/widget/key-indicator",
+                      "en/data/analytics/widget/slider-widget",
+                      "en/data/analytics/widget/tabs",
+                      "en/data/analytics/widget/analysis-card/heatmap",
+                      "en/data/analytics/widget/analysis-card/tree-chart",
+                      "en/data/analytics/widget/analysis-card/treemap",
+                      "en/data/analytics/widget/iframe",
+                      "en/data/analytics/widget/analysis-card/sankey-diagram",
+                      "en/data/analytics/widget/analysis-card/sunburst-chart",
+                      "en/data/analytics/widget/document",
+                      "en/data/analytics/widget/analysis-card/river-chart",
+                      "en/data/analytics/widget/text",
+                      "en/data/analytics/widget/analysis-card/funnel-chart",
+                      "en/data/analytics/widget/image",
+                      "en/data/analytics/widget/analysis-card/box-whisker-chart",
+                      "en/data/analytics/widget/video",
+                      "en/data/analytics/widget/analysis-card/3d-bar-chart",
+                      "en/data/analytics/widget/indicator-card",
+                      "en/data/analytics/widget/analysis-card/geographic-map",
+                      "en/data/analytics/widget/indicator-table",
+                      "en/data/analytics/widget/analysis-card/custom-chart"
+                    ]
+                  },
+                  {
+                    "group": "Website Features",
+                    "pages": [
+                      "en/data/analytics/website-features/data-source/aws-redshift",
+                      "en/data/analytics/website-features/data-source/clickhouse",
+                      "en/data/analytics/website-features/data-source/dameng",
+                      "en/data/analytics/website-features/data-source/doris",
+                      "en/data/analytics/website-features/data-source/hive",
+                      "en/data/analytics/website-features/data-source/kingbasees",
+                      "en/data/analytics/website-features/data-source/kyligence",
+                      "en/data/analytics/website-features/data-source/mariadb",
+                      "en/data/analytics/website-features/data-source/mysql",
+                      "en/data/analytics/website-features/data-source/opengauss",
+                      "en/data/analytics/website-features/data-source/postgres",
+                      "en/data/analytics/website-features/data-source/presto",
+                      "en/data/analytics/website-features/data-source/sap-bw",
+                      "en/data/analytics/website-features/data-source/sap-hana",
+                      "en/data/analytics/website-features/data-source/starrocks",
+                      "en/data/analytics/website-features/data-source/trino",
+                      "en/data/analytics/website-features/enterprise-organization/ai-assistant",
+                      "en/data/analytics/website-features/enterprise-organization/authentication",
+                      "en/data/analytics/website-features/enterprise-organization/business-domain",
+                      "en/data/analytics/website-features/enterprise-organization/data-source-management",
+                      "en/data/analytics/website-features/enterprise-organization/system-integration",
+                      "en/data/analytics/website-features/enterprise-tenant/account-information",
+                      "en/data/analytics/website-features/enterprise-tenant/company-organization",
+                      "en/data/analytics/website-features/enterprise-tenant/custom-smtp",
+                      "en/data/analytics/website-features/enterprise-tenant/function-module",
+                      "en/data/analytics/website-features/enterprise-tenant/role-permission",
+                      "en/data/analytics/website-features/enterprise-tenant/tenant-configuration",
+                      "en/data/analytics/website-features/enterprise-tenant/user-management",
+                      "en/data/analytics/website-features/proxy/desktop-proxy",
+                      "en/data/analytics/website-features/proxy/server-proxy",
+                      "en/data/analytics/website-features/single-sign-on/feishu-login",
+                      "en/data/analytics/website-features/single-sign-on/keycloak-login"
+                    ]
+                  },
+                  {
+                    "group": "Tutorial",
+                    "pages": [
+                      "en/data/analytics/tutorial/sap/sap-bpc",
+                      "en/data/analytics/tutorial/mdx/mdx-introduction",
+                      "en/data/analytics/tutorial/sap/sap-bpc-consolidated-reports",
+                      "en/data/analytics/tutorial/sap/how-to-analyze-sap-bw-data-models",
+                      "en/data/analytics/tutorial/sap/sap-bw-calendar-dimension",
+                      "en/data/analytics/tutorial/mdx/mdx",
+                      "en/data/analytics/tutorial/moving-average",
+                      "en/data/analytics/tutorial/analyze-with-wasm-database",
+                      "en/data/analytics/tutorial/member-intrinsic-properties"
+                    ]
+                  }
+                ]
+              },
+              {
                 "tab": "Integrations",
                 "groups": [
                   {
@@ -625,252 +819,6 @@
                     "group": "Sales and Service",
                     "pages": [
                       "en/data/apps/sales-and-service/sales-ontology"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "product": "BI",
-            "tabs": [
-              {
-                "tab": "Semantic Model",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/bi/semantic-model/multidimensional-model-introduction",
-                      "en/bi/semantic-model/manage-semantic-model",
-                      "en/bi/semantic-model/semantic-modeling-workspace",
-                      "en/bi/semantic-model/query-lab",
-                      "en/bi/semantic-model/dimension-member-retrieval",
-                      "en/bi/semantic-model/ai-assistant",
-                      "en/bi/semantic-model/query-log",
-                      "en/bi/semantic-model/sql-multidimensional-model",
-                      "en/bi/semantic-model/mdx-multidimensional-model"
-                    ]
-                  },
-                  {
-                    "group": "Dimension Designer",
-                    "pages": [
-                      "en/bi/semantic-model/dimension-designer/dimension-designer"
-                    ]
-                  },
-                  {
-                    "group": "Multidimensional Dataset Designer",
-                    "pages": [
-                      "en/bi/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Indicator Management",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/bi/indicator-management/indicator-registration",
-                      "en/bi/indicator-management/indicator-business-domain",
-                      "en/bi/indicator-management/indicator-certification",
-                      "en/bi/indicator-management/derived-indicator",
-                      "en/bi/indicator-management/indicator-management",
-                      "en/bi/indicator-management/qualification-condition",
-                      "en/bi/indicator-management/indicator-market",
-                      "en/bi/indicator-management/indicator-application",
-                      "en/bi/indicator-management/ai-assistant",
-                      "en/bi/indicator-management/indicator-measure"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Story Dashboard",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/bi/story-dashboard/projects",
-                      "en/bi/story-dashboard/create-story",
-                      "en/bi/story-dashboard/workspace",
-                      "en/bi/story-dashboard/preferences",
-                      "en/bi/story-dashboard/story-details",
-                      "en/bi/story-dashboard/page-layout",
-                      "en/bi/story-dashboard/device",
-                      "en/bi/story-dashboard/mobile",
-                      "en/bi/story-dashboard/sort-ranking",
-                      "en/bi/story-dashboard/advanced-styles",
-                      "en/bi/story-dashboard/dimension-selector",
-                      "en/bi/story-dashboard/calculated-measures",
-                      "en/bi/story-dashboard/parameters",
-                      "en/bi/story-dashboard/slicer",
-                      "en/bi/story-dashboard/combined-slicer",
-                      "en/bi/story-dashboard/advanced-slicer",
-                      "en/bi/story-dashboard/explorer",
-                      "en/bi/story-dashboard/share",
-                      "en/bi/story-dashboard/story-templates",
-                      "en/bi/story-dashboard/large-screen",
-                      "en/bi/story-dashboard/execution-explanation",
-                      "en/bi/story-dashboard/access-authorization",
-                      "en/bi/story-dashboard/ai-assistant",
-                      "en/bi/story-dashboard/association-analysis"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Widget",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/bi/widget/key-indicator",
-                      "en/bi/widget/slider-widget",
-                      "en/bi/widget/tabs",
-                      "en/bi/widget/iframe",
-                      "en/bi/widget/document",
-                      "en/bi/widget/text",
-                      "en/bi/widget/image",
-                      "en/bi/widget/video",
-                      "en/bi/widget/indicator-card",
-                      "en/bi/widget/indicator-table"
-                    ]
-                  },
-                  {
-                    "group": "Analysis Card",
-                    "pages": [
-                      "en/bi/widget/analysis-card/analysis-card",
-                      "en/bi/widget/analysis-card/bar-chart",
-                      "en/bi/widget/analysis-card/line-chart",
-                      "en/bi/widget/analysis-card/pie-chart",
-                      "en/bi/widget/analysis-card/scatter-chart",
-                      "en/bi/widget/analysis-card/heatmap",
-                      "en/bi/widget/analysis-card/tree-chart",
-                      "en/bi/widget/analysis-card/treemap",
-                      "en/bi/widget/analysis-card/sankey-diagram",
-                      "en/bi/widget/analysis-card/sunburst-chart",
-                      "en/bi/widget/analysis-card/river-chart",
-                      "en/bi/widget/analysis-card/funnel-chart",
-                      "en/bi/widget/analysis-card/box-whisker-chart",
-                      "en/bi/widget/analysis-card/3d-bar-chart",
-                      "en/bi/widget/analysis-card/geographic-map",
-                      "en/bi/widget/analysis-card/custom-chart"
-                    ]
-                  },
-                  {
-                    "group": "Analysis Table",
-                    "pages": [
-                      "en/bi/widget/analysis-table/flat-table",
-                      "en/bi/widget/analysis-table/pivot-table"
-                    ]
-                  },
-                  {
-                    "group": "Filter Bar",
-                    "pages": [
-                      "en/bi/widget/filter-bar/tree-selector",
-                      "en/bi/widget/filter-bar/member-selector",
-                      "en/bi/widget/filter-bar/dropdown-selector",
-                      "en/bi/widget/filter-bar/filter-bar",
-                      "en/bi/widget/filter-bar/calendar-selector"
-                    ]
-                  },
-                  {
-                    "group": "Input Controller",
-                    "pages": [
-                      "en/bi/widget/input-controller/calendar-controller",
-                      "en/bi/widget/input-controller/parameter-controller"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Website Features",
-                "groups": [
-                  {
-                    "group": "Data Source",
-                    "pages": [
-                      "en/bi/website-features/data-source/aws-redshift",
-                      "en/bi/website-features/data-source/clickhouse",
-                      "en/bi/website-features/data-source/dameng",
-                      "en/bi/website-features/data-source/doris",
-                      "en/bi/website-features/data-source/hive",
-                      "en/bi/website-features/data-source/kingbasees",
-                      "en/bi/website-features/data-source/kyligence",
-                      "en/bi/website-features/data-source/mariadb",
-                      "en/bi/website-features/data-source/mysql",
-                      "en/bi/website-features/data-source/opengauss",
-                      "en/bi/website-features/data-source/postgres",
-                      "en/bi/website-features/data-source/presto",
-                      "en/bi/website-features/data-source/sap-bw",
-                      "en/bi/website-features/data-source/sap-hana",
-                      "en/bi/website-features/data-source/starrocks",
-                      "en/bi/website-features/data-source/trino"
-                    ]
-                  },
-                  {
-                    "group": "Enterprise Organization",
-                    "pages": [
-                      "en/bi/website-features/enterprise-organization/ai-assistant",
-                      "en/bi/website-features/enterprise-organization/authentication",
-                      "en/bi/website-features/enterprise-organization/business-domain",
-                      "en/bi/website-features/enterprise-organization/data-source-management",
-                      "en/bi/website-features/enterprise-organization/system-integration"
-                    ]
-                  },
-                  {
-                    "group": "Enterprise Tenant",
-                    "pages": [
-                      "en/bi/website-features/enterprise-tenant/account-information",
-                      "en/bi/website-features/enterprise-tenant/company-organization",
-                      "en/bi/website-features/enterprise-tenant/custom-smtp",
-                      "en/bi/website-features/enterprise-tenant/function-module",
-                      "en/bi/website-features/enterprise-tenant/role-permission",
-                      "en/bi/website-features/enterprise-tenant/tenant-configuration",
-                      "en/bi/website-features/enterprise-tenant/user-management"
-                    ]
-                  },
-                  {
-                    "group": "Proxy",
-                    "pages": [
-                      "en/bi/website-features/proxy/desktop-proxy",
-                      "en/bi/website-features/proxy/server-proxy"
-                    ]
-                  },
-                  {
-                    "group": "Single Sign On",
-                    "pages": [
-                      "en/bi/website-features/single-sign-on/feishu-login",
-                      "en/bi/website-features/single-sign-on/keycloak-login"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Tutorial",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/bi/tutorial/moving-average",
-                      "en/bi/tutorial/analyze-with-wasm-database",
-                      "en/bi/tutorial/member-intrinsic-properties"
-                    ]
-                  },
-                  {
-                    "group": "Mdx",
-                    "pages": [
-                      "en/bi/tutorial/mdx/mdx-introduction",
-                      "en/bi/tutorial/mdx/mdx"
-                    ]
-                  },
-                  {
-                    "group": "Sap",
-                    "pages": [
-                      "en/bi/tutorial/sap/sap-bpc",
-                      "en/bi/tutorial/sap/sap-bpc-consolidated-reports",
-                      "en/bi/tutorial/sap/how-to-analyze-sap-bw-data-models",
-                      "en/bi/tutorial/sap/sap-bw-calendar-dimension"
                     ]
                   }
                 ]
@@ -1040,39 +988,40 @@
                     ]
                   },
                   {
-                    "group": "工具集",
-                    "pages": [
-                      "zh-Hans/ai/agent/toolset/built-in-toolset",
-                      "zh-Hans/ai/agent/toolset/custom-toolset",
-                      "zh-Hans/ai/agent/toolset/scheduled-tasks",
-                      "zh-Hans/ai/agent/toolset/feishu",
-                      "zh-Hans/ai/agent/toolset/dingtalk",
-                      "zh-Hans/ai/agent/toolset/planning-tasks",
-                      "zh-Hans/ai/agent/toolset/coding-expert",
-                      "zh-Hans/ai/agent/toolset/bi-toolset/data-modeling",
-                      "zh-Hans/ai/agent/toolset/bi-toolset/indicator-management",
-                      "zh-Hans/ai/agent/toolset/bi-toolset/dashboard",
-                      "zh-Hans/ai/agent/toolset/bi-toolset/data-governance",
-                      "zh-Hans/ai/agent/toolset/chatbi-toolset/self-built-app-configuration",
-                      "zh-Hans/ai/agent/toolset/chatbi-toolset/dialogue-model",
-                      "zh-Hans/ai/agent/toolset/chatbi-toolset/dialogue-robot",
-                      "zh-Hans/ai/agent/toolset/chatbi-toolset/quick-application",
-                      "zh-Hans/ai/agent/toolset/mcp-tools/crawl4ai",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/bash-command-execution",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/file-tools",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/code-project",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/python-execution",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/browser-use-tools",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/browser-tools",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/computer-tools",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
-                      "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
-                    ]
-                  },
-                  {
                     "group": "Artifacts",
                     "pages": [
                       "zh-Hans/ai/agent/artifacts/index"
+                    ]
+                  },
+                  {
+                    "group": "工具集",
+                    "pages": [
+                      "zh-Hans/ai/agent/toolset/virtual-environment/bash-command-execution",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/file-tools",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/self-built-app-configuration",
+                      "zh-Hans/ai/agent/toolset/built-in-toolset",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/code-project",
+                      "zh-Hans/ai/agent/toolset/mcp-tools/crawl4ai",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/dialogue-model",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/dialogue-robot",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/data-modeling",
+                      "zh-Hans/ai/agent/toolset/custom-toolset",
+                      "zh-Hans/ai/agent/toolset/chatbi-toolset/quick-application",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/indicator-management",
+                      "zh-Hans/ai/agent/toolset/toolset",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/python-execution",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/dashboard",
+                      "zh-Hans/ai/agent/toolset/scheduled-tasks",
+                      "zh-Hans/ai/agent/toolset/bi-toolset/data-governance",
+                      "zh-Hans/ai/agent/toolset/feishu",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/browser-use-tools",
+                      "zh-Hans/ai/agent/toolset/dingtalk",
+                      "zh-Hans/ai/agent/toolset/planning-tasks",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/browser-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/computer-tools",
+                      "zh-Hans/ai/agent/toolset/coding-expert",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
+                      "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
                     ]
                   }
                 ]
@@ -1120,9 +1069,9 @@
                       "zh-Hans/ai/knowledge-base/index",
                       "zh-Hans/ai/knowledge-base/maintain-documents",
                       "zh-Hans/ai/knowledge-base/intelligent-filtering",
+                      "zh-Hans/ai/knowledge-base/api",
                       "zh-Hans/ai/knowledge-base/knowledge-graph-graphrag",
                       "zh-Hans/ai/knowledge-base/pdf-processing-and-preview",
-                      "zh-Hans/ai/knowledge-base/api",
                       "zh-Hans/ai/knowledge-base/connect-external-knowledge-base",
                       "zh-Hans/ai/knowledge-base/recall-test",
                       "zh-Hans/ai/knowledge-base/ways-to-use-knowledge-base",
@@ -1217,7 +1166,6 @@
                       "zh-Hans/ai/plugin/overview",
                       "zh-Hans/ai/plugin/core-concepts",
                       "zh-Hans/ai/plugin/development-steps",
-                      "zh-Hans/ai/plugin/assistant-workspace-catalogs",
                       "zh-Hans/ai/plugin/mcp-tools-and-apps",
                       "zh-Hans/ai/plugin/remote-component",
                       "zh-Hans/ai/plugin/managed-connections",
@@ -1228,7 +1176,8 @@
                       "zh-Hans/ai/plugin/publish-and-use",
                       "zh-Hans/ai/plugin/permission-design-guide",
                       "zh-Hans/ai/plugin/schema-ui-extension",
-                      "zh-Hans/ai/plugin/plugin-development"
+                      "zh-Hans/ai/plugin/plugin-development",
+                      "zh-Hans/ai/plugin/assistant-workspace-catalogs"
                     ]
                   },
                   {
@@ -1242,7 +1191,7 @@
                     ]
                   },
                   {
-                    "group": "集成",
+                    "group": "Integration",
                     "pages": [
                       "zh-Hans/ai/plugin/integration/index",
                       "zh-Hans/ai/plugin/integration/lark-integration",
@@ -1257,6 +1206,15 @@
                       "zh-Hans/ai/plugin/feishu-document-example/feishu-system-integration",
                       "zh-Hans/ai/plugin/feishu-document-example/feishu-document-source-strategy",
                       "zh-Hans/ai/plugin/feishu-document-example/feishu-document-conversion-strategy"
+                    ]
+                  },
+                  {
+                    "group": "集成",
+                    "pages": [
+                      "zh-Hans/ai/plugin/integration/index",
+                      "zh-Hans/ai/plugin/integration/lark-integration",
+                      "zh-Hans/ai/plugin/integration/wecom-integration",
+                      "zh-Hans/ai/plugin/integration/dingtalk-integration"
                     ]
                   }
                 ]
@@ -1281,6 +1239,12 @@
                     ]
                   },
                   {
+                    "group": "Sdk",
+                    "pages": [
+                      "zh-Hans/ai/chatkit/sdk/integrate-xpertai-api"
+                    ]
+                  },
+                  {
                     "group": "SDK",
                     "pages": [
                       "zh-Hans/ai/chatkit/sdk/integrate-xpertai-api"
@@ -1302,6 +1266,21 @@
               {
                 "tab": "教程",
                 "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/tutorial/workflow-and-agent",
+                      "zh-Hans/ai/tutorial/develop-custom-agentic-app",
+                      "zh-Hans/ai/tutorial/dingtalk-h5-app",
+                      "zh-Hans/ai/tutorial/integrate-with-mcp-dify",
+                      "zh-Hans/ai/tutorial/build-agentic-chatbi-from-scratch",
+                      "zh-Hans/ai/tutorial/project-group-single-vs-multi-agent",
+                      "zh-Hans/ai/tutorial/agentic-bi-end-to-end-analysis",
+                      "zh-Hans/ai/tutorial/echarts-mcp-app",
+                      "zh-Hans/ai/tutorial/chatkit-browser-extension",
+                      "zh-Hans/ai/tutorial/tutorial"
+                    ]
+                  },
                   {
                     "group": "智能体应用",
                     "pages": [
@@ -1423,6 +1402,162 @@
                 ]
               },
               {
+                "tab": "数据分析",
+                "groups": [
+                  {
+                    "group": "语义模型",
+                    "pages": [
+                      "zh-Hans/data/analytics/semantic-model/multidimensional-model-introduction",
+                      "zh-Hans/data/analytics/semantic-model/manage-semantic-model",
+                      "zh-Hans/data/analytics/semantic-model/semantic-modeling-workspace",
+                      "zh-Hans/data/analytics/semantic-model/query-lab",
+                      "zh-Hans/data/analytics/semantic-model/dimension-designer/dimension-designer",
+                      "zh-Hans/data/analytics/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer",
+                      "zh-Hans/data/analytics/semantic-model/dimension-member-retrieval",
+                      "zh-Hans/data/analytics/semantic-model/ai-assistant",
+                      "zh-Hans/data/analytics/semantic-model/query-log",
+                      "zh-Hans/data/analytics/semantic-model/sql-multidimensional-model",
+                      "zh-Hans/data/analytics/semantic-model/mdx-multidimensional-model"
+                    ]
+                  },
+                  {
+                    "group": "指标管理",
+                    "pages": [
+                      "zh-Hans/data/analytics/indicator-management/indicator-registration",
+                      "zh-Hans/data/analytics/indicator-management/indicator-business-domain",
+                      "zh-Hans/data/analytics/indicator-management/indicator-certification",
+                      "zh-Hans/data/analytics/indicator-management/derived-indicator",
+                      "zh-Hans/data/analytics/indicator-management/indicator-management",
+                      "zh-Hans/data/analytics/indicator-management/qualification-condition",
+                      "zh-Hans/data/analytics/indicator-management/indicator-market",
+                      "zh-Hans/data/analytics/indicator-management/indicator-application",
+                      "zh-Hans/data/analytics/indicator-management/ai-assistant",
+                      "zh-Hans/data/analytics/indicator-management/indicator-measure"
+                    ]
+                  },
+                  {
+                    "group": "故事看板",
+                    "pages": [
+                      "zh-Hans/data/analytics/story-dashboard/projects",
+                      "zh-Hans/data/analytics/story-dashboard/create-story",
+                      "zh-Hans/data/analytics/story-dashboard/workspace",
+                      "zh-Hans/data/analytics/story-dashboard/preferences",
+                      "zh-Hans/data/analytics/story-dashboard/story-details",
+                      "zh-Hans/data/analytics/story-dashboard/page-layout",
+                      "zh-Hans/data/analytics/story-dashboard/device",
+                      "zh-Hans/data/analytics/story-dashboard/mobile",
+                      "zh-Hans/data/analytics/story-dashboard/sort-ranking",
+                      "zh-Hans/data/analytics/story-dashboard/advanced-styles",
+                      "zh-Hans/data/analytics/story-dashboard/dimension-selector",
+                      "zh-Hans/data/analytics/story-dashboard/calculated-measures",
+                      "zh-Hans/data/analytics/story-dashboard/parameters",
+                      "zh-Hans/data/analytics/story-dashboard/slicer",
+                      "zh-Hans/data/analytics/story-dashboard/combined-slicer",
+                      "zh-Hans/data/analytics/story-dashboard/advanced-slicer",
+                      "zh-Hans/data/analytics/story-dashboard/explorer",
+                      "zh-Hans/data/analytics/story-dashboard/share",
+                      "zh-Hans/data/analytics/story-dashboard/story-templates",
+                      "zh-Hans/data/analytics/story-dashboard/large-screen",
+                      "zh-Hans/data/analytics/story-dashboard/execution-explanation",
+                      "zh-Hans/data/analytics/story-dashboard/access-authorization",
+                      "zh-Hans/data/analytics/story-dashboard/ai-assistant",
+                      "zh-Hans/data/analytics/story-dashboard/association-analysis"
+                    ]
+                  },
+                  {
+                    "group": "微件",
+                    "pages": [
+                      "zh-Hans/data/analytics/widget/input-controller/calendar-controller",
+                      "zh-Hans/data/analytics/widget/input-controller/parameter-controller",
+                      "zh-Hans/data/analytics/widget/filter-bar/tree-selector",
+                      "zh-Hans/data/analytics/widget/analysis-table/flat-table",
+                      "zh-Hans/data/analytics/widget/analysis-card/analysis-card",
+                      "zh-Hans/data/analytics/widget/filter-bar/member-selector",
+                      "zh-Hans/data/analytics/widget/analysis-table/pivot-table",
+                      "zh-Hans/data/analytics/widget/analysis-card/bar-chart",
+                      "zh-Hans/data/analytics/widget/filter-bar/dropdown-selector",
+                      "zh-Hans/data/analytics/widget/filter-bar/filter-bar",
+                      "zh-Hans/data/analytics/widget/analysis-card/line-chart",
+                      "zh-Hans/data/analytics/widget/analysis-card/pie-chart",
+                      "zh-Hans/data/analytics/widget/filter-bar/calendar-selector",
+                      "zh-Hans/data/analytics/widget/analysis-card/scatter-chart",
+                      "zh-Hans/data/analytics/widget/key-indicator",
+                      "zh-Hans/data/analytics/widget/slider-widget",
+                      "zh-Hans/data/analytics/widget/tabs",
+                      "zh-Hans/data/analytics/widget/analysis-card/heatmap",
+                      "zh-Hans/data/analytics/widget/analysis-card/tree-chart",
+                      "zh-Hans/data/analytics/widget/analysis-card/treemap",
+                      "zh-Hans/data/analytics/widget/iframe",
+                      "zh-Hans/data/analytics/widget/analysis-card/sankey-diagram",
+                      "zh-Hans/data/analytics/widget/analysis-card/sunburst-chart",
+                      "zh-Hans/data/analytics/widget/document",
+                      "zh-Hans/data/analytics/widget/analysis-card/river-chart",
+                      "zh-Hans/data/analytics/widget/text",
+                      "zh-Hans/data/analytics/widget/analysis-card/funnel-chart",
+                      "zh-Hans/data/analytics/widget/image",
+                      "zh-Hans/data/analytics/widget/analysis-card/box-whisker-chart",
+                      "zh-Hans/data/analytics/widget/video",
+                      "zh-Hans/data/analytics/widget/analysis-card/3d-bar-chart",
+                      "zh-Hans/data/analytics/widget/indicator-card",
+                      "zh-Hans/data/analytics/widget/analysis-card/geographic-map",
+                      "zh-Hans/data/analytics/widget/indicator-table",
+                      "zh-Hans/data/analytics/widget/analysis-card/custom-chart"
+                    ]
+                  },
+                  {
+                    "group": "网站功能",
+                    "pages": [
+                      "zh-Hans/data/analytics/website-features/data-source/aws-redshift",
+                      "zh-Hans/data/analytics/website-features/data-source/clickhouse",
+                      "zh-Hans/data/analytics/website-features/data-source/dameng",
+                      "zh-Hans/data/analytics/website-features/data-source/doris",
+                      "zh-Hans/data/analytics/website-features/data-source/hive",
+                      "zh-Hans/data/analytics/website-features/data-source/kingbasees",
+                      "zh-Hans/data/analytics/website-features/data-source/kyligence",
+                      "zh-Hans/data/analytics/website-features/data-source/mariadb",
+                      "zh-Hans/data/analytics/website-features/data-source/mysql",
+                      "zh-Hans/data/analytics/website-features/data-source/opengauss",
+                      "zh-Hans/data/analytics/website-features/data-source/postgres",
+                      "zh-Hans/data/analytics/website-features/data-source/presto",
+                      "zh-Hans/data/analytics/website-features/data-source/sap-bw",
+                      "zh-Hans/data/analytics/website-features/data-source/sap-hana",
+                      "zh-Hans/data/analytics/website-features/data-source/starrocks",
+                      "zh-Hans/data/analytics/website-features/data-source/trino",
+                      "zh-Hans/data/analytics/website-features/enterprise-organization/ai-assistant",
+                      "zh-Hans/data/analytics/website-features/enterprise-organization/authentication",
+                      "zh-Hans/data/analytics/website-features/enterprise-organization/business-domain",
+                      "zh-Hans/data/analytics/website-features/enterprise-organization/data-source-management",
+                      "zh-Hans/data/analytics/website-features/enterprise-organization/system-integration",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/account-information",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/company-organization",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/custom-smtp",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/function-module",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/role-permission",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/tenant-configuration",
+                      "zh-Hans/data/analytics/website-features/enterprise-tenant/user-management",
+                      "zh-Hans/data/analytics/website-features/proxy/desktop-proxy",
+                      "zh-Hans/data/analytics/website-features/proxy/server-proxy",
+                      "zh-Hans/data/analytics/website-features/single-sign-on/feishu-login",
+                      "zh-Hans/data/analytics/website-features/single-sign-on/keycloak-login"
+                    ]
+                  },
+                  {
+                    "group": "教程",
+                    "pages": [
+                      "zh-Hans/data/analytics/tutorial/sap/sap-bpc",
+                      "zh-Hans/data/analytics/tutorial/mdx/mdx",
+                      "zh-Hans/data/analytics/tutorial/sap/sap-bpc-consolidated-reports",
+                      "zh-Hans/data/analytics/tutorial/mdx/mdx-introduction",
+                      "zh-Hans/data/analytics/tutorial/sap/how-to-analyze-sap-bw-data-models",
+                      "zh-Hans/data/analytics/tutorial/sap/sap-bw-calendar-dimension",
+                      "zh-Hans/data/analytics/tutorial/moving-average",
+                      "zh-Hans/data/analytics/tutorial/analyze-with-wasm-database",
+                      "zh-Hans/data/analytics/tutorial/member-intrinsic-properties"
+                    ]
+                  }
+                ]
+              },
+              {
                 "tab": "资源对接",
                 "groups": [
                   {
@@ -1480,252 +1615,6 @@
                     "group": "销售服务",
                     "pages": [
                       "zh-Hans/data/apps/sales-and-service/sales-ontology"
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "product": "BI",
-            "tabs": [
-              {
-                "tab": "语义模型",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/bi/semantic-model/multidimensional-model-introduction",
-                      "zh-Hans/bi/semantic-model/manage-semantic-model",
-                      "zh-Hans/bi/semantic-model/semantic-modeling-workspace",
-                      "zh-Hans/bi/semantic-model/query-lab",
-                      "zh-Hans/bi/semantic-model/dimension-member-retrieval",
-                      "zh-Hans/bi/semantic-model/ai-assistant",
-                      "zh-Hans/bi/semantic-model/query-log",
-                      "zh-Hans/bi/semantic-model/sql-multidimensional-model",
-                      "zh-Hans/bi/semantic-model/mdx-multidimensional-model"
-                    ]
-                  },
-                  {
-                    "group": "多维数据集设计器",
-                    "pages": [
-                      "zh-Hans/bi/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer"
-                    ]
-                  },
-                  {
-                    "group": "维度设计器",
-                    "pages": [
-                      "zh-Hans/bi/semantic-model/dimension-designer/dimension-designer"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "指标管理",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/bi/indicator-management/indicator-registration",
-                      "zh-Hans/bi/indicator-management/indicator-business-domain",
-                      "zh-Hans/bi/indicator-management/indicator-certification",
-                      "zh-Hans/bi/indicator-management/derived-indicator",
-                      "zh-Hans/bi/indicator-management/indicator-management",
-                      "zh-Hans/bi/indicator-management/qualification-condition",
-                      "zh-Hans/bi/indicator-management/indicator-market",
-                      "zh-Hans/bi/indicator-management/indicator-application",
-                      "zh-Hans/bi/indicator-management/ai-assistant",
-                      "zh-Hans/bi/indicator-management/indicator-measure"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "故事看板",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/bi/story-dashboard/projects",
-                      "zh-Hans/bi/story-dashboard/create-story",
-                      "zh-Hans/bi/story-dashboard/workspace",
-                      "zh-Hans/bi/story-dashboard/preferences",
-                      "zh-Hans/bi/story-dashboard/story-details",
-                      "zh-Hans/bi/story-dashboard/page-layout",
-                      "zh-Hans/bi/story-dashboard/device",
-                      "zh-Hans/bi/story-dashboard/mobile",
-                      "zh-Hans/bi/story-dashboard/sort-ranking",
-                      "zh-Hans/bi/story-dashboard/advanced-styles",
-                      "zh-Hans/bi/story-dashboard/dimension-selector",
-                      "zh-Hans/bi/story-dashboard/calculated-measures",
-                      "zh-Hans/bi/story-dashboard/parameters",
-                      "zh-Hans/bi/story-dashboard/slicer",
-                      "zh-Hans/bi/story-dashboard/combined-slicer",
-                      "zh-Hans/bi/story-dashboard/advanced-slicer",
-                      "zh-Hans/bi/story-dashboard/explorer",
-                      "zh-Hans/bi/story-dashboard/share",
-                      "zh-Hans/bi/story-dashboard/story-templates",
-                      "zh-Hans/bi/story-dashboard/large-screen",
-                      "zh-Hans/bi/story-dashboard/execution-explanation",
-                      "zh-Hans/bi/story-dashboard/access-authorization",
-                      "zh-Hans/bi/story-dashboard/ai-assistant",
-                      "zh-Hans/bi/story-dashboard/association-analysis"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "微件",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/bi/widget/key-indicator",
-                      "zh-Hans/bi/widget/slider-widget",
-                      "zh-Hans/bi/widget/tabs",
-                      "zh-Hans/bi/widget/iframe",
-                      "zh-Hans/bi/widget/document",
-                      "zh-Hans/bi/widget/text",
-                      "zh-Hans/bi/widget/image",
-                      "zh-Hans/bi/widget/video",
-                      "zh-Hans/bi/widget/indicator-card",
-                      "zh-Hans/bi/widget/indicator-table"
-                    ]
-                  },
-                  {
-                    "group": "分析卡片",
-                    "pages": [
-                      "zh-Hans/bi/widget/analysis-card/analysis-card",
-                      "zh-Hans/bi/widget/analysis-card/bar-chart",
-                      "zh-Hans/bi/widget/analysis-card/line-chart",
-                      "zh-Hans/bi/widget/analysis-card/pie-chart",
-                      "zh-Hans/bi/widget/analysis-card/scatter-chart",
-                      "zh-Hans/bi/widget/analysis-card/heatmap",
-                      "zh-Hans/bi/widget/analysis-card/tree-chart",
-                      "zh-Hans/bi/widget/analysis-card/treemap",
-                      "zh-Hans/bi/widget/analysis-card/sankey-diagram",
-                      "zh-Hans/bi/widget/analysis-card/sunburst-chart",
-                      "zh-Hans/bi/widget/analysis-card/river-chart",
-                      "zh-Hans/bi/widget/analysis-card/funnel-chart",
-                      "zh-Hans/bi/widget/analysis-card/box-whisker-chart",
-                      "zh-Hans/bi/widget/analysis-card/3d-bar-chart",
-                      "zh-Hans/bi/widget/analysis-card/geographic-map",
-                      "zh-Hans/bi/widget/analysis-card/custom-chart"
-                    ]
-                  },
-                  {
-                    "group": "分析表格",
-                    "pages": [
-                      "zh-Hans/bi/widget/analysis-table/flat-table",
-                      "zh-Hans/bi/widget/analysis-table/pivot-table"
-                    ]
-                  },
-                  {
-                    "group": "筛选栏",
-                    "pages": [
-                      "zh-Hans/bi/widget/filter-bar/tree-selector",
-                      "zh-Hans/bi/widget/filter-bar/member-selector",
-                      "zh-Hans/bi/widget/filter-bar/dropdown-selector",
-                      "zh-Hans/bi/widget/filter-bar/filter-bar",
-                      "zh-Hans/bi/widget/filter-bar/calendar-selector"
-                    ]
-                  },
-                  {
-                    "group": "输入控制器",
-                    "pages": [
-                      "zh-Hans/bi/widget/input-controller/calendar-controller",
-                      "zh-Hans/bi/widget/input-controller/parameter-controller"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "网站功能",
-                "groups": [
-                  {
-                    "group": "Data Source",
-                    "pages": [
-                      "zh-Hans/bi/website-features/data-source/aws-redshift",
-                      "zh-Hans/bi/website-features/data-source/clickhouse",
-                      "zh-Hans/bi/website-features/data-source/dameng",
-                      "zh-Hans/bi/website-features/data-source/doris",
-                      "zh-Hans/bi/website-features/data-source/hive",
-                      "zh-Hans/bi/website-features/data-source/kingbasees",
-                      "zh-Hans/bi/website-features/data-source/kyligence",
-                      "zh-Hans/bi/website-features/data-source/mariadb",
-                      "zh-Hans/bi/website-features/data-source/mysql",
-                      "zh-Hans/bi/website-features/data-source/opengauss",
-                      "zh-Hans/bi/website-features/data-source/postgres",
-                      "zh-Hans/bi/website-features/data-source/presto",
-                      "zh-Hans/bi/website-features/data-source/sap-bw",
-                      "zh-Hans/bi/website-features/data-source/sap-hana",
-                      "zh-Hans/bi/website-features/data-source/starrocks",
-                      "zh-Hans/bi/website-features/data-source/trino"
-                    ]
-                  },
-                  {
-                    "group": "Enterprise Organization",
-                    "pages": [
-                      "zh-Hans/bi/website-features/enterprise-organization/ai-assistant",
-                      "zh-Hans/bi/website-features/enterprise-organization/authentication",
-                      "zh-Hans/bi/website-features/enterprise-organization/business-domain",
-                      "zh-Hans/bi/website-features/enterprise-organization/data-source-management",
-                      "zh-Hans/bi/website-features/enterprise-organization/system-integration"
-                    ]
-                  },
-                  {
-                    "group": "Enterprise Tenant",
-                    "pages": [
-                      "zh-Hans/bi/website-features/enterprise-tenant/account-information",
-                      "zh-Hans/bi/website-features/enterprise-tenant/company-organization",
-                      "zh-Hans/bi/website-features/enterprise-tenant/custom-smtp",
-                      "zh-Hans/bi/website-features/enterprise-tenant/function-module",
-                      "zh-Hans/bi/website-features/enterprise-tenant/role-permission",
-                      "zh-Hans/bi/website-features/enterprise-tenant/tenant-configuration",
-                      "zh-Hans/bi/website-features/enterprise-tenant/user-management"
-                    ]
-                  },
-                  {
-                    "group": "Proxy",
-                    "pages": [
-                      "zh-Hans/bi/website-features/proxy/desktop-proxy",
-                      "zh-Hans/bi/website-features/proxy/server-proxy"
-                    ]
-                  },
-                  {
-                    "group": "Single Sign On",
-                    "pages": [
-                      "zh-Hans/bi/website-features/single-sign-on/feishu-login",
-                      "zh-Hans/bi/website-features/single-sign-on/keycloak-login"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "教程",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/bi/tutorial/moving-average",
-                      "zh-Hans/bi/tutorial/analyze-with-wasm-database",
-                      "zh-Hans/bi/tutorial/member-intrinsic-properties"
-                    ]
-                  },
-                  {
-                    "group": "Mdx",
-                    "pages": [
-                      "zh-Hans/bi/tutorial/mdx/mdx",
-                      "zh-Hans/bi/tutorial/mdx/mdx-introduction"
-                    ]
-                  },
-                  {
-                    "group": "Sap",
-                    "pages": [
-                      "zh-Hans/bi/tutorial/sap/sap-bpc",
-                      "zh-Hans/bi/tutorial/sap/sap-bpc-consolidated-reports",
-                      "zh-Hans/bi/tutorial/sap/how-to-analyze-sap-bw-data-models",
-                      "zh-Hans/bi/tutorial/sap/sap-bw-calendar-dimension"
                     ]
                   }
                 ]

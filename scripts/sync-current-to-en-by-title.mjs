@@ -40,17 +40,17 @@ const PAIRS = {
   tutorial: { srcRel: "current/tutorials", dstRel: "en/ai/tutorial" },
 
   // ===== BI =====
-  biIndicators: { srcRel: "current/indicators", dstRel: "en/bi/indicator-management" },
-  biSemantic: { srcRel: "current/models", dstRel: "en/bi/semantic-model" },
-  biStories: { srcRel: "current/stories", dstRel: "en/bi/story-dashboard" },
-  biWidgets: { srcRel: "current/widgets", dstRel: "en/bi/widget" },
+  biIndicators: { srcRel: "current/indicators", dstRel: "en/data/analytics/indicator-management" },
+  biSemantic: { srcRel: "current/models", dstRel: "en/data/analytics/semantic-model" },
+  biStories: { srcRel: "current/stories", dstRel: "en/data/analytics/story-dashboard" },
+  biWidgets: { srcRel: "current/widgets", dstRel: "en/data/analytics/widget" },
 
   // ===== BI / Website Features =====
-  biDataSource: { srcRel: "current/server/datasources", dstRel: "en/bi/website-features/data-source" },
-  biEnterpriseOrg: { srcRel: "current/server/organization", dstRel: "en/bi/website-features/enterprise-organization" },
-  biEnterpriseTenant: { srcRel: "current/server/tenant", dstRel: "en/bi/website-features/enterprise-tenant" },
-  biSSO: { srcRel: "current/server/sso", dstRel: "en/bi/website-features/single-sign-on" },
-  biProxy: { srcRel: "current/server/local-agent", dstRel: "en/bi/website-features/proxy" },
+  biDataSource: { srcRel: "current/server/datasources", dstRel: "en/data/analytics/website-features/data-source" },
+  biEnterpriseOrg: { srcRel: "current/server/organization", dstRel: "en/data/analytics/website-features/enterprise-organization" },
+  biEnterpriseTenant: { srcRel: "current/server/tenant", dstRel: "en/data/analytics/website-features/enterprise-tenant" },
+  biSSO: { srcRel: "current/server/sso", dstRel: "en/data/analytics/website-features/single-sign-on" },
+  biProxy: { srcRel: "current/server/local-agent", dstRel: "en/data/analytics/website-features/proxy" },
 };
 
 /**

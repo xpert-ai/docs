@@ -1,0 +1,34 @@
+---
+title: Parameter Controller
+sidebar_position: 1
+---
+
+**Parameter Controller** is a component in input controllers for input control of multidimensional dataset parameters.
+
+<Tip>
+
+For details on parameter creation, see [Parameters](../../../../stories/parameter/).
+
+</Tip>
+
+## Input
+
+The controller corresponding to **Input** type parameters is basically an input box, allowing users to manually enter values. If the parameter type is **Number**, you can also choose to use a slider to control parameter values. Slider detailed parameters are as follows:
+
+| Name | Description |
+| ------------ | ---------------------------- |
+| Use Slider | Whether to use slider component to display parameter value input |
+| Slider Max Value | Maximum value allowed by the slider |
+| Slider Min Value | Minimum value allowed by the slider |
+| Slider Step Size | Value change size produced by sliding the slider one step |
+| Slider Interval Length | Actual display length of slider scale intervals |
+| Slider Inverted | Display slider in reverse |
+| Slider Vertical | Display slider vertically |
+
+## Selection
+
+**Selection** type parameters will be displayed as a selection list of optional values. Optional list members will use the pre-entered value list in the parameters. Currently supports single selection.
+
+## Dimension Members
+
+**Dimension** type parameters are based on a given dimension, displaying pre-selected members as controller options. Users select one or more from these members as result values.
