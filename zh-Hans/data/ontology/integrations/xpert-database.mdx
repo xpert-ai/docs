@@ -1,6 +1,7 @@
 ---
 title: Xpert 数据库资源
 description: 将 xpert-pro SQL DataSource 接入 UOSE 并提供元数据发现和只读数据库动作。
+sidebar_position: 5
 ---
 
 `xpert_database` 资源用于把 xpert-pro 中的 SQL DataSource 接入 UOSE系统。它同步数据库 catalog、schema、table、column、constraint 和 index 等元数据，并提供受控的只读查询与分析动作。
@@ -87,4 +88,3 @@ description: 将 xpert-pro SQL DataSource 接入 UOSE 并提供元数据发现�
 - 对生产库限制 `maxQueryRows`。
 - 让 Agent 先 describe table 或 explain query，再执行 select。
 - 把所有写动作保留为审批和未来扩展，不在 v1 生产中开放。
-

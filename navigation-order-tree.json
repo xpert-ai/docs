@@ -238,14 +238,6 @@
               ]
             },
             {
-              "slug": "ontology",
-              "pages": [
-                "ontology-workspace",
-                "snapshot-and-projection",
-                "entity-graph"
-              ]
-            },
-            {
               "slug": "agent-execution",
               "pages": [
                 "agent-tools",
@@ -259,6 +251,38 @@
                 "policies",
                 "approvals",
                 "audit"
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "ontology",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "overview",
+                "ontology-studio",
+                "ontology-workspace",
+                "snapshot-and-projection",
+                "entity-graph"
+              ]
+            },
+            {
+              "slug": "integrations",
+              "pages": [
+                "overview",
+                "semantic-model",
+                "sap-odata",
+                "knowledge",
+                "xpert-database",
+                "extensibility"
+              ]
+            },
+            {
+              "slug": "cases",
+              "pages": [
+                "plugin-scenarios"
               ]
             }
           ]
@@ -289,22 +313,6 @@
             {
               "slug": "tutorial",
               "pages": []
-            }
-          ]
-        },
-        {
-          "slug": "integrations",
-          "groups": [
-            {
-              "slug": "__default__",
-              "pages": [
-                "overview",
-                "semantic-model",
-                "sap-odata",
-                "knowledge",
-                "xpert-database",
-                "extensibility"
-              ]
             }
           ]
         },

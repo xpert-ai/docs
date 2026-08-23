@@ -44,7 +44,8 @@
     "website-features": "Website Features",
     "widget": "Widget",
     "harness": "Harness",
-    "overview": "Overview"
+    "overview": "Overview",
+    "cases": "Case Studies"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -72,7 +73,7 @@
     "integrations": "资源对接",
     "practices": "最佳实践",
     "control-plane": "控制面",
-    "ontology": "本体空间",
+    "ontology": "本体",
     "agent-execution": "Agent 执行",
     "governance": "治理",
     "apps": "插件应用",
@@ -117,6 +118,7 @@
     "trigger": "触发器",
     "built-in": "内置",
     "harness": "Harness",
-    "overview": "概述"
+    "overview": "概述",
+    "cases": "案例"
   }
 }

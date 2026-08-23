@@ -1,0 +1,182 @@
+---
+title: 插件场景中的本体
+description: 了解阀门业务工作台如何携带、发布、读取并操作化一个领域本体。
+sidebar_position: 1
+---
+
+阀门业务工作台是 Xpert 插件使用本体的参考模式。插件不会只把本体当作一段附加到提示词的文本，而是携带版本化领域模型，通过 data-xpert 生命周期发布，从 `ready` 快照读取准确对象，再把本体 Action 定义映射到插件自有、受治理的执行适配器。
+
+最终形成一个包含 Object 360、语义证据、Action 发现、预检、人工审批、Demo 执行和审计的工程业务界面。
+
+## 责任划分
+
+```mermaid
+flowchart LR
+  A["插件自有版本化本体包"] --> B["显式初始化"]
+  B --> C["data-xpert 定义草稿"]
+  C --> D["校验并发布语义版本"]
+  D --> E["ready 本体快照"]
+  E --> F["阀门 Object 360 与助手读取"]
+  E --> G["Action 发现与预检"]
+  G --> H["插件自有待审核草案"]
+  H --> I["Workbench 人工审批"]
+  I --> J["插件 Demo 适配器"]
+  J --> K["模拟回执与审计时间线"]
+```
+
+| 层 | 负责内容 |
+| --- | --- |
+| data-xpert 本体 | 实体与关系语义、实例、证据、约束、Action 定义、snapshot 和 graph version |
+| 阀门插件服务 | 有范围的读取、草案记录、预检编排、Action 到适配器映射、Demo 执行回执和审计事件 |
+| Workbench 界面 | 对象选择、Object 360、草案检查、人工批准或拒绝、显式启动 Demo |
+| Assistant 中间件 | 读取、搜索、Action 发现、预检，以及用户明确要求后的 `pending_review` 草案创建 |
+
+日常 Workbench 和 Assistant 操作对本体数据只读。唯一的本体写入路径是显式初始化或版本升级。草案和执行审计记录保存在插件命名空间，不会反写为本体事实。
+
+## 携带版本化本体包
+
+插件在代码中携带稳定资源 ID 为 `valve-engineering-ontology` 的本体包。`1.0.0` 版本包含中性的产品演示内容：
+
+| 内容 | 数量 | 领域含义 |
+| --- | ---: | --- |
+| 实体类型 | 5 | `valve`、`valve_component`、`actuator`、`material`、`standard` |
+| 关系类型 | 4 | 部件、材料、执行机构和标准关系 |
+| Action 类型 | 7 | 维护、巡检、质量、备件、更换、隔离模拟和工程评审 |
+| Demo 实例 | 7 | 一个阀门及其关联工程对象 |
+| Demo 关系 | 6 | 形成相连的一跳工程 Object 360 |
+
+本体包不包含客户生产记录或外部数据绑定，因此初始化具有确定性，适合安全演示，同时继续使用生产集成会使用的同一套已发布本体契约。
+
+### 为什么本体包只保存在服务端
+
+iframe 不会提交资源 ID、语义版本、定义内容、tenant、organization 或 data-xpert 地址。这些值来自插件代码、配置和宿主运行时，避免浏览器调用方改变本体范围，或通过 Workbench bridge 导入任意定义。
+
+## 通过定义生命周期初始化
+
+连接 data-xpert 本身不会写入本体。Workbench 用户必须点击**初始化本体**并确认。
+
+<Steps>
+  <Step title="检查固定资源和版本">
+    插件检查 `valve-engineering-ontology` 是否存在，以及代码自有语义版本是否已经发布。
+  </Step>
+  <Step title="创建或替换草稿">
+    定义不存在时创建定义；如果存在未发布草稿，必须由用户再次明确确认代码自有本体包将覆盖该草稿。
+  </Step>
+  <Step title="在 data-xpert 中校验">
+    完整草稿通过本体定义 API 提交，并使用与本体工作室相同的实体、关系、Action、实例和实例关系规则校验。
+  </Step>
+  <Step title="发布语义版本">
+    data-xpert 创建不可变版本和已发布快照，并更新运行时投影。
+  </Step>
+  <Step title="刷新 ready 资源">
+    插件重新加载资源，只展示处于活动、`ready` 状态并包含精确根实体类型编码 `valve` 的对象。
+  </Step>
+</Steps>
+
+初始化具有幂等性：准确语义版本已经发布时返回 `already_current`，不会创建重复版本。升级时应修改代码自有模型、递增语义版本、重新部署，再由 Workbench 提示**更新本体**。不要改写已发布语义版本。
+
+## 从已发布邻域构建 Object 360
+
+初始化后，Workbench 服务端使用当前用户的短期 Actor Token 调用 data-xpert Agent Tools，并重新校验组织、活动资源、`ready` 状态、可选资源白名单、可选定义筛选和精确 `valve` 根类型。
+
+对选中的阀门，插件会组合当前实体及其一跳邻域，展示：
+
+- 稳定身份和类型化属性；
+- 部件、材料、执行机构与适用标准；
+- 关系方向和关联对象详情；
+- 证据与来源摘要；
+- 结构化约束和告警；
+- 当前类型可用的 Action 定义；
+- 页面使用的 snapshot ID 和 graph version。
+
+Assistant 获得同一个有界 Workbench 上下文。它的 Skill 要求区分本体事实、证据缺口和 Agent 判断，避免把建议描述成源系统事实。
+
+## 把本体 Action 变成受治理操作
+
+本体定义 Action 的业务含义：稳定编码、目标类型、风险、审批要求、输入契约、前置条件、发现模式和预期影响。插件再把稳定 `actionTypeCode` 映射到执行适配器。
+
+阀门示例包含：
+
+| Action 编码 | 风险 | Demo 结果 |
+| --- | --- | --- |
+| `create_maintenance_work_order` | HIGH | `WO-DEMO-*` 维护工单回执 |
+| `schedule_valve_inspection` | MEDIUM | `INS-DEMO-*` 巡检任务 |
+| `raise_quality_deviation` | HIGH | `NCR-DEMO-*` 质量偏差 |
+| `request_spare_part` | MEDIUM | `PR-DEMO-*` 备件申请 |
+| `request_valve_replacement` | HIGH | `ENG-DEMO-*` 工程评审 |
+| `isolate_valve` | CRITICAL | `SIM-DEMO-*` 仅模拟隔离回执 |
+| `request_engineering_review` | LOW | `ENG-DEMO-*` 内部复核 |
+
+在客户 Demo 配置下，插件可以展示当前本体尚未包含的 Action，但必须清晰标记为 Demo 补充。如果要求所有可见 Action 都来自 data-xpert，应关闭 fallback。
+
+## 创建草案前先预检
+
+Assistant 或 Workbench 创建 `ontology_action` 草案前，会先运行只读的 `valve_preflight_action`，检查：
+
+- Action 是否适用于当前实体类型；
+- Demo 适配器是否启用；
+- 必填输入和数值范围；
+- 草案使用的 graph version 是否过期；
+- 是否存在同类待审核或已批准任务；
+- 本体约束和 `simulation_only` 告警。
+
+规范化输入与预检摘要会随草案保存，使审批人能够检查实际通过校验的准确契约。
+
+## 让审批与执行保持人工控制
+
+Assistant 中间件提供严格工具，用于发现 ready 资源、检查 Schema、搜索对象、读取 Object 360、发现 Action、执行预检、列出草案、创建草案和读取审计。唯一写操作是幂等创建 `pending_review` 草案。
+
+它故意不提供 approve、reject 或 execute 工具。
+
+```text
+本体 Action
+  → 读取当前对象与 graph version
+  → 发现并预检
+  → 用户明确要求后创建 pending_review 草案
+  → Workbench 用户批准或拒绝
+  → 用户显式启动 Demo 适配器
+  → 追加执行事件并生成模拟回执
+```
+
+只有已批准草案可以执行。成功路径记录：
+
+```text
+proposal_created
+  → proposal_approved
+  → execution_queued
+  → execution_started
+  → execution_completed
+```
+
+失败时记录 `execution_failed`，不会伪造成功回执。CRITICAL 阀门隔离路径明确标记为 `simulation_only`，不会声称向 DCS 或 SIS 发送了控制命令。
+
+## 安全与范围模式
+
+阀门插件展示了以下可复用规则：
+
+- Actor Token 和 tenant 身份只保留在 view bridge 的服务端；
+- 从当前宿主请求获得身份，而不是接受浏览器配置；
+- 每次 data-xpert 调用都要求活动 organization 范围；
+- 插件自有本体完成初始化后再配置资源白名单；
+- 校验稳定实体类型编码，不根据显示名称或属性组合猜测类型；
+- 预检时固定 snapshot 与 graph version；
+- 把语义 Action 定义与执行凭据、适配器代码分开；
+- 把本体初始化、托管 Assistant 准备和日常 Workbench 操作分成独立生命周期；
+- 让有后果的状态变更保持可见、可认证、幂等和可审计。
+
+## 可复用插件蓝图
+
+把这种模式用于其他领域时：
+
+1. 定义稳定的实体、关系、属性和 Action 编码；
+2. 决定插件携带中性本体包、绑定客户资源，或同时使用两者；
+3. 通过 data-xpert 发布，而不是维护私有图格式；
+4. 初始化和语义版本升级都要求显式确认；
+5. 从 `ready` 快照发现对象，并校验准确根实体类型；
+6. 根据实体邻域、证据、约束和 Action 构建紧凑领域 DTO；
+7. 把 Action 编码映射到插件自有适配器，不把凭据放进本体；
+8. 创建草案前执行预检与 graph version 校验；
+9. 风险要求时，把审批和执行保留在已认证用户界面；
+10. 将草案、执行回执和追加式审计与本体事实分开持久化。
+
+这样既能让本体保持为可复用语义契约，又能由每个插件提供适合自身领域的界面、集成适配器和治理流程。

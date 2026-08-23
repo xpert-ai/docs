@@ -1,0 +1,148 @@
+---
+title: Ontology Workspace
+description: Browse published ontology definitions, business objects, instance graphs, search results, and snapshot history.
+sidebar_position: 3
+---
+
+Ontology Workspace is the runtime inspection surface for published semantics. It groups ontology definitions, ontology-owned data, connected business objects, and partitioned project graphs so users can verify what is ready for search, Assistant reasoning, and plugin use.
+
+Use Ontology Studio to change a definition. Use Ontology Workspace to answer: **what semantic version is active, which objects exist, how are they connected, and what exact snapshot supports this result?**
+
+## Workspace layout
+
+The page has three working areas:
+
+| Area | Purpose |
+| --- | --- |
+| Resource navigator | Group and filter ontology definitions, definition-owned data, connected resources, and partitions |
+| Search and graph | Search across active entities, inspect the current instance graph, and review snapshot history |
+| Ontology Assistant | Ask questions with the selected definition, resource, partition, snapshot, graph version, entity, and search text as context |
+
+The resource and Assistant panels can be collapsed. The Assistant panel is resizable and remembers its width in the browser.
+
+## Summary and health
+
+Summary cards aggregate the current organization view:
+
+- ontology definition count;
+- definition-owned data count;
+- business object count;
+- resources missing a snapshot;
+- resources with failed snapshots;
+- total nodes and RDF triples.
+
+Each resource or partition has one of these health states:
+
+| Status | Meaning | Suggested response |
+| --- | --- | --- |
+| `ready` | Publishing and runtime projection are usable | Inspect, search, or consume the graph |
+| `pending` | Publishing or projection is still running | Wait, then refresh |
+| `publish_failed` | Ontology publication failed | Inspect the source sync or publish error |
+| `projection_failed` | Snapshot exists, but runtime projection failed | Repair or rerun projection before Agent use |
+| `missing_snapshot` | No current snapshot exists | Publish the definition or synchronize the resource |
+
+<Tip>
+A visible resource is not automatically ready for Agent or plugin use. Check the health badge and current snapshot before diagnosing search or Action discovery.
+</Tip>
+
+## Resource grouping
+
+The navigator groups resources by ontology definition when a definition reference is available. A group can contain:
+
+- the definition resource itself;
+- ontology-owned data published with the definition;
+- business objects or resources that reference that definition;
+- partitioned graphs, such as project-specific business-object subgraphs.
+
+Resources without a definition reference appear under **Not associated with an ontology definition**. This distinction helps separate manually designed domain ontologies from adapter-generated or legacy resource graphs.
+
+Use the navigator search to match definition name, business-object type and key, description, resource ID, owner, version, resource type, or tag. You can also filter by resource type and health.
+
+## Global entity search
+
+Search active entities across resources by:
+
+- display label;
+- external key;
+- alias;
+- entity type.
+
+You can optionally constrain the search to an entity type or resource type. Results include the matched field, resource and partition, entity type code, external key, and graph references. Selecting a result switches the graph to its resource and passes the entity to the Assistant context.
+
+Search is intentionally bounded. If a broad query reaches the applied limit, narrow the query or add an entity-type filter rather than treating the result set as an exhaustive export.
+
+## Instance graph
+
+Select a `ready` resource or partition and open **Instance graph**. The graph shows:
+
+- entity instances as nodes;
+- relationship instances as edges;
+- typed properties and identity fields;
+- source and target direction;
+- resource, snapshot, graph version, ontology, and partition references;
+- resource-specific visualization when a registered visualization is available.
+
+Selecting an entity exposes its details and makes it available to the ontology Assistant. The graph is a snapshot view: it describes published semantic state and does not edit the Studio draft or source system.
+
+For the underlying graph model, see [Entity, Relationship, and Attribute Graph](./entity-graph).
+
+## Snapshot history
+
+Open **Snapshot history** for the selected resource or partition. Up to the latest 30 records show:
+
+- source data version;
+- whether the snapshot is current;
+- publication and projection health;
+- creation time;
+- graph version;
+- entity, relationship, and triple counts.
+
+Snapshot history is useful for explaining count changes, reproducing an Agent or plugin decision, and distinguishing a stale consumer from a failed current publication. Downstream operations should carry snapshot ID and graph version when reproducibility matters.
+
+## Ontology Assistant
+
+When the organization has an effective ontology Assistant, Ontology Workspace mounts it beside the graph. Every request can carry:
+
+- definition ID, definition resource ID, and semantic version;
+- selected resource and optional partition;
+- snapshot ID and graph version;
+- business-object type and key;
+- selected entity ID, type code, external key, label, and graph references;
+- the current search query.
+
+This lets users ask questions such as:
+
+- Which objects and relationships explain the current business object?
+- Which constraints or Actions apply to the selected entity?
+- What changed between the current object and an earlier snapshot?
+- Which source or evidence supports this property?
+
+The Assistant is scoped to the current organization and depends on administrator initialization. If the effective Assistant or ChatKit frame is unavailable, the page shows a configuration message rather than silently using another organization or tenant fallback.
+
+## Delete an ontology instance or partition
+
+Ontology Workspace supports explicit deletion for runtime instances:
+
+- deleting a **partition** removes that project subgraph's snapshot history, entities, relationships, query cache, and RDF graph;
+- deleting a **resource instance** archives the resource and cleans its runtime snapshots, instance projections, query cache, and RDF graph.
+
+The unified ontology definition and other project partitions are not deleted. A confirmation dialog describes the exact target and consequence before the operation.
+
+<Warning>
+Runtime-instance deletion is different from deleting or archiving an ontology definition in Ontology Studio. Confirm the selected resource ID and partition key before continuing.
+</Warning>
+
+## Verification checklist
+
+After publishing or synchronizing a resource, verify:
+
+1. the resource appears in the expected ontology-definition group;
+2. health is `ready` and a current snapshot is present;
+3. node, relationship, and triple counts are plausible;
+4. a known object can be found by label or external key;
+5. its graph contains the expected typed relationships and properties;
+6. snapshot history shows the intended source version and graph version;
+7. the Assistant receives the selected object without requiring the user to restate its identity;
+8. downstream plugins pin and revalidate resource, entity type, snapshot, and graph context.
+
+Next, see how the [Valve Business Workbench uses published ontology context](./cases/plugin-scenarios).

@@ -1,6 +1,7 @@
 ---
 title: 语义模型资源
 description: 将 Xpert 语义模型、Cube、指标和维度接入 UOSE 并提供分析动作。
+sidebar_position: 2
 ---
 
 `semantic_model` 资源用于把 Xpert 语义模型接入 UOSE系统。它把模型、Cube、指标、度量和维度同步为本体对象，并通过语义查询接口提供只读分析动作。
@@ -78,4 +79,3 @@ capabilities 主要包括：
 5. 通过 `discoverActions` 确认可执行查询动作。
 6. 通过 `simulateAction` 校验时间窗、粒度、维度和 filters。
 7. 通过 `executeAction` 返回趋势、表格或分析摘要。
-

@@ -1,6 +1,7 @@
 ---
 title: 适配器扩展与 manifest 契约
 description: 新资源类型如何通过 adapter、manifest 和 capabilities schema 接入 UOSE。
+sidebar_position: 6
 ---
 
 UOSE系统的资源接入是可扩展的。新增资源类型时，不需要改变 Agent Tools 的整体协议，而是实现新的 adapter、manifest 和 capabilities schema，让新资源自然进入统一对象语义执行模型。
@@ -87,4 +88,3 @@ Capabilities 应控制同步和执行范围：
 - `simulateAction` 能拒绝非法参数。
 - `executeAction` 能记录审计。
 - 错误进入可排查状态，而不是静默失败。
-

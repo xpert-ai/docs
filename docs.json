@@ -580,14 +580,6 @@
                     ]
                   },
                   {
-                    "group": "Ontology",
-                    "pages": [
-                      "en/data/features/ontology/ontology-workspace",
-                      "en/data/features/ontology/snapshot-and-projection",
-                      "en/data/features/ontology/entity-graph"
-                    ]
-                  },
-                  {
                     "group": "Agent Execution",
                     "pages": [
                       "en/data/features/agent-execution/agent-tools",
@@ -601,6 +593,38 @@
                       "en/data/features/governance/policies",
                       "en/data/features/governance/approvals",
                       "en/data/features/governance/audit"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Ontology",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/data/ontology/overview",
+                      "en/data/ontology/ontology-studio",
+                      "en/data/ontology/ontology-workspace",
+                      "en/data/ontology/snapshot-and-projection",
+                      "en/data/ontology/entity-graph"
+                    ]
+                  },
+                  {
+                    "group": "Integrations",
+                    "pages": [
+                      "en/data/ontology/integrations/overview",
+                      "en/data/ontology/integrations/semantic-model",
+                      "en/data/ontology/integrations/sap-odata",
+                      "en/data/ontology/integrations/knowledge",
+                      "en/data/ontology/integrations/xpert-database",
+                      "en/data/ontology/integrations/extensibility"
+                    ]
+                  },
+                  {
+                    "group": "Case Studies",
+                    "pages": [
+                      "en/data/ontology/cases/plugin-scenarios"
                     ]
                   }
                 ]
@@ -757,22 +781,6 @@
                       "en/data/analytics/tutorial/moving-average",
                       "en/data/analytics/tutorial/analyze-with-wasm-database",
                       "en/data/analytics/tutorial/member-intrinsic-properties"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Integrations",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/data/integrations/overview",
-                      "en/data/integrations/semantic-model",
-                      "en/data/integrations/sap-odata",
-                      "en/data/integrations/knowledge",
-                      "en/data/integrations/xpert-database",
-                      "en/data/integrations/extensibility"
                     ]
                   }
                 ]
@@ -1376,14 +1384,6 @@
                     ]
                   },
                   {
-                    "group": "本体空间",
-                    "pages": [
-                      "zh-Hans/data/features/ontology/ontology-workspace",
-                      "zh-Hans/data/features/ontology/snapshot-and-projection",
-                      "zh-Hans/data/features/ontology/entity-graph"
-                    ]
-                  },
-                  {
                     "group": "Agent 执行",
                     "pages": [
                       "zh-Hans/data/features/agent-execution/agent-tools",
@@ -1397,6 +1397,38 @@
                       "zh-Hans/data/features/governance/policies",
                       "zh-Hans/data/features/governance/approvals",
                       "zh-Hans/data/features/governance/audit"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "本体",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/data/ontology/overview",
+                      "zh-Hans/data/ontology/ontology-studio",
+                      "zh-Hans/data/ontology/ontology-workspace",
+                      "zh-Hans/data/ontology/snapshot-and-projection",
+                      "zh-Hans/data/ontology/entity-graph"
+                    ]
+                  },
+                  {
+                    "group": "资源对接",
+                    "pages": [
+                      "zh-Hans/data/ontology/integrations/overview",
+                      "zh-Hans/data/ontology/integrations/semantic-model",
+                      "zh-Hans/data/ontology/integrations/sap-odata",
+                      "zh-Hans/data/ontology/integrations/knowledge",
+                      "zh-Hans/data/ontology/integrations/xpert-database",
+                      "zh-Hans/data/ontology/integrations/extensibility"
+                    ]
+                  },
+                  {
+                    "group": "案例",
+                    "pages": [
+                      "zh-Hans/data/ontology/cases/plugin-scenarios"
                     ]
                   }
                 ]
@@ -1553,22 +1585,6 @@
                       "zh-Hans/data/analytics/tutorial/moving-average",
                       "zh-Hans/data/analytics/tutorial/analyze-with-wasm-database",
                       "zh-Hans/data/analytics/tutorial/member-intrinsic-properties"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "资源对接",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/data/integrations/overview",
-                      "zh-Hans/data/integrations/semantic-model",
-                      "zh-Hans/data/integrations/sap-odata",
-                      "zh-Hans/data/integrations/knowledge",
-                      "zh-Hans/data/integrations/xpert-database",
-                      "zh-Hans/data/integrations/extensibility"
                     ]
                   }
                 ]

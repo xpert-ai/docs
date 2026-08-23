@@ -1,0 +1,194 @@
+---
+title: Ontology Studio
+description: Design, connect, validate, version, and publish business ontologies in a visual workspace.
+sidebar_position: 2
+---
+
+Ontology Studio is the authoring surface for business ontology definitions. Use it to model a domain, connect the model to existing resources, add ontology-owned data, inspect semantic paths, and publish an immutable version into the UOSE ontology runtime.
+
+The Studio separates editable draft state from published runtime state. Changes are saved to a revisioned draft; Ontology Workspace and downstream plugins continue to read the last published snapshot until a new version is validated and published.
+
+## Create an ontology
+
+Open **Data & Ontology → Ontology Studio**, then select **Create ontology**.
+
+| Field | Meaning |
+| --- | --- |
+| Name | User-facing ontology name |
+| Resource ID | Stable runtime identifier used by snapshots and integrations; use letters, digits, `.`, `_`, or `-` |
+| Description | Domain purpose and ownership |
+| Starting template | `Blank ontology` or the editable `Supply chain` example |
+
+The Studio list shows the resource ID, current published version, draft status, entity count, relationship count, instance count, and last update time. Search filters definitions by their identifying text.
+
+<Warning>
+Treat the Resource ID and published semantic versions as integration contracts. Do not rename or reuse them casually after plugins or external automation start resolving the ontology by ID and version.
+</Warning>
+
+## Design workspace
+
+The **Design** workspace is used for schema and Action authoring.
+
+### Entity types and properties
+
+An entity type defines a stable `code`, readable name, description, optional icon and color, optional default state, and typed properties. Supported property value types are:
+
+- `string`
+- `number`
+- `integer`
+- `boolean`
+- `datetime`
+- `json`
+
+Each property can be required or repeated. Stable codes are used by bindings, relationships, Actions, Agent tools, and plugins; readable names can be localized or refined without changing those contracts.
+
+### Relationship types
+
+A relationship type connects a source entity type to a target entity type. Select one of four cardinalities:
+
+- one to one;
+- one to many;
+- many to one;
+- many to many.
+
+Relationships can also have their own typed properties. Create them from the resource explorer or drag between entity handles on the graph canvas. Endpoint constraints are validated before publication.
+
+### Action definitions
+
+An Action definition describes a semantic operation without embedding an execution implementation. It can define:
+
+- one or more target entity type codes;
+- risk level: `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL`;
+- whether approval is required;
+- discovery mode: manual only, suggestable, auto-plannable, or auto-executable;
+- intent tags and preconditions;
+- input and output schemas;
+- expected effects such as read, analysis, state transition, or external call;
+- idempotency and expected-effect requirements.
+
+<Info>
+An Action in the ontology is a semantic and governance contract. Execution still requires a Tool Contract or plugin adapter. Defining an Action does not grant an Assistant permission to approve or execute it.
+</Info>
+
+### Canvas tools
+
+The canvas supports selection, drag positioning, zoom, fit-to-view, automatic layout, relationship creation, and PNG export. The alternative RDF view renders a Turtle preview generated from the current draft.
+
+Studio keeps local undo/redo history and autosaves the draft. Updates use the expected draft revision, so a concurrent edit produces a conflict instead of silently overwriting newer server state. When a conflict occurs, reload the server draft or download the local draft before continuing.
+
+## Import RDF / OWL
+
+Use **Import RDF** to load an RDF/XML ontology into the current draft. The import flow:
+
+1. parses a file up to 5 MB;
+2. previews added, updated, and removed entity and relationship types;
+3. reports mapping notes for unsupported or defaulted semantics;
+4. explains which Actions, bindings, instances, and instance relationships will be cleared;
+5. replaces the current draft only after explicit confirmation.
+
+The importer maps OWL classes, datatype properties, object properties, identifiers, and cardinality when the Studio contract can represent them. It reports skipped bindings, unsupported property metadata, unresolved endpoints, and value-type conversions rather than guessing.
+
+## Data & Bindings workspace
+
+The **Data & Bindings** workspace connects the schema to data. All three sections share the same revision, validation, and publication lifecycle as the schema.
+
+### Source bindings
+
+A source binding maps one entity type to an existing UOSE resource. Configure:
+
+- source resource ID and resource type;
+- optional source table or object;
+- primary key and optional display field;
+- property-to-source-field mappings.
+
+Bindings can be `draft`, `valid`, or `invalid`. Run binding validation before publication and resolve missing keys, source fields, or incompatible mappings.
+
+### Manual instances
+
+Manual instances are records owned by the ontology definition. Select an entity type, provide a stable external key, an optional display name and lifecycle state, and values for known properties. Attribute names and required values are validated against the schema.
+
+### Instance relationships
+
+Instance relationships connect concrete source and target instances. The chosen relationship type constrains both endpoint types, preventing a draft from linking objects that violate the schema.
+
+## Explore workspace
+
+The **Explore** workspace helps review semantic structure before and after publication:
+
+- search entity and relationship types;
+- filter graph layers and labels;
+- inspect incoming and outgoing relationships;
+- find a semantic path between two types;
+- compare the draft schema graph with the published schema graph;
+- inspect published details when a version exists;
+- pass the current definition, draft revision, workspace, and selected schema element to the ontology Assistant.
+
+The Assistant can provide contextual design guidance and, when the configured template includes ontology-authoring tools, write bounded draft changes. Studio refreshes successful remote changes and does not overwrite unsaved local edits.
+
+## Validate, preview, and publish
+
+Use the **Versions** workspace for release management.
+
+### Validate
+
+Validation reports errors and warnings with an owner kind and path. It checks, among other things:
+
+- duplicate or invalid stable codes;
+- property definitions and required instance attributes;
+- relationship source and target integrity;
+- Action targets, contracts, and referenced types;
+- data bindings and instance relationships;
+- publishable schema and data counts.
+
+Resolve errors before publication. Review warnings as release-readiness signals, including optional fields that remain unmapped.
+
+### Preview manifest
+
+**Preview manifest** compiles the draft into the exact `MetaManifest` and business-ontology publish request. Use it when reviewing Action contracts, generated schema, or integration output before a release.
+
+### Publish
+
+Provide a semantic version and optional release notes. Publication validates again, then creates:
+
+- an immutable ontology-definition version;
+- a compiled manifest and publish request;
+- a business ontology snapshot;
+- a graph version and ontology ID;
+- RDF materialization and runtime instance projections when configured.
+
+After publication, select **Open in Ontology Workspace** to inspect the resulting resource.
+
+## Version and lifecycle management
+
+Published versions are immutable. From version history you can:
+
+- inspect version metadata, snapshot ID, and graph version;
+- compare a published version with the current draft;
+- download the compiled Manifest and RDF artifacts;
+- restore an earlier version as a new editable draft.
+
+An ontology that has never been published can be deleted. A published ontology is archived instead: it leaves the active Studio list while immutable versions and published runtime snapshots remain available.
+
+## Recommended authoring sequence
+
+<Steps>
+  <Step title="Define stable domain types">
+    Create entity types and properties first. Use codes that plugins, bindings, and APIs can keep for the lifetime of the domain contract.
+  </Step>
+  <Step title="Connect types with explicit relationships">
+    Define endpoints and cardinality, then inspect the graph and path finder for missing or ambiguous semantics.
+  </Step>
+  <Step title="Add governed Actions">
+    Define the target, risk, approval requirement, discovery mode, input, preconditions, and expected effects. Keep adapter-specific credentials and execution logic outside the ontology.
+  </Step>
+  <Step title="Bind or add representative data">
+    Map external resources, add ontology-owned instances where appropriate, and connect concrete instances with schema-constrained relationships.
+  </Step>
+  <Step title="Validate and preview">
+    Resolve errors, review warnings, and inspect the compiled manifest before assigning a semantic version.
+  </Step>
+  <Step title="Publish and verify">
+    Publish the release, then open [Ontology Workspace](./ontology-workspace) to verify snapshot health, graph contents, search, and history.
+  </Step>
+</Steps>
+

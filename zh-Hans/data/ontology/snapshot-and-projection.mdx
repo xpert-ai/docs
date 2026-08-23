@@ -1,6 +1,7 @@
 ---
 title: Snapshot、RDF 与实例投影
 description: UOSE 如何把外部资源元数据发布为版本化本体并投影到运行时实例表。
+sidebar_position: 4
 ---
 
 Ontology Snapshot 是 UOSE系统中语义发布的版本化结果。它把某次资源同步得到的 canonical ontology IR 固化下来，作为查询、图谱、动作发现和审计的共同语义基线。
@@ -64,4 +65,3 @@ UOSE 会在以下时机尝试 repair：
 - sync publish 前。
 
 repair 成功后会重新生成 IR、发布 snapshot，并更新实体投影。这样可以避免坏 contract 继续成为 current snapshot。
-
