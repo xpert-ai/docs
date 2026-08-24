@@ -1,0 +1,385 @@
+---
+title: Workbench Remote Components
+description: Build a custom Xpert plugin Workbench UI with View Extensions, React, and the host bridge.
+---
+
+# Workbench Remote Components
+
+A Remote Component is a View Extension rendering mode for plugin-owned custom UI inside Assistant Workbench.
+
+The View Extension defines where the view appears, who can see it, and which capabilities it may use. The Remote Component defines how those capabilities are presented and used inside an iframe. It is not a standalone plugin type and does not replace the server-side View Provider.
+
+```text
+ViewExtensionProvider
+  -> Manifest: placement, activation, data, actions, events
+  -> Remote Component Entry
+  -> Workbench iframe
+  <-> Host Bridge
+```
+
+Read [View Extensions](./view-extension) before starting.
+
+## When to use one
+
+Use a Remote Component when the Workbench needs:
+
+- A multi-panel business Workbench, editor, or canvas.
+- Complex interactions such as drag and drop, a timeline, or graphical editing.
+- Several paged datasets with targeted refresh behavior.
+- Coordination with Assistant chat, file previews, or other Workbench views.
+
+Prefer platform-rendered stats, tables, lists, or read-only details for standard data presentation.
+
+## Recommended project structure
+
+Separate maintained source from generated assets:
+
+```text
+src/lib/
+├── contract-review-view.provider.ts
+└── remote-components/
+    └── contract-review/
+        ├── src/
+        │   ├── main.tsx
+        │   ├── bridge.ts
+        │   ├── i18n.ts
+        │   └── components/
+        ├── app.js
+        └── app.css
+scripts/
+└── build-remote-components.mjs
+```
+
+- `src/**/*.ts` and `src/**/*.tsx` are the source of truth.
+- `app.js` and `app.css` are generated assets; do not edit them manually.
+- The plugin build must generate and copy the Remote Component assets.
+- Add a dedicated TypeScript typecheck for the remote source.
+
+React is the recommended development path. The View protocol also supports `vue` and `esm` runtimes; the current product executes iframe isolation.
+
+## Define stable keys
+
+```ts
+export const PLUGIN_NAME = '@acme/plugin-contract-review'
+export const PROVIDER_KEY = 'contract_review'
+export const VIEW_KEY = 'review'
+export const PUBLIC_VIEW_KEY = `${PROVIDER_KEY}__${VIEW_KEY}`
+export const REMOTE_ENTRY_KEY = 'contract-review'
+export const REVIEW_FEATURE = 'contract-review'
+```
+
+The public view key follows `<providerKey>__<manifestKey>`. `component.entry` is a provider-local entry key, not a browser URL.
+
+## Register the View Provider
+
+The View Provider returns the Workbench manifest and handles its data and actions:
+
+```ts
+import {
+  type IXpertViewExtensionProvider,
+  ViewExtensionProvider
+} from '@xpert-ai/plugin-sdk'
+import type {
+  XpertExtensionViewManifest,
+  XpertResolvedViewHostContext,
+  XpertViewDataResult,
+  XpertViewQuery
+} from '@xpert-ai/contracts'
+
+@ViewExtensionProvider(PROVIDER_KEY)
+export class ContractReviewViewProvider
+  implements IXpertViewExtensionProvider
+{
+  constructor(private readonly reviewService: ContractReviewService) {}
+
+  supports(context: XpertResolvedViewHostContext) {
+    return context.hostType === 'agent'
+  }
+
+  getViewManifests(
+    _context: XpertResolvedViewHostContext,
+    slot: string
+  ): XpertExtensionViewManifest[] {
+    if (slot !== 'agent.workbench.main') return []
+
+    return [
+      {
+        key: VIEW_KEY,
+        title: { en_US: 'Contract Review', zh_Hans: '合同审核' },
+        description: {
+          en_US: 'Review extracted contract data and approve changes.',
+          zh_Hans: '审核合同抽取结果并确认变更。'
+        },
+        hostType: 'agent',
+        slot,
+        source: {
+          provider: PROVIDER_KEY,
+          plugin: PLUGIN_NAME
+        },
+        activation: {
+          requiredFeatures: [REVIEW_FEATURE]
+        },
+        refreshable: true,
+        view: {
+          type: 'remote_component',
+          runtime: 'react',
+          protocolVersion: 1,
+          component: {
+            isolation: 'iframe',
+            entry: REMOTE_ENTRY_KEY
+          },
+          dataSource: { mode: 'platform' }
+        },
+        dataSource: {
+          mode: 'platform',
+          querySchema: {
+            supportsPagination: true,
+            supportsSearch: true,
+            supportsSelection: true,
+            supportsParameters: true,
+            defaultPageSize: 20
+          },
+          cache: { enabled: false }
+        },
+        parameters: [
+          {
+            key: 'status',
+            label: { en_US: 'Status', zh_Hans: '状态' },
+            type: 'string'
+          }
+        ],
+        actions: [
+          {
+            key: 'approve_contract',
+            label: { en_US: 'Approve', zh_Hans: '批准' },
+            placement: 'row',
+            actionType: 'invoke',
+            transport: 'json',
+            permissions: ['contract.review.approve']
+          }
+        ],
+        hostEvents: {
+          subscriptions: [
+            {
+              key: 'contract-mutated',
+              event: 'assistant.tool.completed',
+              filter: {
+                sources: ['chatkit'],
+                toolNames: ['contract_update', 'contract_approve']
+              },
+              action: { type: 'forward', debounceMs: 800 }
+            }
+          ]
+        }
+      }
+    ]
+  }
+
+  getViewData(
+    context: XpertResolvedViewHostContext,
+    viewKey: string,
+    query: XpertViewQuery
+  ): Promise<XpertViewDataResult> {
+    return this.reviewService.getViewData(context, viewKey, query)
+  }
+}
+```
+
+The domain middleware that owns the contract review data and Agent tools should declare `REVIEW_FEATURE`. The Workbench host exposes the view only after the Assistant connects that middleware.
+
+For a fixed Workbench entry, return the same manifest from `agent.workbench.fixed` and add `workbench.fixed` and menu configuration.
+
+## Return the Remote Component entry
+
+The provider returns a complete HTML document from `getRemoteComponentEntry()`. Use the Plugin SDK HTML helper:
+
+```ts
+import { readFile } from 'node:fs/promises'
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+import { renderRemoteReactIframeHtml } from '@xpert-ai/plugin-sdk'
+import type {
+  XpertRemoteComponentEntry,
+  XpertRemoteComponentViewSchema,
+  XpertResolvedViewHostContext
+} from '@xpert-ai/contracts'
+
+const requireFromHere = createRequire(__filename)
+
+async function readPackageFile(packageName: string, file: string) {
+  const root = dirname(requireFromHere.resolve(`${packageName}/package.json`))
+  return readFile(join(root, file), 'utf8')
+}
+
+// Other IXpertViewExtensionProvider methods from the previous section are omitted.
+export class ContractReviewViewProvider {
+  async getRemoteComponentEntry(
+    _context: XpertResolvedViewHostContext,
+    viewKey: string,
+    component: XpertRemoteComponentViewSchema['component']
+  ): Promise<XpertRemoteComponentEntry> {
+    if (viewKey !== VIEW_KEY || component.entry !== REMOTE_ENTRY_KEY) {
+      throw new Error('unsupported_remote_component_entry')
+    }
+
+    const root = join(__dirname, 'remote-components', REMOTE_ENTRY_KEY)
+    const [appScript, appCss, reactUmd, reactDomUmd] = await Promise.all([
+      readFile(join(root, 'app.js'), 'utf8'),
+      readFile(join(root, 'app.css'), 'utf8'),
+      readPackageFile('react', 'umd/react.production.min.js'),
+      readPackageFile('react-dom', 'umd/react-dom.production.min.js')
+    ])
+
+    return {
+      html: renderRemoteReactIframeHtml({
+        title: 'Contract Review',
+        lang: 'en-US',
+        reactUmd,
+        reactDomUmd,
+        appScript,
+        appCss
+      }),
+      contentType: 'text/html; charset=utf-8'
+    }
+  }
+}
+```
+
+The platform validates the remote entry key and re-checks host access, manifest visibility, and feature activation before fetching the HTML.
+
+## Implement the frontend entry
+
+Install the bridge listener first, then render business UI after `init` arrives:
+
+```tsx
+import '@xpert-ai/plugin-shadcn-ui/style.css'
+import { createRoot } from 'react-dom/client'
+import { useEffect, useState } from 'react'
+import { installBridge } from './bridge'
+import type { RemoteInitContext } from './types'
+import { ContractReviewWorkbench } from './components/contract-review-workbench'
+
+function App() {
+  const [context, setContext] = useState<RemoteInitContext | null>(null)
+
+  useEffect(() => installBridge({
+    onInit: (message) => setContext(normalizeInitContext(message)),
+    onHostEvent: (event) => handleHostEvent(event)
+  }), [])
+
+  if (!context) return <LoadingState />
+  return <ContractReviewWorkbench context={context} />
+}
+
+createRoot(document.getElementById('root')!).render(<App />)
+```
+
+See [Remote Component Host Bridge](./remote-component-bridge) for message types, timeouts, actions, files, client commands, and host events.
+
+## Data and actions
+
+A Remote Component does not call platform APIs directly. It requests data through the host bridge:
+
+```ts
+const result = await requestData({
+  page,
+  pageSize,
+  search,
+  parameters: {
+    table: 'contracts',
+    status
+  }
+})
+```
+
+The provider queries from the trusted server context and applies tenant, organization, and user authorization before filtering and pagination:
+
+```ts
+async function loadContractsForWorkbench(
+  service: ContractReviewService,
+  context: XpertResolvedViewHostContext,
+  query: XpertViewQuery
+): Promise<XpertViewDataResult> {
+  return service.listForWorkbench({
+    tenantId: context.tenantId,
+    organizationId: context.organizationId,
+    userId: context.userId,
+    page: query.page ?? 1,
+    pageSize: Math.min(query.pageSize ?? 20, 100),
+    search: query.search,
+    status: getStringParameter(query.parameters, 'status')
+  })
+}
+```
+
+Load large datasets by page and panel. `parameters` accepts only scalar values or scalar arrays; do not send nested filter objects directly.
+
+Run mutations through declared `executeAction` or `executeFileAction` capabilities. A successful action may return `refresh: true`; a complex Remote Component can instead refresh only the affected region from the returned business identifier.
+
+## Theme, components, and layout
+
+- Build buttons, inputs, dialogs, tables, and other standard controls with `@xpert-ai/plugin-shadcn-ui`.
+- Load the shared stylesheet once and call `installShadcnThemeVars()` after applying the host `--xui-*` tokens.
+- Compile Tailwind against the Remote Component TSX and emit production `app.css`.
+- Keep `html`, `body`, `#root`, and the outer application at `width: 100%` and `height: 100%`.
+- Set `min-width: 0`, `min-height: 0`, and controlled overflow through flex and grid ancestors.
+- Make navigation or inspector panels collapsible when they compete with the primary workspace.
+- Use `AlertDialog` for consequential confirmations; do not use browser-native confirmation dialogs.
+
+## Internationalization
+
+Treat host `init.locale` as authoritative and normalize it once at the entry boundary. Maintain at least `en-US` and `zh-Hans`; do not map every `zh-*` locale to Simplified Chinese.
+
+Components should use semantic translation keys and shared `Intl` formatters, without `locale === ...` copy branches in JSX. Keep `{ en_US, zh_Hans }` localized objects at the manifest boundary.
+
+## State and debugging
+
+- Keep ephemeral UI state in React state or refs.
+- Persist durable business state through the host bridge.
+- Do not read or write `localStorage` or `sessionStorage`.
+- Gate detailed logs with host-provided `init.debug.enabled`; keep them off by default in production.
+- Never log tokens, tenant or organization IDs, file contents, full snapshots, or personally sensitive data.
+
+## Optional: open from a tool result
+
+A persistent Workbench entry is listed from its host slot. Use `xpert.extension_view` only when the view should appear after a particular tool call:
+
+```ts
+return {
+  content: [{ type: 'text', text: 'Opening contract review.' }],
+  _meta: {
+    'xpertai/visualization': {
+      type: 'xpert.extension_view',
+      title: 'Contract Review',
+      slotKey: 'tool:contract-review',
+      parameterKey: `contract:${contractId}`,
+      renderMode: 'replace',
+      payload: {
+        version: 1,
+        viewKey: PUBLIC_VIEW_KEY,
+        parameters: { contractId },
+        initialQuery: { selectionId: contractId }
+      }
+    }
+  }
+}
+```
+
+The tool opens an already registered view. It should not return the complete page data or include host identity, API URLs, or credentials.
+
+## Validation checklist
+
+- The View Provider is registered in the plugin server module.
+- The manifest includes `source` and the correct `activation.requiredFeatures`.
+- Removing the owning Feature removes both the Agent tools and the View.
+- Remote entry, local view, and public view keys are stable and tested.
+- The production build regenerates `app.js` and `app.css` and checks for stale output.
+- Iframe messages validate the source window, protocol version, instance ID, and request ID.
+- Data, JSON actions, file actions, client commands, and host events are declared in the manifest.
+- Provider reads and mutations enforce tenant, organization, user, and business authorization.
+- Theme installation works in light, dark, and every supported density.
+- English and Chinese catalogs keep matching keys and interpolation parameters.
+- Workbench E2E loads the real generated assets.
+- Platform-dependent permissions, files, and installation behavior receive an installed-host pass.
+
+Continue with [Remote Component Host Bridge](./remote-component-bridge) for the protocol mapping behind each host capability.

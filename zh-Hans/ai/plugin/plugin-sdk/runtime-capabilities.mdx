@@ -1,0 +1,158 @@
+---
+title: 运行时能力
+description: 在 Xpert 插件中调用宿主提供的类型安全平台服务。
+sidebar_position: 1
+---
+
+运行时能力（Runtime Capability）是插件与 Xpert 宿主服务之间的类型安全边界。插件无需导入宿主实现类或重复搭建基础设施，即可使用工作区文件、知识库、产物、沙箱任务、操作者令牌和项目预配等平台能力。
+
+本页涉及的公共类型和能力键均由 `@xpert-ai/plugin-sdk` 导出。
+
+## 能力模型
+
+能力键是一个冻结对象，包含稳定 ID、说明和仅用于 TypeScript 推导的 API 类型：
+
+```ts
+export type RuntimeCapabilityKey<T> = {
+  readonly id: string
+  readonly description?: string
+  readonly __type?: T
+}
+```
+
+请使用 SDK 导出的能力键对象，不要直接使用字符串。能力键既能让 `get()` 和 `require()` 推导出准确 API 类型，也能让宿主与动态加载的插件通过稳定 ID 对齐同一份契约。
+
+能力注册表提供四个操作：
+
+| 方法 | 用途 |
+| --- | --- |
+| `register(key, implementation)` | 注册或替换实现，主要供宿主基础设施和测试使用。 |
+| `has(key)` | 检查某个实现是否已注册。 |
+| `get(key)` | 返回类型化实现；不可用时返回 `undefined`。 |
+| `require(key)` | 返回类型化实现；不可用时抛出错误。 |
+
+## 在智能体中间件中解析能力
+
+智能体中间件可通过 `context.runtime.capabilities` 访问当前执行范围内的能力注册表：
+
+```ts
+import {
+  WorkspaceFilesRuntimeCapability,
+  type IAgentMiddlewareContext
+} from '@xpert-ai/plugin-sdk'
+
+export function resolveWorkspaceFiles(context: IAgentMiddlewareContext) {
+  const files = context.runtime.capabilities?.get(
+    WorkspaceFilesRuntimeCapability
+  )
+
+  if (!files) {
+    return { available: false as const }
+  }
+
+  return { available: true as const, files }
+}
+```
+
+功能可以隐藏或降级时使用 `get()`；只有在插件已确认该能力是当前操作的必要前提时，才使用 `require()`：
+
+```ts
+const files = context.runtime.capabilities?.require(
+  WorkspaceFilesRuntimeCapability
+)
+
+if (!files) {
+  throw new Error('当前运行时未提供工作区文件能力')
+}
+```
+
+能力注册表由宿主按执行上下文提供。能力方法仍会执行租户、组织、用户、工作区、项目和 Xpert 范围校验；调用者传入 ID 并不能绕过这些边界。
+
+## 在 NestJS 服务提供器中解析能力
+
+服务端插件的服务提供器可以注入平台能力注册表。若插件需要兼容尚未提供该能力的宿主版本，请将依赖声明为可选：
+
+```ts
+import { Inject, Injectable, Optional } from '@nestjs/common'
+import {
+  XPERT_RUNTIME_CAPABILITIES_TOKEN,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+@Injectable()
+export class ExportService {
+  constructor(
+    @Optional()
+    @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
+    private readonly capabilities?: RuntimeCapabilityRegistry
+  ) {}
+}
+```
+
+应在实际操作附近解析能力，以便准确报告可用性。不要跨请求缓存与用户或执行上下文绑定的结果。
+
+## 运行时包中的能力
+
+| 导出的能力键 | 稳定 ID | API 摘要 |
+| --- | --- | --- |
+| `WorkspaceFilesRuntimeCapability` | `platform.workspace.files` | 存储、解析、读取、删除、理解和搜索工作区文件。 |
+| `KnowledgebaseRuntimeCapability` | `platform.knowledgebase` | 列出和搜索知识库，管理插件写入的分块。 |
+| `KnowledgebaseProvisioningRuntimeCapability` | `platform.knowledgebase.provisioning` | 幂等预配托管知识库并连接到智能体。 |
+| `KnowledgebaseDocumentsRuntimeCapability` | `platform.knowledgebase.documents` | 上传、导入、组织、处理、检查和删除文档。 |
+| `KnowledgeDocumentVisualAssetsRuntimeCapability` | `platform.knowledgebase.visual-assets` | 在不暴露宿主存储路径的前提下解析受治理的文档图片。 |
+| `ArtifactsRuntimeCapability` | `platform.artifacts` | 创建、版本化、预览、共享、归档和删除平台托管产物。 |
+| `SandboxJobsRuntimeCapability` | `platform.sandbox.jobs` | 在隔离、短生命周期的沙箱运行时中运行已注册操作。 |
+| `ActorTokenRuntimeCapability` | `platform.actor-token` | 为出站 API 调用签发短生命周期的宿主操作者令牌。 |
+| `ProjectProvisioningRuntimeCapability` | `platform.project.provisioning` | 幂等创建或协调对话项目，并连接助手。 |
+
+继续阅读详细参考：
+
+- [工作区文件](./workspace-files)
+- [知识库能力](./knowledgebase)
+- [产物](./artifacts)
+- [沙箱任务](./sandbox-jobs)
+- [操作者令牌](./actor-token)
+- [项目预配](./project-provisioning)
+
+## 定义能力与测试消费者
+
+`createRuntimeCapability<T>()` 可为宿主或插件子系统创建类型化能力键。不要复用现有 `platform.*` ID 来承载不同契约。如果消费者不应注册实现，请使用只暴露 `get()` 的只读 `RuntimeCapabilityResolver`。
+
+```ts
+import { createRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+interface InspectionAuditApi {
+  append(input: { resourceId: string; event: string }): Promise<void>
+}
+
+export const InspectionAuditRuntimeCapability =
+  createRuntimeCapability<InspectionAuditApi>('acme.inspection.audit', {
+    description: 'Append an inspection audit event.'
+  })
+```
+
+单元测试可使用 `DefaultRuntimeCapabilityRegistry` 注册类型化模拟实现：
+
+```ts
+import {
+  DefaultRuntimeCapabilityRegistry,
+  WorkspaceFilesRuntimeCapability,
+  type WorkspaceFilesApi
+} from '@xpert-ai/plugin-sdk'
+
+const workspaceFiles: WorkspaceFilesApi = createWorkspaceFilesFake()
+
+const capabilities = new DefaultRuntimeCapabilityRegistry().register(
+  WorkspaceFilesRuntimeCapability,
+  workspaceFiles
+)
+```
+
+生产插件通常只消费平台能力键，其实现由宿主基础设施注册。对于可选能力，应同时测试“可用”和“不可用”两条路径。
+
+## 兼容性规则
+
+- 从 `@xpert-ai/plugin-sdk` 导入能力键和 API 类型，不要在插件中复制接口。
+- 将能力可用性视为运行时条件。插件安装成功，并不代表宿主服务、提供器、绑定或已注册沙箱操作一定就绪。
+- 在异步边界传递可移植引用和结构化 DTO，不要通过队列或持久化聊天元数据传递原始文件字节、持有者令牌、宿主路径或实现实例。
+- 将能力返回值限制在当前授权范围内；后续任务或回调应重新解析所需资源。

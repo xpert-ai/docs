@@ -1,0 +1,385 @@
+---
+title: 工作台远程组件
+description: 使用视图扩展、React 和宿主桥接，为 Xpert 插件构建自定义工作台前端界面。
+---
+
+# 工作台远程组件
+
+远程组件（Remote Component）是视图扩展（View Extension）的一种渲染方式，用于在 Assistant 工作台中承载插件自定义 UI。
+
+视图扩展负责视图出现在哪里、对谁可见以及允许使用哪些能力；远程组件负责这些能力在 iframe 中如何呈现和交互。它不是独立的插件类型，也不替代服务端视图提供器。
+
+```text
+ViewExtensionProvider
+  -> 视图清单：位置、激活、数据、操作、事件
+  -> 远程组件入口
+  -> 工作台 iframe
+  <-> 宿主桥接
+```
+
+开始前建议先阅读[视图扩展](./view-extension)。
+
+## 适用场景
+
+当工作台需要以下能力时使用远程组件：
+
+- 多面板业务工作台、编辑器或画布。
+- 拖放、时间线、图形化编辑等复杂交互。
+- 需要组合多个分页数据集和局部刷新。
+- 需要与 Assistant 对话、文件预览或其他工作台视图协同。
+
+标准指标、表格、列表或只读详情优先使用平台声明式视图。
+
+## 推荐工程结构
+
+将可维护源码和生成产物分开：
+
+```text
+src/lib/
+├── contract-review-view.provider.ts
+└── remote-components/
+    └── contract-review/
+        ├── src/
+        │   ├── main.tsx
+        │   ├── bridge.ts
+        │   ├── i18n.ts
+        │   └── components/
+        ├── app.js
+        └── app.css
+scripts/
+└── build-remote-components.mjs
+```
+
+- `src/**/*.ts` 和 `src/**/*.tsx` 是源码。
+- `app.js` 和 `app.css` 是构建产物，不应手工维护。
+- 插件构建必须生成并复制远程组件产物。
+- 为远程源码配置独立的 TypeScript 类型检查。
+
+React 是推荐开发方式。视图协议也支持 `vue` 和 `esm` 运行时；当前产品执行 iframe 隔离模式。
+
+## 定义稳定键
+
+```ts
+export const PLUGIN_NAME = '@acme/plugin-contract-review'
+export const PROVIDER_KEY = 'contract_review'
+export const VIEW_KEY = 'review'
+export const PUBLIC_VIEW_KEY = `${PROVIDER_KEY}__${VIEW_KEY}`
+export const REMOTE_ENTRY_KEY = 'contract-review'
+export const REVIEW_FEATURE = 'contract-review'
+```
+
+公开视图键遵循 `<providerKey>__<manifestKey>`。`component.entry` 是提供器内部的入口键，不是浏览器 URL。
+
+## 注册视图提供器
+
+视图提供器返回工作台清单，并处理数据与操作：
+
+```ts
+import {
+  type IXpertViewExtensionProvider,
+  ViewExtensionProvider
+} from '@xpert-ai/plugin-sdk'
+import type {
+  XpertExtensionViewManifest,
+  XpertResolvedViewHostContext,
+  XpertViewDataResult,
+  XpertViewQuery
+} from '@xpert-ai/contracts'
+
+@ViewExtensionProvider(PROVIDER_KEY)
+export class ContractReviewViewProvider
+  implements IXpertViewExtensionProvider
+{
+  constructor(private readonly reviewService: ContractReviewService) {}
+
+  supports(context: XpertResolvedViewHostContext) {
+    return context.hostType === 'agent'
+  }
+
+  getViewManifests(
+    _context: XpertResolvedViewHostContext,
+    slot: string
+  ): XpertExtensionViewManifest[] {
+    if (slot !== 'agent.workbench.main') return []
+
+    return [
+      {
+        key: VIEW_KEY,
+        title: { en_US: 'Contract Review', zh_Hans: '合同审核' },
+        description: {
+          en_US: 'Review extracted contract data and approve changes.',
+          zh_Hans: '审核合同抽取结果并确认变更。'
+        },
+        hostType: 'agent',
+        slot,
+        source: {
+          provider: PROVIDER_KEY,
+          plugin: PLUGIN_NAME
+        },
+        activation: {
+          requiredFeatures: [REVIEW_FEATURE]
+        },
+        refreshable: true,
+        view: {
+          type: 'remote_component',
+          runtime: 'react',
+          protocolVersion: 1,
+          component: {
+            isolation: 'iframe',
+            entry: REMOTE_ENTRY_KEY
+          },
+          dataSource: { mode: 'platform' }
+        },
+        dataSource: {
+          mode: 'platform',
+          querySchema: {
+            supportsPagination: true,
+            supportsSearch: true,
+            supportsSelection: true,
+            supportsParameters: true,
+            defaultPageSize: 20
+          },
+          cache: { enabled: false }
+        },
+        parameters: [
+          {
+            key: 'status',
+            label: { en_US: 'Status', zh_Hans: '状态' },
+            type: 'string'
+          }
+        ],
+        actions: [
+          {
+            key: 'approve_contract',
+            label: { en_US: 'Approve', zh_Hans: '批准' },
+            placement: 'row',
+            actionType: 'invoke',
+            transport: 'json',
+            permissions: ['contract.review.approve']
+          }
+        ],
+        hostEvents: {
+          subscriptions: [
+            {
+              key: 'contract-mutated',
+              event: 'assistant.tool.completed',
+              filter: {
+                sources: ['chatkit'],
+                toolNames: ['contract_update', 'contract_approve']
+              },
+              action: { type: 'forward', debounceMs: 800 }
+            }
+          ]
+        }
+      }
+    ]
+  }
+
+  getViewData(
+    context: XpertResolvedViewHostContext,
+    viewKey: string,
+    query: XpertViewQuery
+  ): Promise<XpertViewDataResult> {
+    return this.reviewService.getViewData(context, viewKey, query)
+  }
+}
+```
+
+`REVIEW_FEATURE` 应由拥有合同审核数据和 Agent 工具的领域中间件声明。Assistant 连接该中间件后，工作台宿主才会展示视图。
+
+如果视图需要固定工作台入口，在 `agent.workbench.fixed` 插槽返回同一清单，并增加 `workbench.fixed` 和菜单配置。
+
+## 返回远程组件入口
+
+提供器通过 `getRemoteComponentEntry()` 返回完整 HTML 文档。推荐使用 Plugin SDK 的 HTML 生成器：
+
+```ts
+import { readFile } from 'node:fs/promises'
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+import { renderRemoteReactIframeHtml } from '@xpert-ai/plugin-sdk'
+import type {
+  XpertRemoteComponentEntry,
+  XpertRemoteComponentViewSchema,
+  XpertResolvedViewHostContext
+} from '@xpert-ai/contracts'
+
+const requireFromHere = createRequire(__filename)
+
+async function readPackageFile(packageName: string, file: string) {
+  const root = dirname(requireFromHere.resolve(`${packageName}/package.json`))
+  return readFile(join(root, file), 'utf8')
+}
+
+// 省略上一节已经实现的其他 IXpertViewExtensionProvider 方法。
+export class ContractReviewViewProvider {
+  async getRemoteComponentEntry(
+    _context: XpertResolvedViewHostContext,
+    viewKey: string,
+    component: XpertRemoteComponentViewSchema['component']
+  ): Promise<XpertRemoteComponentEntry> {
+    if (viewKey !== VIEW_KEY || component.entry !== REMOTE_ENTRY_KEY) {
+      throw new Error('unsupported_remote_component_entry')
+    }
+
+    const root = join(__dirname, 'remote-components', REMOTE_ENTRY_KEY)
+    const [appScript, appCss, reactUmd, reactDomUmd] = await Promise.all([
+      readFile(join(root, 'app.js'), 'utf8'),
+      readFile(join(root, 'app.css'), 'utf8'),
+      readPackageFile('react', 'umd/react.production.min.js'),
+      readPackageFile('react-dom', 'umd/react-dom.production.min.js')
+    ])
+
+    return {
+      html: renderRemoteReactIframeHtml({
+        title: 'Contract Review',
+        lang: 'en-US',
+        reactUmd,
+        reactDomUmd,
+        appScript,
+        appCss
+      }),
+      contentType: 'text/html; charset=utf-8'
+    }
+  }
+}
+```
+
+平台会校验远程入口键，并在获取 HTML 前重新检查宿主访问、视图可见性和功能激活状态。
+
+## 实现前端入口
+
+远程组件先安装桥接监听器，再在收到 `init` 后渲染业务 UI：
+
+```tsx
+import '@xpert-ai/plugin-shadcn-ui/style.css'
+import { createRoot } from 'react-dom/client'
+import { useEffect, useState } from 'react'
+import { installBridge } from './bridge'
+import type { RemoteInitContext } from './types'
+import { ContractReviewWorkbench } from './components/contract-review-workbench'
+
+function App() {
+  const [context, setContext] = useState<RemoteInitContext | null>(null)
+
+  useEffect(() => installBridge({
+    onInit: (message) => setContext(normalizeInitContext(message)),
+    onHostEvent: (event) => handleHostEvent(event)
+  }), [])
+
+  if (!context) return <LoadingState />
+  return <ContractReviewWorkbench context={context} />
+}
+
+createRoot(document.getElementById('root')!).render(<App />)
+```
+
+完整的消息类型、超时、操作、文件、客户端命令和宿主事件处理见[远程组件宿主桥接](./remote-component-bridge)。
+
+## 数据与操作
+
+远程组件不直接调用平台 API。它通过宿主桥接请求数据：
+
+```ts
+const result = await requestData({
+  page,
+  pageSize,
+  search,
+  parameters: {
+    table: 'contracts',
+    status
+  }
+})
+```
+
+提供器使用服务端上下文查询数据，并在筛选和分页前应用租户、组织与用户权限：
+
+```ts
+async function loadContractsForWorkbench(
+  service: ContractReviewService,
+  context: XpertResolvedViewHostContext,
+  query: XpertViewQuery
+): Promise<XpertViewDataResult> {
+  return service.listForWorkbench({
+    tenantId: context.tenantId,
+    organizationId: context.organizationId,
+    userId: context.userId,
+    page: query.page ?? 1,
+    pageSize: Math.min(query.pageSize ?? 20, 100),
+    search: query.search,
+    status: getStringParameter(query.parameters, 'status')
+  })
+}
+```
+
+数据量较大的工作台应按页和面板远程加载。`parameters` 只传递标量或标量数组，不要直接发送嵌套筛选对象。
+
+变更操作通过清单声明的 `executeAction` 或 `executeFileAction` 完成。成功结果可以返回 `refresh: true`；复杂远程组件也可以根据返回的业务 ID 只刷新受影响的区域。
+
+## 主题、组件与布局
+
+- 使用 `@xpert-ai/plugin-shadcn-ui` 构建按钮、输入框、对话框、表格等标准控件。
+- 在远程入口中加载一次共享样式，并在应用宿主 `--xui-*` 主题令牌后调用 `installShadcnThemeVars()`。
+- 使用 Tailwind 编译远程组件自己的 TSX，生成生产 `app.css`。
+- 保持 `html`、`body`、`#root` 和最外层应用为 `width: 100%`、`height: 100%`。
+- 在 flex/grid 祖先上设置 `min-width: 0`、`min-height: 0` 和受控溢出。
+- 将竞争主工作区宽度的导航或检查器面板设计为可折叠。
+- 使用 `AlertDialog` 处理真正有后果的确认；不要使用浏览器原生确认框。
+
+## 多语言
+
+以宿主 `init.locale` 为准，在入口处一次性归一化语言。至少维护 `en-US` 和 `zh-Hans` 资源；不要把所有 `zh-*` 语言都映射为简体中文。
+
+组件使用语义翻译键和共享 `Intl` 格式化器，不应在 JSX 中编写 `locale === ...` 文案分支。视图清单继续使用 `{ en_US, zh_Hans }` 平台多语言对象。
+
+## 状态与调试
+
+- 临时 UI 状态保存在 React state 或 ref 中。
+- 持久业务状态通过宿主桥接写入服务端。
+- 不要读取或写入 `localStorage`、`sessionStorage`。
+- 详细日志由宿主 `init.debug.enabled` 控制，生产环境默认关闭。
+- 日志不得包含令牌、租户/组织 ID、文件内容、完整快照或个人敏感信息。
+
+## 可选：由工具按需打开
+
+常驻工作台入口由宿主枚举插槽。只有当视图应在某个工具调用后出现时，才返回 `xpert.extension_view`：
+
+```ts
+return {
+  content: [{ type: 'text', text: '正在打开合同审核。' }],
+  _meta: {
+    'xpertai/visualization': {
+      type: 'xpert.extension_view',
+      title: '合同审核',
+      slotKey: 'tool:contract-review',
+      parameterKey: `contract:${contractId}`,
+      renderMode: 'replace',
+      payload: {
+        version: 1,
+        viewKey: PUBLIC_VIEW_KEY,
+        parameters: { contractId },
+        initialQuery: { selectionId: contractId }
+      }
+    }
+  }
+}
+```
+
+工具只负责打开已经注册的视图，不应返回完整页面数据，也不应携带宿主身份、API 地址或凭据。
+
+## 验证清单
+
+- 视图提供器已在插件服务端模块中注册。
+- 清单包含 `source` 和正确的 `activation.requiredFeatures`。
+- 移除对应功能后，Agent 工具和视图都会消失。
+- 远程入口键、视图键和公开视图键稳定且经过测试。
+- 生产构建会重新生成 `app.js` 和 `app.css`，并检查生成产物未过期。
+- iframe 消息校验来源、协议版本、实例 ID 和请求 ID。
+- 数据、JSON 操作、文件操作、客户端命令和宿主事件都已在清单中声明。
+- 数据读取和变更按租户、组织、用户和业务权限隔离。
+- 主题在浅色、深色和支持的密度下正确工作。
+- 中英文资源、键和插值参数保持一致。
+- 使用真实生成产物运行工作台端到端测试。
+- 涉及平台权限、文件或安装状态时，再执行一次已安装平台验证。
+
+继续阅读[远程组件宿主桥接](./remote-component-bridge)，查看每种宿主能力的协议映射。

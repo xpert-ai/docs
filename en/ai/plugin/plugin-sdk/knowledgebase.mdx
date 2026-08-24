@@ -1,0 +1,239 @@
+---
+title: Knowledgebase Runtime
+description: Search, provision, organize, process, and safely consume knowledgebase content.
+sidebar_position: 3
+---
+
+The runtime package exposes four related capability contracts for knowledgebase access. Use the narrowest contract that matches the operation.
+
+| Capability | Stable ID | Responsibility |
+| --- | --- | --- |
+| `KnowledgebaseRuntimeCapability` | `platform.knowledgebase` | List, search, write, and delete plugin-managed chunks. |
+| `KnowledgebaseProvisioningRuntimeCapability` | `platform.knowledgebase.provisioning` | Idempotently create managed knowledgebases and connect them to an Agent. |
+| `KnowledgebaseDocumentsRuntimeCapability` | `platform.knowledgebase.documents` | Upload, import, organize, process, inspect, and delete persistent documents. |
+| `KnowledgeDocumentVisualAssetsRuntimeCapability` | `platform.knowledgebase.visual-assets` | Resolve and consume governed document images without exposing storage paths. |
+
+## List and search knowledgebases
+
+`KnowledgebaseApi` provides:
+
+| Method | Purpose |
+| --- | --- |
+| `list(input)` | List accessible knowledgebases, optionally by workspace, publication state, and limit. |
+| `search(input)` | Search one or more knowledgebases and return documents plus filter diagnostics. |
+| `writeChunk(input)` | Idempotently write a plugin-managed text chunk. |
+| `deleteChunks(input)` | Delete plugin-managed chunks by keys, key prefix, or managed document key. |
+
+Search supports `vector`, `graph`, and `hybrid` retrieval. Graph settings include `neighborHops`, `entityTopK`, `communityTopK`, and `graphWeight`.
+
+```ts
+import { KnowledgebaseRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const knowledgebase = context.runtime.capabilities?.require(
+  KnowledgebaseRuntimeCapability
+)
+
+if (!knowledgebase) throw new Error('Knowledgebase runtime is unavailable')
+
+const result = await knowledgebase.search({
+  knowledgebaseIds: context.knowledgebaseIds ?? [],
+  query: 'Which inspection rules apply to high-pressure valves?',
+  k: 10,
+  score: 0.65,
+  retrieval: {
+    mode: 'hybrid',
+    neighborHops: 1,
+    graphWeight: 0.35
+  },
+  source: '@acme/plugin-valve-review',
+  requestId: executionId
+})
+
+for (const document of result.documents) {
+  console.log(document.pageContent, document.metadata)
+}
+```
+
+Inspect `result.diagnostics` when filters or retrieval branches do not produce the expected result. Diagnostics report the effective filter, status, hit counts, latency, fallbacks, and stable error codes.
+
+### Idempotent plugin-written chunks
+
+`writeChunk()` requires a stable `writeKey`. A retry can return `status: 'skipped'` instead of duplicating content. Use `document.key` when the plugin needs an independently managed document that can be placed in a folder.
+
+```ts
+await knowledgebase.writeChunk({
+  xpertId,
+  agentKey: 'reviewer',
+  knowledgebaseIds,
+  knowledgebaseId,
+  text: normalizedRequirement,
+  title: requirementCode,
+  writeKey: `requirement:${requirementId}:${revision}`,
+  document: {
+    key: `baseline:${baselineId}`,
+    name: `Baseline ${baselineCode}`,
+    parentId: baselineFolderId
+  },
+  metadata: {
+    requirementId,
+    revision
+  }
+})
+```
+
+Delete only keys owned by the plugin. `deleteDocumentIfEmpty` removes the managed document only after its chunks have been removed and the document is empty.
+
+## Provision managed knowledgebases
+
+`KnowledgebaseProvisioningApi` has two idempotent operations:
+
+| Method | Purpose |
+| --- | --- |
+| `ensure(input)` | Create or update a namespaced set of managed knowledgebases. |
+| `connectAgent(input)` | Connect knowledgebase IDs and optional retrieval policies to an Agent key. |
+
+Each `KnowledgebaseProvisioningSpec` has a stable `key`, display metadata, permission (`private`, `organization`, or `public`), optional parsing defaults, a typed metadata schema, and an incremental-sync flag.
+
+```ts
+import { KnowledgebaseProvisioningRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const provisioning = capabilities.require(
+  KnowledgebaseProvisioningRuntimeCapability
+)
+
+const ensured = await provisioning.ensure({
+  workspaceId,
+  namespace: '@acme/plugin-valve-review',
+  inheritEmbeddingModel: true,
+  knowledgebases: [
+    {
+      key: 'requirements',
+      name: 'Valve requirements',
+      description: 'Managed requirements used by the valve review Agent.',
+      permission: 'organization',
+      language: 'English',
+      chunkSize: 1200,
+      chunkOverlap: 120,
+      metadataSchema: [
+        { key: 'revision', type: 'number', scope: 'document' }
+      ],
+      incrementalSyncEnabled: true
+    }
+  ]
+})
+
+await provisioning.connectAgent({
+  workspaceId,
+  xpertId,
+  agentKey: 'reviewer',
+  knowledgebaseIds: ensured.knowledgebases.map((item) => item.id)
+})
+```
+
+Keep `namespace` and each `key` stable across retries and upgrades. When `inheritEmbeddingModel` is enabled, the host reuses an accessible configured embedding model; provisioning fails explicitly if no suitable model is configured.
+
+## Manage persistent documents
+
+`KnowledgebaseDocumentsApi` separates file upload from document creation and processing:
+
+| Method | Purpose |
+| --- | --- |
+| `listDocuments(input)` | Page through root, folder, or descendant documents. |
+| `createFolder(input)` | Create a folder under the root or another folder. |
+| `moveDocument(input)` | Move a document with an optional expected version. |
+| `uploadFile(input)` | Upload bytes and return stored file metadata. |
+| `importArchive(input)` | Extract a bounded archive, create documents, and report skipped entries and warnings. |
+| `createDocuments(input)` | Create document records from uploaded files or source drafts. |
+| `startProcessing(input)` | Start parsing/indexing for document IDs. |
+| `getDocumentStatus(input)` | Read current processing state and progress. |
+| `deleteDocuments(input)` | Delete document IDs and report missing IDs. |
+
+```ts
+import { KnowledgebaseDocumentsRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const documents = capabilities.require(
+  KnowledgebaseDocumentsRuntimeCapability
+)
+
+const uploaded = await documents.uploadFile({
+  knowledgebaseId,
+  parentId: folderId,
+  file: {
+    buffer: sourceBuffer,
+    originalname: 'requirements.pdf',
+    mimetype: 'application/pdf',
+    size: sourceBuffer.length
+  }
+})
+
+const created = await documents.createDocuments({
+  knowledgebaseId,
+  documents: [
+    {
+      name: uploaded.name,
+      filePath: uploaded.filePath,
+      fileUrl: uploaded.fileUrl,
+      mimeType: uploaded.mimeType,
+      size: uploaded.size,
+      parentId: folderId
+    }
+  ],
+  process: true,
+  metadata: { source: 'valve-review' }
+})
+```
+
+For archive import, set appropriate `maxEntries`, `maxEntrySizeBytes`, `maxDepth`, and `supportedExtensions`. Always surface `skipped`, `warnings`, and `unsupported` to an operator instead of treating a partial import as a complete success.
+
+Use `expectedVersion` when moving a document that may be edited concurrently.
+
+## Consume visual assets safely
+
+`KnowledgeDocumentVisualAssetsApi` is a governed four-step lifecycle:
+
+1. `issueCandidates()` returns execution-scoped logical paths selected from text anchors and business scope.
+2. `prepareImages()` validates those paths and prepares portable inputs for immutable Artifact versions.
+3. `consumeImageBatch()` consumes a prepared batch and returns validated image payloads.
+4. `discardImageBatch()` releases a batch that will not be consumed.
+
+The `filePath` returned for a visual candidate is not a host path and can only be resolved through this capability.
+
+```ts
+import {
+  KnowledgeDocumentVisualAssetsRuntimeCapability
+} from '@xpert-ai/plugin-sdk'
+
+const visuals = capabilities.require(
+  KnowledgeDocumentVisualAssetsRuntimeCapability
+)
+
+const issued = await visuals.issueCandidates({
+  knowledgebaseId,
+  knowledgeDocumentId,
+  query: 'nameplate pressure and connection drawing',
+  textAnchors: [{ page: 4, chunkId, sourceBlockIds }],
+  maxAssets: 4,
+  businessScope: {
+    namespace: 'bom.requirement-evidence',
+    caseId,
+    baselineId,
+    runId,
+    sourceDocumentId
+  }
+})
+
+const prepared = await visuals.prepareImages({
+  filePaths: issued.candidates.map((candidate) => candidate.filePath)
+})
+
+let consumed = false
+try {
+  const images = await visuals.consumeImageBatch(prepared.batchRef)
+  consumed = true
+  // Use validated images inside this trusted server operation.
+} finally {
+  if (!consumed) await visuals.discardImageBatch(prepared.batchRef)
+}
+```
+
+`artifactInputs` is server-only materialization data. Never copy it, `batchRef`, base64 image data, or logical paths into `ToolMessage` content or persisted chat metadata. Persist an Artifact or another governed reference when an image must outlive the current execution.

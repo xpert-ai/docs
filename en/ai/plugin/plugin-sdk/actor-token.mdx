@@ -1,0 +1,69 @@
+---
+title: Actor Token Runtime
+description: Mint short-lived host-issued bearer tokens for scoped outbound API calls.
+sidebar_position: 6
+---
+
+`ActorTokenRuntimeCapability` exposes `ActorTokenApi` under `platform.actor-token`. It mints a short-lived bearer token representing the current authorized actor for a specific outbound audience.
+
+Use this capability when trusted server-side plugin code must call a host or connected service that accepts a host-issued actor token. It is not a long-lived plugin credential and must not be exposed to an iframe, Agent message, tool result, log, or persisted plugin record.
+
+## API
+
+```ts
+type ActorTokenRequest = {
+  audience?: string | string[]
+  ttlSeconds?: number
+  act?: Record<string, string | number | boolean | null | undefined>
+}
+
+type ActorTokenResult = {
+  token: string
+  expiresAt: string
+  audience: string | string[]
+}
+
+interface ActorTokenApi {
+  getToken(input?: ActorTokenRequest): Promise<ActorTokenResult>
+}
+```
+
+- `audience` identifies the intended receiving service or services.
+- `ttlSeconds` requests the required lifetime for the outbound operation.
+- `act` carries bounded scalar actor context required by the receiving contract.
+
+## Example
+
+```ts
+import { ActorTokenRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const actorTokens = context.runtime.capabilities?.require(
+  ActorTokenRuntimeCapability
+)
+
+if (!actorTokens) throw new Error('Actor Token runtime is unavailable')
+
+const actor = await actorTokens.getToken({
+  audience: 'plugins',
+  ttlSeconds: 120,
+  act: {
+    sub: 'valve_business_workbench',
+    view: 'valve-object-360'
+  }
+})
+
+const object = await governedClient.getObject({
+  objectId: valveId,
+  actorToken: actor.token
+})
+```
+
+Request the narrowest audience and lifetime supported by the receiving API. Use the token immediately and discard it after the call.
+
+## Security rules
+
+- Resolve and use tokens only in trusted server-side code.
+- Never put `token` in queue payloads, URLs, browser messages, exceptions, logs, analytics, or database columns.
+- Do not cache or reuse the token beyond `expiresAt`; mint a new token for a later job.
+- Keep `act` small and machine-readable. Do not include credentials, large objects, or user-authored prose.
+- The receiving service must still authorize the requested operation. A minted token does not grant capabilities beyond the host's current actor and audience policy.

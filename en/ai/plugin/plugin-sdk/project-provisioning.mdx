@@ -1,0 +1,66 @@
+---
+title: Project Provisioning Runtime
+description: Idempotently create or reconcile a Chat Project and connect an Assistant.
+sidebar_position: 7
+---
+
+`ProjectProvisioningRuntimeCapability` exposes `ProjectProvisioningApi` under `platform.project.provisioning`. It is for plugins that own a one-to-one mapping between a business project and an Xpert Chat Project.
+
+The `ensure()` operation creates the Chat Project or reconciles its current name, lifecycle status, workspace, and connected Assistant without changing the caller-supplied project ID.
+
+## Contract
+
+```ts
+type ProjectEnsureInput = {
+  projectId: string
+  workspaceId: string
+  xpertId: string
+  name: string
+  status: 'active' | 'archived'
+}
+
+type ProjectEnsureResult = {
+  projectId: string
+  workspaceId: string
+  xpertIds: string[]
+  operation: 'created' | 'updated'
+}
+
+interface ProjectProvisioningApi {
+  ensure(input: ProjectEnsureInput): Promise<ProjectEnsureResult>
+}
+```
+
+`xpertIds` is the complete effective set of connected Assistants after synchronization, not only the Assistant supplied by the current call.
+
+## Example
+
+```ts
+import { ProjectProvisioningRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const projects = capabilities.require(
+  ProjectProvisioningRuntimeCapability
+)
+
+const result = await projects.ensure({
+  projectId: businessProject.chatProjectId,
+  workspaceId: businessProject.workspaceId,
+  xpertId: pluginConfig.assistantId,
+  name: businessProject.name,
+  status: businessProject.archived ? 'archived' : 'active'
+})
+
+await projectRepository.update(businessProject.id, {
+  chatProjectId: result.projectId,
+  provisioningOperation: result.operation
+})
+```
+
+## Idempotency and ownership
+
+- Generate or reserve `projectId` once when the business project is created, then reuse it for every retry and reconciliation.
+- Do not generate a new ID after a timeout. Call `ensure()` again with the same ID.
+- Keep `workspaceId` aligned with the workspace that owns both the business project and the connected Assistant.
+- Synchronize `status: 'archived'` when the business project is archived; do not silently create a replacement active project.
+- Treat `operation` as reconciliation evidence. Product logic should depend on the effective result, not assume every successful call inserted a new record.
+

@@ -1,0 +1,326 @@
+---
+title: 远程组件宿主桥接
+description: 使用受控消息协议连接工作台远程组件、宿主和视图提供器。
+---
+
+# 远程组件宿主桥接
+
+宿主桥接连接远程组件 iframe、工作台宿主和插件视图提供器。它不是任意远程调用通道：每项能力都必须同时具有清单声明、宿主消息处理和对应的服务端实现。
+
+```text
+远程组件
+  -> postMessage
+  -> 工作台宿主
+  -> 已认证的视图扩展 API
+  -> IXpertViewExtensionProvider
+```
+
+远程组件只发送业务意图。宿主负责解析当前用户、宿主、租户和组织上下文，并在调用提供器前校验视图、功能、权限和能力声明。
+
+## 三层能力契约
+
+| 层 | 所有者 | 作用 |
+| --- | --- | --- |
+| 消息协议 | 宿主与远程组件 | 定义 iframe 请求、响应和生命周期消息 |
+| 视图清单 | 插件视图提供器 | 声明允许使用的数据、操作、文件、客户端命令和事件 |
+| 提供器方法 | 插件服务端 | 在可信服务端上下文中执行数据查询或业务操作 |
+
+缺少任意一层时，该能力都不应执行。
+
+## 消息信封
+
+所有消息使用固定通道和协议版本：
+
+```ts
+interface RemoteMessageEnvelope {
+  channel: 'xpertai.remote_component'
+  protocolVersion: 1
+  instanceId?: string
+  type: string
+  requestId?: string
+}
+```
+
+- iframe 加载完成后发送 `ready`。
+- 宿主使用 `init` 返回 `instanceId`、视图清单、初始查询、语言、主题和调试配置。
+- 后续消息必须携带匹配的 `instanceId`。
+- 请求与响应使用同一个 `requestId`。
+- iframe 只接受 `window.parent` 发出的消息；宿主只接受当前 iframe `contentWindow` 发出的消息。
+
+## 支持的消息
+
+宿主发送给 iframe：
+
+| 消息 | 用途 |
+| --- | --- |
+| `init` | 初始化清单、查询、语言、主题和调试状态 |
+| `hostEvent` | 转发与 `manifest.hostEvents` 匹配的宿主事件 |
+| `data` | `requestData` 的响应 |
+| `parameterOptions` | 参数选项响应 |
+| `actionResult` | JSON 操作响应 |
+| `fileActionResult` | 文件操作响应 |
+| `fileAccessResult` | 文件预览或下载授权响应 |
+| `clientCommandResult` | 客户端命令响应 |
+| `error` | 与 `requestId` 对应的请求错误 |
+
+iframe 发送给宿主：
+
+| 消息 | 用途 |
+| --- | --- |
+| `ready` | 请求初始化 |
+| `resize` | 请求调整非固定工作台中的 iframe 高度 |
+| `notify` | 请求显示宿主通知 |
+| `requestData` | 查询视图数据 |
+| `requestParameterOptions` | 查询动态参数选项 |
+| `executeAction` | 执行 JSON 操作 |
+| `executeFileAction` | 执行文件上传操作 |
+| `requestFileAccess` | 请求文件预览或下载授权 |
+| `invokeClientCommand` | 请求宿主执行界面操作 |
+
+## 能力映射
+
+| 能力 | 清单声明 | iframe 消息 | 服务端处理 |
+| --- | --- | --- | --- |
+| 数据查询 | `dataSource` | `requestData` | `getViewData` |
+| 参数选项 | `parameters[].optionSource` | `requestParameterOptions` | `getViewParameterOptions` |
+| JSON 操作 | `actions[].transport = 'json'` | `executeAction` | `executeViewAction` |
+| 文件操作 | `actions[].transport = 'file'` | `executeFileAction` | `executeViewFileAction` |
+| 文件访问 | `fileAccess.purposes` | `requestFileAccess` | `resolveViewFile` |
+| 客户端命令 | `clientCommands[]` | `invokeClientCommand` | 宿主命令注册表 |
+| 宿主事件 | `hostEvents.subscriptions[]` | `hostEvent` | 宿主管理 |
+| 远程入口 | `view.type = 'remote_component'` | 宿主管理 | `getRemoteComponentEntry` |
+
+## TypeScript 桥接客户端
+
+将桥接代码集中在 `bridge.ts`，不要让业务组件直接拼接消息。
+
+```ts
+const CHANNEL = 'xpertai.remote_component'
+const VERSION = 1
+
+type RemoteRequestType =
+  | 'requestData'
+  | 'requestParameterOptions'
+  | 'executeAction'
+  | 'executeFileAction'
+  | 'requestFileAccess'
+  | 'invokeClientCommand'
+
+type RemoteOutboundType = RemoteRequestType | 'ready' | 'resize' | 'notify'
+
+interface PendingRequest {
+  resolve: (value: unknown) => void
+  reject: (error: Error) => void
+  timeout: number
+}
+
+interface BridgeMessage {
+  channel?: unknown
+  protocolVersion?: unknown
+  instanceId?: unknown
+  type?: unknown
+  requestId?: unknown
+  message?: unknown
+  data?: unknown
+  result?: unknown
+  [key: string]: unknown
+}
+
+let instanceId: string | null = null
+let sequence = 0
+const pending = new Map<string, PendingRequest>()
+
+export function installBridge(handlers: {
+  onInit: (message: BridgeMessage) => void
+  onHostEvent: (event: unknown) => void
+}) {
+  const listener = (event: MessageEvent) => {
+    if (event.source !== window.parent || !isBridgeMessage(event.data)) return
+    const message = event.data
+
+    if (message.type === 'init') {
+      instanceId = typeof message.instanceId === 'string'
+        ? message.instanceId
+        : null
+      handlers.onInit(message)
+      return
+    }
+
+    if (message.instanceId !== instanceId) return
+    if (message.type === 'hostEvent') {
+      handlers.onHostEvent(message.event)
+      return
+    }
+
+    const requestId = typeof message.requestId === 'string'
+      ? message.requestId
+      : null
+    const request = requestId ? pending.get(requestId) : undefined
+    if (!request || !requestId) return
+
+    pending.delete(requestId)
+    window.clearTimeout(request.timeout)
+    if (message.type === 'error') {
+      request.reject(new Error(
+        typeof message.message === 'string'
+          ? message.message
+          : 'remote_request_failed'
+      ))
+    } else {
+      request.resolve(message.data ?? message.result)
+    }
+  }
+
+  window.addEventListener('message', listener)
+  post('ready')
+  return () => {
+    window.removeEventListener('message', listener)
+    for (const request of pending.values()) {
+      window.clearTimeout(request.timeout)
+      request.reject(new Error('remote_bridge_disposed'))
+    }
+    pending.clear()
+  }
+}
+
+export function requestHost(
+  type: RemoteRequestType,
+  body: Record<string, unknown>
+) {
+  const requestId = `${Date.now()}-${++sequence}`
+  return new Promise<unknown>((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
+      pending.delete(requestId)
+      reject(new Error('remote_request_timeout'))
+    }, 30_000)
+    pending.set(requestId, { resolve, reject, timeout })
+    post(type, { requestId, ...body })
+  })
+}
+
+function post(type: RemoteOutboundType, body: Record<string, unknown> = {}) {
+  window.parent.postMessage({
+    channel: CHANNEL,
+    protocolVersion: VERSION,
+    instanceId,
+    type,
+    ...body
+  }, '*')
+}
+
+function isBridgeMessage(value: unknown): value is BridgeMessage {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const message = value as BridgeMessage
+  return message.channel === CHANNEL &&
+    message.protocolVersion === VERSION &&
+    typeof message.type === 'string'
+}
+```
+
+业务代码可以在此基础上封装 `requestData()`、`executeAction()` 和 `invokeClientCommand()` 等具名方法。桥接层返回稳定错误代码，由 UI 多语言层转换成用户可见文案。
+
+## 查询数据
+
+```ts
+const result = await requestHost('requestData', {
+  query: {
+    page: 1,
+    pageSize: 20,
+    search,
+    parameters: {
+      table: 'contracts',
+      status
+    }
+  }
+})
+```
+
+`XpertViewQuery.parameters` 只支持标量或标量数组。复杂筛选条件应序列化为明确的 JSON 字符串参数，并由提供器安全解析。
+
+大型表格应使用服务端分页。远程组件不要一次把所有记录加载到 iframe。
+
+## 执行操作
+
+普通业务变更使用 JSON 操作：
+
+```ts
+await requestHost('executeAction', {
+  actionKey: 'approve_contract',
+  targetId: contractId,
+  input: { comment },
+  parameters: { projectId }
+})
+```
+
+`actionKey` 必须存在于 `manifest.actions`，且传输方式必须匹配。提供器仍需校验目标对象、当前用户和租户/组织范围。
+
+文件上传使用 `executeFileAction`，不要把二进制内容或 Base64 放进 JSON 操作。文件预览与下载使用 `requestFileAccess`，由宿主换取有时效的访问授权。
+
+## 客户端命令
+
+客户端命令用于宿主本地 UI 行为，不调用插件提供器。例如发送 Assistant 消息、设置 Assistant 上下文、打开文件或导航到另一工作台视图。
+
+它是一个封闭的三方契约：
+
+1. 源视图在 `manifest.clientCommands` 中声明命令键。
+2. 当前宿主注册同名处理器。
+3. 远程组件通过 `invokeClientCommand` 调用，并处理结构化失败结果。
+
+```ts
+import {
+  WORKBENCH_NAVIGATION_OPEN_COMMAND,
+  WORKBENCH_EXTENSION_VIEW_TARGET
+} from '@xpert-ai/contracts'
+
+await requestHost('invokeClientCommand', {
+  commandKey: WORKBENCH_NAVIGATION_OPEN_COMMAND,
+  payload: {
+    target: WORKBENCH_EXTENSION_VIEW_TARGET,
+    viewKey: 'contract_review__history',
+    selectionId: contractId
+  }
+})
+```
+
+不要从 iframe 直接修改顶层窗口地址。
+
+## 宿主事件
+
+远程组件可以订阅宿主归一化后的事件，例如 Agent 中间件工具完成：
+
+```ts
+hostEvents: {
+  subscriptions: [
+    {
+      key: 'contract-mutated',
+      event: 'assistant.tool.completed',
+      filter: {
+        sources: ['chatkit'],
+        toolNames: ['contract_update', 'contract_approve']
+      },
+      action: { type: 'forward', debounceMs: 800 }
+    }
+  ]
+}
+```
+
+声明式视图通常使用 `refresh`。远程组件优先使用 `forward`，根据业务 ID 只刷新受影响的数据区域，并在本地存在未保存编辑时避免静默覆盖。
+
+## 初始化、主题和多语言
+
+以 `init.locale` 为准，在入口处一次性归一化为 BCP 47 语言标签，例如 `en-US`、`zh-Hans` 和 `zh-Hant`。不要在业务组件中根据语言直接选择文本。
+
+应用 `init.theme.tokens` 后，调用 `installShadcnThemeVars()` 安装语义主题变量。调试日志由 `init.debug.enabled` 控制；不要根据 URL、主机名或平台身份猜测开发环境。
+
+不要依赖 `localStorage` 或 `sessionStorage`。临时状态保存在 React 状态中，持久状态通过宿主桥接写入服务端。
+
+## 安全检查
+
+- 不向 iframe 传递访问令牌、API 地址、Assistant ID、租户 ID 或组织 ID。
+- 不让 iframe 自行选择 `hostType` 或 `hostId`。
+- 不执行清单未声明的操作、文件能力或客户端命令。
+- 不在日志中输出令牌、文件内容、完整业务快照或个人敏感信息。
+- 提供器对每次读取和变更重新执行授权与租户/组织隔离。
+- 对消息来源、协议版本、实例 ID 和请求 ID 添加自动化测试。
+
+返回[工作台远程组件](./remote-component)查看完整开发流程。

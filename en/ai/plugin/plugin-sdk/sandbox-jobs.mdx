@@ -1,0 +1,173 @@
+---
+title: Sandbox Jobs Runtime
+description: Run registered plugin Actions in isolated, short-lived runtimes.
+sidebar_position: 5
+---
+
+`SandboxJobsRuntimeCapability` exposes `SandboxJobsApi` under `platform.sandbox.jobs`. It runs registered, versioned Actions in an isolated Sandbox Runtime and returns validated outputs as portable [Workspace Files](./workspace-files) references.
+
+Plugin callers choose only `action`, `actionVersion`, a structured payload, portable files, and declared outputs. Runtime profiles, images, commands, entrypoints, environment variables, providers, and engine options are resolved and enforced by the host.
+
+For Action Bundle packaging, queue ownership, and operational setup, also read [Sandbox Jobs](../sandbox-jobs).
+
+## API methods
+
+| Method | Purpose |
+| --- | --- |
+| `getActionHealth(input)` | Check the combined readiness of the Action, Runtime Definition, worker, binding, and provider. |
+| `run(input)` | Start, reattach to, or reuse a successful execution by idempotency key. Resolves only on success. |
+| `getJob({ jobId })` | Get the current tenant's persisted job snapshot, or `null`. |
+| `cancel({ jobId })` | Cancel the logical job and terminate an active Runtime when one exists. |
+
+Call `getActionHealth()` before exposing or enqueueing an operation whose availability depends on the runtime:
+
+```ts
+import { SandboxJobsRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const jobs = capabilities.get(SandboxJobsRuntimeCapability)
+
+if (!jobs) return { available: false, reason: 'runtime_unavailable' }
+
+const health = await jobs.getActionHealth({
+  pluginName: '@acme/plugin-presentation',
+  action: 'render-presentation',
+  actionVersion: '1.0.0'
+})
+
+if (!health.available) {
+  return { available: false, reason: health.reason, message: health.message }
+}
+```
+
+## Run an Action
+
+A `SandboxJobRunInput` contains:
+
+| Field | Requirement |
+| --- | --- |
+| `jobId` | Optional caller-known UUID. Supply it when cancellation must be possible while `run()` is awaiting completion. |
+| `action`, `actionVersion` | Exact registered Action contract. |
+| `idempotencyKey` | Stable tenant-scoped key built from business identity and immutable input checksum. |
+| `scope` | Tenant and plugin ownership plus business resource type and ID. |
+| `payload` | Small `JSONValue`; never embed file bytes. |
+| `files` | Portable Workspace references, safe target paths, sizes, hashes, and optional access mode. |
+| `outputs` | Paths, names, MIME types, and Workspace destinations that Core must validate and persist. |
+| `timeoutMs` | Optional soft limit bounded by the Runtime Definition hard deadline. |
+
+```ts
+const result = await jobs.run({
+  action: 'render-presentation',
+  actionVersion: '1.0.0',
+  idempotencyKey: `deck:${deckId}:${sourceSha256}`,
+  scope: {
+    tenantId,
+    organizationId,
+    userId,
+    pluginName: '@acme/plugin-presentation',
+    businessResourceType: 'deck',
+    businessResourceId: deckId
+  },
+  payload: {
+    theme: 'executive',
+    locale: 'en-US'
+  },
+  files: [
+    {
+      reference: sourceReference,
+      targetPath: 'source/deck.json',
+      size: sourceSize,
+      sha256: sourceSha256,
+      access: 'materialized'
+    }
+  ],
+  outputs: [
+    {
+      path: 'output/deck.pdf',
+      originalName: 'deck.pdf',
+      mimeType: 'application/pdf',
+      destination: {
+        catalog: 'projects',
+        projectId,
+        folder: 'exports'
+      }
+    }
+  ],
+  timeoutMs: 120_000
+})
+
+for (const output of result.outputs) {
+  console.log(output.reference, output.sha256)
+}
+```
+
+Use `read-only-seekable` file access only when an Action needs seekable, on-demand reads such as media decoding. `materialized` verifies and copies the complete file under `/workspace/input` before execution.
+
+## Status and progress
+
+Persisted status is one of `waiting`, `starting`, `running`, `succeeded`, `failed`, `cancelled`, or `lost`. A snapshot includes the selected runtime version, Action version, attempt, provider/binding evidence, latest structured progress, validated outputs, timestamps, and any stable error code.
+
+Trusted Actions can emit structured progress using:
+
+```text
+XPERT_SANDBOX_PROGRESS {"progress":0.5,"stage":"rendering","current":10,"total":20}
+```
+
+The `SANDBOX_JOB_PROGRESS_PREFIX` constant contains the required prefix. `progress` is normalized from `0` through `1`; `stage` should be a stable machine-readable name.
+
+## Errors and retry policy
+
+Failed `run()` calls reject with `SandboxJobRuntimeError`. Use `isSandboxJobRuntimeError()` because dynamically loaded plugins can resolve another SDK module instance and `instanceof` alone is not a reliable boundary.
+
+```ts
+import { isSandboxJobRuntimeError } from '@xpert-ai/plugin-sdk'
+
+try {
+  await jobs.run(input)
+} catch (error) {
+  if (isSandboxJobRuntimeError(error)) {
+    await recordFailure({
+      jobId: error.jobId,
+      code: error.code,
+      retryable: error.retryable,
+      message: error.message
+    })
+
+    if (error.retryable) throw error
+    return
+  }
+
+  throw error
+}
+```
+
+Stable error codes cover unavailable or invalid Actions, profiles, runtimes, versions and capacity; startup and browser failures; timeout, memory, media, input and output validation failures; and cancellation. Drive retry from `retryable`, not from matching message text.
+
+The exported `SANDBOX_JOB_ERROR_CODES` list contains:
+
+```text
+SANDBOX_ACTION_UNAVAILABLE
+SANDBOX_ACTION_INVALID
+SANDBOX_PROFILE_UNAVAILABLE
+SANDBOX_RUNTIME_UNAVAILABLE
+SANDBOX_VERSION_MISMATCH
+SANDBOX_CAPACITY_UNAVAILABLE
+SANDBOX_START_FAILED
+BROWSER_LAUNCH_FAILED
+EXPORT_TIMEOUT
+EXPORT_OOM
+EXPORT_MEDIA_FAILED
+EXPORT_INPUT_INVALID
+EXPORT_OUTPUT_INVALID
+SANDBOX_CANCELLED
+```
+
+Health checks use a separate `reason`: `ACTION_MISSING`, `ACTION_INVALID`, `PROFILE_MISSING`, `VERSION_MISMATCH`, `RUNTIME_UNBOUND`, `PROVIDER_UNAVAILABLE`, or `PROFILE_UNHEALTHY`.
+
+## Operational rules
+
+- Run heavyweight Actions from a [Managed Queue](../managed-queues), not an HTTP handler.
+- Keep the idempotency key stable across retries of the same immutable work.
+- Put only structured JSON and portable file references into queue state.
+- Validate `getActionHealth()` for product availability, but still handle a later `run()` failure because runtime health can change.
+- Persist `jobId` in plugin business state when users need status, cancellation, or audit.
+- Treat returned provider, binding, runtime, and digest fields as evidence. Do not use them to choose infrastructure for the next job.

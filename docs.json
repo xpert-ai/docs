@@ -357,7 +357,6 @@
                     "pages": [
                       "en/ai/plugin/overview",
                       "en/ai/plugin/mcp-tools-and-apps",
-                      "en/ai/plugin/remote-component",
                       "en/ai/plugin/managed-connections",
                       "en/ai/plugin/managed-queues",
                       "en/ai/plugin/agent-evolution",
@@ -370,6 +369,21 @@
                       "en/ai/plugin/install",
                       "en/ai/plugin/permissions",
                       "en/ai/plugin/schema"
+                    ]
+                  },
+                  {
+                    "group": "Plugin SDK Core",
+                    "pages": [
+                      "en/ai/plugin/plugin-sdk/runtime-capabilities",
+                      "en/ai/plugin/plugin-sdk/view-extension",
+                      "en/ai/plugin/plugin-sdk/remote-component",
+                      "en/ai/plugin/plugin-sdk/remote-component-bridge",
+                      "en/ai/plugin/plugin-sdk/workspace-files",
+                      "en/ai/plugin/plugin-sdk/knowledgebase",
+                      "en/ai/plugin/plugin-sdk/artifacts",
+                      "en/ai/plugin/plugin-sdk/sandbox-jobs",
+                      "en/ai/plugin/plugin-sdk/actor-token",
+                      "en/ai/plugin/plugin-sdk/project-provisioning"
                     ]
                   },
                   {
@@ -1175,7 +1189,6 @@
                       "zh-Hans/ai/plugin/core-concepts",
                       "zh-Hans/ai/plugin/development-steps",
                       "zh-Hans/ai/plugin/mcp-tools-and-apps",
-                      "zh-Hans/ai/plugin/remote-component",
                       "zh-Hans/ai/plugin/managed-connections",
                       "zh-Hans/ai/plugin/managed-queues",
                       "zh-Hans/ai/plugin/agent-evolution",
@@ -1186,6 +1199,21 @@
                       "zh-Hans/ai/plugin/schema-ui-extension",
                       "zh-Hans/ai/plugin/plugin-development",
                       "zh-Hans/ai/plugin/assistant-workspace-catalogs"
+                    ]
+                  },
+                  {
+                    "group": "Plugin SDK Core",
+                    "pages": [
+                      "zh-Hans/ai/plugin/plugin-sdk/runtime-capabilities",
+                      "zh-Hans/ai/plugin/plugin-sdk/view-extension",
+                      "zh-Hans/ai/plugin/plugin-sdk/remote-component",
+                      "zh-Hans/ai/plugin/plugin-sdk/remote-component-bridge",
+                      "zh-Hans/ai/plugin/plugin-sdk/workspace-files",
+                      "zh-Hans/ai/plugin/plugin-sdk/knowledgebase",
+                      "zh-Hans/ai/plugin/plugin-sdk/artifacts",
+                      "zh-Hans/ai/plugin/plugin-sdk/sandbox-jobs",
+                      "zh-Hans/ai/plugin/plugin-sdk/actor-token",
+                      "zh-Hans/ai/plugin/plugin-sdk/project-provisioning"
                     ]
                   },
                   {

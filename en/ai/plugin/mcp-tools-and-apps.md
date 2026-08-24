@@ -19,7 +19,7 @@ Use a plugin-managed MCP server when you want to:
 - ship app-only tools that are callable by the iframe but not visible to the model
 - install, enable, disable, and version the MCP server as part of a plugin
 
-Do not use this pattern for persistent Workbench pages or integration configuration pages. Those should use [Remote Component Plugins](./remote-component) or other view extension surfaces. Do not use Agent middleware as the MCP App resource host; middleware can trigger workflows, but MCP Apps should be served through MCP resources and the MCP Apps host.
+Do not use this pattern for persistent Workbench pages or integration configuration pages. Those should use [Workbench Remote Components](./plugin-sdk/remote-component) or other View Extension surfaces. Do not use Agent middleware as the MCP App resource host; middleware can trigger workflows, but MCP Apps should be served through MCP resources and the MCP Apps host.
 
 ## Package Layout
 
@@ -547,6 +547,6 @@ Cover these cases before shipping:
 
 - [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)
 - [MCP Tools](../agent/toolset/mcp-tools/index)
-- [Remote Component Plugins](./remote-component)
+- [Workbench Remote Components](./plugin-sdk/remote-component)
 - [Plugin Development Steps](./develop)
 - [Publishing and Usage](./install)

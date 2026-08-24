@@ -19,7 +19,7 @@ title: MCP Tools 和 MCP Apps
 - 提供 iframe 可调用、但模型不可见的 app-only 工具
 - 把 MCP server 的安装、启用、停用和版本管理纳入插件生命周期
 
-如果要开发长期存在的 Workbench 页面或集成配置页面，应使用 [Remote Component 插件](./remote-component) 或其他 View Extension 能力。不要让 Agent middleware 承担 MCP App resource host 的职责；middleware 可以触发工作流，但 MCP Apps 应通过 MCP resource 和 MCP Apps Host 交付。
+如果要开发长期存在的工作台页面或集成配置页面，应使用[工作台远程组件](./plugin-sdk/remote-component)或其他视图扩展能力。不要让 Agent 中间件承担 MCP App 资源宿主的职责；中间件可以触发工作流，但 MCP Apps 应通过 MCP 资源和 MCP Apps 宿主交付。
 
 ## 包结构
 
@@ -547,6 +547,6 @@ pnpm nx build @acme/plugin-sales-mcp-app
 
 - [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)
 - [MCP 工具](../agent/toolset/mcp-tools/mcp-tools)
-- [Remote Component 插件](./remote-component)
+- [工作台远程组件](./plugin-sdk/remote-component)
 - [插件的开发步骤](./development-steps)
 - [发布与使用](./publish-and-use)

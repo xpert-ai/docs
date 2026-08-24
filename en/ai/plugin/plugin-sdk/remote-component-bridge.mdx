@@ -1,0 +1,326 @@
+---
+title: Remote Component Host Bridge
+description: Connect a Workbench Remote Component, its host, and its View Provider through the controlled bridge protocol.
+---
+
+# Remote Component Host Bridge
+
+The host bridge connects a Remote Component iframe, the Workbench host, and the plugin View Provider. It is not a generic RPC tunnel: every capability requires a manifest declaration, a host message handler, and the corresponding server implementation.
+
+```text
+Remote Component
+  -> postMessage
+  -> Workbench Host
+  -> authenticated View Extension API
+  -> IXpertViewExtensionProvider
+```
+
+The Remote Component sends business intent only. The host resolves the current user, host, tenant, and organization context and validates the view, feature, permissions, and capability declaration before calling the provider.
+
+## Three contract layers
+
+| Layer | Owner | Purpose |
+| --- | --- | --- |
+| Message protocol | Host and Remote Component | Defines iframe requests, responses, and lifecycle messages |
+| View manifest | Plugin View Provider | Declares allowed data, actions, files, client commands, and events |
+| Provider method | Plugin server | Runs a data query or business operation in a trusted server context |
+
+The host must reject a capability when any layer is missing.
+
+## Message envelope
+
+All messages use a fixed channel and protocol version:
+
+```ts
+interface RemoteMessageEnvelope {
+  channel: 'xpertai.remote_component'
+  protocolVersion: 1
+  instanceId?: string
+  type: string
+  requestId?: string
+}
+```
+
+- The iframe sends `ready` after loading.
+- The host returns `init` with the `instanceId`, manifest, initial query, locale, theme, and debug configuration.
+- Later messages must carry the matching `instanceId`.
+- Requests and responses share one `requestId`.
+- The iframe accepts messages only from `window.parent`; the host accepts messages only from the current iframe `contentWindow`.
+
+## Supported messages
+
+Host to iframe:
+
+| Message | Purpose |
+| --- | --- |
+| `init` | Initialize the manifest, query, locale, theme, and debug state |
+| `hostEvent` | Forward an event matched by `manifest.hostEvents` |
+| `data` | Response to `requestData` |
+| `parameterOptions` | Parameter option response |
+| `actionResult` | JSON action response |
+| `fileActionResult` | File action response |
+| `fileAccessResult` | File preview or download grant response |
+| `clientCommandResult` | Client command response |
+| `error` | Request-scoped error |
+
+Iframe to host:
+
+| Message | Purpose |
+| --- | --- |
+| `ready` | Request initialization |
+| `resize` | Request iframe height in a non-fixed Workbench surface |
+| `notify` | Request a host notification |
+| `requestData` | Query view data |
+| `requestParameterOptions` | Query dynamic parameter options |
+| `executeAction` | Execute a JSON action |
+| `executeFileAction` | Execute a file upload action |
+| `requestFileAccess` | Request a file preview or download grant |
+| `invokeClientCommand` | Request a host-local UI command |
+
+## Capability mapping
+
+| Capability | Manifest declaration | Iframe message | Server handling |
+| --- | --- | --- | --- |
+| Data query | `dataSource` | `requestData` | `getViewData` |
+| Parameter options | `parameters[].optionSource` | `requestParameterOptions` | `getViewParameterOptions` |
+| JSON action | `actions[].transport = 'json'` | `executeAction` | `executeViewAction` |
+| File action | `actions[].transport = 'file'` | `executeFileAction` | `executeViewFileAction` |
+| File access | `fileAccess.purposes` | `requestFileAccess` | `resolveViewFile` |
+| Client command | `clientCommands[]` | `invokeClientCommand` | Host command registry |
+| Host event | `hostEvents.subscriptions[]` | `hostEvent` | Host-managed |
+| Remote entry | `view.type = 'remote_component'` | Host-managed | `getRemoteComponentEntry` |
+
+## TypeScript bridge client
+
+Keep the bridge in `bridge.ts`; business components should not construct wire messages directly.
+
+```ts
+const CHANNEL = 'xpertai.remote_component'
+const VERSION = 1
+
+type RemoteRequestType =
+  | 'requestData'
+  | 'requestParameterOptions'
+  | 'executeAction'
+  | 'executeFileAction'
+  | 'requestFileAccess'
+  | 'invokeClientCommand'
+
+type RemoteOutboundType = RemoteRequestType | 'ready' | 'resize' | 'notify'
+
+interface PendingRequest {
+  resolve: (value: unknown) => void
+  reject: (error: Error) => void
+  timeout: number
+}
+
+interface BridgeMessage {
+  channel?: unknown
+  protocolVersion?: unknown
+  instanceId?: unknown
+  type?: unknown
+  requestId?: unknown
+  message?: unknown
+  data?: unknown
+  result?: unknown
+  [key: string]: unknown
+}
+
+let instanceId: string | null = null
+let sequence = 0
+const pending = new Map<string, PendingRequest>()
+
+export function installBridge(handlers: {
+  onInit: (message: BridgeMessage) => void
+  onHostEvent: (event: unknown) => void
+}) {
+  const listener = (event: MessageEvent) => {
+    if (event.source !== window.parent || !isBridgeMessage(event.data)) return
+    const message = event.data
+
+    if (message.type === 'init') {
+      instanceId = typeof message.instanceId === 'string'
+        ? message.instanceId
+        : null
+      handlers.onInit(message)
+      return
+    }
+
+    if (message.instanceId !== instanceId) return
+    if (message.type === 'hostEvent') {
+      handlers.onHostEvent(message.event)
+      return
+    }
+
+    const requestId = typeof message.requestId === 'string'
+      ? message.requestId
+      : null
+    const request = requestId ? pending.get(requestId) : undefined
+    if (!request || !requestId) return
+
+    pending.delete(requestId)
+    window.clearTimeout(request.timeout)
+    if (message.type === 'error') {
+      request.reject(new Error(
+        typeof message.message === 'string'
+          ? message.message
+          : 'remote_request_failed'
+      ))
+    } else {
+      request.resolve(message.data ?? message.result)
+    }
+  }
+
+  window.addEventListener('message', listener)
+  post('ready')
+  return () => {
+    window.removeEventListener('message', listener)
+    for (const request of pending.values()) {
+      window.clearTimeout(request.timeout)
+      request.reject(new Error('remote_bridge_disposed'))
+    }
+    pending.clear()
+  }
+}
+
+export function requestHost(
+  type: RemoteRequestType,
+  body: Record<string, unknown>
+) {
+  const requestId = `${Date.now()}-${++sequence}`
+  return new Promise<unknown>((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
+      pending.delete(requestId)
+      reject(new Error('remote_request_timeout'))
+    }, 30_000)
+    pending.set(requestId, { resolve, reject, timeout })
+    post(type, { requestId, ...body })
+  })
+}
+
+function post(type: RemoteOutboundType, body: Record<string, unknown> = {}) {
+  window.parent.postMessage({
+    channel: CHANNEL,
+    protocolVersion: VERSION,
+    instanceId,
+    type,
+    ...body
+  }, '*')
+}
+
+function isBridgeMessage(value: unknown): value is BridgeMessage {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const message = value as BridgeMessage
+  return message.channel === CHANNEL &&
+    message.protocolVersion === VERSION &&
+    typeof message.type === 'string'
+}
+```
+
+Build named wrappers such as `requestData()`, `executeAction()`, and `invokeClientCommand()` on top of this boundary. Return stable error codes from the bridge and translate them at the UI boundary.
+
+## Query data
+
+```ts
+const result = await requestHost('requestData', {
+  query: {
+    page: 1,
+    pageSize: 20,
+    search,
+    parameters: {
+      table: 'contracts',
+      status
+    }
+  }
+})
+```
+
+`XpertViewQuery.parameters` accepts only scalar values or scalar arrays. Serialize a complex filter into one explicit JSON string parameter and parse it safely in the provider.
+
+Use server-side pagination for large tables. Do not load every record into the iframe.
+
+## Execute actions
+
+Use JSON actions for normal business mutations:
+
+```ts
+await requestHost('executeAction', {
+  actionKey: 'approve_contract',
+  targetId: contractId,
+  input: { comment },
+  parameters: { projectId }
+})
+```
+
+The `actionKey` must exist in `manifest.actions`, and its transport must match. The provider still validates the target, current user, and tenant/organization scope.
+
+Use `executeFileAction` for uploads; do not put binary or Base64 content in JSON actions. Use `requestFileAccess` for previews and downloads so the host can issue a time-bounded grant.
+
+## Client commands
+
+Client commands perform host-local UI behavior without calling the plugin provider. Examples include sending an Assistant message, setting Assistant context, opening a file, or navigating to another Workbench view.
+
+They form a closed three-party contract:
+
+1. The source manifest allowlists the command key in `clientCommands`.
+2. The current host registers a handler for the same key.
+3. The Remote Component invokes it through `invokeClientCommand` and handles a structured failure result.
+
+```ts
+import {
+  WORKBENCH_NAVIGATION_OPEN_COMMAND,
+  WORKBENCH_EXTENSION_VIEW_TARGET
+} from '@xpert-ai/contracts'
+
+await requestHost('invokeClientCommand', {
+  commandKey: WORKBENCH_NAVIGATION_OPEN_COMMAND,
+  payload: {
+    target: WORKBENCH_EXTENSION_VIEW_TARGET,
+    viewKey: 'contract_review__history',
+    selectionId: contractId
+  }
+})
+```
+
+Do not navigate the top window directly from the iframe.
+
+## Host events
+
+A Remote Component can subscribe to normalized host events, such as a completed Agent middleware tool:
+
+```ts
+hostEvents: {
+  subscriptions: [
+    {
+      key: 'contract-mutated',
+      event: 'assistant.tool.completed',
+      filter: {
+        sources: ['chatkit'],
+        toolNames: ['contract_update', 'contract_approve']
+      },
+      action: { type: 'forward', debounceMs: 800 }
+    }
+  ]
+}
+```
+
+Declarative views normally use `refresh`. Prefer `forward` for Remote Components so they can refresh only the affected data. If local edits are dirty, do not silently replace them with remote state.
+
+## Initialization, theme, and locale
+
+Treat `init.locale` as authoritative and normalize it once to a BCP 47 tag such as `en-US`, `zh-Hans`, or `zh-Hant`. Do not select copy with locale branches inside business components.
+
+After applying `init.theme.tokens`, call `installShadcnThemeVars()` to install semantic theme variables. Gate debug logging with `init.debug.enabled`; do not infer development mode from URLs, hostnames, or platform identity.
+
+Do not rely on `localStorage` or `sessionStorage`. Keep ephemeral state in React and persist durable state through the host bridge.
+
+## Security checklist
+
+- Do not pass access tokens, API URLs, Assistant IDs, tenant IDs, or organization IDs into the iframe.
+- Do not let the iframe select `hostType` or `hostId`.
+- Reject actions, file capabilities, and client commands that are absent from the manifest.
+- Do not log tokens, file contents, complete business snapshots, or personally sensitive data.
+- Re-run authorization and tenant/organization isolation for every provider read and mutation.
+- Test the message source, protocol version, instance ID, and request ID boundaries.
+
+Return to [Workbench Remote Components](./remote-component) for the complete development workflow.

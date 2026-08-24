@@ -1,0 +1,69 @@
+---
+title: 操作者令牌运行时
+description: 为作用域明确的出站 API 调用签发短生命周期的宿主持有者令牌。
+sidebar_position: 6
+---
+
+`ActorTokenRuntimeCapability` 通过 `platform.actor-token` 暴露 `ActorTokenApi`。它为指定出站受众签发代表当前授权操作者的短生命周期持有者令牌（Bearer Token）。
+
+当可信服务端插件代码需要调用支持宿主操作者令牌的宿主服务或连接服务时使用此能力。它不是插件长期凭证，禁止暴露给 iframe、智能体消息、工具结果和日志，也不能保存到插件记录。
+
+## API
+
+```ts
+type ActorTokenRequest = {
+  audience?: string | string[]
+  ttlSeconds?: number
+  act?: Record<string, string | number | boolean | null | undefined>
+}
+
+type ActorTokenResult = {
+  token: string
+  expiresAt: string
+  audience: string | string[]
+}
+
+interface ActorTokenApi {
+  getToken(input?: ActorTokenRequest): Promise<ActorTokenResult>
+}
+```
+
+- `audience` 指明预期接收服务。
+- `ttlSeconds` 请求出站操作所需的有效期。
+- `act` 携带接收方契约所需的有界标量操作者上下文。
+
+## 示例
+
+```ts
+import { ActorTokenRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const actorTokens = context.runtime.capabilities?.require(
+  ActorTokenRuntimeCapability
+)
+
+if (!actorTokens) throw new Error('操作者令牌运行时不可用')
+
+const actor = await actorTokens.getToken({
+  audience: 'plugins',
+  ttlSeconds: 120,
+  act: {
+    sub: 'valve_business_workbench',
+    view: 'valve-object-360'
+  }
+})
+
+const object = await governedClient.getObject({
+  objectId: valveId,
+  actorToken: actor.token
+})
+```
+
+应请求接收 API 支持的最窄受众和最短有效期，并在签发后立即使用，用完即丢弃。
+
+## 安全规则
+
+- 只在可信服务端代码中解析和使用令牌。
+- 禁止将 `token` 放入队列载荷、URL、浏览器消息、异常、日志、分析事件或数据库列。
+- 不要在 `expiresAt` 之后缓存或复用令牌；后续任务应重新签发。
+- `act` 应保持精简且机器可读，不能包含凭证、大对象或用户编写的长文本。
+- 接收服务仍必须对目标操作执行授权。已签发令牌不会突破宿主对当前操作者和受众的权限策略。

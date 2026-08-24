@@ -1,0 +1,173 @@
+---
+title: 沙箱任务运行时
+description: 在隔离、短生命周期的运行时中运行已注册插件操作。
+sidebar_position: 5
+---
+
+`SandboxJobsRuntimeCapability` 通过 `platform.sandbox.jobs` 暴露 `SandboxJobsApi`。它在隔离的沙箱运行时中运行已注册、带版本的沙箱操作（Action），并将校验后的输出作为可移植[工作区文件](./workspace-files)引用返回。
+
+插件调用者只能选择 `action`、`actionVersion`、结构化载荷、可移植文件和声明的输出。运行时配置（Runtime Profile）、镜像、命令、入口点、环境变量、提供器与引擎选项均由宿主解析并强制执行。
+
+关于操作包（Action Bundle）打包、队列归属和运维配置，另请阅读[沙箱任务](../sandbox-jobs)。
+
+## API 方法
+
+| 方法 | 用途 |
+| --- | --- |
+| `getActionHealth(input)` | 检查操作、运行时定义、工作进程、绑定和提供器的聚合就绪状态。 |
+| `run(input)` | 按幂等键启动、重新连接或复用成功执行；仅在成功时正常返回。 |
+| `getJob({ jobId })` | 获取当前租户可访问的持久化任务快照，不存在时返回 `null`。 |
+| `cancel({ jobId })` | 取消逻辑任务，并在存在活动运行环境时终止它。 |
+
+如果产品功能是否可见取决于运行时，请在展示或入队操作前调用 `getActionHealth()`：
+
+```ts
+import { SandboxJobsRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const jobs = capabilities.get(SandboxJobsRuntimeCapability)
+
+if (!jobs) return { available: false, reason: 'runtime_unavailable' }
+
+const health = await jobs.getActionHealth({
+  pluginName: '@acme/plugin-presentation',
+  action: 'render-presentation',
+  actionVersion: '1.0.0'
+})
+
+if (!health.available) {
+  return { available: false, reason: health.reason, message: health.message }
+}
+```
+
+## 运行沙箱操作
+
+`SandboxJobRunInput` 包含：
+
+| 字段 | 要求 |
+| --- | --- |
+| `jobId` | 可选的调用方已知 UUID。若 `run()` 等待期间也必须支持取消，应提供该字段。 |
+| `action`、`actionVersion` | 精确匹配已注册操作契约。 |
+| `idempotencyKey` | 由业务身份和不可变输入校验和组成的稳定租户级键。 |
+| `scope` | 租户、插件所有权以及业务资源类型和 ID。 |
+| `payload` | 小型 `JSONValue`，禁止嵌入文件字节。 |
+| `files` | 可移植工作区引用、安全目标路径、大小、哈希和可选访问模式。 |
+| `outputs` | 平台核心必须校验并持久化的路径、文件名、MIME 类型和工作区目标。 |
+| `timeoutMs` | 可选软限制，且不能超过运行时定义的硬截止时间。 |
+
+```ts
+const result = await jobs.run({
+  action: 'render-presentation',
+  actionVersion: '1.0.0',
+  idempotencyKey: `deck:${deckId}:${sourceSha256}`,
+  scope: {
+    tenantId,
+    organizationId,
+    userId,
+    pluginName: '@acme/plugin-presentation',
+    businessResourceType: 'deck',
+    businessResourceId: deckId
+  },
+  payload: {
+    theme: 'executive',
+    locale: 'zh-Hans'
+  },
+  files: [
+    {
+      reference: sourceReference,
+      targetPath: 'source/deck.json',
+      size: sourceSize,
+      sha256: sourceSha256,
+      access: 'materialized'
+    }
+  ],
+  outputs: [
+    {
+      path: 'output/deck.pdf',
+      originalName: 'deck.pdf',
+      mimeType: 'application/pdf',
+      destination: {
+        catalog: 'projects',
+        projectId,
+        folder: 'exports'
+      }
+    }
+  ],
+  timeoutMs: 120_000
+})
+
+for (const output of result.outputs) {
+  console.log(output.reference, output.sha256)
+}
+```
+
+只有操作需要可随机访问的按需读取（例如媒体解码）时才使用 `read-only-seekable`。`materialized` 会在执行前校验完整文件并复制到 `/workspace/input`。
+
+## 状态与进度
+
+持久化状态为 `waiting`、`starting`、`running`、`succeeded`、`failed`、`cancelled` 或 `lost`。快照包含选中的运行时版本、操作版本、尝试次数、提供器和绑定证据、最新结构化进度、校验后输出、时间戳和稳定错误码。
+
+可信操作可使用以下格式输出结构化进度：
+
+```text
+XPERT_SANDBOX_PROGRESS {"progress":0.5,"stage":"rendering","current":10,"total":20}
+```
+
+常量 `SANDBOX_JOB_PROGRESS_PREFIX` 提供固定前缀。`progress` 取值范围为 `0` 到 `1`，`stage` 应使用稳定、机器可读的名称。
+
+## 错误与重试策略
+
+`run()` 失败时会抛出 `SandboxJobRuntimeError`。动态加载插件可能解析到另一个 SDK 模块实例，因此不要只依赖 `instanceof`，应使用 `isSandboxJobRuntimeError()`。
+
+```ts
+import { isSandboxJobRuntimeError } from '@xpert-ai/plugin-sdk'
+
+try {
+  await jobs.run(input)
+} catch (error) {
+  if (isSandboxJobRuntimeError(error)) {
+    await recordFailure({
+      jobId: error.jobId,
+      code: error.code,
+      retryable: error.retryable,
+      message: error.message
+    })
+
+    if (error.retryable) throw error
+    return
+  }
+
+  throw error
+}
+```
+
+稳定错误码覆盖操作、配置、运行时、版本和容量不可用或无效，启动和浏览器失败，超时、内存、媒体、输入输出校验失败，以及取消。重试策略必须依据 `retryable`，不能匹配错误文本。
+
+导出的 `SANDBOX_JOB_ERROR_CODES` 列表包含：
+
+```text
+SANDBOX_ACTION_UNAVAILABLE
+SANDBOX_ACTION_INVALID
+SANDBOX_PROFILE_UNAVAILABLE
+SANDBOX_RUNTIME_UNAVAILABLE
+SANDBOX_VERSION_MISMATCH
+SANDBOX_CAPACITY_UNAVAILABLE
+SANDBOX_START_FAILED
+BROWSER_LAUNCH_FAILED
+EXPORT_TIMEOUT
+EXPORT_OOM
+EXPORT_MEDIA_FAILED
+EXPORT_INPUT_INVALID
+EXPORT_OUTPUT_INVALID
+SANDBOX_CANCELLED
+```
+
+健康检查使用另一组 `reason`：`ACTION_MISSING`、`ACTION_INVALID`、`PROFILE_MISSING`、`VERSION_MISMATCH`、`RUNTIME_UNBOUND`、`PROVIDER_UNAVAILABLE` 或 `PROFILE_UNHEALTHY`。
+
+## 运维规则
+
+- 重型操作应从[托管队列](../managed-queues)运行，不要阻塞 HTTP 处理器。
+- 同一份不可变工作重试时保持幂等键不变。
+- 队列状态中只能放结构化 JSON 和可移植文件引用。
+- `getActionHealth()` 用于产品可用性判断，但 `run()` 时仍要处理失败，因为运行时健康状态可能变化。
+- 用户需要查看状态、取消或审计时，应在插件业务状态中持久化 `jobId`。
+- 返回的提供器、绑定、运行时和摘要字段属于执行证据，不能用于替下一次任务选择基础设施。

@@ -1,0 +1,167 @@
+---
+title: View Extensions
+description: Learn how Xpert plugins use view providers and manifests to add declarative views or remote components to Workbench and other host surfaces.
+---
+
+# View Extensions
+
+A View Extension is the standard contract for adding an interactive plugin view to an Xpert host surface. It defines where the view appears, when it is visible, which data and operations it can use, and how it is rendered.
+
+For Assistant Workbench, a Remote Component is one View Extension rendering mode. It owns the custom UI inside an iframe; the View Extension owns the host slot, feature activation, permissions, data, and action contract.
+
+```text
+Assistant feature
+  -> Workbench View Host
+  -> agent.workbench.main / agent.workbench.fixed
+  -> ViewExtensionProvider
+  -> XpertExtensionViewManifest
+  -> platform renderer or Remote Component
+```
+
+## Core concepts
+
+| Concept | Responsibility |
+| --- | --- |
+| Host | The product surface and current user context, such as an Assistant, project, or knowledge base |
+| Slot | A location where the host accepts extension views, such as `agent.workbench.main` |
+| View Provider | The plugin server implementation that supplies manifests, data, actions, and an optional remote entry |
+| Manifest | The declaration of placement, activation, rendering, and allowed capabilities |
+| Remote Component | Plugin-owned custom UI running in a host-controlled iframe |
+
+A Remote Component is not a standalone plugin type and cannot register itself without a manifest. A complete Workbench UI normally combines a server-side View Provider with a frontend Remote Component.
+
+## Hosts and slots
+
+`hostType` identifies a host category. The platform can expose `agent`, `project`, `knowledgebase`, `integration`, and `sandbox` hosts.
+
+Assistant Workbench uses the `agent` host. Common slots include:
+
+| Slot | Purpose |
+| --- | --- |
+| `agent.workbench.main` | A primary view that follows the current Workbench content |
+| `agent.workbench.fixed` | A fixed view available from the Workbench menu |
+| `detail.sidebar` | Supporting content in a host detail sidebar |
+
+A plugin can only contribute to slots declared by the host. Slot names describe product placement, not plugin business domains.
+
+## Feature activation
+
+Assistant Workbench slots require `activation.requiredFeatures`. A Feature is the capability token that connects Agent functionality with its human-facing Workbench view:
+
+```text
+Agent middleware declares a Feature
+  -> the Assistant connects that middleware
+  -> the View Host receives the Feature
+  -> the matching View becomes visible
+```
+
+```ts
+activation: {
+  requiredFeatures: ['contract-review']
+}
+```
+
+Bind a View to the domain capability that owns its data and actions. Removing the middleware should remove both its Agent tools and its gated Workbench view.
+
+## View Providers
+
+Register a provider with `@ViewExtensionProvider(providerKey)`:
+
+```ts
+import {
+  type IXpertViewExtensionProvider,
+  ViewExtensionProvider
+} from '@xpert-ai/plugin-sdk'
+import type {
+  XpertExtensionViewManifest,
+  XpertResolvedViewHostContext,
+  XpertViewDataResult,
+  XpertViewQuery
+} from '@xpert-ai/contracts'
+
+@ViewExtensionProvider('contract_review')
+export class ContractReviewViewProvider
+  implements IXpertViewExtensionProvider
+{
+  constructor(private readonly reviewService: ContractReviewService) {}
+
+  supports(context: XpertResolvedViewHostContext) {
+    return context.hostType === 'agent'
+  }
+
+  getViewManifests(
+    _context: XpertResolvedViewHostContext,
+    slot: string
+  ): XpertExtensionViewManifest[] {
+    if (slot !== 'agent.workbench.main') return []
+    return [createContractReviewManifest(slot)]
+  }
+
+  async getViewData(
+    context: XpertResolvedViewHostContext,
+    viewKey: string,
+    query: XpertViewQuery
+  ): Promise<XpertViewDataResult> {
+    return this.reviewService.getViewData(context, viewKey, query)
+  }
+}
+```
+
+The provider receives the local manifest key. The platform exposes a public view key in this form:
+
+```text
+<providerKey>__<manifestKey>
+```
+
+For example, the `review` manifest from provider `contract_review` becomes `contract_review__review`.
+
+## Choose a rendering mode
+
+The manifest `view.type` selects the renderer:
+
+| Type | Best for | UI owner |
+| --- | --- | --- |
+| `stats` | A small metric summary | Platform |
+| `table` | Standard tables, search, sorting, and pagination | Platform |
+| `list` | Standard lists | Platform |
+| `detail` | Read-only field details | Platform |
+| `raw_json` | Diagnostics or raw payloads | Platform |
+| `remote_component` | Editors, canvases, complex workflows, or multi-panel Workbenches | Plugin |
+
+Prefer a declarative renderer when it meets the product need. Use a Remote Component when the interaction and layout clearly exceed the platform table, list, or form surface.
+
+## The manifest is a capability allowlist
+
+The manifest describes both the view and the host capabilities available to it:
+
+| Manifest field | Capability |
+| --- | --- |
+| `dataSource` | Data queries, pagination, search, sorting, and parameter support |
+| `parameters` | View parameters and provider-backed options |
+| `actions` | JSON or file actions |
+| `fileAccess` | Preview or download files resolved by the provider |
+| `clientCommands` | Host UI commands such as open file, navigate, or send an Assistant message |
+| `hostEvents` | Host-side events such as completed Agent middleware tools |
+| `permissions` | Permissions required to access the entire view |
+
+A Remote Component must not treat the bridge as a generic RPC tunnel. Declare every data or operation capability in the manifest before the host and provider handle it.
+
+## Opening and rendering are independent
+
+A host can list a view from a slot, or a tool result can open it on demand with `xpert.extension_view`. This changes only the entry path; the manifest, permissions, provider data, and Remote Component implementation remain the same.
+
+A tool result should contain only the public view key, initial query, and business parameters. Do not include access tokens, API URLs, Assistant IDs, tenant IDs, or organization IDs.
+
+## Security boundary
+
+- The host resolves `hostType`, `hostId`, tenant, organization, and user from authenticated server-side state.
+- The platform validates manifests and filters them by feature activation and permissions.
+- Remote Components do not receive access tokens, platform API URLs, or internal host identity fields.
+- Providers must re-check business permissions and must not trust iframe-supplied business identifiers on their own.
+- Use JSON actions for bounded structured data and dedicated capabilities for files or large payloads.
+
+## Next steps
+
+- [Workbench Remote Components](./remote-component): build a custom plugin Workbench UI.
+- [Remote Component Host Bridge](./remote-component-bridge): map messages to manifest declarations and provider methods.
+- [Runtime Capabilities](./runtime-capabilities): consume platform services from plugin server code.

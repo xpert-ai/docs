@@ -1,0 +1,135 @@
+---
+title: 产物运行时
+description: 为插件生成的交付物创建不可变版本和受治理访问链接。
+sidebar_position: 4
+---
+
+`ArtifactsRuntimeCapability` 通过 `platform.artifacts` 暴露 `ArtifactsApi`。它管理插件与智能体生成的持久化交付物，包括 HTML、Markdown、PDF、PowerPoint、图片、普通文件、站点和演示文稿。
+
+产物内容字节存放在[工作区文件](./workspace-files)中。产物服务在此基础上增加稳定业务身份、不可变版本历史、受治理访问链接、生命周期状态和访问计数。
+
+## 数据模型
+
+产物流程分为三层：
+
+1. **产物容器**：由 `pluginName`、`resourceType` 和 `resourceId` 定义的稳定插件业务身份。
+2. **产物版本**：由 `WorkspacePortableFileReference`、MIME 类型、校验和与元数据描述的不可变内容。
+3. **产物链接**：包含版本策略、访问模式、过期时间和展示策略的打开、共享或下载入口。
+
+产物的 `kind` 类型支持 `html`、`markdown`、`pdf`、`pptx`、`image`、`file`、`site` 和 `presentation`。
+
+## 容器与版本方法
+
+| 方法 | 用途 |
+| --- | --- |
+| `createArtifact(input)` | 在不上传内容字节的情况下创建或定位容器。 |
+| `findArtifactBySource(input)` | 按插件业务来源三元组查找容器。 |
+| `getArtifact(idOrSlug)` | 按 ID 或 slug 获取容器。 |
+| `listArtifacts(input?)` | 分页列出可见容器。 |
+| `archiveArtifact(idOrSlug)` | 将容器状态切换为 `archived`。 |
+| `deleteArtifact(idOrSlug)` | 将容器状态切换为 `deleted`。 |
+| `createArtifactVersion(input)` | 创建不可变版本。 |
+| `ensureArtifactVersion(input)` | 幂等创建或复用版本。 |
+| `listArtifactVersions(input)` | 按可选幂等键或状态列出版本。 |
+
+容器状态为 `active`、`archived` 或 `deleted`；版本状态为 `active` 或 `deleted`。
+
+## 链接与共享方法
+
+| 方法 | 用途 |
+| --- | --- |
+| `createArtifactLink(input)` | 创建新的受治理链接。 |
+| `createSignedPreviewLink(input)` | 创建短生命周期预览链接；不能作为持久共享 URL。 |
+| `updateArtifactLinkAccess(idOrSlug, patch)` | 更新可变的访问与展示属性。 |
+| `revokeArtifactLink(idOrSlug)` | 撤销指定链接。 |
+| `getArtifactShare(input)` | 按产物和 `shareKey` 解析当前有效的持久共享。 |
+| `ensureArtifactShare(input)` | 创建、复用或替换一个稳定共享槽位。 |
+| `revokeArtifactShare(input)` | 撤销稳定共享槽位。 |
+
+链接状态为 `active`、`revoked` 或 `expired`。`versionMode: 'latest'` 始终跟随当前产物版本；`versionMode: 'version'` 固定到某个不可变版本。
+
+访问模式包括：
+
+- `owner_only`
+- `workspace_all`
+- `organization_all`
+- `custom_principals`
+- `public_link`
+- `signed_preview`
+
+展示方式可选 `inline` 或 `attachment`，可控制是否允许下载，还可应用 `strict` 或 `interactive` 安全 HTML 配置。
+
+## 发布生成文件
+
+先将字节写入工作区文件，再创建或复用产物版本和共享：
+
+```ts
+import {
+  ArtifactsRuntimeCapability,
+  WorkspaceFilesRuntimeCapability
+} from '@xpert-ai/plugin-sdk'
+
+const files = capabilities.require(WorkspaceFilesRuntimeCapability)
+const artifacts = capabilities.require(ArtifactsRuntimeCapability)
+
+const stored = await files.writeRuntimeBuffer({
+  buffer: reportBuffer,
+  originalName: 'inspection-report.pdf',
+  mimeType: 'application/pdf',
+  folder: 'reports'
+})
+
+const artifact = await artifacts.createArtifact({
+  source: {
+    pluginName: '@acme/plugin-inspection',
+    resourceType: 'inspection-report',
+    resourceId: inspectionId
+  },
+  kind: 'pdf',
+  title: `检验报告 ${inspectionCode}`,
+  scope: {
+    workspaceId,
+    projectId,
+    userId
+  }
+})
+
+const { version } = await artifacts.ensureArtifactVersion({
+  artifactId: artifact.id,
+  idempotencyKey: `inspection:${inspectionId}:${reportRevision}`,
+  workspaceFileRef: stored.reference,
+  mimeType: 'application/pdf',
+  fileName: stored.name,
+  size: stored.size,
+  sha256: reportSha256,
+  sourceVersionId: reportRevision,
+  setCurrent: true
+})
+
+const { link } = await artifacts.ensureArtifactShare({
+  artifactId: artifact.id,
+  artifactVersionId: version.id,
+  versionMode: 'version',
+  shareKey: 'reviewers',
+  access: {
+    mode: 'workspace_all'
+  },
+  presentation: {
+    disposition: 'inline',
+    allowDownload: true
+  }
+})
+
+return link.publicUrl
+```
+
+请使用能代表相同不可变内容的确定性版本 `idempotencyKey`。`ensureArtifactVersion()` 返回 `created` 或 `reused`；`ensureArtifactShare()` 返回 `created`、`reused` 或 `replaced`。
+
+## 安全与生命周期规则
+
+- 不要在产物元数据中保存内容字节；应写入工作区文件并传递可移植引用。
+- 请求 `public_link` 前必须取得用户明确确认，并在访问输入中设置 `userConfirmedPublicLink`。
+- `createSignedPreviewLink()` 只用于短期预览；持久共享策略应保存 `shareKey` 并调用 `ensureArtifactShare()`。
+- 评审、审批、审计和可复现交付应固定到具体版本；只有读者应始终看到最新内容时才使用 `latest`。
+- 除非交付物确实需要平台允许的交互 HTML 能力，否则应选择 `strict`。
+- 访问应结束时撤销链接或共享槽位。业务对象归档时，插件也应同步执行相应的产物生命周期策略。

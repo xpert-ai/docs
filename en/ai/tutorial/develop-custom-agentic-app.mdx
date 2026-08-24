@@ -23,7 +23,7 @@ Use these platform docs alongside this tutorial:
 
 - [Plugin development](../plugin/develop), [plugin concepts](../plugin/concepts), and [plugin schema](../plugin/schema)
 - [Agent middleware](../middleware), [custom middleware](../middleware/custom), and the tools exposed by middleware
-- [Workbench and ChatKit](../../data/features/agent-execution/workbench-and-chatkit), [ChatKit](../chatkit), and [remote components](../plugin/remote-component)
+- [Workbench and ChatKit](../../data/features/agent-execution/workbench-and-chatkit), [ChatKit](../chatkit), and [Workbench Remote Components](../plugin/plugin-sdk/remote-component)
 - [Assistant configuration](../agent/ai-assistant/configure-ai-assistant) and [plugin install/use](../plugin/install)
 
 ## Reference Architecture
@@ -199,7 +199,7 @@ For document-intake apps, encode evidence requirements in schemas and tool descr
 
 A real business app should not leave results only in chat. Users need a [Workbench surface](../../data/features/agent-execution/workbench-and-chatkit) for lists, filters, source files, field edits, difference review, and final submission.
 
-A BOM-style plugin registers a fixed view, such as `BOM Review`, through a view provider. For iframe-based plugin UI, see [remote components](../plugin/remote-component). Its manifest declares:
+A BOM-style plugin registers a fixed view, such as `BOM Review`, through a view provider. For iframe-based plugin UI, see [Workbench Remote Components](../plugin/plugin-sdk/remote-component). Its manifest declares:
 
 - View placement: Agent Workbench main slot or fixed slot.
 - Rendering mode: `remote_component + react + iframe`.

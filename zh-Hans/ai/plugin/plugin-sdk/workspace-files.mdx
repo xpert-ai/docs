@@ -1,0 +1,144 @@
+---
+title: 工作区文件运行时
+description: 在 Xpert 工作区存储卷中读取、写入、解析、理解和搜索文件。
+sidebar_position: 2
+---
+
+`WorkspaceFilesRuntimeCapability` 通过稳定 ID `platform.workspace.files` 暴露 `WorkspaceFilesApi`，是插件访问 Xpert 工作区存储卷的统一文件边界。
+
+请使用该能力替代直接读取宿主文件系统或自建插件存储。它会保留平台作用域，为异步任务返回可移植引用，并可将已有文件接入平台文件理解流程。
+
+## 目录与作用域
+
+支持以下逻辑目录：
+
+```ts
+type WorkspaceFileCatalog =
+  | 'projects'
+  | 'users'
+  | 'knowledges'
+  | 'skills'
+  | 'xperts'
+```
+
+显式 API 接收 `WorkspaceFileScope` 中的 `tenantId`、`organizationId`、`userId`、`catalog`、`scopeId`、`projectId`、`knowledgeId`、`rootId` 和 `xpertId` 等字段。运行时感知 API 会尽可能从当前智能体工作区推导作用域。
+
+`filePath` 始终是相对工作区存储卷的路径，不是 `/workspace/...`，也不是宿主或 API 进程的文件系统路径。
+
+## 选择正确的引用类型
+
+| 类型 | 用途 |
+| --- | --- |
+| `WorkspaceFileReference` | 通过显式作用域和存储卷相对 `filePath` 定位已知文件。 |
+| `WorkspaceRuntimeFileDescriptor` | 接收智能体工具产生的路径和元数据，包括 `/workspace/...` 别名。 |
+| `WorkspacePortableFileReference` | 为后续回调、队列重试、产物版本或沙箱任务持久化或入队作用域完整的引用。 |
+| `WorkspaceFileLocator` | 在运行时感知 API 中接收字符串、运行时描述符或可移植引用。 |
+
+可移植引用包含 `source: 'platform.workspace.files'`、稳定 `filePath`、作用域元数据和面向运行时的 `workspacePath`。请持久化完整引用，不要将其简化成沙箱路径。
+
+## 文件操作
+
+| 方法 | 返回值 | 用途 |
+| --- | --- | --- |
+| `uploadBuffer(input)` | `WorkspaceFile` | 将字节上传到显式作用域的存储卷。 |
+| `resolveFile(input)` | `WorkspaceFile` | 在不加载字节的情况下解析元数据和可打开 URL。 |
+| `readBuffer(input)` | `WorkspaceFileBuffer` | 从显式作用域文件读取字节。 |
+| `deleteFile(input)` | `void` | 删除显式作用域文件。 |
+| `resolveRuntimeReference(input)` | `WorkspacePortableFileReference` | 在不读取字节的情况下标准化运行时定位器。 |
+| `readRuntimeBuffer(input)` | `WorkspaceRuntimeFileBuffer` | 在当前智能体工作区内解析定位器并读取字节。 |
+| `writeRuntimeBuffer(input)` | `WorkspaceFile` 加 `reference` | 将生成的字节写入当前运行时工作区。 |
+
+读取智能体工具传入的路径：
+
+```ts
+import { WorkspaceFilesRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const files = context.runtime.capabilities?.require(
+  WorkspaceFilesRuntimeCapability
+)
+
+if (!files) throw new Error('工作区文件能力不可用')
+
+const input = await files.readRuntimeBuffer('/workspace/input/specification.pdf')
+
+console.log(input.mimeType, input.size)
+// input.buffer 仅用于本次操作。
+// input.reference 可以持久化或发送给后台任务。
+```
+
+写入生成结果：
+
+```ts
+const output = await files.writeRuntimeBuffer({
+  buffer: reportBuffer,
+  originalName: 'quality-report.pdf',
+  mimeType: 'application/pdf',
+  folder: 'reports',
+  metadata: {
+    resourceType: 'inspection',
+    resourceId: inspectionId
+  }
+})
+
+await queue.enqueue({
+  // 在类型化队列载荷中保存 output.reference，而不是 output.buffer。
+})
+```
+
+## 文件理解
+
+文件理解 API 复用平台现有的文件资产（FileAsset）和文件分块（FileChunk）索引，不会创建插件私有的重复索引。
+
+| 方法 | 用途 |
+| --- | --- |
+| `understandFile(input)` | 将已有工作区文件注册到解析和语义索引流程。 |
+| `getUnderstandingStatus(input)` | 获取精简的解析和向量索引就绪状态，不返回解析文本。 |
+| `retryUnderstanding(input)` | 重试一个失败文件资产的解析和索引。 |
+| `listUnderstandingChunks(input)` | 按解析顺序分页读取有界分块。 |
+| `searchUnderstandingChunks(input)` | 在现有分块索引上执行混合搜索。 |
+| `validateUnderstandingReferences(input)` | 校验有界 `fileAssetId`/`chunkId` 证据并获取摘录。 |
+
+注册并搜索文件：
+
+```ts
+const understood = await files.understandFile({
+  catalog: 'projects',
+  projectId,
+  filePath: uploaded.filePath,
+  originalName: uploaded.name,
+  mimeType: uploaded.mimeType,
+  purpose: 'workspace',
+  parseMode: 'deep'
+})
+
+const status = await files.getUnderstandingStatus({
+  catalog: 'projects',
+  projectId,
+  fileAssetId: understood.fileAssetId
+})
+
+if (status.vectorIndexStatus === 'ready') {
+  const chunks = await files.searchUnderstandingChunks({
+    catalog: 'projects',
+    projectId,
+    fileAssetId: understood.fileAssetId,
+    query: '工作压力验收标准',
+    limit: 8,
+    contentLength: 1200
+  })
+}
+```
+
+`listUnderstandingChunks()` 的页码从 1 开始，并返回 `hasMore`。宿主会限制页大小、搜索数量、摘录长度和单个分块的内容长度。消费者应分页获取，不能假定一次调用会返回完整文档。
+
+`vectorIndexStatus` 的取值为 `pending`、`ready`、`failed` 或 `unavailable`。在开放语义搜索前，应将它与通用解析 `status` 分开检查。
+
+`WorkspaceMediaFilesApi<TLocator>` 是面向媒体生成适配器的窄类型。它要求实现 `uploadBuffer()` 和 `readBuffer()`，并可选暴露 `readRuntimeBuffer()` 与 `deleteFile()`；当组件不应依赖完整工作区文件 API 时使用该类型。
+
+## 安全与生命周期
+
+- 只需要元数据或可打开 URL 时优先使用 `resolveFile()`；只有实际处理内容时才读取字节。
+- 不要将 `/workspace/...` 路径放入延迟任务；应先用 `resolveRuntimeReference()` 转换。
+- 在展示证据或据此执行操作前，使用 `validateUnderstandingReferences()` 重新校验证据。
+- 所有显式操作都要声明作用域，不要从不可信绝对路径构造 `filePath`。
+- 原始字节缓冲区（`Buffer`）只属于当前服务端操作；后续工作应持久化可移植引用。

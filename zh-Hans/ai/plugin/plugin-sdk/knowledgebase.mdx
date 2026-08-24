@@ -1,0 +1,239 @@
+---
+title: 知识库运行时
+description: 搜索、预配、组织、处理并安全消费知识库内容。
+sidebar_position: 3
+---
+
+运行时包提供四个相互关联的知识库能力契约。请选择与操作范围最匹配的窄契约。
+
+| 能力 | 稳定 ID | 职责 |
+| --- | --- | --- |
+| `KnowledgebaseRuntimeCapability` | `platform.knowledgebase` | 列表、搜索、写入和删除插件管理的分块。 |
+| `KnowledgebaseProvisioningRuntimeCapability` | `platform.knowledgebase.provisioning` | 幂等创建托管知识库并连接到智能体。 |
+| `KnowledgebaseDocumentsRuntimeCapability` | `platform.knowledgebase.documents` | 上传、导入、组织、处理、检查和删除持久化文档。 |
+| `KnowledgeDocumentVisualAssetsRuntimeCapability` | `platform.knowledgebase.visual-assets` | 在不暴露存储路径的情况下解析和消费受治理的文档图片。 |
+
+## 列出和搜索知识库
+
+`KnowledgebaseApi` 提供：
+
+| 方法 | 用途 |
+| --- | --- |
+| `list(input)` | 按工作区、发布状态和数量上限列出可访问知识库。 |
+| `search(input)` | 搜索一个或多个知识库，返回文档和筛选诊断。 |
+| `writeChunk(input)` | 幂等写入插件管理的文本分块。 |
+| `deleteChunks(input)` | 按键、键前缀或托管文档键删除插件管理的分块。 |
+
+搜索支持 `vector`、`graph` 和 `hybrid` 检索模式。图检索设置包括 `neighborHops`、`entityTopK`、`communityTopK` 和 `graphWeight`。
+
+```ts
+import { KnowledgebaseRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const knowledgebase = context.runtime.capabilities?.require(
+  KnowledgebaseRuntimeCapability
+)
+
+if (!knowledgebase) throw new Error('知识库运行时不可用')
+
+const result = await knowledgebase.search({
+  knowledgebaseIds: context.knowledgebaseIds ?? [],
+  query: '高压阀门适用哪些检验规则？',
+  k: 10,
+  score: 0.65,
+  retrieval: {
+    mode: 'hybrid',
+    neighborHops: 1,
+    graphWeight: 0.35
+  },
+  source: '@acme/plugin-valve-review',
+  requestId: executionId
+})
+
+for (const document of result.documents) {
+  console.log(document.pageContent, document.metadata)
+}
+```
+
+当筛选或检索分支结果不符合预期时，请检查 `result.diagnostics`。诊断信息会返回生效筛选器、状态、命中数、延迟、降级信息和稳定错误码。
+
+### 幂等写入插件分块
+
+`writeChunk()` 要求稳定的 `writeKey`。重试时可返回 `status: 'skipped'`，从而避免重复内容。插件需要独立管理且可放入知识库目录的文档时，请使用 `document.key`。
+
+```ts
+await knowledgebase.writeChunk({
+  xpertId,
+  agentKey: 'reviewer',
+  knowledgebaseIds,
+  knowledgebaseId,
+  text: normalizedRequirement,
+  title: requirementCode,
+  writeKey: `requirement:${requirementId}:${revision}`,
+  document: {
+    key: `baseline:${baselineId}`,
+    name: `基线 ${baselineCode}`,
+    parentId: baselineFolderId
+  },
+  metadata: {
+    requirementId,
+    revision
+  }
+})
+```
+
+仅删除插件自身拥有的键。`deleteDocumentIfEmpty` 只会在分块已删除且托管文档为空时移除该文档。
+
+## 预配托管知识库
+
+`KnowledgebaseProvisioningApi` 提供两个幂等操作：
+
+| 方法 | 用途 |
+| --- | --- |
+| `ensure(input)` | 创建或更新带命名空间的一组托管知识库。 |
+| `connectAgent(input)` | 将知识库 ID 和可选检索策略连接到某个智能体键。 |
+
+每个 `KnowledgebaseProvisioningSpec` 都包含稳定 `key`、展示元数据、权限（`private`、`organization` 或 `public`）、可选解析默认值、类型化元数据模式（Schema）和增量同步开关。
+
+```ts
+import { KnowledgebaseProvisioningRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const provisioning = capabilities.require(
+  KnowledgebaseProvisioningRuntimeCapability
+)
+
+const ensured = await provisioning.ensure({
+  workspaceId,
+  namespace: '@acme/plugin-valve-review',
+  inheritEmbeddingModel: true,
+  knowledgebases: [
+    {
+      key: 'requirements',
+      name: '阀门需求',
+      description: '供阀门评审智能体使用的托管需求。',
+      permission: 'organization',
+      language: 'Chinese',
+      chunkSize: 1200,
+      chunkOverlap: 120,
+      metadataSchema: [
+        { key: 'revision', type: 'number', scope: 'document' }
+      ],
+      incrementalSyncEnabled: true
+    }
+  ]
+})
+
+await provisioning.connectAgent({
+  workspaceId,
+  xpertId,
+  agentKey: 'reviewer',
+  knowledgebaseIds: ensured.knowledgebases.map((item) => item.id)
+})
+```
+
+重试和升级时保持 `namespace` 与各个 `key` 不变。启用 `inheritEmbeddingModel` 后，宿主会复用可访问且已配置的嵌入模型；如果没有合适模型，预配会明确失败。
+
+## 管理持久化文档
+
+`KnowledgebaseDocumentsApi` 将文件上传、文档创建和处理拆分为不同阶段：
+
+| 方法 | 用途 |
+| --- | --- |
+| `listDocuments(input)` | 分页列出根目录、指定目录或全部后代文档。 |
+| `createFolder(input)` | 在根目录或另一个目录下创建目录。 |
+| `moveDocument(input)` | 移动文档，并可附带预期版本。 |
+| `uploadFile(input)` | 上传字节并返回存储文件元数据。 |
+| `importArchive(input)` | 有界解压归档包、创建文档，并报告跳过项与警告。 |
+| `createDocuments(input)` | 根据已上传文件或来源草稿创建文档记录。 |
+| `startProcessing(input)` | 启动指定文档的解析和索引。 |
+| `getDocumentStatus(input)` | 查询处理状态和进度。 |
+| `deleteDocuments(input)` | 删除指定文档并报告不存在的 ID。 |
+
+```ts
+import { KnowledgebaseDocumentsRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const documents = capabilities.require(
+  KnowledgebaseDocumentsRuntimeCapability
+)
+
+const uploaded = await documents.uploadFile({
+  knowledgebaseId,
+  parentId: folderId,
+  file: {
+    buffer: sourceBuffer,
+    originalname: 'requirements.pdf',
+    mimetype: 'application/pdf',
+    size: sourceBuffer.length
+  }
+})
+
+const created = await documents.createDocuments({
+  knowledgebaseId,
+  documents: [
+    {
+      name: uploaded.name,
+      filePath: uploaded.filePath,
+      fileUrl: uploaded.fileUrl,
+      mimeType: uploaded.mimeType,
+      size: uploaded.size,
+      parentId: folderId
+    }
+  ],
+  process: true,
+  metadata: { source: 'valve-review' }
+})
+```
+
+导入归档包时，请设置合适的 `maxEntries`、`maxEntrySizeBytes`、`maxDepth` 和 `supportedExtensions`。应向操作人员展示 `skipped`、`warnings` 与 `unsupported`，不要把部分导入误报为完整成功。
+
+移动可能被并发编辑的文档时，请使用 `expectedVersion`。
+
+## 安全消费视觉资产
+
+`KnowledgeDocumentVisualAssetsApi` 采用受治理的四步生命周期：
+
+1. `issueCandidates()` 根据文本锚点和业务作用域返回执行级逻辑路径。
+2. `prepareImages()` 校验这些路径，并为不可变产物版本准备可移植输入。
+3. `consumeImageBatch()` 消费已准备批次并返回经过校验的图片载荷。
+4. `discardImageBatch()` 释放不再消费的批次。
+
+视觉候选项中的 `filePath` 不是宿主路径，只能通过本能力再次解析。
+
+```ts
+import {
+  KnowledgeDocumentVisualAssetsRuntimeCapability
+} from '@xpert-ai/plugin-sdk'
+
+const visuals = capabilities.require(
+  KnowledgeDocumentVisualAssetsRuntimeCapability
+)
+
+const issued = await visuals.issueCandidates({
+  knowledgebaseId,
+  knowledgeDocumentId,
+  query: '铭牌压力与连接图',
+  textAnchors: [{ page: 4, chunkId, sourceBlockIds }],
+  maxAssets: 4,
+  businessScope: {
+    namespace: 'bom.requirement-evidence',
+    caseId,
+    baselineId,
+    runId,
+    sourceDocumentId
+  }
+})
+
+const prepared = await visuals.prepareImages({
+  filePaths: issued.candidates.map((candidate) => candidate.filePath)
+})
+
+let consumed = false
+try {
+  const images = await visuals.consumeImageBatch(prepared.batchRef)
+  consumed = true
+  // 仅在本次可信服务端操作中使用已校验图片。
+} finally {
+  if (!consumed) await visuals.discardImageBatch(prepared.batchRef)
+}
+```
+
+`artifactInputs` 是仅供服务端物化使用的数据。禁止将它、`batchRef`、Base64 编码图片数据或逻辑路径复制到工具消息（`ToolMessage`）内容或持久化聊天元数据。图片需要超出当前执行生命周期时，应持久化为产物或其他受治理引用。

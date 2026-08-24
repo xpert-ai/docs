@@ -23,7 +23,7 @@ tags:
 
 - [插件开发](../plugin/plugin-development)、[插件核心概念](../plugin/core-concepts) 与 [插件配置表单](../plugin/schema-ui-extension)
 - [智能体中间件](../middleware)、[自定义中间件](../middleware/custom) 与其中暴露的中间件工具
-- [工作台与资源对话](../../data/features/agent-execution/workbench-and-chatkit)、[ChatKit](../chatkit) 与 [远程组件](../plugin/remote-component)
+- [工作台与资源对话](../../data/features/agent-execution/workbench-and-chatkit)、[ChatKit](../chatkit) 与[工作台远程组件](../plugin/plugin-sdk/remote-component)
 - [助手配置](../agent/ai-assistant/configure-ai-assistant) 与 [插件发布和使用](../plugin/publish-and-use)
 
 ## 参考架构
@@ -199,7 +199,7 @@ const saveContractHeaderTool = tool(
 
 真正的业务应用不能只把结果丢回聊天窗口。用户需要在[工作台](../../data/features/agent-execution/workbench-and-chatkit)中查看列表、筛选结果、打开来源文件、修改字段、确认差异和提交审核。
 
-BOM 类插件会通过视图提供器注册一个固定视图，例如 `BOM 审核台`。如果需要 iframe 形式的插件界面，可参考[远程组件](../plugin/remote-component)。它的清单声明了：
+BOM 类插件会通过视图提供器注册一个固定视图，例如 `BOM 审核台`。如果需要 iframe 形式的插件界面，可参考[工作台远程组件](../plugin/plugin-sdk/remote-component)。它的清单声明了：
 
 - 视图位置：智能体工作台主槽位或固定槽位。
 - 渲染方式：`remote_component + react + iframe`。

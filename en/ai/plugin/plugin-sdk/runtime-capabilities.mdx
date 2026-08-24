@@ -1,0 +1,158 @@
+---
+title: Runtime Capabilities
+description: Use typed, host-provided platform services from Xpert plugins.
+sidebar_position: 1
+---
+
+Runtime capabilities are the typed boundary between a plugin and services owned by the Xpert host. They let plugin code use workspace storage, knowledgebases, Artifacts, Sandbox Jobs, actor tokens, and project provisioning without importing host implementation classes or creating parallel infrastructure.
+
+All public types and capability keys on this page are exported from `@xpert-ai/plugin-sdk`.
+
+## Capability model
+
+A capability key is a frozen object containing a stable ID, a description, and a TypeScript-only API type:
+
+```ts
+export type RuntimeCapabilityKey<T> = {
+  readonly id: string
+  readonly description?: string
+  readonly __type?: T
+}
+```
+
+Use the exported key object instead of a raw string. The key carries the API type into `get()` and `require()`, while the stable ID lets the host and dynamically loaded plugins agree on the same contract.
+
+The registry exposes four operations:
+
+| Method | Purpose |
+| --- | --- |
+| `register(key, implementation)` | Register or replace an implementation. Intended for host infrastructure and tests. |
+| `has(key)` | Check whether an implementation is registered. |
+| `get(key)` | Return the typed implementation, or `undefined` when unavailable. |
+| `require(key)` | Return the typed implementation or throw when unavailable. |
+
+## Resolve a capability in Agent middleware
+
+Agent middleware receives the scoped registry on `context.runtime.capabilities`:
+
+```ts
+import {
+  WorkspaceFilesRuntimeCapability,
+  type IAgentMiddlewareContext
+} from '@xpert-ai/plugin-sdk'
+
+export function resolveWorkspaceFiles(context: IAgentMiddlewareContext) {
+  const files = context.runtime.capabilities?.get(
+    WorkspaceFilesRuntimeCapability
+  )
+
+  if (!files) {
+    return { available: false as const }
+  }
+
+  return { available: true as const, files }
+}
+```
+
+Use `get()` when the feature can be hidden or degraded. Use `require()` only after the plugin has established that the capability is mandatory for the current operation:
+
+```ts
+const files = context.runtime.capabilities?.require(
+  WorkspaceFilesRuntimeCapability
+)
+
+if (!files) {
+  throw new Error('Workspace Files is unavailable in this runtime')
+}
+```
+
+The registry is scoped by the host. Capability methods still enforce tenant, organization, user, workspace, project, and Xpert boundaries; a caller-supplied identifier does not bypass those boundaries.
+
+## Resolve a capability in a NestJS provider
+
+Server-side plugin providers can inject the platform registry. Keep the dependency optional when the plugin can load on a host version that does not provide the capability:
+
+```ts
+import { Inject, Injectable, Optional } from '@nestjs/common'
+import {
+  XPERT_RUNTIME_CAPABILITIES_TOKEN,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+@Injectable()
+export class ExportService {
+  constructor(
+    @Optional()
+    @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
+    private readonly capabilities?: RuntimeCapabilityRegistry
+  ) {}
+}
+```
+
+Resolve the capability close to the operation so availability can be reported accurately. Do not cache user- or execution-scoped results across requests.
+
+## Capabilities in the runtime package
+
+| Exported key | Stable ID | API summary |
+| --- | --- | --- |
+| `WorkspaceFilesRuntimeCapability` | `platform.workspace.files` | Store, resolve, read, delete, parse, and search workspace files. |
+| `KnowledgebaseRuntimeCapability` | `platform.knowledgebase` | List and search knowledgebases and manage plugin-written chunks. |
+| `KnowledgebaseProvisioningRuntimeCapability` | `platform.knowledgebase.provisioning` | Idempotently provision managed knowledgebases and connect them to an Agent. |
+| `KnowledgebaseDocumentsRuntimeCapability` | `platform.knowledgebase.documents` | Upload, import, organize, process, inspect, and delete documents. |
+| `KnowledgeDocumentVisualAssetsRuntimeCapability` | `platform.knowledgebase.visual-assets` | Resolve governed document images without exposing host storage paths. |
+| `ArtifactsRuntimeCapability` | `platform.artifacts` | Create, version, preview, share, archive, and delete platform-managed Artifacts. |
+| `SandboxJobsRuntimeCapability` | `platform.sandbox.jobs` | Run registered Actions in isolated, short-lived Sandbox Runtimes. |
+| `ActorTokenRuntimeCapability` | `platform.actor-token` | Mint a short-lived host-issued actor token for an outbound API call. |
+| `ProjectProvisioningRuntimeCapability` | `platform.project.provisioning` | Idempotently create or reconcile a Chat Project and connect an Assistant. |
+
+Continue with the detailed references:
+
+- [Workspace Files](./workspace-files)
+- [Knowledgebase capabilities](./knowledgebase)
+- [Artifacts](./artifacts)
+- [Sandbox Jobs](./sandbox-jobs)
+- [Actor Token](./actor-token)
+- [Project Provisioning](./project-provisioning)
+
+## Define and test capability consumers
+
+`createRuntimeCapability<T>()` creates a typed key for a host or plugin subsystem. Do not reuse a `platform.*` ID for a different contract. `RuntimeCapabilityResolver` is the read-only `get()` view to use when a consumer must not register implementations.
+
+```ts
+import { createRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+interface InspectionAuditApi {
+  append(input: { resourceId: string; event: string }): Promise<void>
+}
+
+export const InspectionAuditRuntimeCapability =
+  createRuntimeCapability<InspectionAuditApi>('acme.inspection.audit', {
+    description: 'Append an inspection audit event.'
+  })
+```
+
+For unit tests, register a typed fake in `DefaultRuntimeCapabilityRegistry`:
+
+```ts
+import {
+  DefaultRuntimeCapabilityRegistry,
+  WorkspaceFilesRuntimeCapability,
+  type WorkspaceFilesApi
+} from '@xpert-ai/plugin-sdk'
+
+const workspaceFiles: WorkspaceFilesApi = createWorkspaceFilesFake()
+
+const capabilities = new DefaultRuntimeCapabilityRegistry().register(
+  WorkspaceFilesRuntimeCapability,
+  workspaceFiles
+)
+```
+
+Production plugin code normally consumes platform keys; host infrastructure owns their registration. Test both the available path and the unavailable path when a capability is optional.
+
+## Compatibility rules
+
+- Import keys and API types from `@xpert-ai/plugin-sdk`; do not copy the interfaces into a plugin.
+- Treat capability availability as a runtime condition. Package installation alone does not prove that a host service, provider, binding, or registered Sandbox Action is ready.
+- Keep portable references and structured DTOs at async boundaries. Do not pass raw file bytes, bearer tokens, host paths, or implementation instances through queues or persisted chat metadata.
+- Keep capability results within the current authorized scope and re-resolve them for later jobs or callbacks.

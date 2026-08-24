@@ -122,6 +122,6 @@ The runtime capability boundary transports base64 DTOs instead of `Y.Doc` instan
 
 ## Related resources
 
-- [Remote Component plugins](./remote-component)
+- [Workbench Remote Components](./plugin-sdk/remote-component)
 - [Managed Queues](./managed-queues)
 - [Artifacts](../agent/artifacts/index)

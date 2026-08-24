@@ -1,0 +1,167 @@
+---
+title: 视图扩展
+description: 了解 Xpert 插件如何通过视图提供器和视图清单，把声明式视图或远程组件接入工作台等宿主界面。
+---
+
+# 视图扩展
+
+视图扩展（View Extension）是插件向 Xpert 宿主界面提供可交互视图的标准协议。它定义视图出现在哪里、何时可见、能够读取哪些数据、允许执行哪些操作，以及由哪种方式完成渲染。
+
+对于 Assistant 工作台，远程组件（Remote Component）是视图扩展的一种渲染方式。它负责 iframe 中的自定义前端 UI；视图扩展负责宿主插槽、功能激活、权限、数据和操作等完整契约。
+
+```text
+Assistant 功能
+  -> 工作台视图宿主
+  -> agent.workbench.main / agent.workbench.fixed
+  -> ViewExtensionProvider
+  -> XpertExtensionViewManifest
+  -> 平台声明式渲染器或远程组件
+```
+
+## 核心概念
+
+| 概念 | 职责 |
+| --- | --- |
+| 宿主（Host） | 提供可扩展的产品界面和当前用户上下文，例如 Assistant、项目或知识库 |
+| 插槽（Slot） | 宿主中允许视图出现的位置，例如 `agent.workbench.main` |
+| 视图提供器（View Provider） | 插件服务端实现，提供视图清单、数据、操作和可选的远程组件入口 |
+| 视图清单（Manifest） | 声明视图的位置、激活条件、渲染方式和能力白名单 |
+| 远程组件（Remote Component） | 在宿主控制的 iframe 中运行的插件自定义前端 UI |
+
+远程组件不是独立的插件类型，也不能脱离视图清单单独注册。完整的工作台 UI 通常由服务端视图提供器和前端远程组件共同组成。
+
+## 宿主与插槽
+
+`hostType` 表示宿主类型。平台可以提供 `agent`、`project`、`knowledgebase`、`integration` 或 `sandbox` 等宿主。
+
+Assistant 工作台使用 `agent` 宿主，常用插槽包括：
+
+| 插槽 | 用途 |
+| --- | --- |
+| `agent.workbench.main` | 随当前工作台内容展示的主视图 |
+| `agent.workbench.fixed` | 在工作台菜单中提供固定入口的视图 |
+| `detail.sidebar` | 宿主详情页侧栏中的补充视图 |
+
+插件只能向宿主已经声明的插槽提供视图。插槽描述产品位置，不应包含插件业务名称。
+
+## 功能激活
+
+Assistant 工作台插槽要求视图声明 `activation.requiredFeatures`。功能（Feature）是连接 Agent 能力和人类工作台界面的能力令牌：
+
+```text
+Agent 中间件声明 Feature
+  -> Assistant 连接该中间件
+  -> 视图宿主获得功能
+  -> 对应 View 才可见
+```
+
+```ts
+activation: {
+  requiredFeatures: ['contract-review']
+}
+```
+
+视图应依赖拥有其数据与操作的领域能力。移除对应中间件后，它提供的 Agent 工具和工作台视图应一起消失。
+
+## 视图提供器
+
+插件通过 `@ViewExtensionProvider(providerKey)` 注册视图提供器：
+
+```ts
+import {
+  type IXpertViewExtensionProvider,
+  ViewExtensionProvider
+} from '@xpert-ai/plugin-sdk'
+import type {
+  XpertExtensionViewManifest,
+  XpertResolvedViewHostContext,
+  XpertViewDataResult,
+  XpertViewQuery
+} from '@xpert-ai/contracts'
+
+@ViewExtensionProvider('contract_review')
+export class ContractReviewViewProvider
+  implements IXpertViewExtensionProvider
+{
+  constructor(private readonly reviewService: ContractReviewService) {}
+
+  supports(context: XpertResolvedViewHostContext) {
+    return context.hostType === 'agent'
+  }
+
+  getViewManifests(
+    _context: XpertResolvedViewHostContext,
+    slot: string
+  ): XpertExtensionViewManifest[] {
+    if (slot !== 'agent.workbench.main') return []
+    return [createContractReviewManifest(slot)]
+  }
+
+  async getViewData(
+    context: XpertResolvedViewHostContext,
+    viewKey: string,
+    query: XpertViewQuery
+  ): Promise<XpertViewDataResult> {
+    return this.reviewService.getViewData(context, viewKey, query)
+  }
+}
+```
+
+提供器中的 `viewKey` 是本地清单键。平台公开的完整视图键为：
+
+```text
+<providerKey>__<manifestKey>
+```
+
+例如 `contract_review` 提供器中的 `review` 视图，对外键为 `contract_review__review`。
+
+## 选择渲染方式
+
+视图清单的 `view.type` 决定渲染方式：
+
+| 类型 | 适用场景 | UI 所有者 |
+| --- | --- | --- |
+| `stats` | 少量指标概览 | 平台 |
+| `table` | 标准表格、搜索、排序和分页 | 平台 |
+| `list` | 标准列表 | 平台 |
+| `detail` | 只读字段详情 | 平台 |
+| `raw_json` | 调试或原始数据展示 | 平台 |
+| `remote_component` | 编辑器、画布、复杂工作流或多面板工作台 | 插件 |
+
+优先选择能满足需求的声明式视图。只有在交互和布局明显超出平台表格、列表或表单能力时，才使用远程组件。
+
+## 视图清单是能力白名单
+
+视图清单不仅描述页面，还声明远程组件能够使用的宿主能力：
+
+| 清单字段 | 能力 |
+| --- | --- |
+| `dataSource` | 查询视图数据、分页、搜索、排序和参数支持 |
+| `parameters` | 视图参数以及服务端提供的动态选项 |
+| `actions` | JSON 操作或文件操作 |
+| `fileAccess` | 预览或下载由提供器解析的文件 |
+| `clientCommands` | 打开文件、导航或发送 Assistant 消息等宿主界面操作 |
+| `hostEvents` | 接收工具完成等宿主侧事件 |
+| `permissions` | 访问整个视图所需的权限 |
+
+远程组件不能把宿主桥接当作任意远程调用通道。每项数据访问或操作都必须先在清单中声明，再由宿主和提供器执行。
+
+## 打开方式与渲染方式彼此独立
+
+视图可以由宿主枚举插槽后展示，也可以由工具结果中的 `xpert.extension_view` 按需打开。这只是入口不同，不会改变视图的清单、权限、数据提供器或远程组件实现。
+
+工具结果只应携带公开视图键、初始查询和业务参数，不应包含访问令牌、API 地址、Assistant ID、租户 ID 或组织 ID。
+
+## 安全边界
+
+- 宿主根据已认证的服务端状态解析 `hostType`、`hostId`、租户、组织和用户。
+- 清单由平台校验并按功能激活和权限过滤。
+- 远程组件不接收访问令牌、平台 API 地址或宿主内部身份字段。
+- 提供器必须重新校验业务权限，不能只信任 iframe 传入的业务 ID。
+- JSON 操作用于有界结构化数据；文件和大对象使用专用能力。
+
+## 下一步
+
+- [工作台远程组件](./remote-component)：构建插件自定义工作台 UI。
+- [远程组件宿主桥接](./remote-component-bridge)：查看消息、清单和提供器方法之间的映射。
+- [运行时能力](./runtime-capabilities)：在插件服务端调用宿主提供的平台服务。

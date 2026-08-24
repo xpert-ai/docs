@@ -150,7 +150,6 @@
                 "core-concepts",
                 "development-steps",
                 "mcp-tools-and-apps",
-                "remote-component",
                 "managed-connections",
                 "managed-queues",
                 "agent-evolution",
@@ -160,6 +159,21 @@
                 "permission-design-guide",
                 "schema-ui-extension",
                 "plugin-development"
+              ]
+            },
+            {
+              "slug": "plugin-sdk",
+              "pages": [
+                "runtime-capabilities",
+                "view-extension",
+                "remote-component",
+                "remote-component-bridge",
+                "workspace-files",
+                "knowledgebase",
+                "artifacts",
+                "sandbox-jobs",
+                "actor-token",
+                "project-provisioning"
               ]
             },
             {

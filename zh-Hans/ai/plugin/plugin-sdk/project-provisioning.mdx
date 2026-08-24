@@ -1,0 +1,65 @@
+---
+title: 项目预配运行时
+description: 幂等创建或协调对话项目，并连接助手。
+sidebar_position: 7
+---
+
+`ProjectProvisioningRuntimeCapability` 通过 `platform.project.provisioning` 暴露 `ProjectProvisioningApi`，适用于需要维护业务项目与 Xpert 对话项目一对一映射的插件。
+
+`ensure()` 会创建对话项目，或协调其当前名称、生命周期状态、工作区和连接的助手，同时保持调用方提供的项目 ID 不变。
+
+## 契约
+
+```ts
+type ProjectEnsureInput = {
+  projectId: string
+  workspaceId: string
+  xpertId: string
+  name: string
+  status: 'active' | 'archived'
+}
+
+type ProjectEnsureResult = {
+  projectId: string
+  workspaceId: string
+  xpertIds: string[]
+  operation: 'created' | 'updated'
+}
+
+interface ProjectProvisioningApi {
+  ensure(input: ProjectEnsureInput): Promise<ProjectEnsureResult>
+}
+```
+
+`xpertIds` 是同步完成后连接的助手完整集合，而不仅是当前调用传入的助手。
+
+## 示例
+
+```ts
+import { ProjectProvisioningRuntimeCapability } from '@xpert-ai/plugin-sdk'
+
+const projects = capabilities.require(
+  ProjectProvisioningRuntimeCapability
+)
+
+const result = await projects.ensure({
+  projectId: businessProject.chatProjectId,
+  workspaceId: businessProject.workspaceId,
+  xpertId: pluginConfig.assistantId,
+  name: businessProject.name,
+  status: businessProject.archived ? 'archived' : 'active'
+})
+
+await projectRepository.update(businessProject.id, {
+  chatProjectId: result.projectId,
+  provisioningOperation: result.operation
+})
+```
+
+## 幂等性与归属
+
+- 创建业务项目时只生成或预留一次 `projectId`，后续重试和协调必须复用该 ID。
+- 超时后不要生成新 ID；使用相同 ID 再次调用 `ensure()`。
+- `workspaceId` 必须与业务项目和所连接助手的归属工作区保持一致。
+- 业务项目归档时同步 `status: 'archived'`，不要静默创建一个新的活动项目作为替代。
+- 将 `operation` 作为协调结果证据。产品逻辑应依据有效结果，不能假定每次成功调用都创建了新记录。
