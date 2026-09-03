@@ -138,7 +138,22 @@
         },
         {
           "slug": "middleware",
-          "groups": []
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": []
+            },
+            {
+              "slug": "built-in",
+              "pages": []
+            },
+            {
+              "slug": "mcp-server",
+              "pages": [
+                "index"
+              ]
+            }
+          ]
         },
         {
           "slug": "plugin",
@@ -149,6 +164,7 @@
                 "overview",
                 "core-concepts",
                 "development-steps",
+                "host-native-mcp-tools",
                 "mcp-tools-and-apps",
                 "managed-connections",
                 "managed-queues",

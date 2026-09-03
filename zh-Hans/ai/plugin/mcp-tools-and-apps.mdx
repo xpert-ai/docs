@@ -3,7 +3,9 @@ sidebar_position: 5
 title: MCP Tools 和 MCP Apps
 ---
 
-插件可以把 MCP server 作为可安装资源交付。这是为 Xpert 增加标准 MCP tools 的推荐方式，也是交付可在 ChatKit 中内联渲染的 MCP Apps 的推荐方式。
+Xpert 插件支持两种 MCP 发布模式，**两者都可以交付 MCP Apps**。已有业务服务在 Xpert 宿主中执行时，优先使用[插件原生 MCP 工具](./host-native-mcp-tools)：在 Provider `apps` 中声明 `defineMcpApp()`，再用 `mcp.app.resourceKey` 绑定已有 Tool。Xpert 负责 HTML 资源、身份、Publication 策略、审计和 Streamable HTTP，无需 stdio 入口。本页的包结构和 Server 示例介绍另一条插件托管 stdio 路径；App bridge、元数据、i18n 与主题规范则适用于两种模式。
+
+产品入口也遵循该归属边界。插件托管的 stdio Server 在 manifest 中声明，并在 **MCP 管理 → 运行实例** 中拥有子进程条目；宿主原生装饰器 Provider 没有独立进程，它从插件详情 dialog 启用，生成的 Publication 出现在 **MCP 服务**。一个插件可以采用任一模式或包含多个 Provider，但除非有明确兼容需求，不要同时通过两条路径重复发布同一个业务操作。
 
 本文只讲插件侧如何打包和实现。ChatKit 宿主运行时、iframe bridge、消息渲染和安全模型请参考 [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps)。
 
@@ -13,11 +15,11 @@ title: MCP Tools 和 MCP Apps
 
 当你需要以下能力时，使用 plugin-managed MCP server：
 
-- 通过 MCP 协议暴露工具，而不是实现 Xpert 原生 `ToolsetStrategy`
+- 由插件持有可移植的 MCP Server 进程，而不是使用 Xpert 的宿主原生 Tool Provider 适配器
 - 让工具实现尽量保持 MCP host 可移植性
-- 在工具结果中返回可交互的 MCP App
-- 提供 iframe 可调用、但模型不可见的 app-only 工具
 - 把 MCP server 的安装、启用、停用和版本管理纳入插件生命周期
+
+两种模式都支持交互式 App 和 iframe 专用 Tool，不能仅因这两项需求就引入 stdio 进程。App 是 Resource 型界面，不是额外的 Tool：五个 Tool 绑定两个 App 后，`tools/list` 仍是五项，另有两个 App 资源。宿主管理路径的打包、同步与验收见[原生 MCP Apps](./host-native-mcp-tools)。
 
 如果要开发长期存在的工作台页面或集成配置页面，应使用[工作台远程组件](./plugin-sdk/remote-component)或其他视图扩展能力。不要让 Agent 中间件承担 MCP App 资源宿主的职责；中间件可以触发工作流，但 MCP Apps 应通过 MCP 资源和 MCP Apps 宿主交付。
 

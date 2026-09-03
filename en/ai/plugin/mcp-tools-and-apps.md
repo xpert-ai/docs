@@ -3,7 +3,9 @@ sidebar_position: 5
 title: MCP Tools and MCP Apps
 ---
 
-Plugins can ship MCP servers as installable plugin resources. This is the recommended way to add standard MCP tools, and it is also the recommended way to deliver MCP Apps that render inside ChatKit.
+Xpert plugins support two MCP publishing models, and **both can deliver MCP Apps**. For an existing business service executing in the Xpert host, prefer [Host-Native MCP Tools for Plugins](./host-native-mcp-tools): declare `defineMcpApp()` in Provider `apps` and bind the existing Tool through `mcp.app.resourceKey`. Xpert serves the HTML resource with managed identity, Publication policy, audit, and Streamable HTTP; no stdio entrypoint is needed. This page's package and server examples cover the separate plugin-managed stdio path, while its App bridge, metadata, i18n, and theme rules apply to both models.
+
+The product surfaces reflect that ownership boundary. A plugin-managed stdio server is declared in the manifest and has a child-process entry under **MCP Management → Runtime instances**. A host-native decorated Provider has no separate process; it is enabled from the plugin detail dialog and its resulting Publication appears under **MCP services**. One plugin may contain either model or multiple Providers, but do not publish the same business operation through both paths without an explicit compatibility requirement.
 
 This page focuses on how to package and implement the plugin side. For the ChatKit host runtime, iframe bridge, message rendering, and security model, see [ChatKit MCP Apps](../chatkit/chatkit-mcp-apps).
 
@@ -13,11 +15,11 @@ For a complete business-oriented walkthrough, continue with [Build a Sales Perfo
 
 Use a plugin-managed MCP server when you want to:
 
-- expose tools through the MCP protocol instead of an Xpert-native ToolsetStrategy
+- own a portable MCP server process instead of using Xpert's host-native Tool Provider adapter
 - keep the tool implementation portable across MCP hosts
-- return an interactive MCP App from a tool result
-- ship app-only tools that are callable by the iframe but not visible to the model
 - install, enable, disable, and version the MCP server as part of a plugin
+
+Interactive Apps and iframe-only Tools are supported by both models; they are not reasons on their own to introduce a stdio process. An App is a Resource-backed UI, not another Tool: five Tools with two bound Apps remain five `tools/list` entries, plus two App resources. See [native App packaging, synchronization, and acceptance](./host-native-mcp-tools) for the host-managed path.
 
 Do not use this pattern for persistent Workbench pages or integration configuration pages. Those should use [Workbench Remote Components](./plugin-sdk/remote-component) or other View Extension surfaces. Do not use Agent middleware as the MCP App resource host; middleware can trigger workflows, but MCP Apps should be served through MCP resources and the MCP Apps host.
 

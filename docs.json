@@ -346,6 +346,12 @@
                       "en/ai/middleware/built-in/ralph-loop",
                       "en/ai/middleware/built-in/human-in-the-loop"
                     ]
+                  },
+                  {
+                    "group": "MCP Server",
+                    "pages": [
+                      "en/ai/middleware/mcp-server/index"
+                    ]
                   }
                 ]
               },
@@ -356,6 +362,7 @@
                     "group": "Default",
                     "pages": [
                       "en/ai/plugin/overview",
+                      "en/ai/plugin/host-native-mcp-tools",
                       "en/ai/plugin/mcp-tools-and-apps",
                       "en/ai/plugin/managed-connections",
                       "en/ai/plugin/managed-queues",
@@ -1176,6 +1183,12 @@
                       "zh-Hans/ai/middleware/built-in/sensitive-filter",
                       "zh-Hans/ai/middleware/built-in/agent-behavior-monitor"
                     ]
+                  },
+                  {
+                    "group": "MCP Server",
+                    "pages": [
+                      "zh-Hans/ai/middleware/mcp-server/index"
+                    ]
                   }
                 ]
               },
@@ -1188,6 +1201,7 @@
                       "zh-Hans/ai/plugin/overview",
                       "zh-Hans/ai/plugin/core-concepts",
                       "zh-Hans/ai/plugin/development-steps",
+                      "zh-Hans/ai/plugin/host-native-mcp-tools",
                       "zh-Hans/ai/plugin/mcp-tools-and-apps",
                       "zh-Hans/ai/plugin/managed-connections",
                       "zh-Hans/ai/plugin/managed-queues",
