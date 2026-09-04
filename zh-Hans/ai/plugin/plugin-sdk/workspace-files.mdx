@@ -19,11 +19,50 @@ type WorkspaceFileCatalog =
   | 'knowledges'
   | 'skills'
   | 'xperts'
+  | 'user-xperts'
 ```
 
 显式 API 接收 `WorkspaceFileScope` 中的 `tenantId`、`organizationId`、`userId`、`catalog`、`scopeId`、`projectId`、`knowledgeId`、`rootId` 和 `xpertId` 等字段。运行时感知 API 会尽可能从当前智能体工作区推导作用域。
 
+对于当前 Agent 的运行时文件，宿主只会在绑定明确数据所有者时提供能力：Project 模式绑定 `projectId`；非 Project 模式绑定 `xpertId`。个人 Xpert 使用 `catalog: 'user-xperts'`，其中 `scopeId` 是 Xpert ID，`userId` 作为独立字段保留用户隔离。不要把 `userId` 和 `xpertId` 拼进一个 `scopeId`。
+
 `filePath` 始终是相对工作区存储卷的路径，不是 `/workspace/...`，也不是宿主或 API 进程的文件系统路径。
+
+## 在 NestJS Provider 中获取文件能力
+
+智能体中间件直接使用 `context.runtime.capabilities`。View Provider、Controller 或其他 NestJS 服务必须使用 `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN`，根据宿主解析出的当前作用域创建 scoped API：
+
+```ts
+import { Inject, Optional } from '@nestjs/common'
+import {
+  WorkspaceFilesRuntimeCapability,
+  XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN,
+  type AgentMiddlewareRuntimeScope,
+  type AgentMiddlewareRuntimeServiceApi
+} from '@xpert-ai/plugin-sdk'
+
+export class DocumentService {
+  constructor(
+    @Optional()
+    @Inject(XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN)
+    private readonly runtimeService?: AgentMiddlewareRuntimeServiceApi
+  ) {}
+
+  workspaceFiles(scope: AgentMiddlewareRuntimeScope) {
+    const files = this.runtimeService
+      ?.createScopedApi(scope)
+      .capabilities?.get(WorkspaceFilesRuntimeCapability)
+
+    if (!files) {
+      throw new Error('当前运行作用域未提供工作区文件能力')
+    }
+
+    return files
+  }
+}
+```
+
+不要在 Provider 中只从 `XPERT_RUNTIME_CAPABILITIES_TOKEN` 获取工作区文件。该令牌表示未绑定具体数据所有者的全局能力集合，新宿主会故意从中省略 `WorkspaceFilesRuntimeCapability`。完整的 Provider 获取规则见[运行时能力](./runtime-capabilities#在-nestjs-服务提供器中解析能力)。
 
 ## 选择正确的引用类型
 
@@ -137,6 +176,7 @@ if (status.vectorIndexStatus === 'ready') {
 
 ## 安全与生命周期
 
+- 每次请求都根据宿主解析的服务端上下文创建 scoped API；不要跨用户、Xpert、Project 或请求缓存文件能力实例。
 - 只需要元数据或可打开 URL 时优先使用 `resolveFile()`；只有实际处理内容时才读取字节。
 - 不要将 `/workspace/...` 路径放入延迟任务；应先用 `resolveRuntimeReference()` 转换。
 - 在展示证据或据此执行操作前，使用 `validateUnderstandingReferences()` 重新校验证据。
