@@ -19,11 +19,50 @@ type WorkspaceFileCatalog =
   | 'knowledges'
   | 'skills'
   | 'xperts'
+  | 'user-xperts'
 ```
 
 Explicit APIs accept `WorkspaceFileScope` fields such as `tenantId`, `organizationId`, `userId`, `catalog`, `scopeId`, `projectId`, `knowledgeId`, `rootId`, and `xpertId`. Runtime-aware APIs infer the current Agent workspace when possible.
 
+For files in the current Agent runtime, the host exposes the capability only after binding a concrete data owner: Project mode binds `projectId`, while non-Project mode binds `xpertId`. A personal Xpert uses `catalog: 'user-xperts'`, where `scopeId` is the Xpert ID and `userId` remains a separate user-isolation field. Never concatenate `userId` and `xpertId` into one `scopeId`.
+
 `filePath` is always relative to a workspace Volume. It is not `/workspace/...` and is never a host/API-process filesystem path.
+
+## Resolve Workspace Files in a NestJS provider
+
+Agent middleware uses `context.runtime.capabilities` directly. A View Provider, controller, or other NestJS service must inject `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN` and create a scoped API from host-resolved context:
+
+```ts
+import { Inject, Optional } from '@nestjs/common'
+import {
+  WorkspaceFilesRuntimeCapability,
+  XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN,
+  type AgentMiddlewareRuntimeScope,
+  type AgentMiddlewareRuntimeServiceApi
+} from '@xpert-ai/plugin-sdk'
+
+export class DocumentService {
+  constructor(
+    @Optional()
+    @Inject(XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN)
+    private readonly runtimeService?: AgentMiddlewareRuntimeServiceApi
+  ) {}
+
+  workspaceFiles(scope: AgentMiddlewareRuntimeScope) {
+    const files = this.runtimeService
+      ?.createScopedApi(scope)
+      .capabilities?.get(WorkspaceFilesRuntimeCapability)
+
+    if (!files) {
+      throw new Error('Workspace Files is unavailable in the current runtime scope')
+    }
+
+    return files
+  }
+}
+```
+
+Do not resolve Workspace Files only from `XPERT_RUNTIME_CAPABILITIES_TOKEN` inside a provider. That token represents the global capability set without a bound data owner, and current hosts intentionally omit `WorkspaceFilesRuntimeCapability` from it. See [Runtime Capabilities](./runtime-capabilities#resolve-a-capability-in-a-nestjs-provider) for the complete provider rules.
 
 ## Choose the right reference
 
@@ -137,6 +176,7 @@ if (status.vectorIndexStatus === 'ready') {
 
 ## Safety and lifecycle
 
+- Create a scoped API from host-resolved server context for each request. Do not cache file capability instances across users, Xperts, Projects, or requests.
 - Prefer `resolveFile()` when only metadata or an openable URL is required; use byte-reading methods only for actual processing.
 - Never pass `/workspace/...` paths into a delayed job. Convert them with `resolveRuntimeReference()` first.
 - Validate stored evidence with `validateUnderstandingReferences()` before presenting or acting on it.

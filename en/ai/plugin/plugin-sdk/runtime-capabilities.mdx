@@ -70,12 +70,26 @@ The registry is scoped by the host. Capability methods still enforce tenant, org
 
 ## Resolve a capability in a NestJS provider
 
-Server-side plugin providers can inject the platform registry. Keep the dependency optional when the plugin can load on a host version that does not provide the capability:
+A NestJS provider is not inherently bound to one Agent execution, so first distinguish whether a capability depends on the current runtime scope:
+
+| Consumer | Resolution path |
+| --- | --- |
+| Agent middleware | Use `context.runtime.capabilities` directly. |
+| A user-, Xpert-, or Project-scoped capability in a NestJS provider | Inject `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN` and call `createScopedApi(scope)` for each operation. |
+| A global capability that does not depend on a data owner | Inject `XPERT_RUNTIME_CAPABILITIES_TOKEN`. |
+
+Data-owning capabilities such as `WorkspaceFilesRuntimeCapability` must be resolved from the scoped runtime API first. An unbound global registry may intentionally omit Workspace Files when no `xpertId` or `projectId` is bound. A plugin must not work around that boundary by asking the host to restore unscoped file access.
+
+The following example creates a scoped API for each export operation. The global registry is only a compatibility fallback for older hosts; omit that fallback in a new plugin that does not support those hosts:
 
 ```ts
 import { Inject, Injectable, Optional } from '@nestjs/common'
 import {
+  WorkspaceFilesRuntimeCapability,
+  XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN,
   XPERT_RUNTIME_CAPABILITIES_TOKEN,
+  type AgentMiddlewareRuntimeScope,
+  type AgentMiddlewareRuntimeServiceApi,
   type RuntimeCapabilityRegistry
 } from '@xpert-ai/plugin-sdk'
 
@@ -83,13 +97,31 @@ import {
 export class ExportService {
   constructor(
     @Optional()
+    @Inject(XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN)
+    private readonly runtimeService?: AgentMiddlewareRuntimeServiceApi,
+    @Optional()
     @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
-    private readonly capabilities?: RuntimeCapabilityRegistry
+    private readonly globalCapabilities?: RuntimeCapabilityRegistry
   ) {}
+
+  private workspaceFiles(scope: AgentMiddlewareRuntimeScope) {
+    const files = this.runtimeService
+      ?.createScopedApi(scope)
+      .capabilities?.get(WorkspaceFilesRuntimeCapability)
+      ?? this.globalCapabilities?.get(WorkspaceFilesRuntimeCapability)
+
+    if (!files) {
+      throw new Error('Workspace Files is unavailable in the current runtime scope')
+    }
+
+    return files
+  }
 }
 ```
 
-Resolve the capability close to the operation so availability can be reported accurately. Do not cache user- or execution-scoped results across requests.
+The `tenantId`, `organizationId`, `userId`, `xpertId`, `projectId`, `conversationId`, `catalog`, and `scopeId` passed to `createScopedApi()` must come from host-resolved server context, never from untrusted iframe, form, or action-input identifiers.
+
+Create the scoped API and resolve the capability close to each operation so availability is reported accurately. Do not cache user- or execution-scoped APIs or capability instances across requests.
 
 ## Capabilities in the runtime package
 
@@ -153,6 +185,7 @@ Production plugin code normally consumes platform keys; host infrastructure owns
 ## Compatibility rules
 
 - Import keys and API types from `@xpert-ai/plugin-sdk`; do not copy the interfaces into a plugin.
+- A NestJS provider that consumes a scope-sensitive capability must use `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN.createScopedApi()`; do not use an unbound global registry as its primary source.
 - Treat capability availability as a runtime condition. Package installation alone does not prove that a host service, provider, binding, or registered Sandbox Action is ready.
 - Keep portable references and structured DTOs at async boundaries. Do not pass raw file bytes, bearer tokens, host paths, or implementation instances through queues or persisted chat metadata.
 - Keep capability results within the current authorized scope and re-resolve them for later jobs or callbacks.

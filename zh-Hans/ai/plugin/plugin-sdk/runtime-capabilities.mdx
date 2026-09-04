@@ -70,12 +70,26 @@ if (!files) {
 
 ## 在 NestJS 服务提供器中解析能力
 
-服务端插件的服务提供器可以注入平台能力注册表。若插件需要兼容尚未提供该能力的宿主版本，请将依赖声明为可选：
+NestJS 服务提供器不天然绑定某一次智能体执行，因此必须先区分能力是否依赖当前运行作用域：
+
+| 使用位置 | 获取方式 |
+| --- | --- |
+| 智能体中间件 | 直接使用 `context.runtime.capabilities`。 |
+| NestJS Provider 中与用户、Xpert 或 Project 绑定的能力 | 注入 `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN`，并为每次操作调用 `createScopedApi(scope)`。 |
+| 与数据所有者无关的全局能力 | 注入 `XPERT_RUNTIME_CAPABILITIES_TOKEN`。 |
+
+`WorkspaceFilesRuntimeCapability` 等涉及数据归属的能力必须优先从 scoped runtime API 获取。未绑定 `xpertId` 或 `projectId` 的全局注册表可能会故意不提供工作区文件能力，插件不能通过放宽宿主权限来绕过这个限制。
+
+下面的示例在每次导出操作时创建作用域能力。全局注册表只作为兼容旧宿主的回退，新插件如果不需要兼容旧宿主，可以省略该回退：
 
 ```ts
 import { Inject, Injectable, Optional } from '@nestjs/common'
 import {
+  WorkspaceFilesRuntimeCapability,
+  XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN,
   XPERT_RUNTIME_CAPABILITIES_TOKEN,
+  type AgentMiddlewareRuntimeScope,
+  type AgentMiddlewareRuntimeServiceApi,
   type RuntimeCapabilityRegistry
 } from '@xpert-ai/plugin-sdk'
 
@@ -83,13 +97,31 @@ import {
 export class ExportService {
   constructor(
     @Optional()
+    @Inject(XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN)
+    private readonly runtimeService?: AgentMiddlewareRuntimeServiceApi,
+    @Optional()
     @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
-    private readonly capabilities?: RuntimeCapabilityRegistry
+    private readonly globalCapabilities?: RuntimeCapabilityRegistry
   ) {}
+
+  private workspaceFiles(scope: AgentMiddlewareRuntimeScope) {
+    const files = this.runtimeService
+      ?.createScopedApi(scope)
+      .capabilities?.get(WorkspaceFilesRuntimeCapability)
+      ?? this.globalCapabilities?.get(WorkspaceFilesRuntimeCapability)
+
+    if (!files) {
+      throw new Error('当前运行作用域未提供工作区文件能力')
+    }
+
+    return files
+  }
 }
 ```
 
-应在实际操作附近解析能力，以便准确报告可用性。不要跨请求缓存与用户或执行上下文绑定的结果。
+传给 `createScopedApi()` 的 `tenantId`、`organizationId`、`userId`、`xpertId`、`projectId`、`conversationId`、`catalog` 和 `scopeId` 必须来自宿主已解析的服务端上下文，不能来自 iframe、表单或 action input 中未经信任的 ID。
+
+应在实际操作附近重新创建 scoped API 并解析能力，以便准确报告可用性。不要跨请求缓存与用户或执行上下文绑定的 API 或能力实例。
 
 ## 运行时包中的能力
 
@@ -153,6 +185,7 @@ const capabilities = new DefaultRuntimeCapabilityRegistry().register(
 ## 兼容性规则
 
 - 从 `@xpert-ai/plugin-sdk` 导入能力键和 API 类型，不要在插件中复制接口。
+- NestJS Provider 消费作用域敏感能力时，必须使用 `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN.createScopedApi()`；不要把未绑定数据所有者的全局注册表作为主要来源。
 - 将能力可用性视为运行时条件。插件安装成功，并不代表宿主服务、提供器、绑定或已注册沙箱操作一定就绪。
 - 在异步边界传递可移植引用和结构化 DTO，不要通过队列或持久化聊天元数据传递原始文件字节、持有者令牌、宿主路径或实现实例。
 - 将能力返回值限制在当前授权范围内；后续任务或回调应重新解析所需资源。
