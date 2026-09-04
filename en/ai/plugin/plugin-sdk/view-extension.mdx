@@ -40,6 +40,7 @@ Assistant Workbench uses the `agent` host. Common slots include:
 | --- | --- |
 | `agent.workbench.main` | A primary view that follows the current Workbench content |
 | `agent.workbench.fixed` | A fixed view available from the Workbench menu |
+| `agent.profile.tabs` | Lazy-loaded tabs inside Assistant Profile |
 | `detail.sidebar` | Supporting content in a host detail sidebar |
 
 A plugin can only contribute to slots declared by the host. Slot names describe product placement, not plugin business domains.
@@ -165,3 +166,57 @@ A tool result should contain only the public view key, initial query, and busine
 - [Workbench Remote Components](./remote-component): build a custom plugin Workbench UI.
 - [Remote Component Host Bridge](./remote-component-bridge): map messages to manifest declarations and provider methods.
 - [Runtime Capabilities](./runtime-capabilities): consume platform services from plugin server code.
+
+## Assistant Profile tabs
+
+Import `AGENT_PROFILE_TABS_SLOT` from `@xpert-ai/contracts` and contribute to the existing `agent` host. Declare a domain Feature in middleware metadata and require it in every Profile manifest. The same provider can supply Workbench and Profile views.
+
+```ts
+import { AGENT_PROFILE_TABS_SLOT, type XpertExtensionViewManifest } from '@xpert-ai/contracts'
+
+const profileTab: XpertExtensionViewManifest = {
+  key: 'recent-cases',
+  title: { en_US: 'Recent cases', zh_Hans: '最近案件' },
+  hostType: 'agent',
+  slot: AGENT_PROFILE_TABS_SLOT,
+  activation: { requiredFeatures: ['case-profile'] },
+  view: {
+    type: 'remote_component', runtime: 'react', protocolVersion: 1,
+    dataSource: { mode: 'platform' },
+    component: { isolation: 'iframe', entry: 'case-profile' }
+  },
+  dataSource: { mode: 'platform', cache: { enabled: false } },
+  actions: [{ key: 'approve_and_continue', label: 'Approve and continue',
+    actionType: 'invoke', placement: 'row', requiredHostAccess: 'read' }],
+  clientCommands: [
+    { key: 'assistant.profile.interaction' },
+    { key: 'assistant.profile.close' }
+  ]
+}
+```
+
+### Identity and authorization
+
+`getViewData(context, viewKey, query)` and `executeViewAction(context, viewKey, actionKey, request)` receive `XpertResolvedViewHostContext`. For Agent hosts, its backend-only `assistant` contains:
+
+| Field | Meaning |
+| --- | --- |
+| `instanceId` | Resolved published Assistant used for this host |
+| `currentId` | Current editable instance in the same version family, when uniquely available |
+| `versionIds` | IDs in the same Assistant version family, including current and published instances |
+
+The host resolves this identity inside the tenant, organization, and Workspace boundary. Never infer identity from a name, role, or shared template. Never accept Assistant, user, tenant, or organization IDs from iframe query/action input as authorization. The iframe receives no authentication credentials and submits only business parameters through the bridge.
+
+The platform checks host access, Feature activation, declared actions, and the view session. **The plugin owns Assistant-to-business-resource permissions.** For example, Factory Operations intersects explicit assignments or execution participation with the current human's readable Case Projects before pagination and totals.
+
+Server plugins can use `ProjectAccessRuntimeCapability` (`platform.project.access`) from `@xpert-ai/plugin-sdk` to list a human actor's readable Projects (including explicit `assistantIds` bindings) or assert owner/manager access. This capability is available to plugin server services; it does not grant Agent tools human approval. `requiredHostAccess: 'read'` permits a Profile reader to invoke the route; the plugin must independently authorize every decision on the selected business resource.
+
+### Lifecycle and decisions
+
+The host fetches basic information and manifests when opened. An extension is instantiated and queried on first selection, then remains mounted while the Profile stays open. On tab changes, the host sends `viewActive: false` to the hidden Remote View; it must pause polling and ignore stale responses while retaining its UI/data state. Returning sends `viewActive: true`, reuses cached data, and resumes from the next polling interval. Changing Assistant or closing tears down every cached view and its view session. Basic data comes from `GET /xpert/:id/profile`, which returns a display whitelist, never prompts, credentials, or the full Assistant graph.
+
+Profile Remote Views use an opaque-origin iframe. Do not access `localStorage` or `sessionStorage`. Use React state for ephemeral state and View actions for durable state.
+
+Declare and invoke `assistant.profile.interaction` with `{ busy: true }` while a decision dialog is open or an action is pending; send `{ busy: false }` afterward. This prevents auto-dismissal and tab switching. Handle Escape in the dialog first. When no dialog or action is active, `assistant.profile.close` closes the card and restores focus. Unmounting removes the command scope.
+
+For durable decisions, use a business revision and stable operation ID. Show the proposal and execution mode before approval. Persist approval and continuation intent in one transaction, then dispatch Managed Queue work with checkpoints. The browser must not orchestrate the continuation. Factory Operations' `approve_and_continue` preserves the existing `approve_recovery_plan` behavior and uses the saved Case coordinator to dispatch verification; it never substitutes the currently viewed specialist.

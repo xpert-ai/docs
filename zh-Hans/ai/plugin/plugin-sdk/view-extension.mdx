@@ -40,6 +40,7 @@ Assistant 工作台使用 `agent` 宿主，常用插槽包括：
 | --- | --- |
 | `agent.workbench.main` | 随当前工作台内容展示的主视图 |
 | `agent.workbench.fixed` | 在工作台菜单中提供固定入口的视图 |
+| `agent.profile.tabs` | Assistant 资料卡内按需加载的 tabs |
 | `detail.sidebar` | 宿主详情页侧栏中的补充视图 |
 
 插件只能向宿主已经声明的插槽提供视图。插槽描述产品位置，不应包含插件业务名称。
@@ -165,3 +166,53 @@ export class ContractReviewViewProvider
 - [工作台远程组件](./remote-component)：构建插件自定义工作台 UI。
 - [远程组件宿主桥接](./remote-component-bridge)：查看消息、清单和提供器方法之间的映射。
 - [运行时能力](./runtime-capabilities)：在插件服务端调用宿主提供的平台服务。
+
+## Assistant Profile tabs
+
+从 `@xpert-ai/contracts` 导入 `AGENT_PROFILE_TABS_SLOT`，向现有 `agent` host 注册视图。在 middleware metadata 中声明领域 Feature，每个 Profile manifest 都通过 `activation.requiredFeatures` 启用校验。同一 provider 可以同时提供 Workbench 与 Profile 视图。
+
+```ts
+import { AGENT_PROFILE_TABS_SLOT, type XpertExtensionViewManifest } from '@xpert-ai/contracts'
+
+const profileTab: XpertExtensionViewManifest = {
+  key: 'recent-cases',
+  title: { en_US: 'Recent cases', zh_Hans: '最近案件' },
+  hostType: 'agent', slot: AGENT_PROFILE_TABS_SLOT,
+  activation: { requiredFeatures: ['case-profile'] },
+  view: {
+    type: 'remote_component', runtime: 'react', protocolVersion: 1,
+    dataSource: { mode: 'platform' },
+    component: { isolation: 'iframe', entry: 'case-profile' }
+  },
+  dataSource: { mode: 'platform', cache: { enabled: false } },
+  actions: [{ key: 'approve_and_continue', label: '批准并继续',
+    actionType: 'invoke', placement: 'row', requiredHostAccess: 'read' }],
+  clientCommands: [{ key: 'assistant.profile.interaction' }, { key: 'assistant.profile.close' }]
+}
+```
+
+### 可信身份与权限
+
+`getViewData(context, viewKey, query)` 和 `executeViewAction(context, viewKey, actionKey, request)` 接收 `XpertResolvedViewHostContext`。Agent host 的后端专用 `assistant` 字段包含：
+
+| 字段 | 含义 |
+| --- | --- |
+| `instanceId` | 此 host 解析出的已发布 Assistant |
+| `currentId` | 同一版本族中唯一的当前编辑实例；不存在时使用当前解析实例 |
+| `versionIds` | 同一 Assistant 的版本身份集合，包含当前实例和发布版本 |
+
+平台在租户、组织和工作空间边界内解析身份。不要根据名称、角色或相同模板推断实例。不要把 iframe query/action 中的 Assistant、用户、租户或组织 ID 当作授权依据。iframe 不接收认证信息，只通过 bridge 提交业务参数。
+
+平台检查 host 访问、Feature、声明的 action 和 view session。**Assistant 对业务资源的访问权限由插件控制。** 工厂插件先将明确分配及执行参与记录，与当前人类用户可读的 Case Projects 取交集，再分页和统计。
+
+服务端插件可以使用 `@xpert-ai/plugin-sdk` 的 `ProjectAccessRuntimeCapability`（`platform.project.access`），查询用户可读 Project（包含明确绑定的 `assistantIds`）或校验 owner/manager 权限。该能力供插件服务使用，不赋予 Agent 工具人类审批权。`requiredHostAccess: 'read'` 仅允许 Profile 读者进入 action 路由；插件必须再次校验具体案件的审批权限。
+
+### 加载与决策生命周期
+
+打开资料卡时获取基本资料和 manifests。扩展 tab 首次选中时实例化、查询并获取 view session，之后在资料卡打开期间保持挂载。切换 tab 时，宿主向隐藏的 Remote View 发送 `viewActive: false`；视图应暂停轮询、忽略过期响应，同时保留界面和数据状态。切回发送 `viewActive: true`，立即复用缓存数据，并从下一个轮询周期继续刷新。切换 Assistant 或关闭资料卡时释放全部缓存视图及 view session。基本资料接口 `GET /xpert/:id/profile` 返回展示白名单，不返回提示词、认证信息或完整 Assistant 图。
+
+Profile Remote View 使用 opaque-origin iframe，不能读取 `localStorage` 或 `sessionStorage`。临时状态放在 React state 中，持久化状态通过 View actions 保存。
+
+打开确认弹窗及提交期间，声明并调用 `assistant.profile.interaction`，传入 `{ busy: true }`，结束后传 `{ busy: false }`。宿主会保持卡片打开并禁止切换 tab。弹窗优先消费 Escape；没有弹窗和提交任务时，可调用 `assistant.profile.close` 关闭卡片并恢复焦点。销毁视图时一并注销命令作用域。
+
+持久决策需携带业务版本和稳定的 operation ID。审批前展示方案和执行模式，审批与续跑意图在同一事务中保存，再通过 Managed Queue 和检查点推进。不要由浏览器编排后台续跑。工厂插件新增 `approve_and_continue`，保留原 `approve_recovery_plan` 语义，并始终使用 Factory Case 保存的协调 Assistant 派发验证任务，不替换成当前查看的专业 Assistant。

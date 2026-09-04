@@ -1,0 +1,34 @@
+---
+title: Assistant 资料卡
+description: 在当前对话中查看 Assistant 资料、插件业务视图并处理人工审批。
+---
+
+Assistant 资料卡把已发布 Assistant 的信息和插件业务 tabs 放在同一张卡内。在侧栏悬停 Assistant 头像即可打开，聊天页头也提供显式资料操作。
+
+## 打开与切换
+
+在侧栏头像上悬停 350 ms 即可打开资料卡。悬停头像以外的菜单项区域不会打开，侧栏也不再显示单独的 info 图标。原菜单项的对话导航与切换行为保留。键盘和触屏用户可以使用聊天页头的资料操作；进入卡片后可使用方向键、Home 或 End 切换 tab。
+
+顶部固定显示头像、名称、简介、标签和版本，并通过四个紧凑指标展示可用 Skills 数量、去重后的 Tools 数量、直属 sub-agents 数量和近 30 天 conversations 数量。默认选中“基本信息”，展示完整简介，以及实际存在的工作空间、创建者和日期。卡宽 480 px、高度上限 640 px，并受视口约束；内容区域独立滚动。
+
+Skills 统计该 Assistant 所在 Workspace 中、通过运行时 Workspace 访问校验且未被该 Assistant binding 禁用的已安装技能。该指标表示 Assistant 可访问的 Workspace 技能库存，不要求主 Agent 当前已经挂载 Skills Middleware；实际执行时是否暴露技能仍由运行时能力选择决定。Tools 统计主 Agent 通过直属 Toolsets 和 Middleware 暴露的已启用工具并按名称去重。Sub-agents 包含直属的内置 Agent 和 External Assistant。近 30 天对话排除 debugger 会话，并在当前组织内沿同一 Assistant 的已发布版本族汇总。可选的 Skills 或对话统计源暂时不可用时显示“—”，资料卡的其他内容仍可使用。
+
+鼠标或焦点位于卡片及插件 iframe 内时保持打开。离开后延迟 300 ms 关闭。从聊天页头操作打开后会保持显示，直到主动关闭。关闭按钮和 Escape 会恢复入口焦点；确认弹窗先处理自己的 Escape，提交中的操作会保持卡片打开。
+
+## 插件扩展 tabs
+
+插件通过 `agent.profile.tabs` 添加声明式视图或 Remote Component。只有 Assistant 启用了对应 Feature，tab 才会出现。单个插件加载失败时显示局部错误与重试，“基本信息”仍然可用。
+
+扩展 tab 首次选中时挂载并查询数据。已访问的 tab 会在当前资料卡内缓存，切换时保留 iframe、界面状态和现有数据；隐藏后暂停轮询，切回立即显示缓存数据，并从下一个轮询周期继续刷新。关闭资料卡或切换 Assistant 时才释放全部缓存视图。后端使用登录用户和可信 Assistant 身份，插件负责自己的业务权限校验。
+
+开发接入参见 [View Extensions](/zh-Hans/ai/plugin/plugin-sdk/view-extension#assistant-profile-tabs)。
+
+## Factory Operations 示例
+
+工厂插件提供“最近案件”和“待处理”。案件通过 Case Project 的明确分配，以及 requester / executor 执行参与记录归属于 Assistant，包含同一实例的发布版本。同角色的不同实例不会自动共享案件。
+
+Project 可读成员可以查看案件；owner / manager 可以审批，editor / member 和 Agent 工具不能授予人类审批。“批准并继续”先展示当前方案、版本、执行范围及模拟模式，确认后才提交；拒绝需要填写原因，取消不产生动作。
+
+审批和后台续跑意图在同一事务中保存。关闭卡片、刷新页面或重启 API 不会丢失已批准的工作。后台执行已批准方案，派发真实的验证 Assistant Task，只有业务验证记录确认恢复后才完成案件。新人工关口、方案变化、权限撤销、协调者缺失及业务失败会停止推进并显示原因。重试沿用已完成步骤。
+
+模拟模式明确标记为模拟。外部模式未配置适配器时保持阻塞，不会生成生产执行成功结果。

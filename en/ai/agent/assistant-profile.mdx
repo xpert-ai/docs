@@ -1,0 +1,34 @@
+---
+title: Assistant Profile
+description: Inspect an Assistant and its plugin views without leaving the current conversation.
+---
+
+Assistant Profile shows published Assistant information and contextual plugin tabs in one card. In the sidebar, hover an Assistant avatar to open it. The chat header also provides an explicit profile action.
+
+## Open and navigate
+
+Hover a sidebar avatar for 350 ms to open the card. Hovering the surrounding menu item does not open it, and the sidebar does not add a separate information icon. The original menu item still opens or switches the conversation. Keyboard and touch users can use the chat header profile action; inside the card, use the arrow keys, Home, or End to select a tab.
+
+The header keeps the avatar, name, description, tags, and version visible. Four compact indicators show available Skills, unique Tools, direct sub-agents, and conversations during the previous 30 days. **Basic information** is selected initially and includes the full description, Workspace, creator, and dates when those fields are available. The card is 480 px wide and at most 640 px high, constrained by the viewport; only its content scrolls.
+
+Skills count installed packages in the Assistant's Workspace that pass the normal runtime Workspace-access check and are not disabled for that Assistant binding. The indicator represents accessible Workspace inventory and does not require the primary Agent to mount Skills Middleware; runtime capability selection still determines whether a Skill is exposed for a particular run. Tools include unique enabled Tools connected directly to the primary Agent through Toolsets or Middleware. Sub-agents include direct internal and External Assistant connections. The conversation count excludes debugger sessions and follows the same Assistant across its published versions in the current organization. If an optional activity source is temporarily unavailable, its value appears as an em dash while the rest of the Profile remains available.
+
+The card stays open while the pointer or keyboard focus is inside it, including a plugin iframe. Leaving starts a 300 ms close delay. A card opened from the chat header action stays open until dismissed. Use the close button or Escape to close and restore focus. A confirmation dialog handles Escape first; a submitted operation keeps the card open until its request settles.
+
+## Plugin tabs
+
+A plugin can contribute declarative or Remote Component views to `agent.profile.tabs`. Tabs appear only when the Assistant enables the required Feature. A failing plugin displays a local error and retry; Basic information remains usable.
+
+An extension tab mounts and queries on first selection. Visited tabs stay cached inside the open Profile, so switching preserves their iframe, UI state, and current data. Hidden tabs pause polling; returning displays cached data immediately and resumes from the next polling interval. Closing the Profile or changing Assistant disposes every cached view. Backend requests use the authenticated user and server-resolved Assistant identity. Plugins enforce their own business permissions.
+
+See [View Extensions](/en/ai/plugin/plugin-sdk/view-extension#assistant-profile-tabs) for the development contract.
+
+## Factory Operations example
+
+Factory Operations adds **Recent cases** and **Needs attention**. Cases belong to an Assistant through explicit Case Project assignments or recorded requester/executor participation, including its published versions. Assistants with the same role do not automatically share cases.
+
+Project readers can inspect cases. Project owners and managers can approve or reject a proposal; editors, members, and Agent tools cannot grant human approval. **Approve and continue** presents the current proposal, revision, execution scope, and simulation mode before submission. Rejection requires a reason; cancellation sends no action.
+
+Approval and the continuation intent are saved atomically. Background work survives closing the card and API restarts. It executes the approved plan, starts the verification Assistant Task, and completes only after the business verification record confirms recovery. A new human gate, changed proposal, revoked permission, missing coordinator, or business failure stops progress with a reason. Retrying retains completed steps.
+
+Simulation is explicitly labeled. Without a configured external adapter, external mode remains blocked and does not report successful production execution.
