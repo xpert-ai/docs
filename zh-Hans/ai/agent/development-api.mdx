@@ -3,7 +3,7 @@ title: 开发接口
 sidebar_position: 13
 ---
 
-数字专家提供了一组 API 及 [SDK](https://github.com/xpert-ai/xpertai-sdk) 用于开发者与专家智智能体进行交互。这些 API 使您可以创建自定义应用程序，以便与数字专家的智能体进行通信。
+数字专家提供了一组 API 及 [SDK](https://github.com/xpert-ai/xpertai-sdk) 用于开发者与专家智能体进行交互。这些 API 使您可以创建自定义应用程序，以便与数字专家的智能体进行通信。
 
 Xpert 智能体接口遵循 [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html) 标准，这是一种用于智能体之间通信的协议。Agent Protocol 为智能体提供了一种通用的方式来交换消息，以便于智能体之间的互操作性。
 
@@ -12,6 +12,124 @@ Xpert 智能体接口遵循 [Agent Protocol](https://langchain-ai.github.io/agen
 ![Develop key](/public/img/ai/xpert-develop-key.png)
 
 - 使用 Key 访问专家智能体的 Rest APIs，或者使用 [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) 访问 XpertAI 平台。
+
+## 直接使用 REST API 调用智能体
+
+调用接口是 `POST /api/ai/v1/chat`，不是创建知识库的 `/api/ai/v1/kb`。
+[完整参数与响应](/zh-hans/api-reference/aiv1/chat-with-an-agent)。
+
+<Note>
+以下请求结构对应当前服务端的 action 协议。私有部署请先确认服务版本支持此结构，并在自己的部署上完成首轮和续聊验收；旧版接口不能仅凭相同路径判断兼容。
+</Note>
+
+### 调用前准备
+
+1. 发布要调用的数字专家，记录其 ID（`xpertId`），不要填写名称或内部 `agentKey`。
+2. 使用有权访问该专家的 API Key。Key 只保存在服务端环境变量中，不要放进浏览器代码。
+3. 设置 API 服务地址。`XPERT_BASE_URL` 是域名或部署前缀，不包含 `/api/ai`，例如 `https://api.xpertai.cn`；私有部署请替换为自己的地址。
+
+```bash
+export XPERT_BASE_URL='https://api.xpertai.cn'
+export XPERT_ID='YOUR_PUBLISHED_XPERT_ID'
+# 在服务端安全设置 XPERT_API_KEY，避免将真实密钥提交到代码仓库。
+```
+
+认证头使用 `Authorization: Bearer <API_KEY>`，也可使用 `x-api-key`。
+本教程使用 API Key；ChatKit 的临时 client secret 有有效期和绑定范围，不能当成通用 API Key。
+
+### 首次发送消息
+
+```bash
+curl --fail-with-body --no-buffer --request POST \
+  "${XPERT_BASE_URL}/api/ai/v1/chat" \
+  --header "Authorization: Bearer ${XPERT_API_KEY}" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: text/event-stream' \
+  --data "{\"request\":{\"action\":\"send\",\"message\":{\"input\":{\"input\":\"你好，请简单介绍一下自己\"}}},\"options\":{\"xpertId\":\"${XPERT_ID}\"}}"
+```
+
+这里的 `request.message.input` 是输入对象，其中的 `input` 是用户文本，不是直接把消息字符串传给 `request`。
+首次调用省略 `request.conversationId`；`options.xpertId` 指定已发布专家。
+如专家要求额外输入变量，应按专家定义填写 `request.state` 或输入对象，不能只发送文本。
+附件须先上传，再传文件句柄；不能直接传浏览器 `File` 对象。
+
+### 解析 SSE 并继续对话
+
+返回内容是 `text/event-stream`。以下是简化的示意帧，实际事件包含更多字段：
+
+```text
+data: {"type":"event","event":"on_conversation_start","data":{"id":"conversation-id"}}
+
+data: {"type":"message","data":"你好"}
+
+data: {"type":"event","event":"on_conversation_end","data":{"id":"conversation-id","status":"idle","error":null}}
+
+```
+
+- 保存 `on_conversation_start` 的 `data.id`，作为后续请求的 `request.conversationId`。
+- 文本增量的 `type` 是 `message`；`data` 可以是字符串，也可以是 `{ "type": "text", "text": "..." }`。工具、组件等结构不能直接拼接成文本。
+- 生命周期事件的 `type` 是 `event`，事件名在 JSON 的 `event` 字段里，不能只监听 SSE 的原生 `event:` 行。
+- 忽略以 `:` 开始的心跳注释；v1 当前实现也可能把 `: keep-alive` 放在 SSE 的 `data:` 中，解析 JSON 前应跳过这种心跳。网络数据块不等于完整 SSE 帧，要处理跨块 UTF-8、多行 `data:` 和空行分隔。
+- 收到 `on_conversation_end` 后检查 `data.status` 和 `data.error`。错误也可能通过原生 `event: error` 或 `on_error` 返回；HTTP 2xx 本身不代表执行成功。
+- `on_interrupt` 表示需要确认或补充输入，不是正常回答结束。断流前没有结束事件时，也不能当成成功或盲目重发，避免重复执行工具操作。
+
+续聊请求体示例（将占位符替换为首轮返回的会话 ID 和同一个专家 ID）：
+
+```json
+{
+  "request": {
+    "action": "send",
+    "conversationId": "CONVERSATION_ID_FROM_SSE",
+    "message": { "input": { "input": "请继续刚才的话题" } }
+  },
+  "options": { "xpertId": "YOUR_PUBLISHED_XPERT_ID" }
+}
+```
+
+`conversationId` 与 LangGraph 的 `thread_id` 是不同字段，不要互换。
+续聊会解析会话绑定的专家；若同时填写 `xpertId`，它必须与会话专家或其可访问发布版本一致。
+项目对话还需要相应权限，`request.projectId`、`options.projectId` 与已有会话项目不能冲突。
+
+### 可运行的 Node.js 示例
+
+[下载 agent-chat.mjs](/public/examples/agent-chat.mjs)，使用 Node.js 22 或更新版本运行：
+
+```bash
+node agent-chat.mjs
+```
+
+脚本读取上述三个环境变量，执行两轮请求，保存首轮会话 ID 后继续提问，并逐段打印文本。
+它检查 HTTP 状态、SSE Content-Type、流内错误、结束状态和会话 ID；遇到中断或提前断流会以非零退出码结束。
+默认每轮超时为 120 秒，可在调用 `chat()` 时传入 `timeoutMs` 调整。超时不证明服务器已停止执行。
+此示例用于文本对话；需要工具确认或富内容展示的应用应扩展对应事件处理。
+
+### 重试、中断恢复与运行中追加
+
+这些操作沿用相同端点，通过 `request.action` 区分；具体字段见接口参考中的各请求类型。
+
+| action | 用途 | 关键字段 |
+| --- | --- | --- |
+| `send` | 首次发送或继续对话 | `message.input`，续聊带 `conversationId` |
+| `retry` | 重试已有执行 | `conversationId`、`source` 中的原消息或执行 ID |
+| `resume` | 确认或拒绝中断 | `conversationId`、`target`、`decision.type`（`confirm` / `reject`） |
+| `follow_up` | 运行中排队或引导 | `conversationId`、`message`、`mode`（`queue` / `steer`） |
+
+恢复时的 `target` 和 `decision.payload` 应来自实际中断事件及该工具的要求；不要编造执行 ID 或固定套用确认内容。
+`clientMessageId` 不能视为服务端幂等保证。运行状态不允许该操作时，应处理服务端错误。
+
+### 常见问题与验收
+
+| 现象 | 检查内容 |
+| --- | --- |
+| 401 / 403 | Key 是否有效、调用身份是否有专家及会话访问权限 |
+| 404 | API 地址、部署版本、专家或会话 ID 是否正确 |
+| 400 | 请求嵌套结构、action、项目及会话是否匹配 |
+| 2xx 但回答失败 | 检查 SSE 内的错误与结束状态、模型配置和运行日志 |
+| 一直等到最后才显示 | 客户端是否流式读取，网关是否缓冲 SSE，代理超时是否足够 |
+
+上线前用目标部署及实际调用身份验证：首轮能回复；第二轮复用同一会话并理解前文；无效 Key 被拒绝；模型/工具失败和断流不会误报成功。
+对于带工具的专家，还应测试中断确认和对应工具行为。
+
 
 ## 使用 LangGraph SDK 调用 XpertAI 平台
 
@@ -43,8 +161,8 @@ SDK 默认会连接到 `http://localhost:8123`（如使用 `langgraph-cli` 本�
 import { Client } from "@langchain/langgraph-sdk";
 
 const client = new Client({
-  apiUrl: "https://api.xpertai.cn/api/ai/", // Your baseUrl of XpertAI server.
-  apiKey: "your-api-key", // API Key of xpert
+  apiUrl: `${process.env.XPERT_BASE_URL}/api/ai`,
+  apiKey: process.env.XPERT_API_KEY,
 })
 ```
 
@@ -71,6 +189,8 @@ console.log("Experts:", xperts);
 #### 获取单个数字专家
 
 ```ts
+const xpertId = process.env.XPERT_ID;
+if (!xpertId) throw new Error("Set XPERT_ID");
 const xpert = await client.assistants.get(xpertId);
 ```
 
@@ -85,7 +205,7 @@ console.log("New Thread:", thread);
 
 示例中，返回包含 `thread_id`、`status` 等属性 ([LangGraph][4])。
 
-#### 预填充状态
+#### 指定线程 ID
 
 ```ts
 const threadWithState = await client.threads.create({
@@ -94,7 +214,7 @@ const threadWithState = await client.threads.create({
 });
 ```
 
-这样可在创建时直接注入线程ID ([LangGraph][4])。
+这样可在创建时指定线程 ID；此例没有预填充智能体状态 ([LangGraph][4])。
 
 #### 查询线程列表 & 获取状态
 
@@ -111,18 +231,19 @@ const history = await client.threads.getHistory(thread.thread_id, { limit: 50 })
 #### 启动流式返回的运行
 
 ```ts
-const stream = client.runs.stream(thread.thread_id, assistant.assistant_id, {
-  input: { 
-    input: "Tell me a joke.", // more parameters 
+const stream = client.runs.stream(thread.thread_id, xpert.assistant_id, {
+  input: {
+    action: "send",
+    message: { input: { input: "Tell me a joke." } },
   },
 });
-for await (const chunk of streamResponse) {
-  const data = (<{ type: 'message', data: string | {type: 'text' | string; text?: string; data?: any} }>chunk.data)
+for await (const chunk of stream) {
+  const data = chunk.data
   // Output text messages only
-  if (data.type === 'message') {
+  if (data?.type === 'message') {
     if (typeof data.data === 'string') {
       process.stdout.write(data.data)
-    } else if (data.data.type === 'text') {
+    } else if (data.data?.type === 'text') {
       process.stdout.write(data.data.text ?? '')
     } else {
       // console.log(`Component:`, data.data);
@@ -136,7 +257,7 @@ for await (const chunk of streamResponse) {
 #### 其他运行操作示例
 
 ```ts
-const run = await client.runs.create(thread.thread_id, assistant.assistant_id, { input: { ... } });
+const run = await client.runs.create(thread.thread_id, xpert.assistant_id, { input: { action: "send", message: { input: { input: "Tell me a joke." } } } });
 const result = await client.runs.join(thread.thread_id, run.run_id);
 await client.runs.cancel(thread.thread_id, run.run_id);
 const runsList = await client.runs.list(thread.thread_id, { limit: 10 });
@@ -148,14 +269,14 @@ const runsList = await client.runs.list(thread.thread_id, { limit: 10 });
 
 ```ts
 // 写入
-await client.store.putItem([xpert_id], "key1", { value: 42 });
+await client.store.putItem([xpert.assistant_id], "key1", { value: 42 });
 
 // 读取
-const item = await client.store.getItem([xpert_id], "key1");
+const item = await client.store.getItem([xpert.assistant_id], "key1");
 
 // 列出命名空间
 const namespaces = await client.store.listNamespaces({
-  prefix: [xpert_id],
+  prefix: [xpert.assistant_id],
   maxDepth: 2,
   limit: 10
 });

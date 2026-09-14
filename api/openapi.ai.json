@@ -1,6 +1,102 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/api/ai/v1/chat": {
+      "post": {
+        "operationId": "AIV1Controller_chat",
+        "summary": "Chat with an agent",
+        "description": "POST a message to a published agent and receive SSE. Authenticate with Authorization: Bearer <API_KEY> or x-api-key. Save on_conversation_start.data.id for continuation. Each SSE data field contains JSON with type, optional event, and data. Text deltas have type=message; lifecycle events have type=event. Inspect on_conversation_end.data.status/error and SSE error events: HTTP success alone does not mean the agent succeeded. Internal runtime options are not public caller fields.",
+        "tags": [
+          "AI/v1"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentChatBody"
+              },
+              "examples": {
+                "firstMessage": {
+                  "summary": "Start a conversation",
+                  "value": {
+                    "request": {
+                      "action": "send",
+                      "message": {
+                        "input": {
+                          "input": "Hello, introduce yourself briefly."
+                        }
+                      }
+                    },
+                    "options": {
+                      "xpertId": "YOUR_PUBLISHED_XPERT_ID"
+                    }
+                  }
+                },
+                "continueConversation": {
+                  "summary": "Continue the conversation",
+                  "value": {
+                    "request": {
+                      "action": "send",
+                      "conversationId": "CONVERSATION_ID_FROM_SSE",
+                      "message": {
+                        "input": {
+                          "input": "Tell me more."
+                        }
+                      }
+                    },
+                    "options": {
+                      "xpertId": "YOUR_PUBLISHED_XPERT_ID"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "SSE stream. A connection close without on_conversation_end is incomplete. Ignore heartbeat comments and data frames whose trimmed value is : keep-alive before parsing JSON. Ignore unrelated lifecycle events.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "data: {\"type\":\"event\",\"event\":\"on_conversation_start\",\"data\":{\"id\":\"conversation-id\"}}\n\ndata: {\"type\":\"message\",\"data\":\"Hello\"}\n\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"id\":\"conversation-id\",\"status\":\"idle\",\"error\":null}}\n\n"
+              }
+            }
+          },
+          "201": {
+            "description": "Some server versions return 201 for the same SSE stream; parse successful 2xx responses as SSE, not JSON.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "data: {\"type\":\"event\",\"event\":\"on_conversation_start\",\"data\":{\"id\":\"conversation-id\"}}\n\ndata: {\"type\":\"message\",\"data\":\"Hello\"}\n\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"id\":\"conversation-id\",\"status\":\"idle\",\"error\":null}}\n\n"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request, conversation/agent/project mismatch or invalid execution state."
+          },
+          "401": {
+            "description": "Missing, invalid or expired credentials."
+          },
+          "403": {
+            "description": "The caller cannot access the agent, conversation or Project."
+          },
+          "404": {
+            "description": "The requested agent, conversation or execution was not found."
+          }
+        }
+      }
+    },
     "/api/ai/v1/kb": {
       "post": {
         "operationId": "AIV1Controller_createKnowledgebase",
@@ -1674,6 +1770,288 @@
       }
     },
     "schemas": {
+      "AgentChatMessage": {
+        "type": "object",
+        "properties": {
+          "clientMessageId": {
+            "type": "string",
+            "description": "Optional client message identifier; do not assume automatic retry deduplication."
+          },
+          "input": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "string",
+                "description": "Text to send to the agent."
+              },
+              "model": {
+                "type": "string",
+                "description": "Optional opaque model option ID from the Assistant model catalog."
+              }
+            },
+            "additionalProperties": true,
+            "description": "Human input. Additional fields depend on the published agent input contract. Upload files before passing file handles; raw browser File objects are not supported."
+          }
+        },
+        "required": [
+          "input"
+        ]
+      },
+      "AgentChatTarget": {
+        "type": "object",
+        "properties": {
+          "aiMessageId": {
+            "type": "string",
+            "description": "Assistant message ID from the existing conversation."
+          },
+          "executionId": {
+            "type": "string",
+            "description": "Execution ID from the existing conversation."
+          }
+        },
+        "description": "Use identifiers returned by the interrupted or failed execution; do not invent them."
+      },
+      "AgentChatSend": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "send"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Conversation ID from on_conversation_start.data.id; omit for a new conversation."
+          },
+          "state": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true,
+            "description": "Agent state variables defined by the published agent."
+          },
+          "projectId": {
+            "type": "string",
+            "description": "Optional Project ID. Must match the existing conversation and options.projectId if both are supplied."
+          },
+          "environmentId": {
+            "type": "string",
+            "description": "Optional environment ID."
+          },
+          "sandboxEnvironmentId": {
+            "type": "string",
+            "description": "Optional sandbox environment ID."
+          },
+          "message": {
+            "$ref": "#/components/schemas/AgentChatMessage"
+          }
+        },
+        "required": [
+          "action",
+          "message"
+        ]
+      },
+      "AgentChatResume": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "resume"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Existing conversation ID from on_conversation_start.data.id. Required for this action."
+          },
+          "state": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true,
+            "description": "Agent state variables defined by the published agent."
+          },
+          "target": {
+            "$ref": "#/components/schemas/AgentChatTarget"
+          },
+          "decision": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "confirm",
+                  "reject"
+                ]
+              },
+              "payload": {
+                "description": "Optional decision payload required by the interrupt."
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "patch": {
+            "type": "object",
+            "properties": {
+              "agentKey": {
+                "type": "string",
+                "description": "Agent key associated with the interruption."
+              },
+              "toolCalls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "update": {
+                "description": "State update accepted by the interrupt."
+              }
+            },
+            "description": "Optional interruption edits. Match the actual interrupt contract."
+          }
+        },
+        "required": [
+          "action",
+          "conversationId",
+          "target",
+          "decision"
+        ]
+      },
+      "AgentChatRetry": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "retry"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Existing conversation ID from on_conversation_start.data.id. Required for this action."
+          },
+          "source": {
+            "$ref": "#/components/schemas/AgentChatTarget"
+          },
+          "environmentId": {
+            "type": "string",
+            "description": "Optional environment ID."
+          },
+          "checkpointId": {
+            "type": "string",
+            "description": "Optional checkpoint ID."
+          }
+        },
+        "required": [
+          "action",
+          "conversationId",
+          "source"
+        ]
+      },
+      "AgentChatFollowUp": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "follow_up"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "Existing conversation ID from on_conversation_start.data.id. Required for this action."
+          },
+          "state": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": true,
+            "description": "Agent state variables defined by the published agent."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "queue",
+              "steer"
+            ],
+            "description": "Queue a follow-up or steer an active run; availability depends on the current execution state."
+          },
+          "message": {
+            "$ref": "#/components/schemas/AgentChatMessage"
+          },
+          "target": {
+            "$ref": "#/components/schemas/AgentChatTarget"
+          }
+        },
+        "required": [
+          "action",
+          "conversationId",
+          "mode",
+          "message"
+        ]
+      },
+      "AgentChatBody": {
+        "type": "object",
+        "properties": {
+          "request": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AgentChatSend"
+              },
+              {
+                "$ref": "#/components/schemas/AgentChatResume"
+              },
+              {
+                "$ref": "#/components/schemas/AgentChatRetry"
+              },
+              {
+                "$ref": "#/components/schemas/AgentChatFollowUp"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "action",
+              "mapping": {
+                "send": "#/components/schemas/AgentChatSend",
+                "resume": "#/components/schemas/AgentChatResume",
+                "retry": "#/components/schemas/AgentChatRetry",
+                "follow_up": "#/components/schemas/AgentChatFollowUp"
+              }
+            }
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "xpertId": {
+                "type": "string",
+                "description": "Published agent ID. Supply it for the first agent call; an existing conversation resolves its bound agent. If provided during continuation it must match that agent or its accessible published version family."
+              },
+              "projectId": {
+                "type": "string",
+                "description": "Optional Project ID; must match request.projectId and the conversation."
+              },
+              "language": {
+                "type": "string",
+                "description": "Optional response language, for example zh-Hans."
+              },
+              "timeZone": {
+                "type": "string",
+                "description": "Optional IANA time zone, for example Asia/Shanghai."
+              },
+              "context": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": true,
+                "description": "Optional runtime context forwarded to middleware/tools; not an authentication or authorization override."
+              }
+            },
+            "description": "Public caller options. Tenant, organization, user and source are resolved by the server; never submit credentials or internal runtime objects here."
+          }
+        },
+        "required": [
+          "request"
+        ]
+      },
       "PaginationParams": {
         "type": "object",
         "properties": {
