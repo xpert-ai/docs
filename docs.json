@@ -463,12 +463,6 @@
                     ]
                   },
                   {
-                    "group": "Sdk",
-                    "pages": [
-                      "en/ai/chatkit/sdk/integrate-xpertai-api"
-                    ]
-                  },
-                  {
                     "group": "SDK",
                     "pages": [
                       "en/ai/chatkit/sdk/integrate-xpertai-api"
@@ -1290,12 +1284,6 @@
                       "zh-Hans/ai/chatkit/chatkit-runtime-capabilities",
                       "zh-Hans/ai/chatkit/chatkit-prompt-workflows",
                       "zh-Hans/ai/chatkit/chatkit-mcp-apps"
-                    ]
-                  },
-                  {
-                    "group": "Sdk",
-                    "pages": [
-                      "zh-Hans/ai/chatkit/sdk/integrate-xpertai-api"
                     ]
                   },
                   {
