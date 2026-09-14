@@ -228,6 +228,54 @@ Validate deployment in this order:
 
 Installation, template visibility, assistant publication, and a working business flow are separate outcomes. Verify each one.
 
+## Use the plugin: From template to AI conversation
+
+After installation, users can follow these steps without reading the plugin code. The screenshots were supplied by the example user and show the actual interface. Creation, configuration, and publication are described in text; no illustrative screenshots are provided for those steps. The screenshots show the Chinese UI.
+
+### 1. Create an expert from the template
+
+Open the platform's template entry, find **Dockyard Content Assistant** (Dockyard 内容助手), and use it to create a digital expert (assistant). You are creating an instance from the template supplied by the plugin, not authoring a new template from scratch.
+
+If the template is missing, confirm that the plugin loaded and check its template contribution metadata. For an existing Dockyard expert, use the template update flow instead of creating another instance.
+
+### 2. Configure the model and publish
+
+Open the expert's configuration or orchestration page, select a model available to the current organization, and confirm that model credentials are configured. Check the Dockyard middleware and workbench association supplied by the template, save the configuration, and publish.
+
+**Help me edit** and **Explain this** are workbench context-menu actions, not two additional Agent tool nodes to add to the orchestration canvas. They prepare references in the expert's ChatKit composer, and responses use the expert's configured model.
+
+### 3. Open the Dockyard workbench
+
+Enter the published expert's conversation page and open **Dockyard Workbench**. Explorer on the left lists files, the center holds document editors, and the chat area on the right is where you ask the Dockyard Content Assistant questions.
+
+![Dockyard 0.3.0 workbench with an actual Content Assistant response on the right](/public/img/ai/tutorial/dockyard/workbench-chat.png)
+
+<Note>
+This screenshot shows the workbench and an assistant response, but its bottom status bar also reports that saving failed and edited content was retained. It demonstrates the interface and response, not a successful save. Keep the current edits, retry as prompted, and confirm that saving succeeds before refreshing or leaving.
+</Note>
+
+### 4. Explain selected text
+
+1. Open a text file in Explorer, such as `theme.css`.
+2. Select the passage to discuss, then right-click and choose **Explain this** (解释一下).
+3. Check the referenced file, text, and line range in ChatKit on the right.
+4. Enter a specific question, such as “Explain what each of these theme color variables controls,” then send it.
+
+![Editor context menu with Help me edit and Explain this actions](/public/img/ai/tutorial/dockyard/editor-context-menu.png)
+
+The menu action prepares a reference without sending a message. Select only the relevant passage when discussing a small part of a file.
+
+### 5. Ask for file edits
+
+1. Right-click the target text file in Explorer and choose **Help me edit** (帮我改) to reference its current full text. For a smaller change, use the same action on an editor selection.
+2. Check the reference in ChatKit and describe the change, for example: “Rewrite this README as three usage steps, keeping the installation commands.”
+3. Send the request and review the suggestion. Continue the conversation if it needs adjustments.
+4. Manually place the accepted content in the editor, click **Save buffer**, confirm success, and then refresh to check persistence.
+
+![Explorer file context menu for editing or explaining a whole-file reference](/public/img/ai/tutorial/dockyard/file-context-menu.png)
+
+**Explain this** in the file menu also references the full text. The entry points differ in scope: an editor selection references a passage, while the file tree references the whole text. **Help me edit does not overwrite the file automatically**, and a code block in a model response does not mean the content has been saved to the workbench.
+
 ## Step 8: Complete acceptance beyond automated tests
 
 | Layer | What to verify | What it does not replace |
@@ -239,7 +287,7 @@ Installation, template visibility, assistant publication, and a working business
 
 Use synthetic code for a minimal check: select `return amount * 0.2` in `tax(amount)`, ask the assistant to explain `tax(100)`, and confirm the answer is 20. Request a specific change, apply it manually, save, and refresh. Also demonstrate recovery from a save conflict or a reference attempted before the composer is ready.
 
-The example has API-to-model explanation evidence. Current-version runtime screenshots and the complete UI workflow for manual adoption, save/restore, and failure recovery still need final acceptance. Do not label API receipts or upstream screenshots as browser acceptance for this plugin.
+The example has API-to-model explanation evidence. User-provided screenshots now show the workbench and both context menus; the complete UI workflow for manual adoption, save/restore, and failure recovery still needs final acceptance. Do not label API receipts or upstream screenshots as browser acceptance for this plugin.
 
 ## Troubleshooting
 
