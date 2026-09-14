@@ -209,7 +209,7 @@ The host resolves this identity inside the tenant, organization, and Workspace b
 
 The platform checks host access, Feature activation, declared actions, and the view session. **The plugin owns Assistant-to-business-resource permissions.** For example, Factory Operations intersects explicit assignments or execution participation with the current human's readable Case Projects before pagination and totals.
 
-Server plugins can use `ProjectAccessRuntimeCapability` (`platform.project.access`) from `@xpert-ai/plugin-sdk` to list a human actor's readable Projects (including explicit `assistantIds` bindings) or assert owner/manager access. This capability is available to plugin server services; it does not grant Agent tools human approval. `requiredHostAccess: 'read'` permits a Profile reader to invoke the route; the plugin must independently authorize every decision on the selected business resource.
+Server plugins can use `ProjectAccessRuntimeCapability` (`platform.project.access`) from `@xpert-ai/plugin-sdk` to list a human actor's readable Projects (including explicit `assistantIds` bindings), assert owner/manager access with `assertManage`, or assert owner/manager/editor access with `assertEdit`. This capability is available to plugin server services; it does not grant Agent tools human approval. `requiredHostAccess: 'read'` permits a Profile reader to invoke the route; the plugin must independently authorize every decision on the selected business resource.
 
 ### Lifecycle and decisions
 

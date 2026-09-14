@@ -205,7 +205,7 @@ const profileTab: XpertExtensionViewManifest = {
 
 平台检查 host 访问、Feature、声明的 action 和 view session。**Assistant 对业务资源的访问权限由插件控制。** 工厂插件先将明确分配及执行参与记录，与当前人类用户可读的 Case Projects 取交集，再分页和统计。
 
-服务端插件可以使用 `@xpert-ai/plugin-sdk` 的 `ProjectAccessRuntimeCapability`（`platform.project.access`），查询用户可读 Project（包含明确绑定的 `assistantIds`）或校验 owner/manager 权限。该能力供插件服务使用，不赋予 Agent 工具人类审批权。`requiredHostAccess: 'read'` 仅允许 Profile 读者进入 action 路由；插件必须再次校验具体案件的审批权限。
+服务端插件可以使用 `@xpert-ai/plugin-sdk` 的 `ProjectAccessRuntimeCapability`（`platform.project.access`），查询用户可读 Project（包含明确绑定的 `assistantIds`），通过 `assertManage` 校验 owner/manager 权限，或通过 `assertEdit` 校验 owner/manager/editor 权限。该能力供插件服务使用，不赋予 Agent 工具人类审批权。`requiredHostAccess: 'read'` 仅允许 Profile 读者进入 action 路由；插件必须再次校验具体案件的审批权限。
 
 ### 加载与决策生命周期
 
