@@ -4,8 +4,8 @@
     "/api/ai/v1/chat": {
       "post": {
         "operationId": "AIV1Controller_chat",
-        "summary": "Chat with an agent",
-        "description": "POST a message to a published agent and receive SSE. Authenticate with Authorization: Bearer <API_KEY> or x-api-key. Save on_conversation_start.data.id for continuation. Each SSE data field contains JSON with type, optional event, and data. Text deltas have type=message; lifecycle events have type=event. Inspect on_conversation_end.data.status/error and SSE error events: HTTP success alone does not mean the agent succeeded. Internal runtime options are not public caller fields.",
+        "summary": "调用智能体",
+        "description": "向已发布的智能体发送消息，通过 SSE 接收流式回复。使用 Authorization: Bearer <API_KEY> 或 x-api-key 鉴权。保存 on_conversation_start.data.id，并在后续请求中通过 conversationId 延续对话。每个 SSE data 字段包含 JSON，字段为 type、可选的 event 和 data。文本增量的 type 为 message，生命周期事件的 type 为 event。请检查 on_conversation_end.data.status、error 以及 SSE 错误事件：HTTP 请求成功不代表智能体执行成功。内部运行时选项不属于公开请求参数。",
         "tags": [
           "AI/v1"
         ],
@@ -22,14 +22,14 @@
                 "$ref": "#/components/schemas/AgentChatBody"
               },
               "examples": {
-                "firstMessage": {
-                  "summary": "Start a conversation",
+                "首次发送消息": {
+                  "summary": "首次发送消息",
                   "value": {
                     "request": {
                       "action": "send",
                       "message": {
                         "input": {
-                          "input": "Hello, introduce yourself briefly."
+                          "input": "你好，请简单介绍一下自己。"
                         }
                       }
                     },
@@ -38,15 +38,15 @@
                     }
                   }
                 },
-                "continueConversation": {
-                  "summary": "Continue the conversation",
+                "继续已有对话": {
+                  "summary": "继续已有对话",
                   "value": {
                     "request": {
                       "action": "send",
                       "conversationId": "CONVERSATION_ID_FROM_SSE",
                       "message": {
                         "input": {
-                          "input": "Tell me more."
+                          "input": "请继续刚才的话题。"
                         }
                       }
                     },
@@ -61,38 +61,45 @@
         },
         "responses": {
           "200": {
-            "description": "SSE stream. A connection close without on_conversation_end is incomplete. Ignore heartbeat comments and data frames whose trimmed value is : keep-alive before parsing JSON. Ignore unrelated lifecycle events.",
+            "description": "SSE 事件流。若连接关闭前未收到 on_conversation_end，则本次回复不完整。解析 JSON 前忽略心跳注释，以及去除首尾空白后内容为 : keep-alive 的 data 帧。按需处理其他生命周期事件。",
             "content": {
               "text/event-stream": {
                 "schema": {
                   "type": "string"
                 },
-                "example": "data: {\"type\":\"event\",\"event\":\"on_conversation_start\",\"data\":{\"id\":\"conversation-id\"}}\n\ndata: {\"type\":\"message\",\"data\":\"Hello\"}\n\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"id\":\"conversation-id\",\"status\":\"idle\",\"error\":null}}\n\n"
+                "example": "data: {\"type\":\"event\",\"event\":\"on_conversation_start\",\"data\":{\"id\":\"conversation-id\"}}\n\ndata: {\"type\":\"message\",\"data\":\"你好\"}\n\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"id\":\"conversation-id\",\"status\":\"idle\",\"error\":null}}\n\n"
               }
             }
           },
           "201": {
-            "description": "Some server versions return 201 for the same SSE stream; parse successful 2xx responses as SSE, not JSON.",
+            "description": "部分服务端版本使用 201 返回相同的 SSE 事件流。成功的 2xx 响应应按 SSE 解析，不能作为普通 JSON 读取。",
             "content": {
               "text/event-stream": {
                 "schema": {
                   "type": "string"
                 },
-                "example": "data: {\"type\":\"event\",\"event\":\"on_conversation_start\",\"data\":{\"id\":\"conversation-id\"}}\n\ndata: {\"type\":\"message\",\"data\":\"Hello\"}\n\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"id\":\"conversation-id\",\"status\":\"idle\",\"error\":null}}\n\n"
+                "example": "data: {\"type\":\"event\",\"event\":\"on_conversation_start\",\"data\":{\"id\":\"conversation-id\"}}\n\ndata: {\"type\":\"message\",\"data\":\"你好\"}\n\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"id\":\"conversation-id\",\"status\":\"idle\",\"error\":null}}\n\n"
               }
             }
           },
           "400": {
-            "description": "Invalid request, conversation/agent/project mismatch or invalid execution state."
+            "description": "请求无效、会话与智能体或项目不匹配，或当前执行状态不允许此操作。"
           },
           "401": {
-            "description": "Missing, invalid or expired credentials."
+            "description": "缺少鉴权凭据，或凭据无效、已过期。"
           },
           "403": {
-            "description": "The caller cannot access the agent, conversation or Project."
+            "description": "调用身份无权访问此智能体、会话或项目。"
           },
           "404": {
-            "description": "The requested agent, conversation or execution was not found."
+            "description": "未找到指定的智能体、会话或执行记录。"
+          }
+        },
+        "x-mint": {
+          "href": "/zh-hans/api-reference/aiv1/chat-with-an-agent",
+          "metadata": {
+            "title": "调用智能体",
+            "description": "向已发布的智能体发送消息，通过 SSE 接收流式回复。使用 Authorization: Bearer <API_KEY> 或 x-api-key 鉴权。保存 on_conversation_start.data.id，并在后续请求中通过 conversationId 延续对话。每个 SSE data 字段包含 JSON，字段为 type、可选的 event 和 data。文本增量的 type 为 message，生命周期事件的 type 为 event。请检查 on_conversation_end.data.status、error 以及 SSE 错误事件：HTTP 请求成功不代表智能体执行成功。内部运行时选项不属于公开请求参数。"
           }
         }
       }
@@ -122,7 +129,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/v1/kb/{id}": {
@@ -159,7 +168,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       },
       "delete": {
         "operationId": "AIV1Controller_deleteKnowledgebase",
@@ -183,7 +194,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/v1/kb/{id}/bulk": {
@@ -223,7 +236,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/v1/kb/{id}/process": {
@@ -262,7 +277,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/v1/kb/{id}/status": {
@@ -288,7 +305,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/v1/file": {
@@ -305,7 +324,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/v1/chatkit/sessions": {
@@ -322,7 +343,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/v1"]
+        "tags": [
+          "AI/v1"
+        ]
       }
     },
     "/api/ai/contexts/file": {
@@ -339,7 +362,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Contexts"]
+        "tags": [
+          "AI/Contexts"
+        ]
       }
     },
     "/api/ai/contexts/file/{id}": {
@@ -365,7 +390,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Contexts"]
+        "tags": [
+          "AI/Contexts"
+        ]
       }
     },
     "/api/ai/knowledges": {
@@ -393,7 +420,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Knowledges"]
+        "tags": [
+          "AI/Knowledges"
+        ]
       }
     },
     "/api/ai/knowledges/{id}": {
@@ -430,7 +459,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Knowledges"]
+        "tags": [
+          "AI/Knowledges"
+        ]
       },
       "delete": {
         "operationId": "KnowledgesController_deleteKnowledgebase",
@@ -454,7 +485,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Knowledges"]
+        "tags": [
+          "AI/Knowledges"
+        ]
       }
     },
     "/api/ai/knowledges/{id}/bulk": {
@@ -494,7 +527,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Knowledges"]
+        "tags": [
+          "AI/Knowledges"
+        ]
       }
     },
     "/api/ai/knowledges/{id}/process": {
@@ -533,7 +568,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Knowledges"]
+        "tags": [
+          "AI/Knowledges"
+        ]
       }
     },
     "/api/ai/knowledges/{id}/status": {
@@ -559,7 +596,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Knowledges"]
+        "tags": [
+          "AI/Knowledges"
+        ]
       }
     },
     "/api/ai/assistants/search": {
@@ -576,7 +615,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Assistants"]
+        "tags": [
+          "AI/Assistants"
+        ]
       }
     },
     "/api/ai/assistants/count": {
@@ -593,7 +634,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Assistants"]
+        "tags": [
+          "AI/Assistants"
+        ]
       }
     },
     "/api/ai/assistants/{id}": {
@@ -619,7 +662,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Assistants"]
+        "tags": [
+          "AI/Assistants"
+        ]
       }
     },
     "/api/ai/threads": {
@@ -636,7 +681,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/search": {
@@ -653,7 +700,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}": {
@@ -679,7 +728,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       },
       "patch": {
         "operationId": "ThreadsController_patchThread",
@@ -703,7 +754,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       },
       "delete": {
         "operationId": "ThreadsController_deleteThread",
@@ -727,7 +780,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/state": {
@@ -753,7 +808,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       },
       "post": {
         "operationId": "ThreadsController_updateThreadState",
@@ -777,7 +834,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/history": {
@@ -803,7 +862,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/copy": {
@@ -829,7 +890,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/runs": {
@@ -871,7 +934,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       },
       "post": {
         "operationId": "ThreadsController_createRun",
@@ -895,7 +960,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/runs/stream": {
@@ -929,7 +996,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/runs/wait": {
@@ -955,7 +1024,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/runs/{run_id}/stream": {
@@ -997,7 +1068,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/runs/{run_id}": {
@@ -1031,7 +1104,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/runs/{run_id}/cancel": {
@@ -1065,7 +1140,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/threads/{thread_id}/usage": {
@@ -1107,7 +1184,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Threads"]
+        "tags": [
+          "AI/Threads"
+        ]
       }
     },
     "/api/ai/conversations": {
@@ -1124,7 +1203,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/search": {
@@ -1141,7 +1222,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}": {
@@ -1167,7 +1250,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "patch": {
         "operationId": "ConversationsController_updateConversation",
@@ -1191,7 +1276,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "delete": {
         "operationId": "ConversationsController_deleteConversation",
@@ -1215,7 +1302,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}/messages": {
@@ -1257,7 +1346,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "post": {
         "operationId": "ConversationsController_createMessage",
@@ -1281,7 +1372,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}/messages/search": {
@@ -1307,7 +1400,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}/messages/{message_id}": {
@@ -1341,7 +1436,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "patch": {
         "operationId": "ConversationsController_updateMessage",
@@ -1373,7 +1470,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "delete": {
         "operationId": "ConversationsController_deleteMessage",
@@ -1405,7 +1504,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks": {
@@ -1455,7 +1556,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "post": {
         "operationId": "ConversationsController_createFeedback",
@@ -1487,7 +1590,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks/search": {
@@ -1521,7 +1626,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks/{feedback_id}": {
@@ -1563,7 +1670,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "patch": {
         "operationId": "ConversationsController_updateFeedback",
@@ -1603,7 +1712,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       },
       "delete": {
         "operationId": "ConversationsController_deleteFeedback",
@@ -1643,7 +1754,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Conversations"]
+        "tags": [
+          "AI/Conversations"
+        ]
       }
     },
     "/api/ai/store/items": {
@@ -1685,7 +1798,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Store"]
+        "tags": [
+          "AI/Store"
+        ]
       },
       "put": {
         "operationId": "StoreController_putItem",
@@ -1700,7 +1815,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Store"]
+        "tags": [
+          "AI/Store"
+        ]
       },
       "delete": {
         "operationId": "StoreController_deleteItem",
@@ -1715,7 +1832,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Store"]
+        "tags": [
+          "AI/Store"
+        ]
       }
     },
     "/api/ai/store/namespaces": {
@@ -1732,7 +1851,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Store"]
+        "tags": [
+          "AI/Store"
+        ]
       }
     },
     "/api/ai/store/items/search": {
@@ -1749,7 +1870,9 @@
             "bearer": []
           }
         ],
-        "tags": ["AI/Store"]
+        "tags": [
+          "AI/Store"
+        ]
       }
     }
   },
@@ -1775,22 +1898,22 @@
         "properties": {
           "clientMessageId": {
             "type": "string",
-            "description": "Optional client message identifier; do not assume automatic retry deduplication."
+            "description": "可选的客户端消息标识。不能假定重复请求会自动去重。"
           },
           "input": {
             "type": "object",
             "properties": {
               "input": {
                 "type": "string",
-                "description": "Text to send to the agent."
+                "description": "发送给智能体的用户文本。"
               },
               "model": {
                 "type": "string",
-                "description": "Optional opaque model option ID from the Assistant model catalog."
+                "description": "可选的模型选项 ID，取自该智能体的模型目录，不应自行拼接。"
               }
             },
             "additionalProperties": true,
-            "description": "Human input. Additional fields depend on the published agent input contract. Upload files before passing file handles; raw browser File objects are not supported."
+            "description": "用户输入对象。额外字段由已发布智能体的输入定义决定。附件须先上传，再传入文件句柄；不能直接传入浏览器 File 对象。"
           }
         },
         "required": [
@@ -1802,14 +1925,14 @@
         "properties": {
           "aiMessageId": {
             "type": "string",
-            "description": "Assistant message ID from the existing conversation."
+            "description": "已有会话中的智能体消息 ID。"
           },
           "executionId": {
             "type": "string",
-            "description": "Execution ID from the existing conversation."
+            "description": "已有会话中的执行 ID。"
           }
         },
-        "description": "Use identifiers returned by the interrupted or failed execution; do not invent them."
+        "description": "使用中断或失败执行返回的标识，不要自行编造。"
       },
       "AgentChatSend": {
         "type": "object",
@@ -1822,25 +1945,25 @@
           },
           "conversationId": {
             "type": "string",
-            "description": "Conversation ID from on_conversation_start.data.id; omit for a new conversation."
+            "description": "会话 ID，取自 on_conversation_start.data.id；首次创建会话时省略。"
           },
           "state": {
             "type": "object",
             "properties": {},
             "additionalProperties": true,
-            "description": "Agent state variables defined by the published agent."
+            "description": "已发布智能体定义的状态变量。"
           },
           "projectId": {
             "type": "string",
-            "description": "Optional Project ID. Must match the existing conversation and options.projectId if both are supplied."
+            "description": "可选的项目 ID。必须与已有会话一致；同时提供 options.projectId 时两者也必须一致。"
           },
           "environmentId": {
             "type": "string",
-            "description": "Optional environment ID."
+            "description": "可选的环境 ID。"
           },
           "sandboxEnvironmentId": {
             "type": "string",
-            "description": "Optional sandbox environment ID."
+            "description": "可选的沙箱环境 ID。"
           },
           "message": {
             "$ref": "#/components/schemas/AgentChatMessage"
@@ -1862,13 +1985,13 @@
           },
           "conversationId": {
             "type": "string",
-            "description": "Existing conversation ID from on_conversation_start.data.id. Required for this action."
+            "description": "已有会话的 ID，取自 on_conversation_start.data.id。此操作必须提供。"
           },
           "state": {
             "type": "object",
             "properties": {},
             "additionalProperties": true,
-            "description": "Agent state variables defined by the published agent."
+            "description": "已发布智能体定义的状态变量。"
           },
           "target": {
             "$ref": "#/components/schemas/AgentChatTarget"
@@ -1884,7 +2007,7 @@
                 ]
               },
               "payload": {
-                "description": "Optional decision payload required by the interrupt."
+                "description": "可选的决策内容，具体结构由中断要求决定。"
               }
             },
             "required": [
@@ -1896,7 +2019,7 @@
             "properties": {
               "agentKey": {
                 "type": "string",
-                "description": "Agent key associated with the interruption."
+                "description": "发生中断的智能体节点标识。"
               },
               "toolCalls": {
                 "type": "array",
@@ -1906,10 +2029,10 @@
                 }
               },
               "update": {
-                "description": "State update accepted by the interrupt."
+                "description": "此中断允许的状态更新内容。"
               }
             },
-            "description": "Optional interruption edits. Match the actual interrupt contract."
+            "description": "可选的中断编辑内容，须符合实际中断的数据约定。"
           }
         },
         "required": [
@@ -1930,18 +2053,18 @@
           },
           "conversationId": {
             "type": "string",
-            "description": "Existing conversation ID from on_conversation_start.data.id. Required for this action."
+            "description": "已有会话的 ID，取自 on_conversation_start.data.id。此操作必须提供。"
           },
           "source": {
             "$ref": "#/components/schemas/AgentChatTarget"
           },
           "environmentId": {
             "type": "string",
-            "description": "Optional environment ID."
+            "description": "可选的环境 ID。"
           },
           "checkpointId": {
             "type": "string",
-            "description": "Optional checkpoint ID."
+            "description": "可选的检查点 ID。"
           }
         },
         "required": [
@@ -1961,13 +2084,13 @@
           },
           "conversationId": {
             "type": "string",
-            "description": "Existing conversation ID from on_conversation_start.data.id. Required for this action."
+            "description": "已有会话的 ID，取自 on_conversation_start.data.id。此操作必须提供。"
           },
           "state": {
             "type": "object",
             "properties": {},
             "additionalProperties": true,
-            "description": "Agent state variables defined by the published agent."
+            "description": "已发布智能体定义的状态变量。"
           },
           "mode": {
             "type": "string",
@@ -1975,7 +2098,7 @@
               "queue",
               "steer"
             ],
-            "description": "Queue a follow-up or steer an active run; availability depends on the current execution state."
+            "description": "将追加消息排队（queue），或引导正在执行的任务（steer）。是否可用取决于当前执行状态。"
           },
           "message": {
             "$ref": "#/components/schemas/AgentChatMessage"
@@ -2024,28 +2147,28 @@
             "properties": {
               "xpertId": {
                 "type": "string",
-                "description": "Published agent ID. Supply it for the first agent call; an existing conversation resolves its bound agent. If provided during continuation it must match that agent or its accessible published version family."
+                "description": "已发布智能体的 ID。首次调用时提供；续聊会解析会话绑定的智能体。续聊时若提供此字段，必须匹配会话智能体或其可访问的发布版本。"
               },
               "projectId": {
                 "type": "string",
-                "description": "Optional Project ID; must match request.projectId and the conversation."
+                "description": "可选的项目 ID，必须与 request.projectId 及会话项目一致。"
               },
               "language": {
                 "type": "string",
-                "description": "Optional response language, for example zh-Hans."
+                "description": "可选的回复语言，例如 zh-Hans。"
               },
               "timeZone": {
                 "type": "string",
-                "description": "Optional IANA time zone, for example Asia/Shanghai."
+                "description": "可选的 IANA 时区，例如 Asia/Shanghai。"
               },
               "context": {
                 "type": "object",
                 "properties": {},
                 "additionalProperties": true,
-                "description": "Optional runtime context forwarded to middleware/tools; not an authentication or authorization override."
+                "description": "可选的运行时上下文，传递给中间件或工具；不能用于覆盖鉴权或授权信息。"
               }
             },
-            "description": "Public caller options. Tenant, organization, user and source are resolved by the server; never submit credentials or internal runtime objects here."
+            "description": "公开的调用选项。租户、组织、用户和调用来源由服务端解析；不要在此提交鉴权凭据或内部运行时对象。"
           }
         },
         "required": [
@@ -2080,7 +2203,9 @@
             "minimum": 0
           }
         },
-        "required": ["where"]
+        "required": [
+          "where"
+        ]
       },
       "CreateUserDTO": {
         "type": "object",
@@ -2101,7 +2226,13 @@
             "type": "object"
           }
         },
-        "required": ["email", "firstName", "lastName", "imageUrl", "role"]
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "imageUrl",
+          "role"
+        ]
       },
       "RegisterUserDTO": {
         "type": "object",
@@ -2116,7 +2247,11 @@
             "$ref": "#/components/schemas/CreateUserDTO"
           }
         },
-        "required": ["password", "confirmPassword", "user"]
+        "required": [
+          "password",
+          "confirmPassword",
+          "user"
+        ]
       },
       "ChangePasswordRequestDTO": {
         "type": "object",
@@ -2131,7 +2266,11 @@
             "type": "string"
           }
         },
-        "required": ["token", "password", "confirmPassword"]
+        "required": [
+          "token",
+          "password",
+          "confirmPassword"
+        ]
       },
       "ResetPasswordRequestDTO": {
         "type": "object",
@@ -2140,7 +2279,9 @@
             "type": "string"
           }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
       "RolePermission": {
         "type": "object",
@@ -2178,7 +2319,16 @@
           },
           "permission": {
             "type": "string",
-            "enum": ["SUPER_ADMIN", "ADMIN", "DATA_ENTRY", "EMPLOYEE", "CANDIDATE", "MANAGER", "VIEWER", "TRIAL"]
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "DATA_ENTRY",
+              "EMPLOYEE",
+              "CANDIDATE",
+              "MANAGER",
+              "VIEWER",
+              "TRIAL"
+            ]
           },
           "enabled": {
             "type": "boolean",
@@ -2186,10 +2336,26 @@
           },
           "roleId": {
             "type": "string",
-            "enum": ["SUPER_ADMIN", "ADMIN", "DATA_ENTRY", "EMPLOYEE", "CANDIDATE", "MANAGER", "VIEWER", "TRIAL"]
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "DATA_ENTRY",
+              "EMPLOYEE",
+              "CANDIDATE",
+              "MANAGER",
+              "VIEWER",
+              "TRIAL"
+            ]
           }
         },
-        "required": ["createdAt", "updatedAt", "tenant", "tenantId", "permission", "roleId"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "tenant",
+          "tenantId",
+          "permission",
+          "roleId"
+        ]
       },
       "Feature": {
         "type": "object",
@@ -2377,7 +2543,14 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "updatedAt", "tenant", "tenantId", "name", "value"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "tenant",
+          "tenantId",
+          "name",
+          "value"
+        ]
       },
       "ImportRecord": {
         "type": "object",
@@ -2559,14 +2732,22 @@
           },
           "inviteStatus": {
             "type": "string",
-            "enum": ["NOT_INVITED", "INVITED", "ACCEPTED"]
+            "enum": [
+              "NOT_INVITED",
+              "INVITED",
+              "ACCEPTED"
+            ]
           },
           "notes": {
             "type": "string"
           },
           "contactType": {
             "type": "string",
-            "enum": ["CLIENT", "CUSTOMER", "LEAD"]
+            "enum": [
+              "CLIENT",
+              "CUSTOMER",
+              "LEAD"
+            ]
           },
           "imageUrl": {
             "type": "string",
@@ -2758,7 +2939,16 @@
           },
           "name": {
             "type": "string",
-            "enum": ["SUPER_ADMIN", "ADMIN", "DATA_ENTRY", "EMPLOYEE", "CANDIDATE", "MANAGER", "VIEWER", "TRIAL"]
+            "enum": [
+              "SUPER_ADMIN",
+              "ADMIN",
+              "DATA_ENTRY",
+              "EMPLOYEE",
+              "CANDIDATE",
+              "MANAGER",
+              "VIEWER",
+              "TRIAL"
+            ]
           },
           "isSystem": {
             "type": "boolean",
@@ -2777,7 +2967,16 @@
             }
           }
         },
-        "required": ["createdAt", "updatedAt", "tenant", "tenantId", "name", "isSystem", "rolePermissions", "users"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "tenant",
+          "tenantId",
+          "name",
+          "isSystem",
+          "rolePermissions",
+          "users"
+        ]
       },
       "UserOrganization": {
         "type": "object",
@@ -2923,7 +3122,12 @@
           },
           "preferredLanguage": {
             "type": "string",
-            "enum": ["zh-CN", "zh-Hans", "zh-Hant", "en"]
+            "enum": [
+              "zh-CN",
+              "zh-Hans",
+              "zh-Hant",
+              "en"
+            ]
           },
           "emailVerified": {
             "type": "boolean"
@@ -3031,7 +3235,13 @@
           },
           "payPeriod": {
             "type": "string",
-            "enum": ["NONE", "BI_WEEKLY", "WEEKLY", "TWICE_PER_MONTH", "MONTHLY"]
+            "enum": [
+              "NONE",
+              "BI_WEEKLY",
+              "WEEKLY",
+              "TWICE_PER_MONTH",
+              "MONTHLY"
+            ]
           },
           "billRateValue": {
             "type": "number"
@@ -3495,7 +3705,15 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "updatedAt", "name", "code", "is_system", "description", "color"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "name",
+          "code",
+          "is_system",
+          "description",
+          "color"
+        ]
       },
       "OrganizationLanguage": {
         "type": "object",
@@ -3621,7 +3839,12 @@
           },
           "category": {
             "type": "string",
-            "enum": ["indicator", "story", "toolset", "xpert"]
+            "enum": [
+              "indicator",
+              "story",
+              "toolset",
+              "xpert"
+            ]
           },
           "label": {
             "type": "object"
@@ -4018,7 +4241,11 @@
           },
           "defaultValueDateType": {
             "type": "string",
-            "enum": ["TODAY", "END_OF_MONTH", "START_OF_MONTH"]
+            "enum": [
+              "TODAY",
+              "END_OF_MONTH",
+              "START_OF_MONTH"
+            ]
           },
           "isActive": {
             "type": "boolean",
@@ -4044,7 +4271,15 @@
           },
           "startWeekOn": {
             "type": "string",
-            "enum": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]
+            "enum": [
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
           },
           "taxId": {
             "type": "string",
@@ -4055,11 +4290,21 @@
           },
           "minimumProjectSize": {
             "type": "string",
-            "enum": ["1000+", "5000+", "10000+", "25000+", "50000+", "100000+"]
+            "enum": [
+              "1000+",
+              "5000+",
+              "10000+",
+              "25000+",
+              "50000+",
+              "100000+"
+            ]
           },
           "bonusType": {
             "type": "string",
-            "enum": ["PROFIT_BASED_BONUS", "REVENUE_BASED_BONUS"]
+            "enum": [
+              "PROFIT_BASED_BONUS",
+              "REVENUE_BASED_BONUS"
+            ]
           },
           "bonusPercentage": {
             "type": "number"
@@ -4141,7 +4386,10 @@
           },
           "timeFormat": {
             "type": "number",
-            "enum": [12, 24]
+            "enum": [
+              12,
+              24
+            ]
           },
           "separateInvoiceItemTaxAndDiscount": {
             "type": "boolean"
@@ -4154,7 +4402,10 @@
           },
           "currencyPosition": {
             "type": "string",
-            "enum": ["LEFT", "RIGHT"]
+            "enum": [
+              "LEFT",
+              "RIGHT"
+            ]
           },
           "discountAfterTax": {
             "type": "boolean"
@@ -4176,7 +4427,12 @@
           },
           "preferredLanguage": {
             "type": "string",
-            "enum": ["zh-CN", "zh-Hans", "zh-Hant", "en"]
+            "enum": [
+              "zh-CN",
+              "zh-Hans",
+              "zh-Hant",
+              "en"
+            ]
           },
           "contact": {
             "$ref": "#/components/schemas/Contact"
@@ -4267,10 +4523,17 @@
         "properties": {
           "preferredLanguage": {
             "type": "string",
-            "enum": ["zh-CN", "zh-Hans", "zh-Hant", "en"]
+            "enum": [
+              "zh-CN",
+              "zh-Hans",
+              "zh-Hant",
+              "en"
+            ]
           }
         },
-        "required": ["preferredLanguage"]
+        "required": [
+          "preferredLanguage"
+        ]
       },
       "Object": {
         "type": "object",
@@ -4286,7 +4549,10 @@
             "type": "string"
           }
         },
-        "required": ["hash", "password"]
+        "required": [
+          "hash",
+          "password"
+        ]
       },
       "EmailTemplate": {
         "type": "object",
@@ -4570,7 +4836,15 @@
             "type": "string"
           }
         },
-        "required": ["fromAddress", "host", "port", "secure", "isValidate", "username", "password"]
+        "required": [
+          "fromAddress",
+          "host",
+          "port",
+          "secure",
+          "isValidate",
+          "username",
+          "password"
+        ]
       },
       "CreateCustomSmtpDTO": {
         "type": "object",
@@ -4602,7 +4876,15 @@
             "type": "string"
           }
         },
-        "required": ["fromAddress", "host", "port", "secure", "isValidate", "username", "password"]
+        "required": [
+          "fromAddress",
+          "host",
+          "port",
+          "secure",
+          "isValidate",
+          "username",
+          "password"
+        ]
       },
       "Country": {
         "type": "object",
@@ -4633,7 +4915,12 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "updatedAt", "isoCode", "country"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "isoCode",
+          "country"
+        ]
       },
       "Currency": {
         "type": "object",
@@ -4664,7 +4951,12 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "updatedAt", "isoCode", "currency"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "isoCode",
+          "currency"
+        ]
       },
       "CreateInviteDTO": {
         "type": "object",
@@ -4689,7 +4981,13 @@
             "type": "string"
           }
         },
-        "required": ["emailIds", "roleId", "invitedById", "inviteType", "startedWorkOn"]
+        "required": [
+          "emailIds",
+          "roleId",
+          "invitedById",
+          "inviteType",
+          "startedWorkOn"
+        ]
       },
       "Invite": {
         "type": "object",
@@ -4747,7 +5045,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["INVITED", "ACCEPTED"]
+            "enum": [
+              "INVITED",
+              "ACCEPTED"
+            ]
           },
           "expireDate": {
             "format": "date-time",
@@ -4863,7 +5164,12 @@
           },
           "storageProvider": {
             "type": "string",
-            "enum": ["LOCAL", "S3", "WASABI", "OSS"]
+            "enum": [
+              "LOCAL",
+              "S3",
+              "WASABI",
+              "OSS"
+            ]
           }
         },
         "required": [
@@ -4907,7 +5213,9 @@
             "type": "boolean"
           }
         },
-        "required": ["where"]
+        "required": [
+          "where"
+        ]
       },
       "CreateKnowledgebaseDTO": {
         "type": "object",
@@ -4926,14 +5234,21 @@
           },
           "permission": {
             "type": "string",
-            "enum": ["private", "organization", "public"],
+            "enum": [
+              "private",
+              "organization",
+              "public"
+            ],
             "example": "organization",
             "description": "Knowledgebase Permission",
             "default": "private"
           },
           "type": {
             "type": "string",
-            "enum": ["standard", "external"],
+            "enum": [
+              "standard",
+              "external"
+            ],
             "example": "standard",
             "description": "Knowledgebase Type",
             "default": "standard"
@@ -5164,11 +5479,18 @@
       },
       "KnowledgebaseTypeEnum": {
         "type": "string",
-        "enum": ["standard", "external"]
+        "enum": [
+          "standard",
+          "external"
+        ]
       },
       "KnowledgeStructureEnum": {
         "type": "string",
-        "enum": ["general", "parent-child", "qa"]
+        "enum": [
+          "general",
+          "parent-child",
+          "qa"
+        ]
       },
       "CopilotProviderModel": {
         "type": "object",
@@ -5469,7 +5791,15 @@
           },
           "modelType": {
             "type": "string",
-            "enum": ["llm", "text-embedding", "rerank", "speech2text", "moderation", "tts", "text2img"]
+            "enum": [
+              "llm",
+              "text-embedding",
+              "rerank",
+              "speech2text",
+              "moderation",
+              "tts",
+              "text2img"
+            ]
           },
           "model": {
             "type": "string"
@@ -5837,7 +6167,14 @@
           },
           "category": {
             "type": "string",
-            "enum": ["text", "image", "audio", "video", "sheet", "other"],
+            "enum": [
+              "text",
+              "image",
+              "audio",
+              "video",
+              "sheet",
+              "other"
+            ],
             "description": "Category of the document"
           },
           "type": {
@@ -6097,7 +6434,11 @@
           },
           "permission": {
             "type": "string",
-            "enum": ["private", "organization", "public"]
+            "enum": [
+              "private",
+              "organization",
+              "public"
+            ]
           },
           "copilotModel": {
             "$ref": "#/components/schemas/CopilotModel"
@@ -6639,7 +6980,14 @@
           },
           "status": {
             "type": "string",
-            "enum": ["running", "success", "error", "pending", "timeout", "interrupted"]
+            "enum": [
+              "running",
+              "success",
+              "error",
+              "pending",
+              "timeout",
+              "interrupted"
+            ]
           },
           "error": {
             "type": "string"
@@ -7283,7 +7631,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["paused", "archived", "scheduled"]
+            "enum": [
+              "paused",
+              "archived",
+              "scheduled"
+            ]
           },
           "xpert": {
             "$ref": "#/components/schemas/Xpert"
@@ -7900,7 +8252,15 @@
           },
           "status": {
             "type": "string",
-            "enum": ["DRAFT", "CHANGING", "REVIEW", "APPROVED", "REJECTED", "RELEASED", "ARCHIVED"]
+            "enum": [
+              "DRAFT",
+              "CHANGING",
+              "REVIEW",
+              "APPROVED",
+              "REJECTED",
+              "RELEASED",
+              "ARCHIVED"
+            ]
           },
           "collection": {
             "$ref": "#/components/schemas/Collection"
@@ -8029,7 +8389,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Progressing", "Archived"]
+            "enum": [
+              "Progressing",
+              "Archived"
+            ]
           },
           "deletedAt": {
             "type": "string",
@@ -8219,7 +8582,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["BASIC", "DERIVE"]
+            "enum": [
+              "BASIC",
+              "DERIVE"
+            ]
           },
           "model": {
             "$ref": "#/components/schemas/SemanticModel"
@@ -8250,7 +8616,12 @@
           },
           "embeddingStatus": {
             "type": "string",
-            "enum": ["processing", "success", "failed", "required"]
+            "enum": [
+              "processing",
+              "success",
+              "failed",
+              "required"
+            ]
           },
           "error": {
             "type": "string"
@@ -8427,7 +8798,11 @@
           },
           "type": {
             "type": "string",
-            "enum": ["SEMANTIC_MODEL", "STORY", "INDICATOR"]
+            "enum": [
+              "SEMANTIC_MODEL",
+              "STORY",
+              "INDICATOR"
+            ]
           },
           "name": {
             "type": "string"
@@ -8515,7 +8890,14 @@
             "type": "string"
           }
         },
-        "required": ["createdAt", "updatedAt", "tenant", "tenantId", "model", "modelId"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "tenant",
+          "tenantId",
+          "model",
+          "modelId"
+        ]
       },
       "Favorite": {
         "type": "object",
@@ -8576,7 +8958,11 @@
           },
           "type": {
             "type": "string",
-            "enum": ["SEMANTIC_MODEL", "STORY", "INDICATOR"]
+            "enum": [
+              "SEMANTIC_MODEL",
+              "STORY",
+              "INDICATOR"
+            ]
           },
           "modelId": {
             "type": "string"
@@ -8743,7 +9129,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["XMLA", "SQL"]
+            "enum": [
+              "XMLA",
+              "SQL"
+            ]
           },
           "catalog": {
             "type": "string"
@@ -8756,7 +9145,10 @@
           },
           "status": {
             "type": "string",
-            "enum": ["progressing", "archived"]
+            "enum": [
+              "progressing",
+              "archived"
+            ]
           },
           "owner": {
             "$ref": "#/components/schemas/User"
@@ -8942,7 +9334,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["XMLA", "SQL"]
+            "enum": [
+              "XMLA",
+              "SQL"
+            ]
           },
           "catalog": {
             "type": "string"
@@ -8975,7 +9370,16 @@
             }
           }
         },
-        "required": ["type", "catalog", "cube", "ownerId", "dataSourceId", "businessAreaId", "queries", "roles"]
+        "required": [
+          "type",
+          "catalog",
+          "cube",
+          "ownerId",
+          "dataSourceId",
+          "businessAreaId",
+          "queries",
+          "roles"
+        ]
       },
       "UpdateSemanticModelDTO": {
         "type": "object",
@@ -8994,7 +9398,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["XMLA", "SQL"]
+            "enum": [
+              "XMLA",
+              "SQL"
+            ]
           },
           "catalog": {
             "type": "string"
@@ -9027,7 +9434,16 @@
             }
           }
         },
-        "required": ["type", "catalog", "cube", "ownerId", "dataSourceId", "businessAreaId", "queries", "roles"]
+        "required": [
+          "type",
+          "catalog",
+          "cube",
+          "ownerId",
+          "dataSourceId",
+          "businessAreaId",
+          "queries",
+          "roles"
+        ]
       },
       "DataSource": {
         "type": "object",
@@ -9145,7 +9561,12 @@
             "readOnly": true
           }
         },
-        "required": ["createdAt", "updatedAt", "tenant", "tenantId"]
+        "required": [
+          "createdAt",
+          "updatedAt",
+          "tenant",
+          "tenantId"
+        ]
       },
       "SemanticModelEntity": {
         "type": "object",
@@ -9201,7 +9622,10 @@
           },
           "type": {
             "type": "string",
-            "enum": ["cube", "dimension"]
+            "enum": [
+              "cube",
+              "dimension"
+            ]
           },
           "options": {
             "type": "object"
@@ -9217,7 +9641,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["paused", "archived", "scheduled"]
+            "enum": [
+              "paused",
+              "archived",
+              "scheduled"
+            ]
           },
           "model": {
             "$ref": "#/components/schemas/SemanticModel"
@@ -9333,7 +9761,11 @@
             "readOnly": true
           }
         },
-        "required": ["organization", "organizationId", "name"]
+        "required": [
+          "organization",
+          "organizationId",
+          "name"
+        ]
       },
       "UpdateApprovalPolicyDTO": {
         "type": "object",
@@ -9362,7 +9794,11 @@
             "readOnly": true
           }
         },
-        "required": ["organization", "organizationId", "name"]
+        "required": [
+          "organization",
+          "organizationId",
+          "name"
+        ]
       },
       "PermissionApprovalUser": {
         "type": "object",
@@ -9493,7 +9929,14 @@
           },
           "permissionType": {
             "type": "string",
-            "enum": ["TIME_OFF", "EQUIPMENT_SHARING", "BUSINESS_TRIP", "INDICATOR", "STORY", "BUSINESS_AREA"]
+            "enum": [
+              "TIME_OFF",
+              "EQUIPMENT_SHARING",
+              "BUSINESS_TRIP",
+              "INDICATOR",
+              "STORY",
+              "BUSINESS_AREA"
+            ]
           },
           "approvalPolicy": {
             "$ref": "#/components/schemas/ApprovalPolicy"
@@ -9600,7 +10043,12 @@
           },
           "storageProvider": {
             "type": "string",
-            "enum": ["LOCAL", "S3", "WASABI", "OSS"]
+            "enum": [
+              "LOCAL",
+              "S3",
+              "WASABI",
+              "OSS"
+            ]
           }
         },
         "required": [

@@ -495,6 +495,7 @@
                     "pages": [
                       "en/ai/tutorial/workflow-and-agent",
                       "en/ai/tutorial/develop-custom-agentic-app",
+                      "en/ai/tutorial/dockyard-workbench-plugin",
                       "en/ai/tutorial/wechat-work-integration",
                       "en/ai/tutorial/dingtalk-h5-app",
                       "en/ai/tutorial/integrate-with-mcp-dify",
@@ -511,7 +512,8 @@
                     "pages": [
                       "en/ai/tutorial/echarts-mcp-app",
                       "en/ai/tutorial/chatkit-browser-extension",
-                      "en/ai/tutorial/develop-custom-agentic-app"
+                      "en/ai/tutorial/develop-custom-agentic-app",
+                      "en/ai/tutorial/dockyard-workbench-plugin"
                     ]
                   },
                   {
@@ -1323,6 +1325,7 @@
                     "pages": [
                       "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/develop-custom-agentic-app",
+                      "zh-Hans/ai/tutorial/dockyard-workbench-plugin",
                       "zh-Hans/ai/tutorial/dingtalk-h5-app",
                       "zh-Hans/ai/tutorial/integrate-with-mcp-dify",
                       "zh-Hans/ai/tutorial/build-agentic-chatbi-from-scratch",
@@ -1338,7 +1341,8 @@
                     "pages": [
                       "zh-Hans/ai/tutorial/echarts-mcp-app",
                       "zh-Hans/ai/tutorial/chatkit-browser-extension",
-                      "zh-Hans/ai/tutorial/develop-custom-agentic-app"
+                      "zh-Hans/ai/tutorial/develop-custom-agentic-app",
+                      "zh-Hans/ai/tutorial/dockyard-workbench-plugin"
                     ]
                   },
                   {
@@ -1390,7 +1394,7 @@
                   {
                     "group": "AI",
                     "openapi": {
-                      "source": "api/openapi.ai.json",
+                      "source": "api/openapi.ai.zh-Hans.json",
                       "directory": "zh-Hans/api-reference"
                     }
                   }
