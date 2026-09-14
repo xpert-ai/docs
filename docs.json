@@ -1323,6 +1323,7 @@
                     "pages": [
                       "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/develop-custom-agentic-app",
+                      "zh-Hans/ai/tutorial/dockyard-workbench-plugin",
                       "zh-Hans/ai/tutorial/dingtalk-h5-app",
                       "zh-Hans/ai/tutorial/integrate-with-mcp-dify",
                       "zh-Hans/ai/tutorial/build-agentic-chatbi-from-scratch",
@@ -1338,7 +1339,8 @@
                     "pages": [
                       "zh-Hans/ai/tutorial/echarts-mcp-app",
                       "zh-Hans/ai/tutorial/chatkit-browser-extension",
-                      "zh-Hans/ai/tutorial/develop-custom-agentic-app"
+                      "zh-Hans/ai/tutorial/develop-custom-agentic-app",
+                      "zh-Hans/ai/tutorial/dockyard-workbench-plugin"
                     ]
                   },
                   {
