@@ -10,10 +10,10 @@ tags:
 
 This tutorial uses Dockyard to show how to integrate an existing Web workbench with Xpert. You will retain its multi-panel interface, persist workbench data through a plugin, provide an assistant template, and pass selected content to a chat assistant for explanations or editing suggestions.
 
-The tutorial focuses on responsibilities, implementation steps, and validation. See [Dockyard demo PR #627](https://github.com/xpert-ai/xpert-plugins/pull/627) for the complete implementation and development materials. The PR has been merged into the official repository’s main branch. The example is pinned to merge [commit 9871c50f](https://github.com/xpert-ai/xpert-plugins/tree/9871c50f408d19ae3e6c3951721ab1c4574185c6/community/apps/dockyard). The PR includes code changes, validation records, and six supporting documents. Use the pinned commit in the official repository to reproduce the example. This is a development case study, not a published npm plugin.
+The tutorial focuses on responsibilities, implementation steps, and validation. The complete example is in [community/apps/dockyard](https://github.com/xpert-ai/xpert-plugins/tree/main/community/apps/dockyard) in the official repository, including plugin source, tests, screenshots, and supporting development documents.
 
 <Warning>
-This tutorial describes Dockyard plugin 0.3.0. Context-menu references require the host command `assistant.composer.append_references`, implemented in [Xpert PR #1025](https://github.com/xpert-ai/xpert/pull/1025). Confirm that your deployment includes this capability before reproducing the reference flow. Installing the plugin alone does not establish support on an unmodified Xpert main checkout. The command is not presented here as a stable capability available in every version.
+This tutorial describes Dockyard plugin 0.3.0. Context-menu references require the host command `assistant.composer.append_references`. Confirm that your deployment includes this capability before reproducing the reference flow. Installing the plugin alone does not establish support on an unmodified Xpert main checkout. The command is not presented here as a stable capability available in every version.
 </Warning>
 
 ## User experience and boundaries
@@ -50,15 +50,14 @@ git fetch upstream main
 git switch -c feature/my-workbench upstream/main
 ```
 
-To run the pinned example first, clone the official repository into a separate directory:
+To run the example first, clone the official repository into a separate directory. The plugin is under `community/apps/dockyard`:
 
 ```bash
 git clone https://github.com/xpert-ai/xpert-plugins.git dockyard-example
 cd dockyard-example
-git checkout 9871c50f408d19ae3e6c3951721ab1c4574185c6
 ```
 
-This checkout is for reproduction. Use your own feature branch when developing a plugin. Record the plugin, host, and upstream UI commit SHAs instead of recording only “latest.” This example uses Node 22, pnpm 8.15.8 for the plugin, and SDK/contracts 3.18.4. Select the host package manager version from its own package.json.
+Use your own feature branch when developing a plugin, and check for differences between your source version and the 0.3.0 example described here. Record the plugin, host, and upstream UI commit SHAs instead of recording only “latest.” This example uses Node 22, pnpm 8.15.8 for the plugin, and SDK/contracts 3.18.4. Select the host package manager version from its own package.json.
 
 Use separate databases, Redis, ports, and log directories for the test host. Read credentials from test environment configuration; do not include them in plugin files, documentation, or commits. Allow only the plugin workspace paths required by the test instance.
 
@@ -158,7 +157,7 @@ Declare the allowed command in the View manifest's `clientCommands`, then invoke
 }
 ```
 
-The complete message also needs a protocol channel, version, instance ID, and request ID. Validate the message source, instance, and response type, and handle timeouts and disposal so a response from another instance cannot complete this request. See `src/lib/remote/bridge.ts` in the pinned example.
+The complete message also needs a protocol channel, version, instance ID, and request ID. Validate the message source, instance, and response type, and handle timeouts and disposal so a response from another instance cannot complete this request. See `src/lib/remote/bridge.ts` in the example.
 
 Capture the selection as a snapshot when the user invokes the menu, including the filename, text, and line range. File-tree actions read the selected file's current text buffer. Use explicit content types instead of inferring them from names; ask the user to choose a text file when no referenceable text is available.
 
@@ -303,8 +302,8 @@ The example has API-to-model explanation evidence. User-provided screenshots now
 
 ## Further reading
 
-- [Demo PR #627: complete implementation and supporting documents](https://github.com/xpert-ai/xpert-plugins/pull/627)
+- [Dockyard plugin source](https://github.com/xpert-ai/xpert-plugins/tree/main/community/apps/dockyard)
 - [Workbench remote components](/en/ai/plugin/plugin-sdk/remote-component)
 - [Plugin publishing and usage](/en/ai/plugin/install)
-- [Pinned example and six development documents](https://github.com/xpert-ai/xpert-plugins/tree/9871c50f408d19ae3e6c3951721ab1c4574185c6/community/apps/dockyard/docs/interview)
+- [Example and six development documents](https://github.com/xpert-ai/xpert-plugins/tree/main/community/apps/dockyard/docs/interview)
 - [Upstream Dockyard repository](https://github.com/wieslawsoltes/Dockyard)
