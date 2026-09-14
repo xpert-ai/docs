@@ -495,6 +495,7 @@
                     "pages": [
                       "en/ai/tutorial/workflow-and-agent",
                       "en/ai/tutorial/develop-custom-agentic-app",
+                      "en/ai/tutorial/dockyard-workbench-plugin",
                       "en/ai/tutorial/wechat-work-integration",
                       "en/ai/tutorial/dingtalk-h5-app",
                       "en/ai/tutorial/integrate-with-mcp-dify",
@@ -511,7 +512,8 @@
                     "pages": [
                       "en/ai/tutorial/echarts-mcp-app",
                       "en/ai/tutorial/chatkit-browser-extension",
-                      "en/ai/tutorial/develop-custom-agentic-app"
+                      "en/ai/tutorial/develop-custom-agentic-app",
+                      "en/ai/tutorial/dockyard-workbench-plugin"
                     ]
                   },
                   {
