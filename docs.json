@@ -1394,7 +1394,7 @@
                   {
                     "group": "AI",
                     "openapi": {
-                      "source": "api/openapi.ai.json",
+                      "source": "api/openapi.ai.zh-Hans.json",
                       "directory": "zh-Hans/api-reference"
                     }
                   }
