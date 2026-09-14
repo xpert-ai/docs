@@ -10,7 +10,7 @@ tags:
 
 本教程以 Dockyard 为例，说明如何把一个已有的 Web 工作台接入 Xpert。你将保留原来的多面板界面，通过插件保存工作台数据，提供助手模板，并把用户选中的内容交给聊天助手解释或讨论修改。
 
-教程重点是接入过程中的职责划分、实现步骤和验证方法。最终示例 Demo 的完整实现和开发材料见 [Dockyard 示例 Demo PR #627](https://github.com/xpert-ai/xpert-plugins/pull/627)，示例固定在提交 [9b9c3354](https://github.com/yurongk/xpert-plugins/tree/9b9c33545411c66bc4b84c495abc0fda1e4951a8/community/apps/dockyard)。读者可以通过 PR 查看代码差异、验证记录和六份配套文档；复现时使用上述固定提交，无需等待 PR 合并。它是开发案例，不是已发布的 npm 插件。
+教程重点是接入过程中的职责划分、实现步骤和验证方法。最终示例 Demo 的完整实现和开发材料见 [Dockyard 示例 Demo PR #627](https://github.com/xpert-ai/xpert-plugins/pull/627)，该 PR 已合并到官方仓库的 main，教程示例固定在合并提交 [9871c50f](https://github.com/xpert-ai/xpert-plugins/tree/9871c50f408d19ae3e6c3951721ab1c4574185c6/community/apps/dockyard)。读者可以通过 PR 查看代码差异、验证记录和六份配套文档；复现时使用上述官方仓库的固定提交。它是开发案例，不是已发布的 npm 插件。
 
 <Warning>
 本文基于 Dockyard 插件 0.3.0。右键引用需要宿主支持 `assistant.composer.append_references`，对应实现见 [Xpert PR #1025](https://github.com/xpert-ai/xpert/pull/1025)。复现前请确认部署版本包含该能力；不能只安装插件就假定未修改的 Xpert main 已支持。本文不将该接口描述为所有版本均可用的稳定能力。
@@ -50,12 +50,12 @@ git fetch upstream main
 git switch -c feature/my-workbench upstream/main
 ```
 
-如果要先运行本教程的固定示例，可在另一个目录克隆示例 fork 并检出上述提交：
+如果要先运行本教程的固定示例，可在另一个目录克隆官方仓库并检出上述合并提交：
 
 ```bash
-git clone https://github.com/yurongk/xpert-plugins.git dockyard-example
+git clone https://github.com/xpert-ai/xpert-plugins.git dockyard-example
 cd dockyard-example
-git checkout 9b9c33545411c66bc4b84c495abc0fda1e4951a8
+git checkout 9871c50f408d19ae3e6c3951721ab1c4574185c6
 ```
 
 这个检出用于复现；开发自己的插件时使用自己的功能分支。记录插件、宿主和上游界面的 SHA，不要只记录“最新版”。本例使用 Node 22、插件 pnpm 8.15.8 和 SDK/contracts 3.18.4；宿主包管理器版本按宿主自己的 package.json 选择。
@@ -306,5 +306,5 @@ pnpm plugin:deploy:local \
 - [最终示例 Demo PR #627：完整实现与配套文档](https://github.com/xpert-ai/xpert-plugins/pull/627)
 - [工作台远程组件](/zh-Hans/ai/plugin/plugin-sdk/remote-component)
 - [插件发布和使用](/zh-Hans/ai/plugin/publish-and-use)
-- [固定版本的示例与六份开发材料](https://github.com/yurongk/xpert-plugins/tree/9b9c33545411c66bc4b84c495abc0fda1e4951a8/community/apps/dockyard/docs/interview)
+- [固定版本的示例与六份开发材料](https://github.com/xpert-ai/xpert-plugins/tree/9871c50f408d19ae3e6c3951721ab1c4574185c6/community/apps/dockyard/docs/interview)
 - [Dockyard 上游仓库](https://github.com/wieslawsoltes/Dockyard)
