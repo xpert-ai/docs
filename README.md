@@ -46,3 +46,16 @@ docker build -t xpert-ai/docs . \
 ## Preview Locally with Mint
 
 `mint dev`
+
+## Chinese Agent Chat API Reference
+
+The English API contract remains in `api/openapi.ai.json`. The Chinese navigation uses the generated `api/openapi.ai.zh-Hans.json`; currently the agent chat endpoint and its schemas are localized. Other endpoints retain their source descriptions.
+
+After updating the source specification, update `api/agent-chat.zh-Hans.translations.json` for any changed agent chat descriptions and regenerate:
+
+```sh
+node scripts/generate-openapi-zh.mjs
+node scripts/generate-openapi-zh.mjs --check
+```
+
+Do not edit the generated specification directly. The generator preserves the published Chinese agent chat URL and fails when translations are missing or stale.
