@@ -43,7 +43,7 @@
         "href": "https://github.com/xpert-ai/xpert"
       },
       {
-        "label": "UOSE",
+        "label": "Ontology",
         "href": "https://data.xpertai.cn/"
       },
       {
@@ -69,7 +69,7 @@
               "href": "https://github.com/xpert-ai/xpert"
             },
             {
-              "label": "UOSE",
+              "label": "Ontology",
               "href": "https://data.xpertai.cn/"
             },
             {
@@ -575,7 +575,7 @@
             ]
           },
           {
-            "product": "UOSE",
+            "product": "Ontology",
             "tabs": [
               {
                 "tab": "Overview",
@@ -686,125 +686,29 @@
                       "en/data/analytics/indicator-management/ai-assistant",
                       "en/data/analytics/indicator-management/indicator-measure"
                     ]
-                  },
+                  }
+                ]
+              },
+              {
+                "tab": "Tutorial",
+                "groups": [
                   {
-                    "group": "Story Dashboard",
+                    "group": "SAP and Resource Onboarding",
                     "pages": [
-                      "en/data/analytics/story-dashboard/projects",
-                      "en/data/analytics/story-dashboard/create-story",
-                      "en/data/analytics/story-dashboard/workspace",
-                      "en/data/analytics/story-dashboard/preferences",
-                      "en/data/analytics/story-dashboard/story-details",
-                      "en/data/analytics/story-dashboard/page-layout",
-                      "en/data/analytics/story-dashboard/device",
-                      "en/data/analytics/story-dashboard/mobile",
-                      "en/data/analytics/story-dashboard/sort-ranking",
-                      "en/data/analytics/story-dashboard/advanced-styles",
-                      "en/data/analytics/story-dashboard/dimension-selector",
-                      "en/data/analytics/story-dashboard/calculated-measures",
-                      "en/data/analytics/story-dashboard/parameters",
-                      "en/data/analytics/story-dashboard/slicer",
-                      "en/data/analytics/story-dashboard/combined-slicer",
-                      "en/data/analytics/story-dashboard/advanced-slicer",
-                      "en/data/analytics/story-dashboard/explorer",
-                      "en/data/analytics/story-dashboard/share",
-                      "en/data/analytics/story-dashboard/story-templates",
-                      "en/data/analytics/story-dashboard/large-screen",
-                      "en/data/analytics/story-dashboard/execution-explanation",
-                      "en/data/analytics/story-dashboard/access-authorization",
-                      "en/data/analytics/story-dashboard/ai-assistant",
-                      "en/data/analytics/story-dashboard/association-analysis"
+                      "en/data/tutorial/sap-resource/sap-bpc",
+                      "en/data/tutorial/sap-resource/sap-bpc-consolidated-reports",
+                      "en/data/tutorial/sap-resource/how-to-analyze-sap-bw-data-models",
+                      "en/data/tutorial/sap-resource/sap-bw-calendar-dimension"
                     ]
                   },
                   {
-                    "group": "Widget",
+                    "group": "Semantic Modeling and Analysis",
                     "pages": [
-                      "en/data/analytics/widget/input-controller/calendar-controller",
-                      "en/data/analytics/widget/input-controller/parameter-controller",
-                      "en/data/analytics/widget/filter-bar/tree-selector",
-                      "en/data/analytics/widget/analysis-table/flat-table",
-                      "en/data/analytics/widget/analysis-card/analysis-card",
-                      "en/data/analytics/widget/filter-bar/member-selector",
-                      "en/data/analytics/widget/analysis-table/pivot-table",
-                      "en/data/analytics/widget/analysis-card/bar-chart",
-                      "en/data/analytics/widget/filter-bar/dropdown-selector",
-                      "en/data/analytics/widget/filter-bar/filter-bar",
-                      "en/data/analytics/widget/analysis-card/line-chart",
-                      "en/data/analytics/widget/analysis-card/pie-chart",
-                      "en/data/analytics/widget/filter-bar/calendar-selector",
-                      "en/data/analytics/widget/analysis-card/scatter-chart",
-                      "en/data/analytics/widget/key-indicator",
-                      "en/data/analytics/widget/slider-widget",
-                      "en/data/analytics/widget/tabs",
-                      "en/data/analytics/widget/analysis-card/heatmap",
-                      "en/data/analytics/widget/analysis-card/tree-chart",
-                      "en/data/analytics/widget/analysis-card/treemap",
-                      "en/data/analytics/widget/iframe",
-                      "en/data/analytics/widget/analysis-card/sankey-diagram",
-                      "en/data/analytics/widget/analysis-card/sunburst-chart",
-                      "en/data/analytics/widget/document",
-                      "en/data/analytics/widget/analysis-card/river-chart",
-                      "en/data/analytics/widget/text",
-                      "en/data/analytics/widget/analysis-card/funnel-chart",
-                      "en/data/analytics/widget/image",
-                      "en/data/analytics/widget/analysis-card/box-whisker-chart",
-                      "en/data/analytics/widget/video",
-                      "en/data/analytics/widget/analysis-card/3d-bar-chart",
-                      "en/data/analytics/widget/indicator-card",
-                      "en/data/analytics/widget/analysis-card/geographic-map",
-                      "en/data/analytics/widget/indicator-table",
-                      "en/data/analytics/widget/analysis-card/custom-chart"
-                    ]
-                  },
-                  {
-                    "group": "Website Features",
-                    "pages": [
-                      "en/data/analytics/website-features/data-source/aws-redshift",
-                      "en/data/analytics/website-features/data-source/clickhouse",
-                      "en/data/analytics/website-features/data-source/dameng",
-                      "en/data/analytics/website-features/data-source/doris",
-                      "en/data/analytics/website-features/data-source/hive",
-                      "en/data/analytics/website-features/data-source/kingbasees",
-                      "en/data/analytics/website-features/data-source/kyligence",
-                      "en/data/analytics/website-features/data-source/mariadb",
-                      "en/data/analytics/website-features/data-source/mysql",
-                      "en/data/analytics/website-features/data-source/opengauss",
-                      "en/data/analytics/website-features/data-source/postgres",
-                      "en/data/analytics/website-features/data-source/presto",
-                      "en/data/analytics/website-features/data-source/sap-bw",
-                      "en/data/analytics/website-features/data-source/sap-hana",
-                      "en/data/analytics/website-features/data-source/starrocks",
-                      "en/data/analytics/website-features/data-source/trino",
-                      "en/data/analytics/website-features/enterprise-organization/ai-assistant",
-                      "en/data/analytics/website-features/enterprise-organization/authentication",
-                      "en/data/analytics/website-features/enterprise-organization/business-domain",
-                      "en/data/analytics/website-features/enterprise-organization/data-source-management",
-                      "en/data/analytics/website-features/enterprise-organization/system-integration",
-                      "en/data/analytics/website-features/enterprise-tenant/account-information",
-                      "en/data/analytics/website-features/enterprise-tenant/company-organization",
-                      "en/data/analytics/website-features/enterprise-tenant/custom-smtp",
-                      "en/data/analytics/website-features/enterprise-tenant/function-module",
-                      "en/data/analytics/website-features/enterprise-tenant/role-permission",
-                      "en/data/analytics/website-features/enterprise-tenant/tenant-configuration",
-                      "en/data/analytics/website-features/enterprise-tenant/user-management",
-                      "en/data/analytics/website-features/proxy/desktop-proxy",
-                      "en/data/analytics/website-features/proxy/server-proxy",
-                      "en/data/analytics/website-features/single-sign-on/feishu-login",
-                      "en/data/analytics/website-features/single-sign-on/keycloak-login"
-                    ]
-                  },
-                  {
-                    "group": "Tutorial",
-                    "pages": [
-                      "en/data/analytics/tutorial/sap/sap-bpc",
-                      "en/data/analytics/tutorial/mdx/mdx-introduction",
-                      "en/data/analytics/tutorial/sap/sap-bpc-consolidated-reports",
-                      "en/data/analytics/tutorial/sap/how-to-analyze-sap-bw-data-models",
-                      "en/data/analytics/tutorial/sap/sap-bw-calendar-dimension",
-                      "en/data/analytics/tutorial/mdx/mdx",
-                      "en/data/analytics/tutorial/moving-average",
-                      "en/data/analytics/tutorial/analyze-with-wasm-database",
-                      "en/data/analytics/tutorial/member-intrinsic-properties"
+                      "en/data/tutorial/semantic-analysis/mdx",
+                      "en/data/tutorial/semantic-analysis/mdx-introduction",
+                      "en/data/tutorial/semantic-analysis/moving-average",
+                      "en/data/tutorial/semantic-analysis/analyze-with-wasm-database",
+                      "en/data/tutorial/semantic-analysis/member-intrinsic-properties"
                     ]
                   }
                 ]
@@ -908,7 +812,7 @@
               "href": "https://github.com/xpert-ai/xpert"
             },
             {
-              "label": "进入 UOSE",
+              "label": "进入本体",
               "href": "https://data.xpertai.cn/"
             },
             {
@@ -1403,7 +1307,7 @@
             ]
           },
           {
-            "product": "UOSE系统",
+            "product": "本体",
             "tabs": [
               {
                 "tab": "概述",
@@ -1514,125 +1418,31 @@
                       "zh-Hans/data/analytics/indicator-management/ai-assistant",
                       "zh-Hans/data/analytics/indicator-management/indicator-measure"
                     ]
-                  },
+                  }
+                ]
+              },
+              {
+                "tab": "教程",
+                "groups": [
                   {
-                    "group": "故事看板",
+                    "group": "SAP 与资源接入",
                     "pages": [
-                      "zh-Hans/data/analytics/story-dashboard/projects",
-                      "zh-Hans/data/analytics/story-dashboard/create-story",
-                      "zh-Hans/data/analytics/story-dashboard/workspace",
-                      "zh-Hans/data/analytics/story-dashboard/preferences",
-                      "zh-Hans/data/analytics/story-dashboard/story-details",
-                      "zh-Hans/data/analytics/story-dashboard/page-layout",
-                      "zh-Hans/data/analytics/story-dashboard/device",
-                      "zh-Hans/data/analytics/story-dashboard/mobile",
-                      "zh-Hans/data/analytics/story-dashboard/sort-ranking",
-                      "zh-Hans/data/analytics/story-dashboard/advanced-styles",
-                      "zh-Hans/data/analytics/story-dashboard/dimension-selector",
-                      "zh-Hans/data/analytics/story-dashboard/calculated-measures",
-                      "zh-Hans/data/analytics/story-dashboard/parameters",
-                      "zh-Hans/data/analytics/story-dashboard/slicer",
-                      "zh-Hans/data/analytics/story-dashboard/combined-slicer",
-                      "zh-Hans/data/analytics/story-dashboard/advanced-slicer",
-                      "zh-Hans/data/analytics/story-dashboard/explorer",
-                      "zh-Hans/data/analytics/story-dashboard/share",
-                      "zh-Hans/data/analytics/story-dashboard/story-templates",
-                      "zh-Hans/data/analytics/story-dashboard/large-screen",
-                      "zh-Hans/data/analytics/story-dashboard/execution-explanation",
-                      "zh-Hans/data/analytics/story-dashboard/access-authorization",
-                      "zh-Hans/data/analytics/story-dashboard/ai-assistant",
-                      "zh-Hans/data/analytics/story-dashboard/association-analysis"
+                      "zh-Hans/data/tutorial/sap-resource/sap-bpc",
+                      "zh-Hans/data/tutorial/sap-resource/sap-bpc-consolidated-reports",
+                      "zh-Hans/data/tutorial/sap-resource/how-to-analyze-sap-bw-data-models",
+                      "zh-Hans/data/tutorial/sap-resource/how-to-analyze-sql-data-models",
+                      "zh-Hans/data/tutorial/sap-resource/sap-bw-calendar-dimension",
+                      "zh-Hans/data/tutorial/sap-resource/sap-procurement-operations-command-center"
                     ]
                   },
                   {
-                    "group": "微件",
+                    "group": "语义模型与分析",
                     "pages": [
-                      "zh-Hans/data/analytics/widget/input-controller/calendar-controller",
-                      "zh-Hans/data/analytics/widget/input-controller/parameter-controller",
-                      "zh-Hans/data/analytics/widget/filter-bar/tree-selector",
-                      "zh-Hans/data/analytics/widget/analysis-table/flat-table",
-                      "zh-Hans/data/analytics/widget/analysis-card/analysis-card",
-                      "zh-Hans/data/analytics/widget/filter-bar/member-selector",
-                      "zh-Hans/data/analytics/widget/analysis-table/pivot-table",
-                      "zh-Hans/data/analytics/widget/analysis-card/bar-chart",
-                      "zh-Hans/data/analytics/widget/filter-bar/dropdown-selector",
-                      "zh-Hans/data/analytics/widget/filter-bar/filter-bar",
-                      "zh-Hans/data/analytics/widget/analysis-card/line-chart",
-                      "zh-Hans/data/analytics/widget/analysis-card/pie-chart",
-                      "zh-Hans/data/analytics/widget/filter-bar/calendar-selector",
-                      "zh-Hans/data/analytics/widget/analysis-card/scatter-chart",
-                      "zh-Hans/data/analytics/widget/key-indicator",
-                      "zh-Hans/data/analytics/widget/slider-widget",
-                      "zh-Hans/data/analytics/widget/tabs",
-                      "zh-Hans/data/analytics/widget/analysis-card/heatmap",
-                      "zh-Hans/data/analytics/widget/analysis-card/tree-chart",
-                      "zh-Hans/data/analytics/widget/analysis-card/treemap",
-                      "zh-Hans/data/analytics/widget/iframe",
-                      "zh-Hans/data/analytics/widget/analysis-card/sankey-diagram",
-                      "zh-Hans/data/analytics/widget/analysis-card/sunburst-chart",
-                      "zh-Hans/data/analytics/widget/document",
-                      "zh-Hans/data/analytics/widget/analysis-card/river-chart",
-                      "zh-Hans/data/analytics/widget/text",
-                      "zh-Hans/data/analytics/widget/analysis-card/funnel-chart",
-                      "zh-Hans/data/analytics/widget/image",
-                      "zh-Hans/data/analytics/widget/analysis-card/box-whisker-chart",
-                      "zh-Hans/data/analytics/widget/video",
-                      "zh-Hans/data/analytics/widget/analysis-card/3d-bar-chart",
-                      "zh-Hans/data/analytics/widget/indicator-card",
-                      "zh-Hans/data/analytics/widget/analysis-card/geographic-map",
-                      "zh-Hans/data/analytics/widget/indicator-table",
-                      "zh-Hans/data/analytics/widget/analysis-card/custom-chart"
-                    ]
-                  },
-                  {
-                    "group": "网站功能",
-                    "pages": [
-                      "zh-Hans/data/analytics/website-features/data-source/aws-redshift",
-                      "zh-Hans/data/analytics/website-features/data-source/clickhouse",
-                      "zh-Hans/data/analytics/website-features/data-source/dameng",
-                      "zh-Hans/data/analytics/website-features/data-source/doris",
-                      "zh-Hans/data/analytics/website-features/data-source/hive",
-                      "zh-Hans/data/analytics/website-features/data-source/kingbasees",
-                      "zh-Hans/data/analytics/website-features/data-source/kyligence",
-                      "zh-Hans/data/analytics/website-features/data-source/mariadb",
-                      "zh-Hans/data/analytics/website-features/data-source/mysql",
-                      "zh-Hans/data/analytics/website-features/data-source/opengauss",
-                      "zh-Hans/data/analytics/website-features/data-source/postgres",
-                      "zh-Hans/data/analytics/website-features/data-source/presto",
-                      "zh-Hans/data/analytics/website-features/data-source/sap-bw",
-                      "zh-Hans/data/analytics/website-features/data-source/sap-hana",
-                      "zh-Hans/data/analytics/website-features/data-source/starrocks",
-                      "zh-Hans/data/analytics/website-features/data-source/trino",
-                      "zh-Hans/data/analytics/website-features/enterprise-organization/ai-assistant",
-                      "zh-Hans/data/analytics/website-features/enterprise-organization/authentication",
-                      "zh-Hans/data/analytics/website-features/enterprise-organization/business-domain",
-                      "zh-Hans/data/analytics/website-features/enterprise-organization/data-source-management",
-                      "zh-Hans/data/analytics/website-features/enterprise-organization/system-integration",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/account-information",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/company-organization",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/custom-smtp",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/function-module",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/role-permission",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/tenant-configuration",
-                      "zh-Hans/data/analytics/website-features/enterprise-tenant/user-management",
-                      "zh-Hans/data/analytics/website-features/proxy/desktop-proxy",
-                      "zh-Hans/data/analytics/website-features/proxy/server-proxy",
-                      "zh-Hans/data/analytics/website-features/single-sign-on/feishu-login",
-                      "zh-Hans/data/analytics/website-features/single-sign-on/keycloak-login"
-                    ]
-                  },
-                  {
-                    "group": "教程",
-                    "pages": [
-                      "zh-Hans/data/analytics/tutorial/sap/sap-bpc",
-                      "zh-Hans/data/analytics/tutorial/mdx/mdx",
-                      "zh-Hans/data/analytics/tutorial/sap/sap-bpc-consolidated-reports",
-                      "zh-Hans/data/analytics/tutorial/mdx/mdx-introduction",
-                      "zh-Hans/data/analytics/tutorial/sap/how-to-analyze-sap-bw-data-models",
-                      "zh-Hans/data/analytics/tutorial/sap/sap-bw-calendar-dimension",
-                      "zh-Hans/data/analytics/tutorial/moving-average",
-                      "zh-Hans/data/analytics/tutorial/analyze-with-wasm-database",
-                      "zh-Hans/data/analytics/tutorial/member-intrinsic-properties"
+                      "zh-Hans/data/tutorial/semantic-analysis/mdx",
+                      "zh-Hans/data/tutorial/semantic-analysis/mdx-introduction",
+                      "zh-Hans/data/tutorial/semantic-analysis/moving-average",
+                      "zh-Hans/data/tutorial/semantic-analysis/analyze-with-wasm-database",
+                      "zh-Hans/data/tutorial/semantic-analysis/member-intrinsic-properties"
                     ]
                   }
                 ]

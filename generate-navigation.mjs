@@ -137,7 +137,7 @@ const NAVBAR_BY_LANGUAGE = {
   en: {
     links: [
       { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
-      { label: "UOSE", href: "https://data.xpertai.cn/" },
+      { label: "Ontology", href: "https://data.xpertai.cn/" },
       { label: "Support", href: "mailto:service@xpertai.cn" },
     ],
     primary: {
@@ -149,7 +149,7 @@ const NAVBAR_BY_LANGUAGE = {
   "zh-Hans": {
     links: [
       { label: "GitHub", href: "https://github.com/xpert-ai/xpert" },
-      { label: "进入 UOSE", href: "https://data.xpertai.cn/" },
+      { label: "进入本体", href: "https://data.xpertai.cn/" },
       { label: "支持", href: "mailto:service@xpertai.cn" },
     ],
     primary: {

@@ -328,22 +328,32 @@
             {
               "slug": "indicator-management",
               "pages": []
+            }
+          ]
+        },
+        {
+          "slug": "tutorial",
+          "groups": [
+            {
+              "slug": "sap-resource",
+              "pages": [
+                "sap-bpc",
+                "sap-bpc-consolidated-reports",
+                "how-to-analyze-sap-bw-data-models",
+                "how-to-analyze-sql-data-models",
+                "sap-bw-calendar-dimension",
+                "sap-procurement-operations-command-center"
+              ]
             },
             {
-              "slug": "story-dashboard",
-              "pages": []
-            },
-            {
-              "slug": "widget",
-              "pages": []
-            },
-            {
-              "slug": "website-features",
-              "pages": []
-            },
-            {
-              "slug": "tutorial",
-              "pages": []
+              "slug": "semantic-analysis",
+              "pages": [
+                "mdx",
+                "mdx-introduction",
+                "moving-average",
+                "analyze-with-wasm-database",
+                "member-intrinsic-properties"
+              ]
             }
           ]
         },
