@@ -1,15 +1,19 @@
 ---
-title: Skills and Plugins
+title: Skills and Graph Capabilities
 sidebar_position: 9
 ---
 
 <Info>
-Let users choose which runtime skills and plugin middlewares should be available for a conversation or a single run.
+Control skills, middleware nodes and sub-agents already configured on the Assistant.
 </Info>
 
 ChatKit can expose optional Xpert runtime capabilities in the composer. This lets users decide when an assistant should load a specialized skill, plugin middleware, or sub-agent instead of enabling every capability on every request.
 
 The result is a smaller default context, clearer user intent, and better control over expensive or high-impact capabilities.
+
+<Note>
+This page covers `runtimeCapabilities`, which selects existing Assistant graph capabilities. Agent Plugins, additional middleware and published experts use a separate `runtimeResources` selection below the composer. See [Plugins, Middleware and Experts](./chatkit-agent-plugins). Resource binding IDs and graph node keys are not interchangeable.
+</Note>
 
 ## Concepts
 
@@ -24,19 +28,15 @@ Skills can be configured as:
 
 When ChatKit sends an explicit runtime allow-list, the selected skill IDs replace the middleware defaults for that run.
 
-### Plugins and Middlewares
+### Graph middleware
 
-Plugins are optional workflow middleware nodes. In product copy they may also be described as plugin middlewares. ChatKit identifies each plugin by the middleware node key, so multiple nodes using the same provider can still be selected independently.
+`runtimeCapabilities.plugins` is a retained protocol field for optional workflow middleware nodes, not standard Agent Plugin packages. ChatKit identifies nodes by `nodeKeys`, so multiple nodes using the same provider can be selected independently. Likewise, `subAgents.nodeKeys` identifies expert connections already configured in the graph.
 
 Required or system middleware should stay hidden from end users. It always runs as part of the backend workflow and is not shown in the ChatKit selector.
 
 ## Composer Experience
 
-When the assistant exposes runtime capabilities, ChatKit adds capability panels to the composer `+` menu:
-
-- Skills
-- Plugins
-- Sub-agents, when available
+When the Assistant exposes runtime capabilities, ChatKit offers configured skills, middleware nodes and graph experts in its capability menus and slash palette. Available entries depend on the Assistant configuration and are distinct from the unified resource catalog below the composer.
 
 Users can enable or disable capabilities from these panels. The current conversation selection is restored when the user returns to the thread.
 

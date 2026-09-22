@@ -165,6 +165,7 @@
                 "overview",
                 "core-concepts",
                 "development-steps",
+                "application-config",
                 "host-native-mcp-tools",
                 "mcp-tools-and-apps",
                 "managed-connections",
@@ -233,6 +234,15 @@
               "slug": "__default__",
               "pages": [
                 "membership-plan"
+              ]
+            },
+            {
+              "slug": "permissions",
+              "pages": [
+                "control-sources-and-defaults",
+                "feature-permission-role-matrix",
+                "assistant-application-authorization",
+                "switch-function-mapping"
               ]
             }
           ]

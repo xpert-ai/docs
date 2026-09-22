@@ -5,6 +5,8 @@ title: Plugin Development Steps
 
 This document provides a detailed practical guide from a starter template to publishing a plugin. The sample project is based on an nx monorepo template (see directory structure below). Contents cover initialization, implementation, config schema, testing, building, publishing, and common troubleshooting.
 
+If your plugin appears as an application in Explore and initializes a private workspace with a published Assistant, also read [Application Initialization Configuration](/en/ai/plugin/application-config). Grant employee usage access separately through [Assistant group authorization](/en/ai/system/permissions/assistant-application-authorization).
+
 <Tip>
 **Plugin development template**  
 git clone https://github.com/xpert-ai/xpert-plugins-starter

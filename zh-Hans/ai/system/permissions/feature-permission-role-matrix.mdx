@@ -10,6 +10,8 @@ description: 页面、功能和按钮需要开启的 feature、permission 与 ro
 - 页面入口、按钮显示和后端操作权限可能分层控制；实际可用性以页面内按钮权限和后端权限共同决定。
 - `roleName` 指平台角色名时，可取：`SUPER_ADMIN`、`ADMIN`、`AI_BUILDER`、`ANALYTICS_BUILDER`、`VIEWER`、`TRIAL`。
 
+应用初始化、私有工作空间成员和已发布 Assistant 的用户组授权是独立层级。员工接入步骤及排查说明见 [Assistant 与应用授权](/zh-Hans/ai/system/permissions/assistant-application-authorization)。
+
 ## 主导航
 
 | 功能 / 页面 | 路径 | 需要开启的 feature | 需要的 permission / roleName | 说明 |
@@ -84,6 +86,8 @@ description: 页面、功能和按钮需要开启的 feature、permission 与 ro
 | Xpert Workspace | 保存工作区基础设置 | `FEATURE_XPERT` | `workspace.capabilities.canManage` | 不是枚举权限，由 workspace 能力决定。 |
 | Xpert Workspace | 成员、可见性、删除、归档 | `FEATURE_XPERT` | `workspace.capabilities.canManage` | owner 或具备管理能力的租户管理员才可操作。 |
 | Xpert 授权 | 组织列表范围 | 无 | 有 `ALL_ORG_VIEW` 可看所有组织；否则只看当前用户所属组织 | 影响数据范围，不是按钮权限。 |
+| 应用初始化 | Explore 应用初始化 | 继承应用入口 | `SUPER_ADMIN`、`ADMIN` 或 `TRIAL`，并满足组织和模型条件 | 新建私有工作空间；不自动分配员工运行授权。 |
+| 已发布 Assistant | 业务用户使用 | 继承 Chat 入口 | 用户属于获授权组织用户组，或满足创建者、空间所有者、显式空间成员条件 | 使用者无需获得 `ORG_USERS_VIEW` 或 `ORG_USERS_EDIT`。 |
 
 ## BI 与数据功能
 

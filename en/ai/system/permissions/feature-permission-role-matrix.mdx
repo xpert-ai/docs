@@ -10,6 +10,8 @@ This page lists the feature switches and permissions required by each function, 
 - Page entries, button visibility, and backend operations can be controlled at different layers. A function is actually usable only when both the UI condition and the backend permission allow it.
 - When `roleName` means a platform role, possible values are `SUPER_ADMIN`, `ADMIN`, `AI_BUILDER`, `ANALYTICS_BUILDER`, `VIEWER`, and `TRIAL`.
 
+Application initialization, private workspace membership and group authorization for a published Assistant are independent layers. See [Assistant and Application Authorization](/en/ai/system/permissions/assistant-application-authorization) for employee onboarding and troubleshooting.
+
 ## Main Navigation
 
 | Function / Page | Path | Required feature | Required permission / roleName | Notes |
@@ -84,6 +86,8 @@ This page lists the feature switches and permissions required by each function, 
 | Xpert Workspace | Save workspace general settings | `FEATURE_XPERT` | `workspace.capabilities.canManage` | Not an enum permission. It is determined by workspace capabilities. |
 | Xpert Workspace | Members, visibility, delete, archive | `FEATURE_XPERT` | `workspace.capabilities.canManage` | Owner or tenant admin with manage capability can operate. |
 | Xpert authorization | Organization list scope | None | Users with `ALL_ORG_VIEW` can see all organizations; otherwise only organizations they belong to | Affects data scope, not button permission. |
+| Application initialization | Initialize an application in Explore | Inherits the application entry | `SUPER_ADMIN`, `ADMIN` or `TRIAL`, with organization and model requirements satisfied | Creates a private workspace; does not automatically grant employees runtime access. |
+| Published Assistant | Business user access | Inherits the Chat entry | Member of an authorized organization group, or eligible as creator, workspace owner or explicit workspace member | Users do not need `ORG_USERS_VIEW` or `ORG_USERS_EDIT`. |
 
 ## BI And Data Functions
 

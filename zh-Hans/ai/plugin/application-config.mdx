@@ -1,0 +1,74 @@
+---
+title: 应用初始化配置
+description: 用 appConfig 声明组织应用、私有工作空间和 Assistant 模板，区分初始化、运行授权和应用升级。
+---
+
+`appConfig` 是插件向宿主提交的应用初始化声明，用于在 Explore 展示应用，并由宿主创建专用工作空间、可选知识库及已发布 Assistant。它不包含用户凭据，也不能替代 Assistant 的运行授权。
+
+## 声明应用
+
+将应用放在插件运行时元数据 `targetAppMeta.xpert.marketplace.contents` 中，以稳定的应用名关联同一插件贡献的 Assistant 模板：
+
+```ts
+import type { PluginMarketplaceContribution } from '@xpert-ai/contracts'
+
+const application = {
+  type: 'app',
+  name: 'sales-reconciliation',
+  displayName: { en_US: 'Sales Reconciliation', zh_Hans: '销售对账' },
+  appConfig: {
+    scope: 'organization',
+    assistantTemplateKey: 'sales-reconciliation-assistant',
+    workspace: {
+      mode: 'dedicated',
+      name: { en_US: 'Sales Reconciliation Workspace', zh_Hans: '销售对账工作空间' },
+      sharing: 'private'
+    },
+    knowledgebases: [],
+    modelRequirements: { primary: true, embedding: false, vision: false },
+    presentation: {
+      dataScope: {
+        en_US: 'Maintainers manage the private workspace. Authorized organization groups use the published Assistant.',
+        zh_Hans: '维护成员管理私有工作空间，获授权的组织用户组使用已发布助手。'
+      }
+    },
+    entry: { type: 'assistant-chat' }
+  }
+} satisfies PluginMarketplaceContribution
+```
+
+此示例要求宿主和开发用 contracts 已支持私有应用空间初始化。`assistantTemplateKey` 必须是同一插件贡献的原始模板 key，不添加插件名前缀，也不通过显示名称匹配。
+
+## 工作空间与授权语义
+
+| 配置 | 含义 |
+| --- | --- |
+| `scope: 'organization'` | 在当前组织创建一套应用资源，不代表全组织自动获得使用或编辑权限 |
+| `workspace.mode: 'dedicated'` | 为应用创建专用工作空间 |
+| `workspace.sharing: 'private'` | 新工作空间为私有，初始化者为所有者；也可以省略此字段 |
+| `assistantTemplateKey` | 安装并发布同插件的入口 Assistant |
+| `knowledgebases` | 声明需要创建的知识库；知识库权限独立于空间可见性 |
+| `presentation.dataScope` | 面向用户解释数据和权限范围，仅是展示文案，不执行授权 |
+| `entry.type: 'assistant-chat'` | 初始化成功后的入口是已发布 Assistant |
+
+当前宿主统一创建私有应用空间。旧插件的 `sharing: 'organization'` 仍可被读取，但作为兼容声明处理，不再触发组织共享；应用目录和详情返回的有效初始化配置为 `private`。新插件应使用 `private` 或省略此字段。工作空间创建后如需改变可见性，由有权管理空间的用户显式操作。
+
+旧 contracts（例如 3.18.6）只接受 `organization` 字面量。尚未升级开发类型包的插件可以暂时保留该兼容声明，但必须先部署支持私有初始化的宿主；只更新文案或插件包不会改变旧宿主的行为。升级类型包后再使用新声明，不应通过强制类型转换掩盖契约不兼容。
+
+私有空间不会把其知识库、文件或业务记录的独立访问策略自动改为私有。应用应分别说明并实现这些资源的授权边界。
+
+## 初始化之后分配使用权限
+
+初始化成功后，管理员需要将业务用户加入组织用户组，再给该组分配已发布 Assistant 的使用权限。维护人员由空间所有者显式加入工作空间。当前 `appConfig` 不声明使用者组，也不会自动创建组或给全组织授权。
+
+完整操作步骤见 [Assistant 与应用授权](/zh-Hans/ai/system/permissions/assistant-application-authorization)。
+
+## 重试、修复与升级
+
+- 同一组织的同一插件应用通过稳定标识复用初始化记录；重复初始化不会新建一套应用。
+- 修复流程复用仍然存在的空间和 Assistant，不覆盖空间成员或可见性。
+- 需要重新创建丢失的空间时，新空间采用私有设置，修复操作者成为新空间所有者。
+- 宿主升级不会自动把既有共享空间改为私有。现有空间的收紧应由所有者显式完成。
+- 插件升级、首次初始化、Assistant 模板升级和业务数据库迁移是独立流程；`ready` 不代表现有 Assistant 已按新模板升级，也不代表员工已获得运行权限。
+
+验证时应分别覆盖新建私有空间、旧声明兼容、重试与修复不覆盖现有设置、维护成员访问，以及仅获用户组授权的员工能够使用 Assistant 而不能编辑私有工作空间。

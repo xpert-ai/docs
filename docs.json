@@ -363,6 +363,7 @@
                     "group": "Default",
                     "pages": [
                       "en/ai/plugin/overview",
+                      "en/ai/plugin/application-config",
                       "en/ai/plugin/host-native-mcp-tools",
                       "en/ai/plugin/mcp-tools-and-apps",
                       "en/ai/plugin/managed-connections",
@@ -459,13 +460,9 @@
                       "en/ai/chatkit/chatkit-plan-mode",
                       "en/ai/chatkit/chatkit-runtime-capabilities",
                       "en/ai/chatkit/chatkit-prompt-workflows",
-                      "en/ai/chatkit/chatkit-mcp-apps"
-                    ]
-                  },
-                  {
-                    "group": "Sdk",
-                    "pages": [
-                      "en/ai/chatkit/sdk/integrate-xpertai-api"
+                      "en/ai/chatkit/chatkit-mcp-apps",
+                      "en/ai/chatkit/chatkit-projects",
+                      "en/ai/chatkit/chatkit-agent-plugins"
                     ]
                   },
                   {
@@ -555,6 +552,7 @@
                     "pages": [
                       "en/ai/system/permissions/control-sources-and-defaults",
                       "en/ai/system/permissions/feature-permission-role-matrix",
+                      "en/ai/system/permissions/assistant-application-authorization",
                       "en/ai/system/permissions/switch-function-mapping"
                     ]
                   }
@@ -1109,6 +1107,7 @@
                       "zh-Hans/ai/plugin/overview",
                       "zh-Hans/ai/plugin/core-concepts",
                       "zh-Hans/ai/plugin/development-steps",
+                      "zh-Hans/ai/plugin/application-config",
                       "zh-Hans/ai/plugin/host-native-mcp-tools",
                       "zh-Hans/ai/plugin/mcp-tools-and-apps",
                       "zh-Hans/ai/plugin/managed-connections",
@@ -1193,13 +1192,9 @@
                       "zh-Hans/ai/chatkit/chatkit-plan-mode",
                       "zh-Hans/ai/chatkit/chatkit-runtime-capabilities",
                       "zh-Hans/ai/chatkit/chatkit-prompt-workflows",
-                      "zh-Hans/ai/chatkit/chatkit-mcp-apps"
-                    ]
-                  },
-                  {
-                    "group": "Sdk",
-                    "pages": [
-                      "zh-Hans/ai/chatkit/sdk/integrate-xpertai-api"
+                      "zh-Hans/ai/chatkit/chatkit-mcp-apps",
+                      "zh-Hans/ai/chatkit/chatkit-projects",
+                      "zh-Hans/ai/chatkit/chatkit-agent-plugins"
                     ]
                   },
                   {
@@ -1287,6 +1282,7 @@
                     "pages": [
                       "zh-Hans/ai/system/permissions/control-sources-and-defaults",
                       "zh-Hans/ai/system/permissions/feature-permission-role-matrix",
+                      "zh-Hans/ai/system/permissions/assistant-application-authorization",
                       "zh-Hans/ai/system/permissions/switch-function-mapping"
                     ]
                   }

@@ -1,0 +1,70 @@
+---
+title: Assistant and Application Authorization
+description: Separate application initialization, private workspace maintenance and published Assistant access to grant organization employees the appropriate permissions.
+---
+
+Application installation, workspace maintenance and Assistant usage are separate authorization steps. After an administrator initializes an application, business users access its published Assistant through authorized organization groups. Only maintainers who need to change Assistant configuration need workspace membership.
+
+## Permission boundaries
+
+| Area | What it controls | Authorization |
+| --- | --- | --- |
+| Plugin installation | Loading plugin code, tools and views into the platform | Plugin installation level and platform administration permissions; a system plugin does not automatically authorize all users |
+| Application initialization | Creating a workspace and installing and publishing an Assistant in the current organization | Host checks the current role, organization and model requirements |
+| Workspace maintenance | Editing Assistants, workflows and workspace resources | Private workspace owner and explicit members; UI and operations also require the applicable platform permissions |
+| Workspace management | Changing members, visibility and other workspace settings | Owner of the organization's private workspace; membership alone does not grant management capability |
+| Assistant usage | Discovering and running a published Assistant | Creator, workspace owner, explicit workspace members, or members of authorized organization groups |
+| User group management | Creating groups, maintaining members and assigning group authorization | Reading requires `ORG_USERS_VIEW`; maintaining groups and assigning Assistant access from a group requires `ORG_USERS_EDIT` |
+
+Organization-level access requires the correct tenant and organization context. Belonging to the same organization does not by itself grant runtime access to an Assistant. Group authorization does not automatically grant workspace editing or management permissions.
+
+## Application initialization creates a private workspace
+
+A host that supports private application workspace initialization creates a dedicated **private workspace** in the organization for an `appConfig` application:
+
+- The user who initializes it becomes the workspace owner.
+- Other organization members do not automatically become workspace maintainers.
+- The application still belongs to the organization. Private describes the workspace maintenance boundary; it does not make the application personal.
+- The host installs and publishes the Assistant, but does not automatically create business user groups or grant runtime access to the entire organization.
+- `ready` means application resources have been initialized, not that all employees have access.
+
+The current initialization entry allows the `SUPER_ADMIN`, `ADMIN` and `TRIAL` roles. `TRIAL` is not a strictly read-only employee role. Initialization role checks and user group permission checks are independent; use the current tenant's role configuration to determine the actual permissions.
+
+For developer configuration, see [Application Initialization Configuration](/en/ai/plugin/application-config).
+
+## Grant access to business users
+
+For a sales reconciliation application, an administrator with the required permissions should:
+
+1. Switch to the organization's application context.
+2. Open Settings → Groups and create a Sales Reconciliation Users group, or select an appropriate existing group.
+3. Add the employees who need access.
+4. Select the published Sales Reconciliation Assistant in the group's Assistant authorization settings and save. Alternatively, someone authorized to maintain that Assistant and read organization groups can select the group on the Assistant's Authorization page.
+5. Ask employees to switch to the same organization and refresh the application list or open the published Assistant's chat entry.
+
+Employees do not need `ORG_USERS_VIEW` or `ORG_USERS_EDIT` to use an authorized Assistant, nor do they need to join its development workspace. The Chat entry still requires platform access such as `FEATURE_XPERT` and `CHAT_VIEW`. Business data, files and application operations continue to enforce their own access checks.
+
+If an employee needs to change Assistant configuration, the workspace owner should separately add them as a workspace member. Do not open workspace maintenance to the entire organization as a substitute for granting business usage access.
+
+## Revoke access
+
+- Removing a user from a group or revoking that group's Assistant authorization removes that runtime authorization path.
+- Users may retain runtime access through another authorized group, creator status, workspace ownership or explicit workspace membership.
+- Removing a workspace maintainer does not automatically revoke their group authorization. Manage the two relationships separately.
+- Subsequent behavior of previously issued sessions or credentials depends on their own expiration and revocation mechanisms. A group change does not mean every session becomes invalid immediately.
+
+## Existing applications and troubleshooting
+
+Older versions created organization-shared application workspaces. A host upgrade, repeated initialization or repair does not overwrite the membership or sharing settings of an existing workspace. To restrict an existing application, the owner should review maintainers, change workspace visibility to private, and separately grant employees runtime access through groups. A workspace recreated by the repair process after being lost is also private.
+
+| Symptom | What to check |
+| --- | --- |
+| Application is ready, but employees cannot find the published Assistant | Publication status, organization context and membership in an authorized group |
+| User can enter an old organization-shared workspace but cannot run its published Assistant | Organization sharing provides workspace access; the organization-level Assistant runtime check does not use that sharing flag as authorization |
+| Loading groups on the Authorization page returns 403 | Request context and the operator's `ORG_USERS_VIEW` permission; employees do not need to open this page themselves to request access |
+| User can run the Assistant but cannot see its development workspace | Expected for employees who only have group-based runtime access to a private workspace |
+| A group authorization was removed, but access remains | Other authorized groups, creator status and explicit workspace membership |
+
+The Assistant Authorization page uses different checks for reading groups and saving Assistant authorization. Reading groups requires `ORG_USERS_VIEW`; saving the Assistant-side authorization relationships also passes Assistant access checks. Button visibility alone does not describe the full authorization boundary. Do not broaden an entire role's user management permissions to solve one employee's access problem.
+
+See also [Feature Permission Matrix](/en/ai/system/permissions/feature-permission-role-matrix) and [Switch and Permission Mapping](/en/ai/system/permissions/switch-function-mapping).

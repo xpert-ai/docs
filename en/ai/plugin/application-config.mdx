@@ -1,0 +1,74 @@
+---
+title: Application Initialization Configuration
+description: Use appConfig to declare organization applications, private workspaces and Assistant templates, and distinguish initialization, runtime authorization and upgrades.
+---
+
+`appConfig` declares how the host initializes a plugin application. It presents the application in Explore and lets the host create a dedicated workspace, optional knowledge bases and a published Assistant. It contains no user credentials and does not grant permission to run the Assistant.
+
+## Declare an application
+
+Place the application in the plugin's runtime metadata at `targetAppMeta.xpert.marketplace.contents`. Use a stable application name and reference an Assistant template contributed by the same plugin:
+
+```ts
+import type { PluginMarketplaceContribution } from '@xpert-ai/contracts'
+
+const application = {
+  type: 'app',
+  name: 'sales-reconciliation',
+  displayName: { en_US: 'Sales Reconciliation', zh_Hans: '销售对账' },
+  appConfig: {
+    scope: 'organization',
+    assistantTemplateKey: 'sales-reconciliation-assistant',
+    workspace: {
+      mode: 'dedicated',
+      name: { en_US: 'Sales Reconciliation Workspace', zh_Hans: '销售对账工作空间' },
+      sharing: 'private'
+    },
+    knowledgebases: [],
+    modelRequirements: { primary: true, embedding: false, vision: false },
+    presentation: {
+      dataScope: {
+        en_US: 'Maintainers manage the private workspace. Authorized organization groups use the published Assistant.',
+        zh_Hans: '维护成员管理私有工作空间，获授权的组织用户组使用已发布助手。'
+      }
+    },
+    entry: { type: 'assistant-chat' }
+  }
+} satisfies PluginMarketplaceContribution
+```
+
+This example requires a host and development contracts that support private application workspace initialization. `assistantTemplateKey` must be the original template key contributed by the same plugin. Do not prefix it with the plugin name or match templates by display name.
+
+## Workspace and authorization semantics
+
+| Setting | Meaning |
+| --- | --- |
+| `scope: 'organization'` | Creates application resources in the current organization; does not automatically give everyone use or edit permission |
+| `workspace.mode: 'dedicated'` | Creates a dedicated workspace for the application |
+| `workspace.sharing: 'private'` | Creates a private workspace owned by the user who initializes it; this field can also be omitted |
+| `assistantTemplateKey` | Installs and publishes the entry Assistant from the same plugin |
+| `knowledgebases` | Declares knowledge bases to create; their permissions are independent of workspace visibility |
+| `presentation.dataScope` | Explains data and permission scope to users; display text only, not an authorization rule |
+| `entry.type: 'assistant-chat'` | Opens the published Assistant after successful initialization |
+
+The current host always creates private application workspaces. It still accepts the legacy `sharing: 'organization'` declaration for compatibility, but this no longer enables organization sharing. The effective initialization configuration returned by the application catalog and details is `private`. New plugins should use `private` or omit the field. After creation, a user with workspace management permission can explicitly change visibility.
+
+Older contracts, such as 3.18.6, accept only the `organization` literal. Plugins that have not upgraded their development types can temporarily retain that compatibility declaration, but must first deploy a host that supports private initialization. Changing copy or the plugin package alone does not change an older host's behavior. Use the new declaration after upgrading the types; do not hide an incompatible contract with a type assertion.
+
+A private workspace does not automatically make the independent access policies for its knowledge bases, files or business records private. Applications must explain and enforce those resource boundaries separately.
+
+## Grant access after initialization
+
+After initialization, an administrator must add business users to an organization group and grant that group access to the published Assistant. The workspace owner explicitly adds maintainers as workspace members. The current `appConfig` does not declare user groups, create them automatically or authorize the entire organization.
+
+See [Assistant and Application Authorization](/en/ai/system/permissions/assistant-application-authorization) for the full procedure.
+
+## Retries, repairs and upgrades
+
+- The same plugin application in the same organization reuses its initialization record through stable identifiers. Repeated initialization does not create another application instance.
+- Repair reuses an existing workspace and Assistant without overwriting workspace membership or visibility.
+- If a missing workspace must be recreated, the new workspace is private and the user performing the repair becomes its owner.
+- Upgrading the host does not automatically make existing shared workspaces private. Owners must explicitly restrict existing workspaces.
+- Plugin upgrades, initial setup, Assistant template upgrades and business database migrations are separate operations. `ready` does not mean an existing Assistant has been upgraded to the new template or that employees have runtime access.
+
+Verification should cover new private workspaces, compatibility with legacy declarations, retries and repairs preserving existing settings, maintainer access, and employees who can use the Assistant through group authorization without editing its private workspace.

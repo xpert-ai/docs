@@ -367,16 +367,22 @@ function findNamedItem(items, key, value) {
 function mergeGroupsWithExistingConfig(generatedGroups, existingGroups) {
   const mergedGroups = [];
   const usedGroupNames = new Set();
+  // Display-name casing can change (for example sdk -> Sdk -> SDK).
+  // Treat those variants as one group when preserving manual configuration.
+  const groupKey = (name) => name.trim().toLowerCase();
 
   for (const generatedGroup of generatedGroups) {
     const existingGroup = findNamedItem(
       existingGroups,
       "group",
       generatedGroup?.group
+    ) ?? (existingGroups ?? []).find(
+      (group) => typeof group?.group === "string" &&
+        groupKey(group.group) === groupKey(generatedGroup.group)
     );
+    usedGroupNames.add(groupKey(generatedGroup.group));
 
     if (existingGroup?.group) {
-      usedGroupNames.add(existingGroup.group);
       mergedGroups.push({
         ...existingGroup,
         ...generatedGroup,
@@ -390,7 +396,7 @@ function mergeGroupsWithExistingConfig(generatedGroups, existingGroups) {
   for (const existingGroup of existingGroups ?? []) {
     const groupName = existingGroup?.group;
     if (typeof groupName !== "string" || !groupName) continue;
-    if (usedGroupNames.has(groupName)) continue;
+    if (usedGroupNames.has(groupKey(groupName))) continue;
     mergedGroups.push(existingGroup);
   }
 
