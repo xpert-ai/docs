@@ -462,7 +462,8 @@
                       "en/ai/chatkit/chatkit-prompt-workflows",
                       "en/ai/chatkit/chatkit-mcp-apps",
                       "en/ai/chatkit/chatkit-projects",
-                      "en/ai/chatkit/chatkit-agent-plugins"
+                      "en/ai/chatkit/chatkit-agent-plugins",
+                      "en/ai/chatkit/chatkit-branch-in-new-chat"
                     ]
                   },
                   {
@@ -1194,7 +1195,8 @@
                       "zh-Hans/ai/chatkit/chatkit-prompt-workflows",
                       "zh-Hans/ai/chatkit/chatkit-mcp-apps",
                       "zh-Hans/ai/chatkit/chatkit-projects",
-                      "zh-Hans/ai/chatkit/chatkit-agent-plugins"
+                      "zh-Hans/ai/chatkit/chatkit-agent-plugins",
+                      "zh-Hans/ai/chatkit/chatkit-branch-in-new-chat"
                     ]
                   },
                   {

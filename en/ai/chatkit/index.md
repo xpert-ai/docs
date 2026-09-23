@@ -11,7 +11,7 @@ ChatKit is the fastest way to build agentic chat experiences. Whether you are cr
 
 With embeddable UI widgets, customizable prompts, tool calling, file attachments, and chain-of-thought visualization, you can build an AI agent without reinventing the chat interface.
 
-ChatKit also includes product-level interaction patterns such as Plan Mode, project and project type selection, skills, conversation plugins/middleware/experts, Prompt Workflows, and Pet, so teams can expose richer assistant behavior without rebuilding the composer from scratch.
+ChatKit also includes product-level interaction patterns such as [Branch in new chat](./chatkit-branch-in-new-chat), Plan Mode, project and project type selection, skills, conversation plugins/middleware/experts, Prompt Workflows, and Pet, so teams can expose richer assistant behavior without rebuilding the composer from scratch.
 
 ## Overview
 
@@ -124,6 +124,7 @@ See these resources to customize ChatKit and extend the chat experience:
 - [Client Tools](./chatkit-tool)
 - [Client Effects](./chatkit-effect)
 - [Actions](./chatkit-actions)
+- [Branch in New Chat](./chatkit-branch-in-new-chat)
 - [Pet](./chatkit-pet)
 - [Plan Mode](./chatkit-plan-mode)
 - [Skills and Graph Capabilities](./chatkit-runtime-capabilities)

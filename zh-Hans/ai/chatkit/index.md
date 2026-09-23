@@ -9,7 +9,7 @@ ChatKit 是构建智能代理型聊天体验的最佳方式。无论你是在打
 
 使用 ChatKit 的可嵌入 UI 小组件、可定制提示、工具调用支持、文件附件以及链路推理可视化功能，你无需重新发明聊天界面即可构建智能代理。
 
-ChatKit 还内置了计划模式、项目与项目类型选择、技能、会话插件／中间件／数字专家、Prompt Workflows、Pet 等产品交互能力，方便团队在不重写 composer 的前提下暴露更丰富的 assistant 行为。
+ChatKit 还内置了[在新对话中分叉](./chatkit-branch-in-new-chat)、计划模式、项目与项目类型选择、技能、会话插件／中间件／数字专家、Prompt Workflows、Pet 等产品交互能力，方便团队在不重写 composer 的前提下暴露更丰富的 assistant 行为。
 
 ## 概述
 
@@ -100,6 +100,7 @@ export function MyChat() {
 - [客户端工具](./chatkit-tool)
 - [客户端副作用](./chatkit-effect)
 - [动作](./chatkit-actions)
+- [在新对话中分叉](./chatkit-branch-in-new-chat)
 - [Pet](./chatkit-pet)
 - [计划模式](./chatkit-plan-mode)
 - [技能与图内能力](./chatkit-runtime-capabilities)
