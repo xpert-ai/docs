@@ -1223,6 +1223,7 @@
                     "group": "默认",
                     "pages": [
                       "zh-Hans/ai/tutorial/assistant-everyday-chat",
+                      "zh-Hans/ai/tutorial/feishu-calendar-connector",
                       "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/develop-custom-agentic-app",
                       "zh-Hans/ai/tutorial/dockyard-workbench-plugin",
@@ -1263,6 +1264,7 @@
                     "group": "入门",
                     "pages": [
                       "zh-Hans/ai/tutorial/assistant-everyday-chat",
+                      "zh-Hans/ai/tutorial/feishu-calendar-connector",
                       "zh-Hans/ai/tutorial/project-group-single-vs-multi-agent",
                       "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/tutorial"
