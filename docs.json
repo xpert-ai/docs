@@ -491,6 +491,8 @@
                   {
                     "group": "Default",
                     "pages": [
+                      "en/ai/tutorial/assistant-everyday-chat",
+                      "en/ai/tutorial/feishu-calendar-connector",
                       "en/ai/tutorial/workflow-and-agent",
                       "en/ai/tutorial/develop-custom-agentic-app",
                       "en/ai/tutorial/dockyard-workbench-plugin",
@@ -532,6 +534,8 @@
                   {
                     "group": "Start Here",
                     "pages": [
+                      "en/ai/tutorial/assistant-everyday-chat",
+                      "en/ai/tutorial/feishu-calendar-connector",
                       "en/ai/tutorial/project-group-single-vs-multi-agent",
                       "en/ai/tutorial/workflow-and-agent",
                       "en/ai/tutorial/tutorial"
@@ -1224,6 +1228,8 @@
                   {
                     "group": "默认",
                     "pages": [
+                      "zh-Hans/ai/tutorial/assistant-everyday-chat",
+                      "zh-Hans/ai/tutorial/feishu-calendar-connector",
                       "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/develop-custom-agentic-app",
                       "zh-Hans/ai/tutorial/dockyard-workbench-plugin",
@@ -1263,6 +1269,8 @@
                   {
                     "group": "入门",
                     "pages": [
+                      "zh-Hans/ai/tutorial/assistant-everyday-chat",
+                      "zh-Hans/ai/tutorial/feishu-calendar-connector",
                       "zh-Hans/ai/tutorial/project-group-single-vs-multi-agent",
                       "zh-Hans/ai/tutorial/workflow-and-agent",
                       "zh-Hans/ai/tutorial/tutorial"

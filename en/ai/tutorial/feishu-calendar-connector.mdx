@@ -1,0 +1,221 @@
+---
+title: Query Feishu Calendar Events and Plan Your Day with a Connector
+description: Connect a Feishu account, configure an agent to read calendars, and organize meetings and identify scheduling conflicts for a specific date and time zone.
+tags:
+  - AI
+  - Xpert
+  - Connector
+  - Feishu
+---
+
+Before starting your workday, you may want to check which meetings are scheduled, when they start, and whether any overlap. With the Feishu connector, an Xpert agent can read an authorized calendar, organize events into a timetable, and identify overlaps among the events it retrieved.
+
+This tutorial walks you through authorizing Feishu, configuring an agent, and querying one day's meetings. You will then verify the results against a few test events.
+
+## What you will learn
+
+- Ask an agent to query a specific calendar accessible to the authorized Feishu account.
+- List meeting names, start times, and end times for a specified date and time zone.
+- Identify overlaps among the retrieved events.
+- Reuse the existing connection with other appropriately configured agents in the same workspace.
+
+The task in this tutorial only reads events and organizes the results. It does not request the creation, modification, or cancellation of meetings.
+
+## Before you begin
+
+| Requirement | How to check |
+| --- | --- |
+| The correct Xpert workspace | Open the workspace containing your agent and make sure you have permission to manage connectors. |
+| A working agent | Configure an available model and confirm that the agent can respond in Xpert. You can use ClawXpert or another agent for your business needs. |
+| The Feishu connector | Feishu is available in the workspace's connector catalog. |
+| A Feishu account for authorization | The account can view the target calendar and the events you want to query in Feishu. |
+| Calendar read permissions | App and user authorization include the permissions required for the calendar query. |
+| An agent runtime environment | A working sandbox and Sandbox Shell tool are available to run the Feishu tools and access Feishu services. |
+
+An administrator usually prepares the runtime environment. Everyday users only need to describe their query in the agent's chat.
+
+> This tutorial uses a shared team connection in a workspace. Queries use the Feishu account authorized for that connector; they do not automatically switch to the personal account of whoever asks the question. Before the first query, confirm whose account you will use and which calendar you will query.
+
+## Step 1: Connect a Feishu account
+
+Open **Workspace → Connectors**, find the **Feishu** card, and select **Connect**. The initial connection has two stages: app authorization and user authorization.
+
+### Complete app authorization
+
+1. Scan the code or sign in on the Feishu authorization page that opens.
+2. Complete the app setup and confirm authorization as prompted by the platform.
+3. Return to Xpert to check the connection status.
+
+After app authorization, the connector may still show **Pending**. Continue with user authorization to complete the connection.
+
+### Complete user authorization
+
+1. If the authorization page does not advance to the next stage, return to the Feishu connector card and select **Continue authorization**.
+2. Confirm user authorization with the account you intend to use for calendar queries.
+3. Wait for the connection status in Xpert to change to **Connected**.
+4. Open the connection details and check the connected account.
+
+The connected status means connector authorization is complete. You still need to run a query to verify that the target calendar and its events are accessible.
+
+If the authorization page does not open, check whether your browser blocked the pop-up. Allow authorization windows for the current site and try again.
+
+## Step 2: Configure the Feishu connector for your agent
+
+After connecting the account, configure the agent that will perform the task to load the Feishu capabilities. If an administrator has already done this, continue to the next step.
+
+1. Open the target agent's **Studio / orchestration page**.
+2. From the canvas add menu, select **Add middleware → Connector**.
+3. Select **Feishu** in the middleware's **Connector** field.
+4. Associate the middleware with the agent node that will execute the task.
+5. Configure a working sandbox and the **Sandbox Shell** tool for the same agent.
+6. Save and publish the agent, then open its chat page.
+
+The administrator should also check that the sandbox can run Node.js and that the Feishu command-line tools and supporting capabilities are ready. Everyday users do not need to enter commands or paste access tokens manually.
+
+Authorizing a connector does not itself require republishing an agent. This step changes the agent's capability configuration, so you need to save and publish it.
+
+## Step 3: Specify the date, time zone, and calendar
+
+Specify these three details before querying so you can verify the result:
+
+| Detail | Example | Why it matters |
+| --- | --- | --- |
+| Date | September 25, 2026 | Avoids ambiguity when requests using "today" or "tomorrow" run at different times. |
+| Time zone | Beijing time, Asia/Shanghai | Keeps the query window and displayed times in the same time zone. |
+| Calendar scope | "Connector Test Calendar" | Prevents treating one calendar's results as the account's entire schedule. |
+
+The following steps use **September 25, 2026** as an example. Replace it and the calendar name with the date and calendar you want to query.
+
+If several calendars have the same name, ask an administrator for the exact calendar identifier. If the agent cannot determine the intended calendar, it should confirm the scope before querying.
+
+## Step 4: Query events and build a timetable
+
+Send the following request in the configured agent's chat:
+
+```text
+Use the Feishu connector to query "Connector Test Calendar", which is accessible to the authorized account.
+
+Date: September 25, 2026.
+Time zone: Asia/Shanghai (Beijing time).
+Window: 00:00 on that date to 00:00 on the following day. Include active events that intersect this window.
+
+Please do the following:
+1. State the date, time zone, and calendar actually queried at the start of the result.
+2. Sort events by start time and list each meeting's name, start time, and end time.
+3. Label events that span multiple days and all-day events. For recurring events, use the actual occurrences on the requested date.
+4. Identify conflicts among the retrieved events, naming the events and their overlapping time ranges.
+5. Clearly state if access is denied, the query fails, or you cannot retrieve the complete results.
+
+Only query this time. Do not create, modify, or cancel events, and do not send meeting invitations.
+```
+
+The agent should call the Feishu tools to read actual events and organize the returned data. A reply such as "I can help you check" does not complete the task.
+
+### Example result
+
+Suppose the test calendar contains these three events. The result could look like this:
+
+**Query scope:** September 25, 2026, Asia/Shanghai, "Connector Test Calendar".
+
+| Meeting | Start time | End time | Overlap |
+| --- | --- | --- | --- |
+| Product team meeting | 09:00 | 10:00 | Overlaps with the client proposal discussion |
+| Client proposal discussion | 09:30 | 10:30 | Overlaps with the product team meeting |
+| Project progress update | 14:00 | 15:00 | No overlap with the other listed events |
+
+**Conflict:** The product team meeting and client proposal discussion overlap from **09:30 to 10:00**, a total of 30 minutes.
+
+This is sample data illustrating the output format. It does not mean that your calendar has already been queried.
+
+### Interpret the conflict results
+
+Overlaps are determined from the start and end times of the retrieved events. For example, 09:00–10:00 overlaps with 09:30–10:30. An event from 09:00–10:00 followed by one from 10:00–11:00 is back-to-back, with no time overlap.
+
+All-day events and events spanning multiple days should be labeled separately. Consider the nature of each event when deciding whether it affects your availability. If an event only exposes free/busy information, the result should preserve that limitation without guessing its title or details.
+
+"No conflicts found" applies only to the calendars and events successfully retrieved in this query. It does not rule out conflicts with calendars you did not query or events you cannot access.
+
+## Step 5: Organize your day from the results
+
+After receiving the timetable, you can ask for a summary:
+
+```text
+Use the events you just retrieved to prepare a short plan for the day.
+List scheduling conflicts that need attention first, then group the meetings into morning and afternoon.
+Provide written suggestions only. Do not change the original events.
+```
+
+The agent can organize suggestions from the retrieved data, such as resolving the two overlapping morning meetings before listing the afternoon schedule.
+
+If the calendar changes after your query, explicitly ask for a fresh query:
+
+```text
+The schedule has just changed. Query the same date and calendar again and update the conflict analysis.
+```
+
+Using the connector to read events does not automatically enable continuous synchronization or scheduled reminders. When you need updated data, ask the agent to read it again.
+
+## Verify the query results
+
+Start with a test calendar. Ask someone with the required permissions to create these three test events manually in Feishu, then run the query. Preparing test data and asking the agent to query it are separate steps.
+
+| Test event | Example time | Purpose |
+| --- | --- | --- |
+| Product team meeting | 09:00–10:00 | Verify basic event retrieval. |
+| Client proposal discussion | 09:30–10:30 | Verify detection of a 30-minute overlap. |
+| Project progress update | 14:00–15:00 | Verify a separate event and chronological sorting. |
+
+Check that:
+
+- The queried account and calendar match those used to prepare the test events.
+- The date and time zone are correct, and start and end times match what you see in Feishu.
+- All three events appear, without omissions or duplicates.
+- The two morning meetings overlap from 09:30 to 10:00.
+- The afternoon meeting is not incorrectly marked as conflicting with the morning meetings.
+- Events in Feishu remain unchanged, with no new invitations or modifications.
+
+If your use case includes all-day events, events spanning multiple days, recurring events, or multiple calendars, add separate tests for those cases. For larger result sets, also verify that the query covers the full requested scope rather than only part of the results.
+
+## Reuse the connection with other agents
+
+Once Feishu is connected in a workspace, you can add the Feishu connector capabilities to other agents, such as a scheduling assistant or project assistant. Configure their runtime environments and publish them, then use the existing authorization to run queries.
+
+Workspace member permissions and external calendar permissions still apply. Switching agents does not automatically switch the account authorized for the connector.
+
+If you run an agent from a project, configure the connector in that project. Project tasks do not automatically use a workspace connection with the same name.
+
+## Troubleshooting
+
+### The connector is still pending after I scan the Feishu code
+
+You may have completed only app authorization. Return to the connector card and select **Continue authorization** to finish user authorization until the status becomes **Connected**.
+
+### The connector is connected, but the agent cannot use Feishu
+
+Check that the target agent has the Feishu connector middleware, that it is associated with the node performing the task, and that you published the changes. Then check the sandbox, Sandbox Shell tool, supporting tools, and network connection.
+
+### The query returned someone else's schedule
+
+Check the authorized account in the connection details. This tutorial uses a team connection: permitted users share the current authorization rather than automatically using their own Feishu identities. Also check that you specified the correct calendar.
+
+### Feishu shows meetings, but the query returned no events
+
+First check the date, time zone, account, and calendar. Then check app and user permissions and the target calendar's sharing settings. Distinguish a successful query with no events from a failed request or denied access; a failure does not mean your day is free.
+
+### I can see availability but not meeting names
+
+The account may only have free/busy access. Ask an authorized administrator to check calendar sharing and the required permissions before querying again. Free/busy information cannot be used to infer restricted meeting titles or content.
+
+### Meeting times differ from the Feishu interface
+
+Check that the agent's output, query parameters, and Feishu interface use the same time zone. Specify **Asia/Shanghai** and include the date in the result. For events spanning multiple days, show both the start and end dates.
+
+### Authorization has expired or permissions are insufficient
+
+Ask a connector administrator to check the authorization status and reconnect or grant the required permissions as prompted. Then query an event you know the account can access to confirm that reading works again.
+
+## Related documentation
+
+- [Agent Middleware](/en/ai/middleware/index)
+- [Sandbox](/en/ai/agent/sandbox/index)
+- [Release Versions](/en/ai/agent/release-version)

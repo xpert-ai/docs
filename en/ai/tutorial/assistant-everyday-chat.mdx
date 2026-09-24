@@ -1,0 +1,222 @@
+---
+title: Ask Questions and Draft Notices with an Assistant in Your Chat App
+description: Connect a Feishu, DingTalk, or WeCom bot to ClawXpert, ask your first question, and draft and refine a notice through follow-up messages.
+tags:
+  - AI
+  - Xpert
+  - Assistant
+  - Trigger
+---
+
+During a workday, you may need to explain a concept, draft a training notice, or make a paragraph more concise. With an Xpert assistant, you can send these requests to a bot in Feishu, DingTalk, or WeCom. ClawXpert processes the request and replies in the same conversation.
+
+This tutorial walks you through connecting an assistant and drafting a product training notice for a sales team. You will then add a location and adjust the tone through follow-up messages to produce a notice you can use.
+
+## What you will learn
+
+- Ask the assistant questions and receive answers in your chat app.
+- Generate a notice from your requirements for timing, audience, and content.
+- Add details in the same conversation and revise the previous draft.
+- Verify the connection and troubleshoot common cases where the bot does not reply.
+
+This tutorial uses text messages and the model's question-answering and writing capabilities. You provide the information for the notice in the conversation, so you do not need to prepare a knowledge base.
+
+## Before you begin
+
+| Requirement | How to check |
+| --- | --- |
+| An Xpert account | You can sign in to Xpert and access the intended organization. |
+| A working ClawXpert setup | ClawXpert is bound to a published agent with a configured model, and the agent can respond in the web chat. |
+| The platform plugin | The Feishu, DingTalk, or WeCom trigger is available in Assistant settings. |
+| A platform account and permissions | You can sign in to the platform client and are allowed to create, manage, or authorize the bot you will use. |
+| Working service connections | The Xpert service is running and can connect to the messaging platform and call the model. |
+
+Someone with the required permissions should complete the initial setup. If an administrator has already connected the bot, you can start at "Send your first question."
+
+## Step 1: Prepare ClawXpert
+
+Open the **ClawXpert overview and configuration page** in Xpert. Check that it is bound to the agent you want to use.
+
+1. If no agent is bound yet, select a published agent and save.
+2. If no agent is available, select **New ClawXpert**, or configure a model for an existing agent and publish it first.
+3. Select **Go to chat** and send: "Hello, please describe what you can help me with in one sentence."
+4. Confirm that the agent replies in the web chat before connecting a messaging platform.
+
+To give the assistant a consistent writing style, you can add the following instructions to the target agent's prompt, then save and publish:
+
+```text
+You are an office assistant who helps users answer everyday questions, draft notices, and revise text.
+Use clear, concise English by default.
+When drafting a notice, preserve the time, location, audience, and preparation requirements provided by the user.
+Do not invent missing essential details. Ask the user or mark them as to be confirmed.
+When the user requests revisions, retain the requirements already confirmed in the conversation.
+```
+
+> A QR connection from Assistant settings binds the bot to the agent currently selected for ClawXpert. Check the target agent before scanning.
+
+## Step 2: Connect your chat platform
+
+Expand the left navigation in Xpert and select the settings button next to **Assistant** to open **Assistant settings**. Choose your platform from the available triggers and follow the relevant steps below.
+
+### Feishu
+
+1. Select **Connect** on the **Lark Trigger** card, which represents Feishu in the English interface.
+2. Scan the QR code with the mainland China Feishu client.
+3. On the Feishu authorization page, select an existing personal app or follow the instructions to create one, then confirm authorization.
+4. Return to Xpert and wait for **"The robot is connected and ready to receive messages."**
+5. Open a conversation with the bot you just authorized in Feishu.
+
+The current QR flow uses personal app authorization for mainland China Feishu. If an existing custom app is not available for selection, follow the "Connect an existing bot" instructions below.
+
+### DingTalk
+
+1. Select **Connect** on the **DingTalk Trigger** card.
+2. Scan the QR code with the DingTalk client.
+3. Complete the bot setup and authorization on the DingTalk page. Follow the platform's options for creating or selecting a bot.
+4. Return to Xpert and wait for **"The robot is connected and ready to receive messages."**
+5. Open a conversation with that bot in DingTalk.
+
+A "scanned" message on your phone may still require a confirmation step. Finish authorization on the platform and check the connection status in Xpert.
+
+### WeCom
+
+1. Select **Connect** on the **WeCom Trigger** card.
+2. Scan the QR code with the WeCom client.
+3. Complete the smart bot setup and authorization on the WeCom page.
+4. Return to Xpert and wait for **"The robot is connected and ready to receive messages."**
+5. Open a conversation supported by that smart bot.
+
+This connects a WeCom smart bot through its long connection mode. Where you can use it depends on the bot's supported conversations and the permissions granted on the platform.
+
+> A successful QR connection from Assistant settings takes effect immediately; you do not need to publish the trigger again. ClawXpert must already have a working published version. Scanning the code without confirming authorization does not complete the connection.
+
+### Connect an existing bot
+
+If an administrator has already prepared a bot and its credentials, create a system integration first, then bind it to the assistant:
+
+| Platform | System integration provider | Credentials to prepare |
+| --- | --- | --- |
+| Feishu | Lark, with the connection method set to Long Connection | App ID and App Secret |
+| DingTalk | DingTalk (Stream Mode) | Client ID (AppKey) and Client Secret (AppSecret) |
+| WeCom | WeCom (Long Connection) | Bot ID and Secret |
+
+1. Open **Assistant settings → Create integration**, select the provider, enter the credentials, test the integration, and save. On the platform, the bot must also be able to receive and reply to messages and be available to the people testing it.
+2. Return to **ClawXpert overview and configuration → Trigger configuration draft**.
+3. Add or edit the platform trigger, select the system integration you created, and enable the trigger.
+4. Select **Save draft**, then **Publish**.
+5. Refresh the status in Assistant settings, then test sending and receiving messages on the platform.
+
+This route requires publishing the trigger configuration. Saving a system integration alone does not bind it to the assistant. If you create an integration by scanning a QR code on the integration creation page, you still need to complete the binding and publishing steps.
+
+## Step 3: Send your first question
+
+In the conversation with your newly connected bot, send:
+
+```text
+What information should an internal training notice usually include? Please answer with five key points.
+```
+
+The assistant should reply in the current conversation with relevant points, such as the training topic, time, location, audience, and preparation requirements. The wording may vary; the goal is to verify that your question reaches the assistant and receives a relevant answer.
+
+For a group chat that supports bots, first add the bot to the group and **@mention the bot** when asking a question. By default, Feishu only triggers a reply in a group when the bot is mentioned.
+
+## Step 4: Draft a training notice
+
+Continue in the same conversation with a specific request:
+
+```text
+Please draft an internal training notice:
+Product training will take place tomorrow at 3 p.m. for the sales team.
+Remind everyone to arrive ten minutes early.
+Keep the tone concise and the body under 100 words.
+The location has not been decided yet, so mark it as to be confirmed.
+```
+
+The assistant should return a draft containing the information you provided. The following is an illustrative example:
+
+> **Product Training Notice**
+>
+> All sales team members are invited to product training tomorrow at 3 p.m. Please arrive ten minutes early. The location is to be confirmed and will be announced separately.
+
+Check that the draft preserves the training time, audience, and early arrival requirement, and marks the undecided location as to be confirmed.
+
+## Step 5: Add a location and revise the draft
+
+After receiving the draft, you do not need to repeat the full request. Send this follow-up in the same conversation:
+
+```text
+The location is now confirmed as the second-floor meeting room. Please update the notice and keep the other requirements unchanged.
+```
+
+The assistant should update the location while keeping the time, audience, and arrival requirement. You can then adjust the tone:
+
+```text
+Make it suitable for posting in a work group chat. Return only the final notice text.
+```
+
+The final version might read:
+
+> Hi sales team, product training will take place tomorrow at 3 p.m. in the second-floor meeting room. Please arrive ten minutes early. Thank you!
+
+Review the text, then copy it to the group or channel where you want to publish it.
+
+> Results in this tutorial are returned to your current conversation with the bot. Asking it to "write a notice" does not automatically send that notice to every participant.
+
+### Tips for follow-up conversations
+
+To help the assistant retain your requirements, complete revisions in the same conversation on the same platform. After the trigger's session idle timeout expires, the next message starts a new session. Provide the relevant background again if that happens.
+
+If you usually split a request across several messages, an administrator can set the trigger's **aggregation time** to combine consecutive messages before the agent processes them. The default is `0`, which means no aggregation wait. Save the draft and publish after changing this setting. Enabling aggregation also adds a delay before the reply.
+
+## Verify that the assistant is ready to use
+
+| Check | Action | Expected result |
+| --- | --- | --- |
+| Agent in the web chat | Ask a simple question in Xpert. | The agent replies normally. |
+| Platform connection | Refresh the status in Assistant settings. | It shows "The robot is connected and ready to receive messages." |
+| Everyday questions | Ask what a training notice should include. | You receive a relevant answer in the platform conversation. |
+| Drafting a notice | Provide the time, audience, and early arrival requirement. | The draft includes the key details without inventing a location. |
+| Follow-up revisions | Add the second-floor meeting room, then change the tone. | The location is updated and previously confirmed requirements are retained. |
+| Group chat, if needed | @mention the bot in an allowed group. | You receive a reply in that group. |
+
+Check the actual replies. A connected status, a saved integration, or a bot appearing in a group does not replace a complete message test.
+
+## Troubleshooting
+
+### My platform is missing from Assistant settings
+
+Check that you are in the correct organization and have bound ClawXpert to an agent, then select **Refresh**. If the platform is still missing, ask an administrator to check that its plugin is installed and enabled.
+
+### I scanned the QR code, but the connection is not complete
+
+Check whether your phone still shows an authorization confirmation step. If the code has expired, select **Retry** to generate a new one. Wait until Xpert reports that the robot is connected before sending a test message.
+
+### I created a system integration, but the bot does not reply
+
+If you configured it on the integration creation page, you must still select that integration in the platform trigger, enable the trigger, save the draft, and publish. Review "Connect an existing bot" to check for a missing binding step.
+
+### The status is connected, but messages receive no reply
+
+Check the following in order:
+
+1. You are messaging the same bot you authorized or bound.
+2. The target ClawXpert can answer questions in the Xpert web chat.
+3. Your test account is allowed to use the bot on the platform.
+4. For group chats, the bot has been added to the group and you have @mentioned it as required.
+5. For manual setup, message permissions are configured, the trigger is enabled, and the configuration has been published.
+
+### The assistant did not retain the earlier notice when I added the location
+
+Check that you are still in the same conversation and have not exceeded the session idle timeout. You can send the current notice again and say: "Change the location in this notice to the second-floor meeting room and leave everything else unchanged."
+
+### Can I use the assistant after closing the Xpert web page?
+
+Once connected, the Xpert service handles messages. You do not need to keep the web page or QR window open for everyday use. The Xpert service, platform connection, and model service must remain available.
+
+## Related documentation
+
+- [Chat Channels](/en/ai/agent/chat-channels)
+- [Release Versions](/en/ai/agent/release-version)
+- [Lark Integration](/en/ai/plugin/integration/lark-integration)
+- [DingTalk Integration](/en/ai/plugin/integration/dingtalk-integration)
+- [WeCom Integration](/en/ai/plugin/integration/wecom-integration)
