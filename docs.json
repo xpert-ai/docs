@@ -167,6 +167,7 @@
                     "group": "Conversation",
                     "pages": [
                       "en/ai/agent/conversation/conversation",
+                      "en/ai/agent/conversation/discover-and-add",
                       "en/ai/agent/conversation/projects"
                     ]
                   },
@@ -914,6 +915,7 @@
                     "group": "对话",
                     "pages": [
                       "zh-Hans/ai/agent/conversation/conversation",
+                      "zh-Hans/ai/agent/conversation/discover-and-add",
                       "zh-Hans/ai/agent/conversation/projects"
                     ]
                   },

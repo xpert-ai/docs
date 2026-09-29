@@ -5,6 +5,12 @@ sidebar_position: 13
 
 ChatKit's unified resource selector adds Agent Plugins, middleware and published digital experts to the current conversation. These resources extend the entry Agent without changing the Assistant's draft or published graph.
 
+## Workspace library versus conversation selection
+
+Desktop’s **Discover & add → Plugins** lists editable workspaces and adds imported organizational packages directly in Desktop. Git/ZIP import, version management, and disabling remain administrator operations. ChatKit’s **Connect plugins** and **Browse all plugins** manage conversation selection rather than workspace installation.
+
+Desktop implements `composer.resources.onConnect`: a ChatKit connection command opens the target Connector authorization or configuration flow in the browser directly, without another Desktop confirmation dialog. The host preserves the draft and checks the current expert, organization, workspace, and connection permissions. After the server confirms readiness, Desktop returns to the foreground and resumes plugin selection without a manual status check. See [Discover & add](/en/ai/agent/conversation/discover-and-add).
+
 ## Enable the selector
 
 ```ts
@@ -28,7 +34,7 @@ The Plugins entry appears below the composer after projects and files, with sele
 | Middleware | Loads all available middleware configurations. Search and click an item to add it; no plus icon or Browse all action |
 | Experts | Loads all available published experts. Search and click an item to add it; no plus icon or Browse all action |
 
-Connect plugins does not download packages from a third-party marketplace or install server code. Importing, configuring and publishing packages are administrator operations.
+Connect plugins does not download packages from a third-party marketplace or install server code. Import and organization-level configuration remain administrator operations; workspace editors can add imported packages in Desktop.
 
 Middleware and experts have a persistent info icon. Hover or focus it to show one information card at a time; middleware cards also list bound Views. Plugin rows do not have an info icon. When a plugin needs a connection, it opens a connection status and action interface.
 
@@ -51,7 +57,7 @@ Menus share theme variables and compact styling with project and file selectors,
 | Middleware | `middleware` | An available configuration for an installed provider, instantiated through the existing middleware registry |
 | Digital expert | `external_xpert` | An authorized published expert, executed through the collaborator invocation path |
 
-Standard packages differ from native Xpert code plugins. Administrators import them from Git with a ref and optional subdirectory, or from ZIP, then publish bindings to authorized workspaces. `extensions["cn.xpertai"]` can declare middleware presets, logical expert references and Connector dependencies. It does not load server code dynamically.
+Standard packages differ from native Xpert code plugins. Administrators import them from Git with a ref and optional subdirectory, or from ZIP, then publish bindings to authorized workspaces; workspace editors can also add imported packages to their editable workspaces in Desktop. `extensions["cn.xpertai"]` can declare middleware presets, logical expert references and Connector dependencies. It does not load server code dynamically.
 
 The catalog combines managed bindings and backend discovery: installed user-addable middleware providers with valid default configurations, and accessible published experts. Providers missing required configuration, the current Assistant and experts already in its graph are not offered as duplicate additions. Managed bindings take precedence, and disabling one cannot be bypassed through discovery.
 
