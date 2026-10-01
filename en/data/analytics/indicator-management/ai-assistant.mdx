@@ -1,25 +1,19 @@
 ---
-title: 🤖 AI Copilot
-description: Use the metric assistant to understand metric definitions, filters, and available business context.
-sidebar_position: 8
+title: Metric and Semantic Model Assistant
+description: Use the semantic model assistant to understand metric bindings, dimensions, and query results.
+sidebar_position: 10
 tags:
   - AI
-  - Copilot
+  - Metrics
 ---
 
-For general functionalities regarding AI Copilot, please refer to [🤖 AI Copilot](/en/ai/agent/ai-assistant/configure-ai-assistant).
+There is no separate page for the old /analysis command inside a metric page. Open the assistant from the semantic model workspace. It can read the current model, cube, selected object, and model quality summary to help check the measures, levels, and variables needed by a metric.
 
-List of Copilot commands for metrics:
+## Recommended flow
 
-| Command | Description |
-| --- | --- |
-| `/i` | Create metric |
-| `/formula` | Create derived metric formula |
+1. In the model workspace, open **Members** or **Cube** and select the measure or level to bind.
+2. Ask the assistant to explain the unique name, suggest a basic or derived metric, or create a read-only validation query.
+3. Confirm the fields manually in the metric dialog and save the draft.
+4. Publish the model and metric, then click **Query** to verify the definition with a real result.
 
-## /i
-
-Command to create metrics, Copilot will automatically create metrics based on the description provided in the command.
-
-## /formula
-
-When creating a command for derived metric formulas, it's important to describe the formula's meaning as clearly as possible so that Copilot can better understand it.
+Review any expression and filter suggested by the assistant. It cannot bypass metric publishing checks, certification, or business-domain permissions, and it never turns a draft into a published asset automatically.

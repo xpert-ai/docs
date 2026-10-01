@@ -1,0 +1,81 @@
+---
+title: Data Analytics Quickstart
+description: Complete a first data analysis flow from data source to your first query.
+sidebar_position: 1
+tags:
+  - Quickstart
+  - SQL
+  - MDX
+---
+
+This guide walks through the smallest complete flow: **connect a data source → create a semantic model → configure a queryable cube → validate and publish → run a query**. Replace the sample values with values from your workspace.
+
+## Before you begin
+
+- Sign in and open the target AI workspace.
+- Have an organization data source available, or have the connection details needed to create one.
+
+## 1. Prepare a data source
+
+1. Open **Data Intelligence → Data Sources** from the workspace sidebar.
+2. If the **Available to the organization** list already contains the connection, click **Bind**. Otherwise click **New**, choose a supported connection type, and fill in the fields.
+3. Click **Test connection** before saving. If it fails, check the host, port, credentials, and network policy.
+4. Confirm that the data source appears under **Authorized**. Only authorized data sources can be used by semantic models.
+
+See [Data sources](./data-sources) for field details.
+
+## 2. Create a semantic model
+
+1. Open **Data Intelligence → Semantic Models** and click **Create**.
+2. Choose `SQL` for a relational database or `XMLA` for a remote multidimensional service.
+3. Select a data source. The catalog selector loads databases, schemas, and catalogs from the source; an XMLA service also returns available cubes.
+4. Enter the required model name. Add an identifier, description, catalog, or cube when needed, then create the model.
+5. Open the new model. It starts as a `Draft` with published version 0.
+
+For XMLA, you can also click **Import cube** on a data source card, discover the remote structure, and create a model from a catalog and cube. See [XMLA multidimensional models](./semantic-model/mdx-multidimensional-model).
+
+## 3. Configure the minimum model
+
+For a relational model, use this order:
+
+1. **Data source browser**: refresh the structure, search and expand schemas, tables, and columns, then confirm that preview data loads.
+2. **Cube**: add or select a cube, choose its fact table, and add at least one measure with a source column and aggregation such as `sum`.
+3. **Dimensions**: add dimensions, hierarchies, and levels, then fill in the dimension table, primary key, foreign key, and level columns.
+4. **Calculations**: add a calculated member when you need a derived value.
+5. Wait until the workspace shows that the draft is synchronized before publishing.
+
+See [Semantic model workspace](./semantic-model/semantic-modeling-workspace), [Dimension design](./semantic-model/dimension-designer/dimension-designer), and [Cubes, fact tables, and measures](./semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer).
+
+## 4. Validate and publish
+
+1. Open **Model quality** and click **Validate**.
+2. Fix every `Error`. Common blocking issues include a missing data source, cube, fact table, measure, level source column, or calculated-member expression.
+3. In **Run and cache**, run a query probe to confirm that the connection and structure are available.
+4. Click **Publish**, add release notes, and select a business domain if requested. The model status changes to `Published` and a new published version is created.
+
+Publishing creates a fixed version. Later edits update only the draft and require another publish before they affect downstream queries.
+
+## 5. Run your first query
+
+1. Open **Data Intelligence → Query Analysis**.
+2. Select the published model and query language: SQL for SQL models or MDX for XMLA models.
+3. Click **Template**, replace the table, column, or cube names with names from the current model, and click **Run**. You can also press Ctrl/⌘+Enter in the editor.
+4. The result area shows row count, data source identifier, and table results. **Recent runs** keeps the latest ten successful or failed runs for the current session.
+
+See [Query workspace](./semantic-model/query-lab) for query syntax and limits.
+
+## 6. Acceptance checklist
+
+- [ ] The data source is authorized and its connection test succeeds.
+- [ ] The model is `Published` and its published version is greater than 0.
+- [ ] Model quality has no blocking errors and the query probe succeeds.
+- [ ] The query result contains the expected columns and rows.
+
+If a query fails, confirm that the selected model is published, the language matches the model type, and SQL table or column names or MDX unique names come from the current model structure. See [Query troubleshooting and run records](./semantic-model/query-log).
+
+## Next steps
+
+- Relational modeling: [SQL semantic models](./semantic-model/sql-multidimensional-model)
+- XMLA/SAP BW: [XMLA multidimensional models](./semantic-model/mdx-multidimensional-model)
+- Governed metrics: [Metric management](./indicator-management/indicator-management)
+- Workspace assistant: [Semantic model assistant](./semantic-model/ai-assistant)

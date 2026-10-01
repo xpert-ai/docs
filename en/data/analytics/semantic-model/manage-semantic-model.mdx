@@ -1,51 +1,38 @@
 ---
-title: Semantic Model Management
-description: Create, organize, authorize, and maintain semantic-model assets.
+title: Create and Manage Semantic Models
+description: Create, search, edit, publish, assign, and delete semantic models.
 sidebar_position: 2
+tags:
+  - Semantic models
+  - Lifecycle
 ---
 
-The **Semantic Model Management Interface** displays semantic models that users have permission to view or manage, and users can view, create, or edit semantic models.
+Open **Data Intelligence → Semantic Models**. The list shows the models visible to your workspace, including their names, identifiers, data sources, types, catalogs, statuses, and published versions.
 
-The list of semantic models is displayed in a tree structure organized by business domain.
+## Create a model
 
-Clicking the create button in the top right corner of the interface allows the creation of different types of semantic models:
+1. Click **Create**, then choose `SQL` (relational) or `XMLA` (remote multidimensional service).
+2. Enter a name and data source. An identifier, description, catalog, and cube are optional, but the structure must be resolvable before publishing.
+3. Catalog options are loaded from the data source. Do not put a SQL schema name in the XMLA cube field; they come from different structure information.
+4. Save and click **Open workspace** on the model card.
 
-* **SQL** Semantic Model
-* **MDX** Semantic Model
-* **WASM** (SQL) Semantic Model
+For an XMLA source, you can also click **Import cube** on the data source card, run discovery, and choose a catalog and cube from the returned list.
 
-## Creation Wizard
+## Search and edit
 
-Clicking the create button opens the Create Semantic Model wizard, where you can select an existing **data source** and then choose a **catalog**.
+Search matches model name, identifier, description, catalog, and cube. **Edit** on a card changes basic information; edit structure in the workspace. Draft changes are saved automatically and remain visible after refreshing the list.
 
-<Tip>
+## Publish and versions
 
-The **Catalog** corresponds to the **Schema** used to isolate physical tables in some databases, the database instance **Database** used to isolate physical tables in other databases, and the **Catalog** used to isolate models in XMLA data sources.
+Before publishing, fix errors in **Model quality** and run a query probe in **Run and cache**. Click **Publish**, add release notes, and select a business domain when requested. After publishing:
 
-</Tip>
+- The status becomes **Published**.
+- The published version increases from 0 or the previous version.
+- Queries and metrics use this published version.
+- Later edits create a new draft and require another publish.
 
-After selecting the service directory, proceed to the next step, enter a unique model name and *associated business domain* (optional), choose whether to use MDX modeling, and click create.
+## Delete and access
 
-Whether to use MDX modeling:
+Deletion requires confirmation. The system may refuse to delete a published model or one still referenced by a metric; move downstream references first. **Access control** shows inherited business-domain members and certified metrics.
 
-* Yes: Create MDX model
-* No: Create SQL model
-
-## Manage Semantic Models
-
-In the list of semantic models, you can add and delete models. Clicking the name of a semantic model navigates to the semantic model editing interface, where you can maintain and create semantic models.
-
-### Upload Model
-
-Clicking the upload button allows you to upload saved model files. Before uploading, you can set the name, associated business domain, and data source for the new model.
-
-## Permissions
-
-The semantic model list will display the following models with permissions:
-
-- Models created by the user.
-- Semantic models under the [business domain](/en/data/features/governance/policies) for which the user has permissions.
-
-<Tip>
-The administrator (ADMIN) role has permissions for all business domains within the organization.
-</Tip>
+See [Semantic models and core objects](./multidimensional-model-introduction) for the workspace objects.

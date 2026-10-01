@@ -675,34 +675,46 @@
                 "tab": "Data and Analytics",
                 "groups": [
                   {
+                    "group": "Quickstart",
+                    "pages": [
+                      "en/data/analytics/quick-start",
+                      "en/data/analytics/data-sources"
+                    ]
+                  },
+                  {
                     "group": "Semantic Model",
                     "pages": [
                       "en/data/analytics/semantic-model/multidimensional-model-introduction",
                       "en/data/analytics/semantic-model/manage-semantic-model",
                       "en/data/analytics/semantic-model/semantic-modeling-workspace",
-                      "en/data/analytics/semantic-model/query-lab",
                       "en/data/analytics/semantic-model/dimension-designer/dimension-designer",
                       "en/data/analytics/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer",
-                      "en/data/analytics/semantic-model/dimension-member-retrieval",
-                      "en/data/analytics/semantic-model/ai-assistant",
-                      "en/data/analytics/semantic-model/query-log",
                       "en/data/analytics/semantic-model/sql-multidimensional-model",
-                      "en/data/analytics/semantic-model/mdx-multidimensional-model"
+                      "en/data/analytics/semantic-model/mdx-multidimensional-model",
+                      "en/data/analytics/semantic-model/dimension-member-retrieval",
+                      "en/data/analytics/semantic-model/ai-assistant"
                     ]
                   },
                   {
-                    "group": "Indicator Management",
+                    "group": "Query Analysis",
                     "pages": [
+                      "en/data/analytics/semantic-model/query-lab",
+                      "en/data/analytics/semantic-model/query-log"
+                    ]
+                  },
+                  {
+                    "group": "Metric Management",
+                    "pages": [
+                      "en/data/analytics/indicator-management/indicator-management",
                       "en/data/analytics/indicator-management/indicator-registration",
+                      "en/data/analytics/indicator-management/derived-indicator",
+                      "en/data/analytics/indicator-management/qualification-condition",
+                      "en/data/analytics/indicator-management/indicator-application",
+                      "en/data/analytics/indicator-management/indicator-measure",
                       "en/data/analytics/indicator-management/indicator-business-domain",
                       "en/data/analytics/indicator-management/indicator-certification",
-                      "en/data/analytics/indicator-management/derived-indicator",
-                      "en/data/analytics/indicator-management/indicator-management",
-                      "en/data/analytics/indicator-management/qualification-condition",
                       "en/data/analytics/indicator-management/indicator-market",
-                      "en/data/analytics/indicator-management/indicator-application",
-                      "en/data/analytics/indicator-management/ai-assistant",
-                      "en/data/analytics/indicator-management/indicator-measure"
+                      "en/data/analytics/indicator-management/ai-assistant"
                     ]
                   }
                 ]
@@ -1439,34 +1451,46 @@
                 "tab": "数据分析",
                 "groups": [
                   {
+                    "group": "快速开始",
+                    "pages": [
+                      "zh-Hans/data/analytics/quick-start",
+                      "zh-Hans/data/analytics/data-sources"
+                    ]
+                  },
+                  {
                     "group": "语义模型",
                     "pages": [
                       "zh-Hans/data/analytics/semantic-model/multidimensional-model-introduction",
                       "zh-Hans/data/analytics/semantic-model/manage-semantic-model",
                       "zh-Hans/data/analytics/semantic-model/semantic-modeling-workspace",
-                      "zh-Hans/data/analytics/semantic-model/query-lab",
                       "zh-Hans/data/analytics/semantic-model/dimension-designer/dimension-designer",
                       "zh-Hans/data/analytics/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer",
-                      "zh-Hans/data/analytics/semantic-model/dimension-member-retrieval",
-                      "zh-Hans/data/analytics/semantic-model/ai-assistant",
-                      "zh-Hans/data/analytics/semantic-model/query-log",
                       "zh-Hans/data/analytics/semantic-model/sql-multidimensional-model",
-                      "zh-Hans/data/analytics/semantic-model/mdx-multidimensional-model"
+                      "zh-Hans/data/analytics/semantic-model/mdx-multidimensional-model",
+                      "zh-Hans/data/analytics/semantic-model/dimension-member-retrieval",
+                      "zh-Hans/data/analytics/semantic-model/ai-assistant"
+                    ]
+                  },
+                  {
+                    "group": "查询分析",
+                    "pages": [
+                      "zh-Hans/data/analytics/semantic-model/query-lab",
+                      "zh-Hans/data/analytics/semantic-model/query-log"
                     ]
                   },
                   {
                     "group": "指标管理",
                     "pages": [
+                      "zh-Hans/data/analytics/indicator-management/indicator-management",
                       "zh-Hans/data/analytics/indicator-management/indicator-registration",
+                      "zh-Hans/data/analytics/indicator-management/derived-indicator",
+                      "zh-Hans/data/analytics/indicator-management/qualification-condition",
+                      "zh-Hans/data/analytics/indicator-management/indicator-application",
+                      "zh-Hans/data/analytics/indicator-management/indicator-measure",
                       "zh-Hans/data/analytics/indicator-management/indicator-business-domain",
                       "zh-Hans/data/analytics/indicator-management/indicator-certification",
-                      "zh-Hans/data/analytics/indicator-management/derived-indicator",
-                      "zh-Hans/data/analytics/indicator-management/indicator-management",
-                      "zh-Hans/data/analytics/indicator-management/qualification-condition",
                       "zh-Hans/data/analytics/indicator-management/indicator-market",
-                      "zh-Hans/data/analytics/indicator-management/indicator-application",
-                      "zh-Hans/data/analytics/indicator-management/ai-assistant",
-                      "zh-Hans/data/analytics/indicator-management/indicator-measure"
+                      "zh-Hans/data/analytics/indicator-management/ai-assistant"
                     ]
                   }
                 ]

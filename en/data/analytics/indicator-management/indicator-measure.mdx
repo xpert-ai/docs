@@ -1,44 +1,31 @@
 ---
-title: 📐 Indicator Measure
-description: Configure semantic-model measures as reusable indicators for analysis.
-sidebar_position: 8
+title: Metric Measures and XMLA Bindings
+description: Select measures, dimensions, and variables for a metric and generate an executable query.
+sidebar_position: 6
 tags:
-  - MDX
-  - Measure
+  - Metrics
+  - Measures
+  - XMLA
 ---
 
-**Indicator Measure** refers to the measured values limited by the conditions defined in the indicator management system. It can be used in various components just like regular measure fields. The conditions of indicators will not be overridden by the context in the calculation of indicator measures, so some components can only select dimensions from the free dimensions of indicators after selecting indicator measures (if defined).
+A metric has a defined source and calculation meaning. When you create one, the system links it to a cube, measures, dimensions, and variables in a semantic model.
 
-In the selection list of the measure selection component, there is a separate group for indicator measures.
+## Binding fields
 
-![Indicator measure](/public/img/indicator/indicator-register-preview.png)
+- **Semantic model**: the model used by the metric.
+- **Cube**: the target cube in an XMLA model.
+- **Value source**: an existing measure or a restricted MDX expression.
+- **Analysis dimensions**: levels users can use to view results.
+- **Member filters**: members to include or exclude.
+- **Variables**: values or ranges required by an SAP query.
+- **Time settings**: default time dimension and grain.
 
-## Using Indicator Measures in Chart Components
+The editor shows options available in the selected model. If no measures are available, refresh the remote structure in the XMLA workspace first.
 
-When creating a new chart card component, after selecting the data source and model, add a measure in the measure area. Click on the measure selection list. If there are corresponding indicator definitions in the indicator system for this data source and model, the indicator measures will appear in the indicator area of the measure selection list.
+## Publish and run
 
-After selecting the indicator measure, if this indicator has defined free dimensions, you can only select dimensions from these free dimensions when selecting dimensions.
+Save the binding, check certification and model version, then click **Publish**. Publishing confirms that the cube, measure, dimensions, levels, members, and variables still exist. When you click **Query**, the system generates SQL or MDX from these settings and shows the data in the result window.
 
-<Info>Follow the page fields and verify the chart result.</Info>
+## Invalid bindings
 
-* The **Unit of Measure** defined in the indicator will be displayed as the unit for measures in the chart.
-* Chart data can also be sorted by indicator size.
-
-<Info>Follow the page fields and verify the chart result.</Info>
-
-## Using Indicator Measures in Analytical Tables
-
-[Application of Indicators in Tables](/en/data/analytics/indicator-management/indicator-application)
-
-## Indicator Components
-
-There are also some component types specifically designed for indicators such as:
-
-* [Indicator Table](/en/data/analytics/indicator-management/indicator-application)
-* [Indicator Card](/en/data/analytics/indicator-management/indicator-application)
-
-These components can directly select the corresponding indicators for display in the configuration.
-
-## Example
-
-<iframe src="https://app.xpertai.cn/public/story/point/2c96a06d-be7f-4200-b9b8-54951fed686c" width="100%" height="800px" frameBorder="0" scrolling="no" allowFullScreen> </iframe>
+A remote cube change can mark an old binding as **Missing**. Refresh the preview in the model workspace, confirm the change, choose the binding again, and save. Do not try to repair it by changing only the display name. Certify again when required, then publish the metric.

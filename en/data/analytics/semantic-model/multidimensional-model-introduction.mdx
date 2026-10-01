@@ -1,149 +1,42 @@
 ---
-title: Multidimensional Models
-description: Understand core objects, query methods, and use cases for multidimensional semantic models.
+title: Semantic Models and Core Objects
+description: Understand the SQL and XMLA model types, their objects, lifecycle, and query boundaries.
 sidebar_position: 1
+tags:
+  - Semantic models
+  - Concepts
 ---
 
-**Multidimensional models** are models that associate multiple dimension tables with a fact table as the basis, separating dimension data from fact data for enhanced analytical capabilities.
+A semantic model turns a physical data source into a business structure that people and tools can query. The current system supports two model types:
 
-> Multidimensional models consist of cubes and dimensions, which can be annotated and extended to support complex query construction. Business Intelligence (BI) developers create cubes to support quick responses and provide a single data source for business reporting. Given the increasing importance of business intelligence across various levels of an organization, using a single analytical data source ensures minimizing differences (if differences cannot be completely eliminated).
+| Type | Data source | Main workspace objects | Query language |
+| --- | --- | --- | --- |
+| `SQL` | Relational database or SQL connection service | Fact tables, relationships, dimensions, measures, calculated members | SQL |
+| `XMLA` | XMLA services such as SAP BW and Analysis Services | Remote cube structure, system names, variables, and measure bindings | MDX |
 
-### Noun Explanations:
+## Model lifecycle
 
-* Cube (多维数据集)
-* Dimension (维度)
-* Shared Dimension (共享维度)
-* Hierarchy (层次结构)
-* Level (层级)
-* Measure (度量)
-* Dimension Member (维度成员)
-* Calculated Member (计算成员)
-* Virtual Cube (虚拟数据集)
-* Role (角色)
+- **Draft**: an editable version. Workspace changes are saved automatically.
+- **Published**: a version that passed model quality checks and was published. Queries and metrics use the published version.
+- **Archived**: no longer used as the current asset.
 
-## Dimensions
+Models can be assigned to business domains. Workspace members inherit access from those domains, and **Access control** shows the effective access.
 
-> Database dimensions are collections of related objects (referred to as attributes) used to provide information about the fact data in one or more cubes. For example, typical attributes in a product dimension might include product name, product category, product line, product specifications, and product price. These objects are bound to one or more columns in one or more tables of the data source view. By default, these attributes, like attribute hierarchies, are visible and used to understand the fact data in cubes. Attributes can be organized into user-defined hierarchies to provide navigation paths to help users browse the data in cubes.
+## Relational model objects
 
-> Cubes contain all the dimensions upon which users analyze fact data. An instance of a database dimension in a multidimensional dataset is called a multidimensional dataset dimension, and it is associated with one or more sets of measure values in the multidimensional dataset. Database dimensions can be used multiple times in a multidimensional dataset. For example, a fact data table might have multiple fact data related to time, and separate multidimensional dataset dimensions can be defined to analyze each fact data related to time. However, only one database dimension related to time needs to exist, which also means only one relationship database table related to time is required to support multiple time-based multidimensional dataset dimensions.
+- **Fact table**: the main table used to aggregate a cube.
+- **Measure**: an aggregatable numeric column, such as order amount, with a source column, data type, aggregation, and format.
+- **Dimension**: a business object used to slice facts, such as customer, product, or time.
+- **Hierarchy**: a navigation path inside a dimension.
+- **Level**: a granularity in a hierarchy, such as year, month, or day.
+- **Calculated member**: a field calculated from an expression in a cube.
 
-### Hierarchy
+## XMLA model objects
 
-Hierarchies are used to organize dimension members into a hierarchical structure and provide navigation paths in cubes. For example, the table below defines the dimension table for the time dimension. The dimension table supports three attributes: year, quarter, and month.
+An XMLA model keeps the remote cube, dimensions, hierarchies, levels, measures, and SAP variables. After a structure refresh, bindings are marked `Valid` or `Missing`. Missing bindings must be fixed before publishing or running metrics.
 
-| Year  | Quarter    | Month  |
-|-------|------------|--------|
-| 1999  | Q1         | January|
-| 1999  | Q1         | February|
-| 1999  | Q1         | March   |
-| 1999  | Q2         | April     |
-| 1999  | Q2         | May       |
-| 1999  | Q2         | June      |
-| 1999  | Q3         | July       |
-| 1999  | Q3         | August  |
-| 1999  | Q3         | September|
-| 1999  | Q4         | October |
-| 1999  | Q4         | November|
-| 1999  | Q4         | December|
+## Query and publishing boundaries
 
-A user-defined hierarchy (calendar) is constructed using the attributes year, quarter, and month to form the time dimension. The relationships between levels and members of the "Calendar" dimension (regular dimension) are illustrated in the relationship diagram below:
+The query workspace runs read-only queries for the selected model. SQL models use SQL and XMLA models use MDX. Metric queries also require both the metric and its model to be published; saving a draft does not change live results.
 
-![Middle](https://docs.microsoft.com/zh-cn/analysis-services/multidimensional-models-olap-logical-dimension-objects/media/as-levelconcepts.png?view=sql-analysis-services-2022)
-
-### Parent-Child Hierarchy
-
-A dimension's parent-child hierarchy is defined by using a special attribute (called the parent attribute) to determine the relationships between members. The parent attribute is used to explain self-referencing relationships or self-joins within the main dimension table. Parent-child hierarchies are constructed based on a single parent attribute. The levels appearing in the hierarchy are formed by parent-child relationships between members associated with the parent attribute, thus only assigning one level to a parent-child hierarchy. The dimension architecture of a parent-child hierarchy relies on self-referencing relationships provided in the main dimension table.
-
-![Hierarchy](https://docs.microsoft.com/zh-cn/analysis-services/multidimensional-models/media/dimorganization.png?view=sql-analysis-services-2022)
-
-In this dimension table, the ParentOrganizationKey column is related to the OrganizationKey primary key column. In other words, each record in this table can be associated with other records in this table through parent-child relationships. This self-join is commonly used to represent hierarchical data within entities, such as employee management structures within a department.
-
-When creating a parent-child hierarchy, the two attributes representing columns must have the same data type and must be in the same table. By default, any member's parent key, whether equal to its own member key, empty, 0, or a value not appearing in the member key column, is considered a top-level member (excluding the "(All)" level).
-
-### Dimension Members
-
-Dimension members are points within a dimension determined by specific attribute values. For example, a gender hierarchy has two members, 'M' and 'F'. "San Francisco", "California", and "USA" are members of the store hierarchy.
-
-Note that entities like "San Francisco", "California", and "USA", although they have a hierarchical relationship, are all members within the store hierarchy, meaning they are statistically analyzed based on different levels of stores they belong to.
-
-## Cubes
-
-> Cubes are multidimensional structures containing information for analysis; they primarily consist of dimensions and measure values. Dimensions define the structure of the multidimensional dataset on which slicing operations are performed, while measure values provide aggregated numerical values of interest to end-users. As a logical structure, cubes allow client applications to retrieve values of measure values as if they were contained within the cells of the multidimensional dataset; a cell is defined for each possible summary value. Cells in cubes are defined by intersections of dimension members and contain aggregated values of measures at that specific intersection.
-
-> Cubes provide a single location to store all relevant data for analysis purposes.
-
-## Measures
-
-> Measures represent a column containing measurable data (usually numeric) that can be aggregated. Measures represent aspects of organizational activities expressed in monetary terms (such as revenue, profit, or cost), by count (inventory levels, number of employees, customers, or orders), or by more complex calculations based on business logic.
-
-> Each multidimensional dataset must have at least one measure, although most have many measures, sometimes reaching hundreds. Structurally, measures typically map to source columns in fact data tables, which provide values used to populate measures. Alternatively, you can define measures with MDX.
-
-> Measures are context-sensitive, operating on numerical data in the context determined by any dimension members coincidentally included in the query. For example, computing the "Distributor Sales" measure would be supported by the Sum operator and would aggregate sales for each dimension member included in the query. Whether the query specifies a single product, aggregates to a category, or slices by time or geography, the measure should produce operations relevant
-
- to the dimensions included in the query.
-
-## Calculated Members
-
-Calculated members are measures whose values are calculated using a set calculation expression. Calculated members provide flexible calculation capabilities to multidimensional models, enabling rich functionality.
-
-## MDX
-
-### 1. Core Advantages of MDX Compared to SQL
-
-| Dimension        | MDX Advantages                                      | Compared to SQL                     |
-|------------------|--------------------------------------------------|-----------------------------|
-| Multidimensional Modeling | Designed for multidimensional data (OLAP Cube)     | SQL is for relational 2D tables, lacks native multidimensional support |
-| Time Intelligence | Native support for time hierarchies (e.g., YTD, QTD, Moving Avg) | SQL requires complex custom window functions or subqueries |
-| Dimension Hierarchies | Direct access to hierarchies (e.g., Year → Quarter → Month) | SQL requires manual hierarchy maintenance |
-| Aggregation Expressiveness | Supports complex dimension member aggregation (e.g., `Aggregate`, `YTD`, `PeriodToDate`) | SQL limited to `GROUP BY` aggregation |
-| Calculated Members | Dynamically creates calculated members with flexible logic | SQL calculated fields limited by table structure and aggregation |
-| Context Switching | Automatically adjusts context based on row/column coordinates (Slicer/Axis) | SQL lacks context concept, requires manual filter management |
-
-### 2. Example Comparison
-
-#### 🎯 Business Requirement:
-
-**Calculate yearly cumulative sales (YTD) for the "Mountain Bike" product category in the "West" region**
-
-#### 🔸 SQL Implementation (Simplified):
-
-```sql
-SELECT
-  YEAR(OrderDate) AS [Year],
-  SUM(SalesAmount) OVER (PARTITION BY YEAR(OrderDate) ORDER BY OrderDate ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS YTD_Sales
-FROM Sales
-WHERE Region = 'West' AND ProductCategory = 'Mountain Bike'
-```
-
-* SQL requires explicit time windows, filter fields, and grouping logic.
-* Not easily reusable or dimension-switchable.
-
-#### 🔹 MDX Implementation:
-
-```mdx
-WITH 
-MEMBER [Measures].[YTD Sales] AS 
-    YTD([Order Date].[Calendar].CurrentMember), [Measures].[Sales Amount]
-
-SELECT 
-  {[Measures].[YTD Sales]} ON COLUMNS,
-  {[Order Date].[Calendar].[Year].Members} ON ROWS
-FROM [Sales]
-WHERE (
-  [Product].[Category].[Mountain Bike],
-  [Geography].[Region].[West]
-)
-```
-
-* Uses `YTD()` for direct time hierarchy accumulation, no window functions needed.
-* `WHERE` slicer automatically adjusts context.
-* Easily extensible to other dimensions or hierarchies (e.g., quarter, month).
-
-### 3. Use Case Comparison Summary:
-
-| Scenario                     | Recommended Language | Reason                     |
-|-----------------------------|--------------------|---------------------------|
-| Raw Transaction Data Operations | SQL               | Efficient for detailed data, transactional queries |
-| Multidimensional Analysis (e.g., Cube Reports, OLAP) | MDX               | Stronger in dimension navigation, hierarchy aggregation, calculated members |
-| Building BI Reports, Dashboard Indicators | MDX               | Easier for KPI expression, time intelligence analysis |
-| Data Warehouse ETL          | SQL               | Structured data processing, cleaning, merging |
+Start with [Managing semantic models](./manage-semantic-model) and [Semantic model workspace](./semantic-modeling-workspace).

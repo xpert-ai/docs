@@ -1,31 +1,19 @@
 ---
-title: 🤖 AI 智能助理
-description: 使用指标助手理解指标口径、筛选条件和可用业务上下文。
-sidebar_position: 8
+title: 指标与语义模型助手
+description: 通过语义模型上下文助手解释指标绑定、维度和查询结果。
+sidebar_position: 10
 tags:
-  - AI
-  - Copilot
+  - 人工智能
+  - 指标
 ---
-关于 AI 智能助理的通用功能请参考 [🤖 AI 智能助理](/zh-Hans/ai/agent/ai-assistant/configure-ai-assistant)
 
-指标副驾驶命令列表：
+当前系统没有旧版“指标页面内 `/analysis` 命令”对应的独立页面。可以从语义模型工作台打开助手，让助手读取当前模型、数据立方体、选中对象和模型质量摘要，协助检查指标需要的度量、层级和变量。
 
-| 命令 | 说明 |
-| --- | --- |
-| [`/indicator`](#indicator) | 创建指标 |
-| [`/iformula`](#iformula) | 创建衍生指标公式 |
-| [`/indicator-architect`](#indicator-architect) | 指标体系架构师命令 |
+## 推荐流程
 
-## /indicator
+1. 在模型工作台打开 **成员** 或 **数据立方体**，选中要绑定的度量/层级。
+2. 打开助手，要求它解释唯一名称、建议基础指标或派生指标类型或生成一个只读验证查询。
+3. 在指标对话框中手动确认字段并保存草稿。
+4. 发布模型和指标后点击查询，用真实结果验证口径。
 
-`/indicator` 或 `/i` 创建指标命令，Copilot 会根据命令中的需求描述自动创建指标。
-
-## /iformula
-
-`iformula` 或 `/if` 创建衍生指标公式命令时，需要尽量清楚的描述公式的含义，以便 Copilot 能更好地理解。
-
-## /indicator-architect
-
-`/indicator-architect` 或 `/ia` 指标体系架构师命令，根据用户提示和模型信息，参考业务角色示例，可以构建分析的指标体系，并逐个创建指标。用户可以轻松定义和管理关键业务指标，实现对业务绩效的全面监控和分析。
-
-![Indicator Architect Command](/public/img/copilot/command-indicator-architect.png)
+助手给出的表达式和过滤器必须由建模人员审核；它不能绕过指标发布校验、认证状态或业务域权限，也不会把草稿自动当成已发布资产。

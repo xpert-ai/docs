@@ -1,8 +1,39 @@
 ---
-title: MDX 多维模型
-description: 配置基于 MDX 的多维模型、维度、度量和计算成员。
-sidebar_position: 30
+title: XMLA 多维模型
+description: 通过 XMLA 发现和导入远程数据立方体，并使用只读 MDX 查询和指标。
+sidebar_position: 11
+tags:
+  - XMLA
+  - MDX
+  - SAP BW
 ---
-MDX (Multidimensional Expressions) 是一种用于创建多维数据模型的语言，可以在 OLAP (Online Analytical Processing) 系统中使用。它支持多维数组，提供了一组专门用于分析数据的函数和运算符。MDX 可以提供丰富的数据分析功能，如聚合数据，分组数据，排序数据等。 Xpert 分析云的 MDX 模型将语言模型运行于 MDX 引擎进行解析执行。
 
-多维建模功能以通用的建模为主， 本篇章介绍与 MDX 建模相关的功能。
+`XMLA` 模型面向 SAP BW、Microsoft Analysis Services 等提供 XMLA 连接的远程多维分析服务。系统保留远程数据立方体的系统名称，不把它转换为本地关系表。
+
+## 导入远程数据立方体
+
+1. 在数据源页面创建或绑定 XMLA 数据源并连接测试。
+2. 在数据源卡片上点击 **导入数据立方体**，或在语义模型创建流程选择 XMLA。
+3. 执行 **发现**，从返回的目录和数据立方体列表中选择目标对象。
+4. 创建模型后进入 XMLA 工作台，检查维度、层次、层级、度量和变量的绑定状态。
+
+## XMLA 工作台
+
+- **概览**：显示当前数据立方体与绑定摘要。
+- 维度、**度量和变量**：编辑显示名称、可见性、默认值及指标可用绑定。
+- **刷新预览**：对比远程结构信息变化；确认校验值后应用刷新。
+- **查询验证**：使用只读 MDX 编辑器执行一次验证查询。
+- 发布前必须修复 `缺失` 绑定和必填的 SAP 变量默认值。
+
+## MDX 查询
+
+在查询实验室选择 MDX，使用 XMLA 返回的唯一名称。例如：
+
+```mdx
+SELECT {[Measures].[Sales]} ON COLUMNS
+FROM [Sales]
+```
+
+远程数据立方体的实际唯一名称可能带目录或层次路径，必须从当前结构信息中复制。原始 MDX 仍受只读和权限策略限制；业务指标则通过已发布模型和显式绑定执行。
+
+详细指标绑定见[指标度量与 XMLA 绑定](../indicator-management/indicator-measure)。

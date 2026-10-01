@@ -1,47 +1,32 @@
 ---
-title: 🏅 Certification
-description: Certify indicator definitions, data sources, and business semantics.
-sidebar_position: 3
+title: Metric Certification and Publishing
+description: Use certification and publishing to manage metric definitions and availability.
+sidebar_position: 8
 tags:
+  - Metrics
   - Certification
 ---
 
-In indicator management, indicator certification is a process of professional recognition of data quality. This process ensures that the metrics or indicators created are accurate, reliable, consistent, and effectively reflect the business performance or status of an enterprise. 
+Certification means that business users have confirmed a metric's source, definition, and calculation. Publishing means that the metric is available for queries. They are separate states: a certified metric still must be published before it can run.
 
-This process covers multiple stages including data sources, modeling specifications, indicator definition, calculation formulas, validation, maintenance, and continuous improvement.
+## Certification states
 
-1. **Data Sources**: Determine the data sources on which indicators depend, including the source of data, collection methods, and frequency. Ensure the reliability and consistency of data sources, as well as the accuracy of data collection.
+- **Not certified**: certification has not been submitted.
+- **In review**: submitted and waiting for review when approval is enabled.
+- **Certified**: approved.
+- **Rejected**: needs changes.
+- **Expired**: the validity period has ended.
 
-2. **Modeling Specifications**: Establish specifications and standards to ensure the consistency and uniformity of data modeling. Define data models, dimensions, measures, relationships, etc., to ensure the consistency of indicator definitions and calculation methods.
+Users with certification permission can use the certification action in the metric list. Before certifying, check the model version, measure, filters, unit, owner, and validity period.
 
-3. **Indicator Definition**: Clearly define the indicators, determine their meanings and scopes. Ensure that the indicators are accurately defined, clear, and consistent with business goals and strategies.
+## Publishing checks
 
-4. **Calculation Formulas**: Develop calculation formulas or algorithms for indicators to ensure the correctness of calculation methods and compliance with business logic. Consider the dimensions, measures, and related calculation rules involved.
+When you click **Publish**, the system checks the model, cube, measures, dimensions, members, and variables again. Only a metric that passes can become **Published**. Editing a published metric creates a new draft that must be published again.
 
-5. **Validation**: Validate and verify the indicators to ensure their accuracy and reliability. Use statistical analysis, data sampling, or other methods to validate the indicators and compare them with actual business data.
+## Acceptance checklist
 
-6. **Maintenance**: Regularly maintain and update the indicators to ensure their timeliness and effectiveness. Monitor data sources and calculation processes, rectify errors or abnormal data, and maintain the consistency and accuracy of indicators.
-
-7. **Continuous Improvement**: Continuously improve the indicator system and calculation methods based on business needs and feedback. Optimize and adjust indicators based on user feedback and business changes to improve their usability and operability.
-
-Indicator certification is aimed at ensuring that decision-makers in enterprises can trust these indicators and use them to evaluate business performance, formulate strategies, and monitor business execution. Therefore, a good indicator management system should support a comprehensive and rigorous indicator certification process.
-
-## Definition of Indicator Certification
-
-Create certification in [Settings/Certification](/en/data/features/governance/policies).
-
-## Authorization for Indicator Certification
-
-<Info>
-User Role: **Project Administrator**
-</Info>
-
-Open the page **Project** -> **Members** to add certification to the project so that data assets in the project can use certification.
-
-## Use of Indicator Certification
-
-<Info>
-User Role: **Project Member**
-</Info>
-
-Open the page **Project** -> **Indicator Registry** where you can assign certification to indicators.
+- [ ] The code and name identify the metric clearly.
+- [ ] Definition, unit, owner, and validity period are complete.
+- [ ] The model and cube version are correct.
+- [ ] The result matches a business example.
+- [ ] Certification and publishing states meet the use case.
