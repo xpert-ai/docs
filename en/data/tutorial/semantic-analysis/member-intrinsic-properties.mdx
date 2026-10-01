@@ -1,4 +1,18 @@
-# Intrinsic Member Properties
+---
+title: Intrinsic Member Properties
+description: Read hierarchy, parent-child, and member metadata with intrinsic member properties.
+sidebar_position: 100
+tags:
+  - MDX
+---
+
+<Info>
+**Applies to:** Current Data Xpert version.
+
+**Prerequisites:** You are signed in to the target organization and have an editable or queryable semantic model.
+
+**External dependency:** MDX and SQL tutorials require a semantic model and data source; the WASM tutorial can run in a browser. If no model is available, start with [Quick Start](../../getting-started/index).
+</Info>
 
 ## Introduction
 
@@ -18,20 +32,18 @@ All these properties can be queried as shown below:
 
 ```mdx-code-block
 <Tabs>
-  <TabItem value="Property" label="Property" default>
-```
+  <Tab title="Property">
 ```sql
 CurrentMember.Properties("PARENT_UNIQUE_NAME")
 ```
 ```mdx-code-block
-  </TabItem>
-  <TabItem value="Function" label="Function">
-```
+  </Tab>
+  <Tab title="Function">
 ```sql
 CurrentMember.Parent.UniqueName
 ```
 ```mdx-code-block
-  </TabItem>
+  </Tab>
 </Tabs>
 ```
 

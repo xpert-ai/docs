@@ -582,14 +582,28 @@
             "product": "Ontology",
             "tabs": [
               {
-                "tab": "Overview",
+                "tab": "Getting Started",
                 "groups": [
                   {
-                    "group": "Default",
+                    "group": "Quick Start",
+                    "pages": [
+                      "en/data/getting-started/index",
+                      "en/data/getting-started/requirements",
+                      "en/data/getting-started/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "By Business Scenario",
+                    "pages": [
+                      "en/data/getting-started/roles"
+                    ]
+                  },
+                  {
+                    "group": "Understand the System",
                     "pages": [
                       "en/data/overview/concept",
+                      "en/data/overview/object-model",
                       "en/data/overview/ontology-theory",
-                      "en/data/overview/uose-theory",
                       "en/data/overview/product-purpose",
                       "en/data/overview/architecture"
                     ]
@@ -702,6 +716,8 @@
                       "en/data/tutorial/sap-resource/sap-bpc",
                       "en/data/tutorial/sap-resource/sap-bpc-consolidated-reports",
                       "en/data/tutorial/sap-resource/how-to-analyze-sap-bw-data-models",
+                      "en/data/tutorial/sap-resource/how-to-analyze-sql-data-models",
+                      "en/data/tutorial/sap-resource/sap-procurement-operations-command-center",
                       "en/data/tutorial/sap-resource/sap-bw-calendar-dimension"
                     ]
                   },
@@ -759,6 +775,18 @@
                     "group": "Sales and Service",
                     "pages": [
                       "en/data/apps/sales-and-service/sales-ontology"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Reference",
+                "groups": [
+                  {
+                    "group": "Terms and Objects",
+                    "pages": [
+                      "en/data/reference/glossary",
+                      "en/data/overview/object-model"
                     ]
                   }
                 ]
@@ -1318,14 +1346,28 @@
             "product": "本体",
             "tabs": [
               {
-                "tab": "概述",
+                "tab": "开始使用",
                 "groups": [
                   {
-                    "group": "默认",
+                    "group": "快速开始",
+                    "pages": [
+                      "zh-Hans/data/getting-started/index",
+                      "zh-Hans/data/getting-started/requirements",
+                      "zh-Hans/data/getting-started/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "按业务场景",
+                    "pages": [
+                      "zh-Hans/data/getting-started/roles"
+                    ]
+                  },
+                  {
+                    "group": "理解系统",
                     "pages": [
                       "zh-Hans/data/overview/concept",
+                      "zh-Hans/data/overview/object-model",
                       "zh-Hans/data/overview/ontology-theory",
-                      "zh-Hans/data/overview/uose-theory",
                       "zh-Hans/data/overview/product-purpose",
                       "zh-Hans/data/overview/architecture"
                     ]
@@ -1467,6 +1509,18 @@
                       "zh-Hans/data/practices/database-discovery",
                       "zh-Hans/data/practices/governance-playbook",
                       "zh-Hans/data/practices/troubleshooting"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "参考",
+                "groups": [
+                  {
+                    "group": "术语与对象",
+                    "pages": [
+                      "zh-Hans/data/reference/glossary",
+                      "zh-Hans/data/overview/object-model"
                     ]
                   }
                 ]

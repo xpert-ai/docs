@@ -29,11 +29,11 @@ queryEntities -> getEntityNeighborhood -> discoverActions -> simulateAction -> e
 
 ```json
 {
-  "resourceId": "inner-bi",
-  "intent": "查询面包交易量最近 7 天每日变化",
+  "resourceId": "<resourceId>",
+  "intent": "查询目标指标最近一段时间的每日变化",
   "scope": {
     "entityTypeCode": "semantic_indicator",
-    "query": "面包交易量",
+    "query": "目标指标",
     "limit": 5
   }
 }
@@ -69,16 +69,16 @@ queryEntities -> getEntityNeighborhood -> discoverActions -> simulateAction -> e
 
 ```json
 {
-  "resourceId": "inner-bi",
+  "resourceId": "<resourceId>",
   "actionTypeCode": "semantic_model.query_metric_snapshot",
   "target": {
-    "entityRef": "面包交易量",
+    "entityRef": "<indicatorRef>",
     "entityTypeCode": "semantic_indicator"
   },
   "params": {
     "window": {
-      "from": "2026-03-15T00:00:00.000Z",
-      "to": "2026-03-21T23:59:59.999Z"
+      "from": "<start-time>",
+      "to": "<end-time>"
     },
     "granularity": "day"
   }

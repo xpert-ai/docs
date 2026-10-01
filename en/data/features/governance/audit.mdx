@@ -71,3 +71,16 @@ Audit is not post-fact archiving. It is a feedback system for continuous UOSE im
 - Record audits for low-risk queries too, so users can review answer sources.
 - Keep approval requests and policy hit reasons for high-risk actions.
 - Do not store tokens, passwords, cookies, or full sensitive business data in audits.
+
+## Web Operation Path
+
+Open **Governance → Execution Audit** and filter by resource, status, time, or task ID. Open a record and check the tool/action, actor, resource, snapshot, policy decision, status, evidence references, and result summary. An approval's `auditRef` should return to the same execution chain.
+
+**Success signal:** A single execution connects discovery, simulation, policy, approval when applicable, and execution, with a final state.
+
+## Checklist
+
+- [ ] The audit record includes the caller and organization context.
+- [ ] It references the actual snapshot or graph version.
+- [ ] The policy allow, deny, or approval reason is explainable.
+- [ ] Results contain only summaries or artifact references, without credentials or complete sensitive data.

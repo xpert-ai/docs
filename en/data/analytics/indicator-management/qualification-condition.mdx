@@ -1,5 +1,6 @@
 ---
 title: 🔏限定条件
+description: Configure dimension-member restrictions and business filters for indicators.
 sidebar_position: 5
 tags:
   - SQL
@@ -11,11 +12,11 @@ tags:
 
 例如下图演示的, 源数据集有三个维度: **时间**, **产品**和**地区**. 如果创建某指标设定了限定条件为时间等于 `2004` 那么此指标对应的数据集(降维后的数据集非物理存在)维度减少为 **产品**和**地区**两个.
 
-![](./OLAP_slicing_en.png)
+![](/public/img/blog/adv/indicator-restrictive-conditions.png)
 By Original: InfopedianDerivative work: Jay - OLAP slicing.png, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=105680876
 
 指标定义时可以将未设置限定条件的维度设置为 **自由维度**, 这样可以明确告诉用户数据集降维后的可用维度. 但这个并不是强制要求, 用户仍然可以选择使用任何维度进行分析.
 
-限定条件的详细设置可以参见 [切片器](../../../stories/slicer/).
+限定条件的详细设置可以参见 Slicer.
 
-对于使用 SQL 模型的指标来说, 还可以设置组合切片器以实现复杂限定条件, 详细参见 [组合切片器](../../../stories/combination-slicer/).
+对于使用 SQL 模型的指标来说, 还可以设置组合切片器以实现复杂限定条件, 详细参见 combination slicer.

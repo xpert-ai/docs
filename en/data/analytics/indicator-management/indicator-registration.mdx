@@ -1,5 +1,6 @@
 ---
 title: 📝 Indicator Registration
+description: Create indicator metadata, measure definitions, filters, and data bindings.
 sidebar_position: 1
 tags:
   - MDX
@@ -14,7 +15,7 @@ The Indicator Registration page is a functional page used to register individual
 
 In the management of indicators, whether through business domains, product lines, or departments for classification and management of indicators, an organizational structure is needed to manage indicators of different attribute categories. We manage indicators by grouping them under business domains.
 
-Refer to [Business Domain Management](../server/organization/business-area)
+Refer to [Business Domain Management](/en/data/features/governance/policies)
 
 1. First, open the **Business Domain** page, click on "Create Business Domain," and enter a name such as **Finance**.
 2. Click the add button on the Finance row to continue adding child business domains, such as **Management Reports**.
@@ -56,13 +57,13 @@ Indicator codes are only limited to uniqueness within the semantic model's multi
 | ------------ | --------------------------------------------------------------------------------------------- |
 | Semantic Model | The semantic model to which the indicator belongs.                                                      |
 | Model Entity | A specific multidimensional model in the semantic model where the indicator data comes from.                      |
-| Indicator Type | **Basic Indicator**: Select a measure from the existing measure fields in the semantic model for the indicator to use as the quantity value. <br/> [**Derived Indicator**](./derivative-indicator/): Data values obtained by combining existing measures and dimensions through calculation formulas. |
+| Indicator Type | **Basic Indicator**: Select a measure from the existing measure fields in the semantic model for the indicator to use as the quantity value. <br/> [**Derived Indicator**](./derived-indicator): Data values obtained by combining existing measures and dimensions through calculation formulas. |
 | Visibility | Whether the indicator is visible to users when used in the frontend.                                                          |
 | Measure | When the indicator type is **Basic Indicator**, select a measure as the quantity value of the indicator.                                                                  |
 | Calculation Formula | When the indicator type is **Derived Indicator**, enter the calculation formula for the indicator measure value.                                                                      |
 | Aggregation Type | When the indicator type is **Derived Indicator**, specify an aggregation type for the calculation formula; defaults to using the aggregation type of the measure for **Basic Indicator**.                                          |
 | Free Dimensions | Dimensions on the multidimensional model unrestricted for this indicator. Will be selected or restricted when displayed.                                               |
-| Restrictive Conditions | Restrictions on other dimensions besides free dimensions on the multidimensional model for this indicator. See [Indicator Restrictive Conditions](./restrictive-condition/) for details.                                 |
+| Restrictive Conditions | Restrictions on other dimensions besides free dimensions on the multidimensional model for this indicator. See [Indicator Restrictive Conditions](./qualification-condition) for details.                                 |
 
 1. Submit to save.
 2. Download Template: You can download a template file for bulk upload, fill in indicator information in bulk, and then upload the file for bulk entry of indicators.

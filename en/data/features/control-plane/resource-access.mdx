@@ -69,3 +69,19 @@ The resource details page provides these views around a single resource:
 - Resource chat: call the ontology assistant in the current resource context.
 
 Resource details are the main entry point for operations and troubleshooting.
+
+## Web Operation Path
+
+An administrator signs in to Data Xpert and goes to **Data and Ontology → Resource Access → Register External Resource**. The form includes the resource ID, type, connection reference, owner, version, tags, and capabilities. After saving, open the resource card and confirm its type, connection reference, and latest sync state.
+
+**Success signal:** a new card appears and resource details expose **Overview, Entity Graph, Sync Jobs, Errors, and Settings**. Registration is only the control-plane step; run the first full sync from **Sync Jobs**.
+
+**Minimum permissions:** resource registration and Secret-reference access. Read-only users can inspect resources and graphs but cannot create, update, or trigger a sync.
+
+## Checklist
+
+- [ ] The resource ID is unique within the organization.
+- [ ] The connection reference points to a saved Secret version.
+- [ ] Capabilities match the resource type schema.
+- [ ] Owner, version, and tags can be reviewed in Settings.
+- [ ] The first sync completed and produced the current snapshot.

@@ -1,0 +1,36 @@
+---
+title: Choose by Business Scenario
+description: Enter resource access, semantic modeling, analysis, Assistant execution, and governance through real business goals.
+sidebar_position: 3
+---
+
+Start with the business problem you need to solve. You do not need to read every concept first; after completing one real scenario, the [Product Concept](../overview/concept) is easier to understand.
+
+| Your business goal | Suggested entry | Result |
+| --- | --- | --- |
+| Answer “What are sales, orders, or procurement trends?” | [Multidimensional Model Introduction](../analytics/semantic-model/multidimensional-model-introduction), [Query Lab](../analytics/semantic-model/query-lab), [Semantic Analysis](../practices/semantic-analysis) | Metrics, dimensions, and query results have a clear definition |
+| Connect SAP, a database, or a knowledge base | [Resource Access](../features/control-plane/resource-access), [Integration Model](../ontology/integrations/overview), [Ontology Workspace](../ontology/ontology-workspace) | External systems become searchable resources and entities |
+| Unify customers, orders, equipment, or other business objects | [Ontology Studio](../ontology/ontology-studio), [Ontology Overview](../ontology/overview), [Snapshots and Projections](../ontology/snapshot-and-projection) | Reusable entities, relationships, and business actions are published |
+| Let an Assistant query data, build a dashboard, or prepare a work order | [Action Discovery](../features/agent-execution/action-discovery), [Workbench and Resource Chat](../features/agent-execution/workbench-and-chatkit), [Apps](../apps/index) | The Assistant completes a governed task in business context |
+| Control high-risk operations and trace decisions | [Policies](../features/governance/policies), [Approvals](../features/governance/approvals), [Execution Audit](../features/governance/audit) | Every execution has a permission decision, approval state, and evidence |
+
+## Recommended first experience
+
+If you only want to understand the system quickly, start with a read-only question:
+
+> “Tell me the number of purchase orders, suppliers, and products this month, and show the data source and update time.”
+
+The system locates business entities in authorized resources, discovers and simulates a query action, and returns the result with audit evidence. If your organization has a procurement resource, see [Procurement Quote Comparison](../apps/supply-chain/procurement-quote-comparison); otherwise use an existing semantic model and follow [Semantic Analysis](../practices/semantic-analysis).
+
+## Continue by responsibility
+
+After choosing a business scenario, follow the path for your responsibility:
+
+- **Administrator:** start with [Secret Management](../features/control-plane/secret-management), [Resource Access](../features/control-plane/resource-access), and [Sync Jobs](../features/control-plane/sync-jobs).
+- **Modeler:** define entities, relationships, and actions, then publish them in [Ontology Studio](../ontology/ontology-studio).
+- **Analyst:** validate metric definitions in [Semantic Modeling Workspace](../analytics/semantic-model/semantic-modeling-workspace) and [Query Lab](../analytics/semantic-model/query-lab).
+- **Assistant / Agent builder:** read [Agent Tools](../features/agent-execution/agent-tools) and [Action Discovery](../features/agent-execution/action-discovery).
+- **Governance user:** use [Policies](../features/governance/policies), [Approvals](../features/governance/approvals), and [Execution Audit](../features/governance/audit).
+- **Plugin developer:** start with [Adapter Extensibility](../ontology/integrations/extensibility) and [Ontology in Plugin Scenarios](../ontology/cases/plugin-scenarios).
+
+When a step fails, use [First Failure Troubleshooting](./troubleshooting) and trace the first page state that is not ready.

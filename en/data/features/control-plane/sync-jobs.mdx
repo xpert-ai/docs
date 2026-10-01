@@ -71,3 +71,19 @@ The usual handling path is to view the event payload, fix the Secret or capabili
 - Set `maxRelations` and mention sample count for knowledge graphs to keep context manageable.
 - For failed jobs, check failedReason and dead-letter first before deciding whether to retry.
 - Run full sync after major capability changes to avoid stale projections.
+
+## Web Operation Path
+
+Open a resource card under **Data and Ontology → Resource Access**, then open **Sync Jobs**. Use **Full Sync** for the first import and **Incremental Sync** for routine updates. The queue page can refresh, retry failed jobs, cancel running jobs, and clean up history. Use **Errors** to inspect dead-letter payloads and processing stages.
+
+**Success signal:** the job is `completed`, the resource overview shows the latest sync time and `snapshotId`, and ontology health becomes `ready`. Do not submit the same mode repeatedly while a job is `waiting` or `active`.
+
+**Minimum permissions:** resource operations that can trigger syncs and view errors. Read-only users can inspect jobs and failure reasons.
+
+## Checklist
+
+- [ ] The first sync uses full mode and its job ID is recorded.
+- [ ] The job ends as `completed` with no unprocessed dead-letter.
+- [ ] The resource has a current snapshot and graph version.
+- [ ] Later incremental syncs use a cursor type supported by the adapter.
+- [ ] Secret or capability problems are fixed before retrying.

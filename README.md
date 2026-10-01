@@ -59,3 +59,13 @@ node scripts/generate-openapi-zh.mjs --check
 ```
 
 Do not edit the generated specification directly. The generator preserves the published Chinese agent chat URL and fails when translations are missing or stale.
+
+## Data documentation checks
+
+Run the dependency-free metadata and local-link check before publishing the Chinese Data Xpert documentation:
+
+```bash
+node scripts/check-data-docs.mjs
+```
+
+The check fails when a page under `zh-Hans/data` lacks a title or description, or when a relative Markdown/MDX link or local image cannot be resolved. External URLs are intentionally skipped.

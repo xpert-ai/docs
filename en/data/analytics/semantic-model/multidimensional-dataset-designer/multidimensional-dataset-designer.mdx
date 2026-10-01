@@ -1,5 +1,6 @@
 ---
 title: 🧊多维数据集设计器
+description: Configure fact tables, dimensions, measures, and calculated members with the multidimensional dataset designer.
 sidebar_position: 7
 tags:
   - MDX
@@ -14,7 +15,7 @@ tags:
 2. 计算: 对计算成员公式设计和数据预览
 3. 查询: 自编写查询语言进行数据查询预览
 
-![](./cube-designer.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 ## 构建多维数据集
 
@@ -64,29 +65,29 @@ tags:
 
 点击维度 (Dimensions) 区域标题栏上的新建维度图标, 可以看到下方多出一行空白行.
 
-![Small](./new-dimension.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 选中维度, 在右侧打开的属性编辑界面中设置维度的属性.
 
-![Small](./dimension-attributes.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
-维度的属性设置同 [❄️维度设计器](../dimension-designer/#维度属性)
+维度的属性设置同 [❄️维度设计器](../dimension-designer/dimension-designer#Dimension Attributes)
 
 #### 新建层次结构
 
 在维度行上点击新增图标, 添加一行空白的层次结构 (Hierarchy).
 
-![Small](./new-hierarchy.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 选中新增的层次结构行, 此时右边属性设置栏变为层次结构的属性设置界面.
 
-层次结构的详细配置请参考 [❄️维度设计器 - 创建层次结构](../dimension-designer/#创建层次结构) 里的属性设置.
+层次结构的详细配置请参考 [❄️维度设计器 - 创建层次结构](../dimension-designer/dimension-designer#Hierarchies and Levels) 里的属性设置.
 
 #### 新建层级
 
-点击维度行上的新建图标, 添加一个或多个层级节点, 点击层级节点在属性设置界面中设置层级属性, 层级详细属性设置请参考 [❄️维度设计器 - 创建层级](../dimension-designer/#创建层级) 中的属性设置.
+点击维度行上的新建图标, 添加一个或多个层级节点, 点击层级节点在属性设置界面中设置层级属性, 层级详细属性设置请参考 [❄️维度设计器 - 创建层级](../dimension-designer/dimension-designer#Hierarchies and Levels) 中的属性设置.
 
-![Small](./new-level.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 ### 共享维度
 
@@ -94,11 +95,11 @@ tags:
 
 将共享维度从模型区域拖至维度区域.
 
-![](./cube-designer.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 选中添加的共享维度打开右侧属性编辑界面:
 
-![Small](./dimension-usage-attributes.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 - 名称: 维度在多维数据集中的唯一技术名称.
 - 外键: 事实表中与此维度主键关联的外键字段.
@@ -109,13 +110,13 @@ tags:
 
 在度量 (Measures) 行上点击新增度量图标, 在下面出现一行空白度量.
 
-![Small](./new-measure.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 选中此行空白度量, 右边设置栏将变为度量设置界面, 输入以下信息:
 
 见下方属性列表
 
-![Small](./measure-attributes.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 #### 度量属性
 
@@ -137,11 +138,11 @@ tags:
 
 在计算成员(Calculated Members)标题栏点击新增图标新建一个计算成员.
 
-![Small](./new-calculated-member.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 选中新增的计算成员行, 在属性编辑界面中设置计算成员属性.
 
-![Small](./calculated-member-attributes.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 #### 计算成员属性
 
@@ -191,7 +192,7 @@ tags:
 - 刷新按钮: 手动刷新预览数据.
 - 转置按钮: 对行列配置进行交换, 使得数据预览的行列进行转置.
 
-![](./cube-designer.png)
+<Info>Follow the adjacent steps and verify the page state.</Info>
 
 ## 查询
 

@@ -1,0 +1,40 @@
+---
+title: Before You Begin
+description: Accounts, workspaces, data sources, and permissions to confirm before using the ontology system.
+sidebar_position: 2
+---
+
+## Account and workspace
+
+Prepare an account that can sign in to Data Xpert and confirm that:
+
+- the current organization is the one you intend to use;
+- you are in the target AI workspace;
+- the workspace can access at least one data source or external resource;
+- you know which Assistant will be used if you plan to work through Agent Workbench.
+
+Organization access does not automatically grant workspace access. Ask an administrator to authorize the workspace data sources when they are not visible.
+
+## Data sources and resources
+
+Quick Start requires an accessible data source or a registered external resource. You can use an existing semantic model, database, SAP OData service, or knowledge resource.
+
+If no resource is available, ask an administrator to complete [Resource Access](../features/control-plane/resource-access), including the resource type, connection reference, and capability settings. Then return to [Quick Start](./index) and run the first sync.
+
+## Permissions by role
+
+An administrator should complete the initial configuration, after which responsibilities can be split as follows:
+
+- **Administrator:** register resources, manage Secrets, run syncs, and review audits;
+- **Modeler:** edit, validate, and publish ontology definitions;
+- **Agent builder:** use Assistants, Agent Tools, and the workbench;
+- **Governance user:** configure policies, process approvals, and review audits;
+- **Read-only user:** search ontology entities and run low-risk queries.
+
+Actions still pass through discovery, simulation, policy checks, and audit. Do not grant arbitrary backend access just to make a task succeed.
+
+## Secrets and connection references
+
+Before registering a resource, create a connection Secret under **Data and Ontology → Secrets**, then use the generated connection reference in the resource configuration. The address, credentials, and certificates in a Secret must point to an approved business system. Never place sensitive values in documentation, screenshots, or action parameters.
+
+After these preparations, follow [Quick Start](./index) to complete the first resource sync and read-only query.

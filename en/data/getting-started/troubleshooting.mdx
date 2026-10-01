@@ -1,0 +1,53 @@
+---
+title: First Failure Troubleshooting
+description: Use page states, sync jobs, snapshots, actions, and audit fields to locate the first failed step.
+sidebar_position: 4
+---
+
+Troubleshoot from left to right: **organization and permissions → Resource → Secret → Sync Job → Snapshot → Entity → Action → Policy / Approval → Audit**. Do not repeat downstream operations while an upstream state is not ready.
+
+## Resource registration failure
+
+In **Data and Ontology → Resource Access**, inspect form errors and resource details. Confirm that the resource ID is unique, the type exists in the catalog, the connection reference comes from a saved Secret, and the capability settings match the adapter schema. If the resource type is missing, check the enabled integration instead of typing an unregistered `resourceType`.
+
+## Sync job failure
+
+In the resource's **Sync Jobs** page, inspect the status, stage, progress, and `failedReason`; use the **Errors** page for the dead-letter payload. Correct the Secret, network, authentication, or capability scope before retrying. Use a full sync for the first import; narrow the service selection for SAP OData and the table or column limits for databases.
+
+## Missing snapshot or projection failure
+
+`missing_snapshot` means that no current snapshot exists, `publish_failed` means that publication failed, and `projection_failed` means that the snapshot exists but its runtime projection failed. Confirm that the latest sync completed and recorded a snapshot ID before asking an Agent to consume the resource.
+
+## Empty entity search
+
+In the ontology workspace, narrow the search by resource and entity type, then check the keyword, external key, and aliases. Confirm that graph health is `ready`, the target service was selected during sync, and database capabilities did not filter out the table. Narrow broad searches when they reach a result limit; do not treat truncated results as a complete export.
+
+## Action unavailable
+
+Inspect `discoverActions.deniedActions.reasonCode` and `stage`:
+
+- `discovery_mode_manual_only`: the action cannot be planned automatically;
+- `target_entity_type_not_supported`: the target type does not match;
+- `analysis_contract_missing` or `query_endpoint_missing`: the semantic model contract or query endpoint is not ready;
+- `policy_binding:deny`: policy denies the request;
+- `policy_binding:require_approval` or `approval_required`: approval is required.
+
+Fix runtime readiness in the resource context before running discovery again.
+
+## Simulation or execution failure
+
+Run `simulateAction` again with the same target and parameters. Check entity uniqueness, the input schema, connection resolution, policy result, approval fingerprint, `approvalRequestId`, and `expectedEffect`. Execute a read-only action only after simulation succeeds; send high-risk actions to **Governance → Approvals**.
+
+## ChatKit or audit issue
+
+Confirm that ChatKit is configured for the current organization and workspace, and that requests carry the current tenant, organization, user, workspace, and Assistant context. If ChatKit opens but tool calls fail, inspect the Data Xpert API response and the audit fields `policyDecision`, `snapshotId`, and `traceId`. Do not retry with a token from another organization.
+
+## Page checklist
+
+| Page | Fields to inspect | Next step |
+| --- | --- | --- |
+| Resource Access | Resource ID, type, owner, status | Open resource details |
+| Sync Jobs | Job status, stage, `failedReason`, snapshot ID | Retry or open the ontology workspace |
+| Ontology Workspace | Health, entity count, graph version | Search for an entity |
+| Resource Chat / ChatKit | Allowed or denied actions, simulation result | Execute a low-risk action or request approval |
+| Execution Audit | Task, tool/action, policy, evidence, result | Review or correct configuration |

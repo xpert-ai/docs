@@ -93,3 +93,17 @@ Write actions should rely on idempotency keys and source-system concurrency cont
 - `discovery_mode_manual_only`: the action cannot be planned automatically.
 - `policy_binding:deny`: policy denies the request.
 - `approval_required`: approval is required.
+
+## Web and ChatKit Operation Path
+
+From resource details or the ontology workspace, open resource chat or use the configured ChatKit. Ask the Assistant to describe the current resource, snapshot, and available entities before discovering actions. Do not request execution without an entity context. Technical integrations should call `discoverActions` → `simulateAction` → (approval when required) → `executeAction` → `getAuditTrace`.
+
+**Success signal:** the conversation or tool response includes `allowedActions` / `deniedActions`, a simulation result, and an audit reference. ChatKit requests must carry the current tenant, organization, workspace, user, and Assistant context.
+
+## Checklist
+
+- [ ] The target entity is unique and comes from a `ready` snapshot.
+- [ ] Denied actions from `discoverActions` include a `reasonCode` and `stage`.
+- [ ] Low-risk actions are simulated before execution.
+- [ ] Write actions provide an `idempotencyKey` and `expectedEffect`.
+- [ ] High-risk actions use an `approvalRequestId` and can be reviewed in audit.

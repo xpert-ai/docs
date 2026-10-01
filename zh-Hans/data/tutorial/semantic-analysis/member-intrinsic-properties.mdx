@@ -1,15 +1,18 @@
 ---
 title: 成员固有属性
+description: 使用成员内置属性读取层级、父子关系和成员元数据。
 sidebar_position: 100
 tags:
   - MDX
 ---
 
-import CodeBlock from '@theme/CodeBlock';
+<Info>
+**适用版本：** Data Xpert / UOSE 当前版本。
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+**前置条件：** 已登录目标组织，并准备好可编辑或可查询的语义模型。
 
+**外部依赖：** MDX / SQL 教程需要对应语义模型和数据源；WASM 教程可在浏览器内运行。没有现成模型时请先阅读[数据本体系统快速开始](../../getting-started/index)。
+</Info>
 MDX（多维表达式）是一种查询多维数据的语言，它使用一种称为“成员”的概念来引用数据。成员是多维数据中的元素，如维度成员或度量成员。
 
 <Info>
@@ -26,20 +29,20 @@ MDX（多维表达式）是一种查询多维数据的语言，它使用一种�
 
 ```mdx-code-block
 <Tabs>
-  <TabItem value="Property" label="Property" default>
+  <Tab title="Property">
 ```
 ```sql
 CurrentMember.Properties("PARENT_UNIQUE_NAME")
 ```
 ```mdx-code-block
-  </TabItem>
-  <TabItem value="Function" label="Function">
+  </Tab>
+  <Tab title="Function">
 ```
 ```sql
 CurrentMember.Parent.UniqueName	
 ```
 ```mdx-code-block
-  </TabItem>
+  </Tab>
 </Tabs>
 ```
 

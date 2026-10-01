@@ -1,5 +1,6 @@
 ---
 title: SAP BW 日历维度
+description: 为 SAP BW 语义模型配置可复用的日历维度和时间层级。
 sidebar_position: 4
 tags:
   - MDX
@@ -7,9 +8,16 @@ tags:
   - BW
 ---
 
+<Info>
+**适用版本：** Data Xpert / UOSE 当前版本。
+
+**前置条件：** 可访问的 SAP BW/BPC 系统、对应 Secret、语义模型权限和可用的 Assistant。
+
+**外部依赖：** 需要可访问的 SAP 系统、对应 Secret 和相关权限；没有 SAP 时请先阅读[数据本体系统快速开始](../../getting-started/index)。
+</Info>
 ## 日历维度介绍
 
-在多维数据集（Cube）中，[日历维度](../../models/mdx-modeling/calendar-dimension)（Calendar Dimension）是一个关键的维度，用于表示和组织与时间相关的数据。日历维度提供了一个结构化的时间框架，使得用户能够按时间段进行数据的切片和分析。典型的日历维度包括年、季度、月、周、日等层级，以及其他相关的时间属性，如财年、财务季度和工作日等。
+在多维数据集（Cube）中，[日历维度](/zh-Hans/data/analytics/semantic-model/dimension-designer/dimension-designer)（Calendar Dimension）是一个关键的维度，用于表示和组织与时间相关的数据。日历维度提供了一个结构化的时间框架，使得用户能够按时间段进行数据的切片和分析。典型的日历维度包括年、季度、月、周、日等层级，以及其他相关的时间属性，如财年、财务季度和工作日等。
 
 日历维度在数据分析和商业智能中具有重要作用，因为大多数业务数据都涉及时间因素。通过使用日历维度，用户可以轻松地进行以下操作：
 
@@ -87,10 +95,10 @@ tags:
 
 语义增强过的模型便可以在 Xpert 分析云系统中自由使用了，涉及到日历维度的场景有以下组件（不限于）：
 
-- [计算成员的差值计算](../../stories/calculations/#5-差值度量-difference-from)
-- [指标注册时的日历维度](../../indicators/register#注册指标)
-- [故事微件的过滤器栏](../../widgets/filter-bar/calendar-select/)
-- [故事微件的输入控制器](../../widgets/input-control/calendar/)
+- [计算成员的差值计算](/zh-Hans/data/practices/semantic-analysis)
+- [指标注册时的日历维度](/zh-Hans/data/analytics/indicator-management/indicator-registration#注册指标)
+- **故事微件的过滤器栏**
+- **故事微件的输入控制器**
 
 ## 总结
 

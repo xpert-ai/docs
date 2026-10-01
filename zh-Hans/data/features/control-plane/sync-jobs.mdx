@@ -71,3 +71,19 @@ UOSE 支持两类同步模式：
 - 对知识图谱设置 `maxRelations` 和 mention 样本数，保持上下文可控。
 - 对失败 job 优先查看 failedReason 和 dead-letter，再决定 retry。
 - 每次重大 capabilities 调整后执行一次 full sync，以避免旧投影残留。
+
+## Web 操作路径
+
+在**数据与本体 → 资源接入**打开资源卡片，进入**同步作业**页。首次接入点击**全量同步**；日常更新使用**增量同步**。队列页可刷新、重试失败任务、取消进行中任务和清理历史记录。进入**错误**页查看 dead-letter 和处理阶段。
+
+**成功信号：**作业状态为 `completed`，资源概览出现最近同步时间和 `snapshotId`，本体空间健康状态变为 `ready`。`waiting` 或 `active` 期间不要重复提交同一模式的作业。
+
+**最小权限：**需要触发同步和查看错误的资源运营权限；只读用户只能查看作业和失败原因。
+
+## 验收清单
+
+- [ ] 首次同步使用 full 模式并记录 job ID。
+- [ ] job 最终为 `completed`，没有未处理 dead-letter。
+- [ ] 资源有当前 Snapshot 和 graph version。
+- [ ] 后续增量同步使用 adapter 支持的 cursor 类型。
+- [ ] 失败后先修复 Secret 或 capabilities，再执行 retry。

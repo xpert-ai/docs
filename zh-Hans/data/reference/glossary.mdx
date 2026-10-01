@@ -1,0 +1,33 @@
+---
+title: 数据本体系统术语表
+description: Data Xpert / UOSE 页面显示名称、稳定编码和使用时机的统一术语表。
+sidebar_position: 1
+---
+
+| 中文名 | 英文 / 稳定编码 | 页面显示位置 | 什么时候会遇到 |
+| --- | --- | --- | --- |
+| 外部资源 | external resource | 数据与本体 → 资源接入 | 注册 SAP、语义模型、Knowledge 或数据库来源时 |
+| 资源 | Resource / `resourceId` | 资源列表、资源详情 | 需要维护连接、负责人、版本和能力时 |
+| 资源类型 | Resource Type / `resourceType` | 新注册外部资源表单 | 选择 `semantic_model`、`sap_odata_api`、`knowledge`、`database` 等 adapter 时 |
+| 连接引用 | `connectionRef` | 资源表单、Secret 管理 | 把资源绑定到 Secret 版本时 |
+| 能力配置 | capabilities | 资源表单、资源设置 | 限制同步范围、查询端点和执行边界时 |
+| 同步作业 | Sync Job | 资源详情 → 同步作业 | 触发 full/incremental、重试、取消或清理时 |
+| 本体快照 | Ontology Snapshot / `snapshotId` | 本体空间、审计 | 固定某次发布的实体、关系和动作视图时 |
+| 图版本 | Graph Version / `graphVersion` | 本体空间、资源图谱 | 复现运行时图查询和助手上下文时 |
+| 本体定义 | Ontology Definition | 本体工作室 | 设计实体类型、关系、Action 和版本时 |
+| 运行时投影 | Runtime Projection | 本体空间健康状态 | 将发布快照变成可搜索实体和关系时 |
+| 实体 | Entity | 实体搜索、图谱 | 按类型、名称、外部键定位业务对象时 |
+| 关系 | Relation | 实体图谱 | 查看对象之间的方向、端点和属性时 |
+| 动作 | Action / `actionTypeCode` | Agent Tools、资源对话 | 发现、模拟和执行某个对象能力时 |
+| 发现模式 | discovery mode | Action 契约 | 判断动作能否自动规划或只能人工触发时 |
+| 策略绑定 | Policy Binding | 治理 → 策略 | 对资源、实体类型或 Action allow/deny/require approval 时 |
+| 审批请求 | Approval Request / `approvalRequestId` | 治理 → 审批 | 高风险 Action 需要人工批准时 |
+| 执行审计 | Execution Audit / `taskId`、`traceId` | 治理 → 执行审计 | 回看调用者、策略、Snapshot、证据和结果时 |
+| 语义模型资源 | `semantic_model` | 资源类型、数据分析 | 已有 BI / OLAP 模型需要查询和同步时 |
+| 业务本体资源 | `business_ontology` | 本体工作室、插件 | 需要跨资源领域定义和治理契约时 |
+| 适配器 | Adapter | 资源类型目录 | 将某类外部协议映射到统一 IR 和 Action 时 |
+| 规范中间表示 | Canonical Ontology IR | 同步日志和架构 | 适配器输出到 Snapshot 之前统一语义时 |
+| 本体助手 | Ontology Assistant | 本体空间、资源对话 | 需要基于当前资源和 Snapshot 解释语义时 |
+| ChatKit | ChatKit | Agent Workbench、资源对话 | 通过对话触发 Agent Tools 和可视化结果时 |
+
+稳定编码用于 API、插件和审计引用；页面中文名可以优化，但不要在集成中用展示名称替代编码。

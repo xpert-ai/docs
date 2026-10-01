@@ -1,16 +1,16 @@
 ---
 title: 📐指标度量
+description: 把语义模型中的度量配置为可分析和可复用的指标。
 sidebar_position: 8
 tags:
   - MDX
 ---
-
 **指标度量** 是指以指标管理系统中的指标定义的条件为限制的度量值. 它可以像普通度量字段一样被用在各种组件中.
 指标的限制条件在指标度量的计算中不会被上下文中的条件所覆盖, 所以有些组件在选择指标度量后维度选择则只能从指标的自由维度中选择(如果有定义的话).
 
 在度量选择组件的选择列表中, 有单独的指标度量组.
 
-![Small](public/img/bi/measure-indicator.png)
+![Small](/public/img/indicator/indicator-register-preview.png)
 
 ## 图形组件中使用指标度量
 
@@ -18,23 +18,23 @@ tags:
 
 选择指标度量后, 如果此指标有定义自由维度, 那么在维度选择时只能从这些自由维度中选择维度.
 
-![Small](./chart-indicator-config.png)
+<Info>请按页面字段完成配置并检查图表结果。</Info>
 
 * 指标定义中的 **度量单位** 将作为图形中度量的单位显示.
 * 图形数据还可以按指标大小进行排序.
 
-![Middle](./chart-indicator-measure.png)
+<Info>请按页面字段完成配置并检查图表结果。</Info>
 
 ## 分析表格中使用指标度量
 
-[指标在表格中的应用](../../../widgets/analytical-grid/pivot-grid/#指标在表格中的应用)
+[指标在表格中的应用](/zh-Hans/data/analytics/indicator-management/indicator-application)
 
 ## 指标组件
 
 还有一些专门为指标服务的组件类型如:
 
-* [指标表格](../../../widgets/indicator-table/)
-* [指标卡片](../../../widgets/indicator-card/)
+* [指标表格](/zh-Hans/data/analytics/indicator-management/indicator-application)
+* [指标卡片](/zh-Hans/data/analytics/indicator-management/indicator-application)
 
 这些组件都可以在配置里直接选择相应的指标进行展示.
 

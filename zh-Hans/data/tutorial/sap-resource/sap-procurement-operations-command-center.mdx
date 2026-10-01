@@ -4,13 +4,21 @@ description: 以 SAP 采购运营指挥中心为例，完成外部资源注册�
 sidebar_position: 2
 ---
 
+<Info>
+**适用版本：** Data Xpert / UOSE 当前版本。
+
+**前置条件：** 可访问的 SAP BW/BPC 系统、对应 Secret、语义模型权限和可用的 Assistant。
+
+**外部依赖：** 需要可访问的 SAP OData 服务、对应 Secret、资源同步权限和 Assistant；没有 SAP 时请先阅读[数据本体系统快速开始](../../getting-started/index)。
+</Info>
+
 本教程用一个完整场景串起 Data 产品的数据接入、语义治理、Assistant 配置和可视化交付：采购负责人只需要向 Assistant 说一句业务需求，系统就能在已授权的 SAP OData 资源上完成预演、查询并生成可刷新的 LiveArtifact Dashboard。
 
-教程使用本地环境中已经注册的 `sap-goodsap-odata` 作为示例资源。该资源包含 `zPurchaseorderSet`、`BusinessPartnerSet`、`ProductSet` 和 `SalesOrderSet` 四个 Entity Set。截图来自一次真实的 SAP 采购分析 Assistant 运行结果；你的租户中的数量、字段和数据值可能不同。
+教程以一个 SAP OData 资源和采购相关 Entity Set 为例。实际 Entity Set、字段和数量以你的 `$metadata` 与本体快照为准。
 
 ## 完成后你将得到什么
 
-- 一个可复用的 `sap-goodsap-odata` 外部资源和对应本体快照。
+- 一个可复用的 `sap-odata-resource` 外部资源和对应本体快照。
 - 一个名为 `SAP采购分析助手` 的 Assistant，按采购、供应商、产品和销售订单分组使用资源。
 - 一套经过动作发现、权限校验和 `simulateAction` 预演的 LiveArtifact bindings。
 - 一个包含 KPI、ECharts 图形和明细表的“SAP 采购运营指挥中心”看板。
@@ -19,7 +27,7 @@ sidebar_position: 2
 
 ```mermaid
 flowchart LR
-  A[Secret Manager\nSAP 连接引用] --> B[外部资源注册\nsap-goodsap-odata]
+  A[Secret Manager\nSAP 连接引用] --> B[外部资源注册\nsap-odata-resource]
   B --> C[Full sync\nOData metadata]
   C --> D[本体快照\nEntity Set / Type / Relation]
   D --> E[Assistant\n资源白名单]
@@ -59,7 +67,7 @@ secret://sap%2Fgoodsap%2Fmain?version=1
 
 | 字段 | 示例值 | 说明 |
 | --- | --- | --- |
-| 资源 ID | `sap-goodsap-odata` | 在当前组织内唯一，建议使用业务系统和协议命名 |
+| 资源 ID | `sap-odata-resource` | 在当前组织内唯一，建议使用业务系统和协议命名 |
 | 资源类型 | `SAP OData API` | 对应 `sap_odata_api` adapter |
 | 连接引用 | `secret://sap%2Fgoodsap%2Fmain?version=1` | 从 Secret Manager 选择，不手工复制密钥 |
 | 负责人 | `data-platform-team` | 负责同步失败和字段变更排查 |
@@ -74,7 +82,7 @@ SAP OData adapter 会同时发现 V2 Gateway catalog 和 V4 catalog，并在同�
 
 点击“创建资源”后，列表中出现资源只代表控制面记录已经创建；它还不能直接被 Assistant 使用。必须继续执行连接和首次 full sync。
 
-![已启用的 sap-goodsap-odata 资源](/public/img/data/sap-procurement-operations/02-external-resource-list.png)
+![已启用的 sap-odata-resource 资源](/public/img/data/sap-procurement-operations/02-external-resource-list.png)
 
 图 2：资源注册完成后，在资源列表中确认状态为“已启用”，再进入详情页执行同步。
 
@@ -82,13 +90,13 @@ SAP OData adapter 会同时发现 V2 Gateway catalog 和 V4 catalog，并在同�
 
 ### 2.1 运行首次同步
 
-进入 `sap-goodsap-odata` 详情页，按以下顺序操作：
+进入 `sap-odata-resource` 详情页，按以下顺序操作：
 
 1. 在“资源上下文”确认连接引用、负责人、版本和标签。
 2. 打开服务发现，搜索并勾选采购相关服务根路径。
 3. 执行 full sync，等待同步作业变为成功。
 4. 在“本体图谱”查看 Entity Set、Entity Type、字段和导航关系。
-5. 在“同步作业”保存本次 snapshot 的版本和错误信息。
+5. 在“同步作业”保存当前 snapshot 的版本和错误信息。
 
 ### 2.2 确认四个采购 Entity Set
 
@@ -154,33 +162,33 @@ Assistant 的系统指令应描述业务目标和边界，而不是写死某个 
 ```json
 {
   "po_collection": {
-    "resourceId": "sap-goodsap-odata",
+    "resourceId": "sap-odata-resource",
     "actionTypeCode": "sap_odata.read_collection",
     "target": { "entitySet": "zPurchaseorderSet" }
   },
   "bp_collection": {
-    "resourceId": "sap-goodsap-odata",
+    "resourceId": "sap-odata-resource",
     "actionTypeCode": "sap_odata.read_collection",
     "target": { "entitySet": "BusinessPartnerSet" }
   },
   "product_collection": {
-    "resourceId": "sap-goodsap-odata",
+    "resourceId": "sap-odata-resource",
     "actionTypeCode": "sap_odata.read_collection",
     "target": { "entitySet": "ProductSet" }
   },
   "so_collection": {
-    "resourceId": "sap-goodsap-odata",
+    "resourceId": "sap-odata-resource",
     "actionTypeCode": "sap_odata.read_collection",
     "target": { "entitySet": "SalesOrderSet" }
   }
 }
 ```
 
-保存时服务端会一次性校验业务域、资源状态、目标实体、动作策略和操作者权限，并在同一个配置命令中写入 Assistant 资源白名单。任一 binding 失败，整个目标状态回滚；不要让前端先保存 Assistant、再发第二个补偿请求。Assistant 级别先授权 `sap-goodsap-odata`，看板级别再把四个 Entity Set 分成独立 binding。
+保存时服务端会一次性校验业务域、资源状态、目标实体、动作策略和操作者权限，并在同一个配置命令中写入 Assistant 资源白名单。任一 binding 失败，整个目标状态回滚；不要让前端先保存 Assistant、再发第二个补偿请求。Assistant 级别先授权 `sap-odata-resource`，看板级别再把四个 Entity Set 分成独立 binding。
 
 ![SAP 采购 Assistant 的资源访问白名单](/public/img/data/sap-procurement-operations/05-assistant-resource-allowlist.png)
 
-图 5：实际配置中只勾选 `sap-goodsap-odata`，其他语义模型资源保持未选中。资源授权和 Artifact binding 是两层边界。
+图 5：配置示例中只勾选 `sap-odata-resource`，其他语义模型资源保持未选中。资源授权和 Artifact binding 是两层边界。
 
 ### 3.3 资源绑定的权限边界
 
@@ -206,7 +214,7 @@ Assistant 的系统指令应描述业务目标和边界，而不是写死某个 
 
 ![向 SAP Assistant 提出一句话看板需求](/public/img/data/sap-procurement-operations/06-agent-one-sentence-request.png)
 
-图 6：实际 ChatKit 执行记录。用户只描述业务目标，技能先读取创作规则，再发现 `sap-goodsap-odata`、预览四个数据集并生成 Artifact。
+图 6：ChatKit 执行记录。用户只描述业务目标，技能先读取创作规则，再发现 `sap-odata-resource`、预览四个数据集并生成 Artifact。
 
 工作空间需要安装并启用 `datax-live-artifact-authoring` 和 `uose-resource-usage`。前者负责 Manifest、HTML、effect v2、ECharts 和生命周期，后者负责资源选择、动作发现和预演；技能安装状态可以在“AI 工作空间 → 技能”中确认。
 
@@ -266,19 +274,17 @@ ECharts 图表只消费 effect v2 的 `columns`、`rows`、`series` 或 `entity`
 
 ![LiveArtifact 中的 ECharts 柱状图和状态图](/public/img/data/sap-procurement-operations/07-live-artifact-echarts.png)
 
-图 9：真实 SAP 采购 Assistant 运行结果中的 ECharts 图表；图表使用标准 rows effect 渲染，不依赖 OData V2/V4 信封。
+图 9：SAP 采购 Assistant 运行结果中的 ECharts 图表；图表使用标准 rows effect 渲染，不依赖 OData V2/V4 信封。
 
 ![LiveArtifact 中的 SAP OData 明细表](/public/img/data/sap-procurement-operations/08-live-artifact-odata-table.png)
 
 图 10：OData collection 的明细展示。表格应保留来源、更新时间和截断提示，避免把当前返回集误认为全量数据。
 
-本地验收时，页面显示过“采购订单 30、业务伙伴 50、产品 50、采购金额 7,537,805.4”的示例值，并成功加载四个 binding。采购明细同时包含 EUR、CNY 和 USD；因此这组金额只证明渲染链路已经跑通，不能直接作为公司级采购总额。
-
 ### 5.2 验收清单
 
 在把看板交给领导前，逐项确认：
 
-- [ ] `sap-goodsap-odata` 资源状态可用，最近 snapshot 同步成功。
+- [ ] `sap-odata-resource` 资源状态可用，最近 snapshot 同步成功。
 - [ ] 四个 binding 的 target 都能在本体快照中定位到 Entity Set。
 - [ ] 四个动作均为 `sap_odata.read_collection` 或 `sap_odata.read_entity`，没有 create、update、delete 或 invoke operation。
 - [ ] 每条 binding 都有成功的 `simulateAction` receipt 和 fingerprint。
@@ -304,7 +310,7 @@ OData collection 受 200 行上限约束，截断结果不能代表全量。对�
 
 ### 分享给同事后，对方看不到数据怎么办？
 
-检查对方是否同时拥有 Assistant context、`sap-goodsap-odata` 资源访问权和 `sap_odata.read_collection` 策略。组织分享不会绕过这三层校验。
+检查对方是否同时拥有 Assistant context、`sap-odata-resource` 资源访问权和 `sap_odata.read_collection` 策略。组织分享不会绕过这三层校验。
 
 ### SAP 返回了 `__metadata` 字段怎么办？
 
