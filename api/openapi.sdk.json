@@ -180,7 +180,7 @@
       "post": {
         "operationId": "create_thread",
         "summary": "Create a thread",
-        "description": "Create a thread before starting a run. An empty JSON object is sufficient. Save thread_id for subsequent requests and metadata.conversation_id when a conversation ID is required. Creating a thread does not start the agent.",
+        "description": "Create a thread before starting a run. For agent conversations, include `assistant_id` and use the same agent ID for the run. The protocol accepts `{}` for an unbound thread, but successful creation does not establish run permission. Save `thread_id` for subsequent requests and `metadata.conversation_id` when a conversation ID is required. Creating a thread does not start the agent. If the run returns 403, see the permission troubleshooting section in the [SDK guide](/en/ai/agent/development-api).",
         "tags": [
           "Threads"
         ],
@@ -189,7 +189,7 @@
           "href": "/en/sdk-api/threads/create-thread",
           "metadata": {
             "title": "Create a thread",
-            "description": "Create a thread before starting a run. An empty JSON object is sufficient. Save thread_id for subsequent requests and metadata.conversation_id when a conversation ID is required. Creating a thread does not start the agent."
+            "description": "Create a thread before starting a run. For agent conversations, include `assistant_id` and use the same agent ID for the run. The protocol accepts `{}` for an unbound thread, but successful creation does not establish run permission. Save `thread_id` for subsequent requests and `metadata.conversation_id` when a conversation ID is required. Creating a thread does not start the agent. If the run returns 403, see the permission troubleshooting section in the [SDK guide](/en/ai/agent/development-api)."
           }
         },
         "responses": {
@@ -204,7 +204,8 @@
                   "thread_id": "11111111-1111-4111-8111-111111111111",
                   "status": "idle",
                   "metadata": {
-                    "conversation_id": "44444444-4444-4444-8444-444444444444"
+                    "conversation_id": "44444444-4444-4444-8444-444444444444",
+                    "assistant_id": "22222222-2222-4222-8222-222222222222"
                   }
                 }
               }
@@ -237,7 +238,7 @@
                   },
                   "assistant_id": {
                     "type": "string",
-                    "description": "Optionally bind an accessible agent at creation."
+                    "description": "Optional at the protocol level. For agent conversations, supply the target published agent ID at creation and use the same ID for subsequent runs. The TypeScript SDK parameter is `assistantId`. If omitted, the thread is created without an agent binding under the current request identity; a later run using a different execution identity can fail with 403. Binding does not grant additional conversation access."
                   },
                   "if_exists": {
                     "type": "string",
@@ -259,7 +260,9 @@
                   }
                 }
               },
-              "example": {}
+              "example": {
+                "assistant_id": "22222222-2222-4222-8222-222222222222"
+              }
             }
           }
         }

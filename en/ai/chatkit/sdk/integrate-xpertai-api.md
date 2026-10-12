@@ -113,7 +113,7 @@ async function main() {
     throw new Error("Assistant not found");
   }
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpert.xpert_id });
 
   const result = await client.runs.wait(thread.thread_id, xpert.xpert_id, {
     input: {
@@ -131,6 +131,8 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+Create the thread with `assistantId` and use the same agent ID for the run. If creation succeeds but the run returns 403, see the permission troubleshooting section in the [SDK guide](/en/ai/agent/development-api).
 
 ### 4. Common Capabilities
 
@@ -165,7 +167,7 @@ async function runWithFile(xpertId: string) {
     filename: "manual.pdf",
   });
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpertId });
 
   const result = await client.runs.wait(thread.thread_id, xpertId, {
     input: {
@@ -230,10 +232,12 @@ curl "https://api.xpertai.cn/api/ai/assistants/<xpert-id>" \
 curl -X POST "https://api.xpertai.cn/api/ai/threads" \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
-  -d '{}'
+  -d '{"assistant_id": "<xpert-id>"}'
 ```
 
 The response will contain a `thread_id`. You will need to continue using this thread ID for subsequent xpert runs.
+
+The HTTP field is `assistant_id`; the TypeScript SDK uses `assistantId`. Although the protocol accepts an unbound thread, agent integrations should bind the target agent at creation and use the same ID for the run. Successful thread creation does not guarantee run permission; see the [SDK guide](/en/ai/agent/development-api) for 403 troubleshooting.
 
 ### 4. Call `runs/stream`
 

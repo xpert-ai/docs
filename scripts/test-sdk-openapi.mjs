@@ -44,6 +44,18 @@ test('documented runnable SDK methods and guide links have reference pages', asy
   }
 });
 
+test('thread examples bind the run agent while the protocol keeps the field optional', () => {
+  const create = source.paths['/api/ai/threads'].post;
+  const request = create.requestBody.content['application/json'];
+  const response = create.responses['201'].content['application/json'].example;
+  const run = source.paths['/api/ai/threads/{thread_id}/runs/wait'].post;
+  assert.equal(request.schema.properties.assistant_id.type, 'string');
+  assert.ok(!(request.schema.required ?? []).includes('assistant_id'));
+  assert.ok(request.example.assistant_id);
+  assert.equal(request.example.assistant_id, run.requestBody.content['application/json'].example.assistant_id);
+  assert.equal(response.metadata.assistant_id, request.example.assistant_id);
+});
+
 test('start, wait and replay retain distinct documented wire contracts', () => {
   const stream = source.paths['/api/ai/threads/{thread_id}/runs/stream'].post;
   const wait = source.paths['/api/ai/threads/{thread_id}/runs/wait'].post;

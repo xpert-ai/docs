@@ -45,7 +45,7 @@ async function main() {
     apiUrl: process.env.XPERTAI_API_URL ?? "https://api.xpertai.cn/api/ai",
     apiKey,
   });
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpertId });
   const input: ChatSendRequest = {
     action: "send",
     message: { input: { input: "你好，请介绍一下你能做什么。" } },
@@ -63,6 +63,16 @@ main().catch((error) => {
 ```
 
 保存 `thread.thread_id`；后续对话复用同一个线程，通过 `client.runs.wait()` 或 `client.runs.stream()` 发送新的消息，不需要重新创建线程。
+
+调用智能体时，创建线程应显式传入 `assistantId`，后续运行使用同一个智能体 ID。SDK 会将 `assistantId` 转换为 HTTP 请求字段 `assistant_id`。接口允许省略该字段，此时按当前请求身份创建未绑定智能体的线程；后续运行若使用不同的执行身份，可能在对话权限检查时返回 403。创建时绑定智能体可提前确定其作用域，但不会授予额外权限。
+
+### 创建线程成功，但运行返回 403
+
+`201 Created` 只表示线程创建成功，不代表具备后续运行权限。如果运行返回 `You do not have access to this conversation`：
+
+1. 确认 API Key 有权访问已发布的目标智能体。用 `client.threads.create({ assistantId: xpertId })` 创建新线程，再把同一个 `xpertId` 传给运行方法。修改示例不会修复此前已创建的线程。
+2. 创建和运行线程时使用相同的凭据及调用者身份，不要复用其他用户或无关智能体的线程。
+3. 如果新建并绑定的线程仍返回 403，请管理员核查 API Key 的实际调用身份、对话所有者（`createdById`）、智能体绑定（`xpertId`）和部署版本。传入 `assistantId` 不会跳过所有权或作用域检查，不能解决所有 403。
 
 ## 实时接收输出
 
@@ -114,6 +124,7 @@ console.log(xperts, xpert);
 ```ts
 const { randomUUID } = await import("node:crypto");
 const customThread = await client.threads.create({
+  assistantId: xpertId,
   threadId: randomUUID(),
   ifExists: "raise",
 });

@@ -113,7 +113,7 @@ async function main() {
     throw new Error("Assistant not found");
   }
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpert.xpert_id });
 
   const result = await client.runs.wait(thread.thread_id, xpert.xpert_id, {
     input: {
@@ -131,6 +131,8 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+创建线程时传入 `assistantId`，运行时使用同一个智能体 ID。如果创建成功但运行返回 403，请查看 [SDK 接入指南](/zh-hans/ai/agent/development-api)中的权限排查说明。
 
 ### 4. 常用能力
 
@@ -165,7 +167,7 @@ async function runWithFile(xpertId: string) {
     filename: "manual.pdf",
   });
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpertId });
 
   const result = await client.runs.wait(thread.thread_id, xpertId, {
     input: {
@@ -230,10 +232,12 @@ curl "https://api.xpertai.cn/api/ai/assistants/<xpert-id>" \
 curl -X POST "https://api.xpertai.cn/api/ai/threads" \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
-  -d '{}'
+  -d '{"assistant_id": "<xpert-id>"}'
 ```
 
 返回结果中会包含 `thread_id`。后续运行 xpert 时要继续使用这个线程 ID。
+
+HTTP 字段名为 `assistant_id`，TypeScript SDK 参数名为 `assistantId`。接口允许创建未绑定的线程，但调用智能体时应在创建阶段绑定目标智能体，并在运行时使用同一个 ID。创建线程成功不代表具备运行权限；403 排查见 [SDK 接入指南](/zh-hans/ai/agent/development-api)。
 
 ### 4. 调用 `runs/stream`
 

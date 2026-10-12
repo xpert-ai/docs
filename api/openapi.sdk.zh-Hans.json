@@ -180,7 +180,7 @@
       "post": {
         "operationId": "create_thread",
         "summary": "创建线程",
-        "description": "发起运行前先创建线程；请求体可以是空 JSON 对象。保存 thread_id 供后续请求使用，需要对话 ID 时读取 metadata.conversation_id。创建线程不会启动智能体。",
+        "description": "发起运行前先创建线程。调用智能体时应传入 `assistant_id`，后续运行使用同一个智能体 ID。接口允许用 `{}` 创建未绑定的线程，但创建成功不代表具备运行权限。保存 `thread_id` 供后续请求使用，需要对话 ID 时读取 `metadata.conversation_id`。创建线程不会启动智能体。若运行返回 403，请查看 [SDK 接入指南](/zh-hans/ai/agent/development-api)中的权限排查说明。",
         "tags": [
           "Threads"
         ],
@@ -189,7 +189,7 @@
           "href": "/zh-hans/sdk-api/threads/create-thread",
           "metadata": {
             "title": "创建线程",
-            "description": "发起运行前先创建线程；请求体可以是空 JSON 对象。保存 thread_id 供后续请求使用，需要对话 ID 时读取 metadata.conversation_id。创建线程不会启动智能体。"
+            "description": "发起运行前先创建线程。调用智能体时应传入 `assistant_id`，后续运行使用同一个智能体 ID。接口允许用 `{}` 创建未绑定的线程，但创建成功不代表具备运行权限。保存 `thread_id` 供后续请求使用，需要对话 ID 时读取 `metadata.conversation_id`。创建线程不会启动智能体。若运行返回 403，请查看 [SDK 接入指南](/zh-hans/ai/agent/development-api)中的权限排查说明。"
           }
         },
         "responses": {
@@ -204,7 +204,8 @@
                   "thread_id": "11111111-1111-4111-8111-111111111111",
                   "status": "idle",
                   "metadata": {
-                    "conversation_id": "44444444-4444-4444-8444-444444444444"
+                    "conversation_id": "44444444-4444-4444-8444-444444444444",
+                    "assistant_id": "22222222-2222-4222-8222-222222222222"
                   }
                 }
               }
@@ -237,7 +238,7 @@
                   },
                   "assistant_id": {
                     "type": "string",
-                    "description": "可选，在创建时绑定有权访问的智能体。"
+                    "description": "接口协议允许省略。调用智能体时，应在创建阶段传入目标已发布智能体的 ID，后续运行使用同一个 ID。TypeScript SDK 对应参数为 `assistantId`。省略时按当前请求身份创建未绑定智能体的线程；后续运行若使用不同的执行身份，可能返回 403。绑定不会授予额外的对话访问权限。"
                   },
                   "if_exists": {
                     "type": "string",
@@ -259,7 +260,9 @@
                   }
                 }
               },
-              "example": {}
+              "example": {
+                "assistant_id": "22222222-2222-4222-8222-222222222222"
+              }
             }
           }
         }
