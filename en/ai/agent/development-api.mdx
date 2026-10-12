@@ -14,7 +14,7 @@ Legacy AI/v1 OpenAPI integration, such as `POST /api/ai/v1/chat`, is deprecated 
 
 ## Before you start
 
-1. Publish the agent and obtain its ID (`xpertId`).
+1. Publish the agent and obtain its ID (`xpertId`), the `assistant_id` field from [agent search](/en/sdk-api/assistants/search-assistants).
 2. Create an API Key with access to that agent and store it in a server environment variable.
 3. Set `XPERTAI_API_URL`, for example `https://api.xpertai.cn/api/ai`. Use your own address for private deployments; do not append `/v1`.
 4. Use Node.js 18 or later and install the SDK:
@@ -111,10 +111,13 @@ The snippets below reuse `client`, `xpertId`, `thread` and `input` from the firs
 
 ### Search and retrieve an agent
 
+`client.assistants.search()` calls `POST /api/ai/assistants/search` and returns an array of accessible published agents. Select the target agent and use its `assistant_id` as `XPERTAI_XPERT_ID` (the `xpertId` or `XP` variable in examples). To find a specific agent, pass `metadata: { slug: "your-xpert-slug" }` with the search options.
+
 ```ts
 const xperts = await client.assistants.search({ limit: 10, offset: 0 });
+console.table(xperts.map(({ assistant_id, name }) => ({ assistant_id, name })));
 const xpert = await client.assistants.get(xpertId);
-console.log(xperts, xpert);
+console.log(xpert.assistant_id, xpert.name);
 ```
 
 ## Create and manage threads
