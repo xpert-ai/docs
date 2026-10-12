@@ -45,7 +45,7 @@ async function main() {
     apiUrl: process.env.XPERTAI_API_URL ?? "https://api.xpertai.cn/api/ai",
     apiKey,
   });
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpertId });
   const input: ChatSendRequest = {
     action: "send",
     message: { input: { input: "Hello, what can you help me with?" } },
@@ -63,6 +63,16 @@ main().catch((error) => {
 ```
 
 Save `thread.thread_id` and reuse the thread for subsequent messages with `client.runs.wait()` or `client.runs.stream()`.
+
+For an agent conversation, pass `assistantId` when creating the thread and use the same agent ID for subsequent runs. The SDK serializes `assistantId` as the HTTP field `assistant_id`. The protocol allows omission to create an unbound thread under the current request identity. If a later run uses a different execution identity, conversation access checks can return 403. Binding the agent at creation establishes its scope early; it does not grant additional access.
+
+### Thread creation succeeds, but the run returns 403
+
+`201 Created` confirms thread creation, not permission to run the agent. If a run returns `You do not have access to this conversation`:
+
+1. Confirm that the API Key can access the published agent. Create a new thread with `client.threads.create({ assistantId: xpertId })`, then pass the same `xpertId` to the run. Changing the example does not repair a previously created thread.
+2. Use the same credentials and caller identity when creating and running the thread. Do not reuse a thread belonging to another user or an unrelated agent.
+3. If a new, bound thread still returns 403, have the administrator check the API Key's effective caller, the conversation's owner (`createdById`) and agent binding (`xpertId`), and the deployed server version. Supplying `assistantId` does not bypass ownership or scope checks and cannot resolve every 403.
 
 ## Receive streaming output
 
@@ -114,6 +124,7 @@ console.log(xperts, xpert);
 ```ts
 const { randomUUID } = await import("node:crypto");
 const customThread = await client.threads.create({
+  assistantId: xpertId,
   threadId: randomUUID(),
   ifExists: "raise",
 });
