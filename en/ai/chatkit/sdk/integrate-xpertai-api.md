@@ -1,10 +1,11 @@
 ---
 title: Integrate XpertAI API
 sidebar_position: 1
+sidebar_hidden: true
 ---
 
 <Info>
-This article explains how to integrate XpertAI backend capabilities in ChatKit-related scenarios, including integration via SDK and direct HTTP API calls.
+SDK integration is independent of ChatKit. For general server integration, see [Development SDK](/en/ai/agent/development-api). This page retains SDK and ChatKit UI embedding details.
 </Info>
 
 ## Integration Overview
@@ -183,6 +184,10 @@ async function runWithFile(xpertId: string) {
 ```
 
 ## Direct API Calls
+
+<Note>
+The following assistants, threads and runs endpoints are the same HTTP endpoints used by the SDK; they are not deprecated. The [official SDK](/en/ai/agent/development-api) is recommended for general application integration. Legacy AI/v1 OpenAPI integration is separate: those old endpoints and examples are no longer maintained, and their availability is not guaranteed.
+</Note>
 
 If you are not using the SDK, you can also call the public REST API directly.
 

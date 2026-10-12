@@ -1,10 +1,11 @@
 ---
 title: 接入 XpertAI API
 sidebar_position: 1
+sidebar_hidden: true
 ---
 
 <Info>
-本文介绍如何在 ChatKit 相关场景中接入 XpertAI 后端能力，包括通过 SDK 接入和通过 HTTP API 直接调用接入。
+SDK 是独立的程序接入方式，不依赖 ChatKit。通用服务端接入请参考 [开发 SDK](/zh-hans/ai/agent/development-api)；本页保留 SDK 和 ChatKit UI 嵌入相关说明。
 </Info>
 
 ## 接入方式概览
@@ -183,6 +184,10 @@ async function runWithFile(xpertId: string) {
 ```
 
 ## 通过 API 直接调用
+
+<Note>
+以下 `assistants`、`threads`、`runs` 接口也是 SDK 使用的底层 HTTP 接口，并未废弃。一般程序接入推荐使用 [官方 SDK](/zh-hans/ai/agent/development-api)。旧 AI/v1 OpenAPI 接入与这些接口不同；旧接口及其示例不再维护，不保证可用。
+</Note>
 
 如果你不使用 SDK，也可以直接调用公开的 REST API。
 

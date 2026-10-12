@@ -144,7 +144,6 @@
                       "en/ai/agent/agent-evolution",
                       "en/ai/agent/embed-webpage",
                       "en/ai/agent/conversation-logs",
-                      "en/ai/agent/development-api",
                       "en/ai/agent/monitoring-dashboard",
                       "en/ai/agent/chat-channels",
                       "en/ai/agent/supervised-architecture",
@@ -466,12 +465,6 @@
                       "en/ai/chatkit/chatkit-agent-plugins",
                       "en/ai/chatkit/chatkit-branch-in-new-chat"
                     ]
-                  },
-                  {
-                    "group": "SDK",
-                    "pages": [
-                      "en/ai/chatkit/sdk/integrate-xpertai-api"
-                    ]
                   }
                 ]
               },
@@ -565,13 +558,31 @@
                 ]
               },
               {
-                "tab": "OpenAPI",
+                "tab": "OpenAPI (Unmaintained)",
                 "groups": [
                   {
                     "group": "AI",
                     "openapi": {
                       "source": "api/openapi.ai.json",
                       "directory": "en/api-reference"
+                    }
+                  }
+                ]
+              },
+              {
+                "tab": "SDK",
+                "groups": [
+                  {
+                    "group": "Standalone Integration",
+                    "pages": [
+                      "en/ai/agent/development-api"
+                    ]
+                  },
+                  {
+                    "group": "HTTP API Reference",
+                    "openapi": {
+                      "source": "api/openapi.sdk.json",
+                      "directory": "en/sdk-api"
                     }
                   }
                 ]
@@ -932,7 +943,6 @@
                       "zh-Hans/ai/agent/agent-evolution",
                       "zh-Hans/ai/agent/embed-webpage",
                       "zh-Hans/ai/agent/conversation-logs",
-                      "zh-Hans/ai/agent/development-api",
                       "zh-Hans/ai/agent/monitoring-dashboard",
                       "zh-Hans/ai/agent/chat-channels",
                       "zh-Hans/ai/agent/supervised-architecture",
@@ -1244,12 +1254,6 @@
                       "zh-Hans/ai/chatkit/chatkit-agent-plugins",
                       "zh-Hans/ai/chatkit/chatkit-branch-in-new-chat"
                     ]
-                  },
-                  {
-                    "group": "SDK",
-                    "pages": [
-                      "zh-Hans/ai/chatkit/sdk/integrate-xpertai-api"
-                    ]
                   }
                 ]
               },
@@ -1341,13 +1345,31 @@
                 ]
               },
               {
-                "tab": "OpenAPI",
+                "tab": "OpenAPI（不再维护）",
                 "groups": [
                   {
                     "group": "AI",
                     "openapi": {
                       "source": "api/openapi.ai.zh-Hans.json",
                       "directory": "zh-Hans/api-reference"
+                    }
+                  }
+                ]
+              },
+              {
+                "tab": "SDK",
+                "groups": [
+                  {
+                    "group": "独立接入",
+                    "pages": [
+                      "zh-Hans/ai/agent/development-api"
+                    ]
+                  },
+                  {
+                    "group": "HTTP 接口参考",
+                    "openapi": {
+                      "source": "api/openapi.sdk.zh-Hans.json",
+                      "directory": "zh-Hans/sdk-api"
                     }
                   }
                 ]

@@ -1,3 +1,5 @@
+// Deprecated: this legacy OpenAPI example is no longer maintained; availability is not guaranteed.
+// Use @xpert-ai/xpert-sdk instead. See /zh-hans/ai/agent/development-api or /en/ai/agent/development-api.
 import { pathToFileURL } from 'node:url';
 
 // POST SSE requires fetch; EventSource cannot send this JSON request body.
