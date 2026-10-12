@@ -1,0 +1,1995 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "XpertAI SDK HTTP API",
+    "version": "1.0.0",
+    "description": "Current HTTP endpoints used by the SDK guide. Authenticate with a server-side API Key using Authorization: Bearer <API_KEY> or x-api-key. These endpoints do not require ChatKit. The reference covers the guide examples, not every method exported by the SDK. Check deployment support before using additional fields."
+  },
+  "servers": [
+    {
+      "url": "https://api.xpertai.cn",
+      "description": "XpertAI API. Replace with your own API origin for private deployments."
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyBearer": []
+    },
+    {
+      "ApiKeyHeader": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Assistants"
+    },
+    {
+      "name": "Threads"
+    },
+    {
+      "name": "Runs"
+    },
+    {
+      "name": "Contexts"
+    },
+    {
+      "name": "Store"
+    }
+  ],
+  "paths": {
+    "/api/ai/assistants/search": {
+      "post": {
+        "operationId": "search_assistants",
+        "summary": "Search agents",
+        "description": "List published agents available to the calling identity. Supported metadata filters include slug, workspaceId, type, latest and version.",
+        "tags": [
+          "Assistants"
+        ],
+        "x-sdk-method": "assistants.search",
+        "x-mint": {
+          "href": "/en/sdk-api/assistants/search-assistants",
+          "metadata": {
+            "title": "Search agents",
+            "description": "List published agents available to the calling identity. Supported metadata filters include slug, workspaceId, type, latest and version."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Assistant"
+                  }
+                },
+                "example": [
+                  {
+                    "assistant_id": "22222222-2222-4222-8222-222222222222",
+                    "name": "Example agent",
+                    "version": 1
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "example": {
+                "limit": 10,
+                "offset": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/assistants/{assistant_id}": {
+      "get": {
+        "operationId": "get_assistant",
+        "summary": "Get an agent",
+        "description": "Get one accessible published agent. Use its assistant_id when starting a run.",
+        "tags": [
+          "Assistants"
+        ],
+        "x-sdk-method": "assistants.get",
+        "x-mint": {
+          "href": "/en/sdk-api/assistants/get-assistant",
+          "metadata": {
+            "title": "Get an agent",
+            "description": "Get one accessible published agent. Use its assistant_id when starting a run."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Assistant"
+                },
+                "example": {
+                  "assistant_id": "22222222-2222-4222-8222-222222222222",
+                  "name": "Example agent",
+                  "version": 1
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "assistant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/threads": {
+      "post": {
+        "operationId": "create_thread",
+        "summary": "Create a thread",
+        "description": "Create a thread before starting a run. An empty JSON object is sufficient. Save thread_id for subsequent requests and metadata.conversation_id when a conversation ID is required. Creating a thread does not start the agent.",
+        "tags": [
+          "Threads"
+        ],
+        "x-sdk-method": "threads.create",
+        "x-mint": {
+          "href": "/en/sdk-api/threads/create-thread",
+          "metadata": {
+            "title": "Create a thread",
+            "description": "Create a thread before starting a run. An empty JSON object is sufficient. Save thread_id for subsequent requests and metadata.conversation_id when a conversation ID is required. Creating a thread does not start the agent."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thread"
+                },
+                "example": {
+                  "thread_id": "11111111-1111-4111-8111-111111111111",
+                  "status": "idle",
+                  "metadata": {
+                    "conversation_id": "44444444-4444-4444-8444-444444444444"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "thread_id": {
+                    "type": "string",
+                    "description": "Optional UUID; generated when omitted.",
+                    "format": "uuid"
+                  },
+                  "assistant_id": {
+                    "type": "string",
+                    "description": "Optionally bind an accessible agent at creation."
+                  },
+                  "if_exists": {
+                    "type": "string",
+                    "enum": [
+                      "raise",
+                      "do_nothing"
+                    ]
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "string"
+                      },
+                      "fromEndUserId": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/threads/search": {
+      "post": {
+        "operationId": "search_threads",
+        "summary": "Search threads",
+        "description": "List private conversations belonging to the current user identity, represented as threads. Supported filters are status and metadata.assistant_id. SDK-only ids and sorting options are not implemented by this handler.",
+        "tags": [
+          "Threads"
+        ],
+        "x-sdk-method": "threads.search",
+        "x-mint": {
+          "href": "/en/sdk-api/threads/search-threads",
+          "metadata": {
+            "title": "Search threads",
+            "description": "List private conversations belonging to the current user identity, represented as threads. Supported filters are status and metadata.assistant_id. SDK-only ids and sorting options are not implemented by this handler."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Thread"
+                  }
+                },
+                "example": [
+                  {
+                    "thread_id": "11111111-1111-4111-8111-111111111111",
+                    "status": "idle",
+                    "metadata": {
+                      "conversation_id": "44444444-4444-4444-8444-444444444444"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {
+                      "assistant_id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example": {
+                "limit": 10,
+                "offset": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/threads/{thread_id}": {
+      "get": {
+        "operationId": "get_thread",
+        "summary": "Get a thread",
+        "description": "Read thread details and metadata, including the owning conversation ID.",
+        "tags": [
+          "Threads"
+        ],
+        "x-sdk-method": "threads.get",
+        "x-mint": {
+          "href": "/en/sdk-api/threads/get-thread",
+          "metadata": {
+            "title": "Get a thread",
+            "description": "Read thread details and metadata, including the owning conversation ID."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Thread"
+                },
+                "example": {
+                  "thread_id": "11111111-1111-4111-8111-111111111111",
+                  "status": "idle",
+                  "metadata": {
+                    "conversation_id": "44444444-4444-4444-8444-444444444444"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/threads/{thread_id}/state": {
+      "get": {
+        "operationId": "get_thread_state",
+        "summary": "Read thread state",
+        "description": "Read an existing checkpoint after a run has produced state. This is current or selected checkpoint state, not complete conversation history. Thread history and state-write APIs are not implemented in the current handler.",
+        "tags": [
+          "Threads"
+        ],
+        "x-sdk-method": "threads.getState",
+        "x-mint": {
+          "href": "/en/sdk-api/threads/get-thread-state",
+          "metadata": {
+            "title": "Read thread state",
+            "description": "Read an existing checkpoint after a run has produced state. This is current or selected checkpoint state, not complete conversation history. Thread history and state-write APIs are not implemented in the current handler."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadState"
+                },
+                "example": {
+                  "values": {},
+                  "checkpoint": {
+                    "thread_id": "11111111-1111-4111-8111-111111111111"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "checkpoint_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/threads/{thread_id}/runs/stream": {
+      "post": {
+        "operationId": "stream_run",
+        "summary": "Start a streaming run",
+        "description": "Start a new run and stream its output. Save run_id from the Content-Location response header. For reconnection use `GET /api/ai/threads/{thread_id}/runs/{run_id}/stream`; repeating this POST can execute the task again. The body uses assistant_id and input, not the legacy request/options envelope.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.stream",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/stream-run",
+          "metadata": {
+            "title": "Start a streaming run",
+            "description": "Start a new run and stream its output. Save run_id from the Content-Location response header. For reconnection use `GET /api/ai/threads/{thread_id}/runs/{run_id}/stream`; repeating this POST can execute the task again. The body uses assistant_id and input, not the legacy request/options envelope."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Schematic SSE frames; real events contain additional fields. Preserve each id cursor, ignore colon-prefixed heartbeat comments and inspect lifecycle, interruption and error events. HTTP success or connection close alone is not task success.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "id: 1791763200000-0\ndata: {\"type\":\"message\",\"data\":\"Hello\"}\n\nid: 1791763200001-0\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"status\":\"idle\",\"error\":null}}\n\n"
+              }
+            },
+            "headers": {
+              "Content-Location": {
+                "description": "Run resource path; the final path segment is run_id.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "/api/ai/threads/11111111-1111-4111-8111-111111111111/runs/33333333-3333-4333-8333-333333333333"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              },
+              "example": {
+                "assistant_id": "22222222-2222-4222-8222-222222222222",
+                "input": {
+                  "action": "send",
+                  "message": {
+                    "input": {
+                      "input": "Hello, introduce yourself briefly."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/threads/{thread_id}/runs": {
+      "post": {
+        "operationId": "create_run",
+        "summary": "Create a background run",
+        "description": "Start a new run and return its record while execution continues. Use run_id to query status or subscribe to its stream. This is an alternative to stream or wait; do not call all three for the same message.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.create",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/create-run",
+          "metadata": {
+            "title": "Create a background run",
+            "description": "Start a new run and return its record while execution continues. Use run_id to query status or subscribe to its stream. This is an alternative to stream or wait; do not call all three for the same message."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                },
+                "example": {
+                  "run_id": "33333333-3333-4333-8333-333333333333",
+                  "thread_id": "11111111-1111-4111-8111-111111111111",
+                  "assistant_id": "22222222-2222-4222-8222-222222222222",
+                  "status": "running",
+                  "created_at": "2026-10-12T00:00:00Z",
+                  "updated_at": "2026-10-12T00:00:00Z",
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              },
+              "example": {
+                "assistant_id": "22222222-2222-4222-8222-222222222222",
+                "input": {
+                  "action": "send",
+                  "message": {
+                    "input": {
+                      "input": "Hello, introduce yourself briefly."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "list_runs",
+        "summary": "List runs",
+        "description": "List top-level executions in a thread. Query parameters are limit and offset.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.list",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/list-runs",
+          "metadata": {
+            "title": "List runs",
+            "description": "List top-level executions in a thread. Query parameters are limit and offset."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Run"
+                  }
+                },
+                "example": [
+                  {
+                    "run_id": "33333333-3333-4333-8333-333333333333",
+                    "thread_id": "11111111-1111-4111-8111-111111111111",
+                    "assistant_id": "22222222-2222-4222-8222-222222222222",
+                    "status": "running",
+                    "created_at": "2026-10-12T00:00:00Z",
+                    "updated_at": "2026-10-12T00:00:00Z",
+                    "metadata": {}
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 10
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/threads/{thread_id}/runs/wait": {
+      "post": {
+        "operationId": "wait_run",
+        "summary": "Start a run and wait",
+        "description": "Start a new run and return accumulated plain text when its stream completes. The current response is `{\"role\":\"ai\",\"content\":\"...\"}`, not a Run record or a full graph state. This does not wait on an existing run_id. Use streaming for interruption and detailed progress handling.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.wait",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/wait-run",
+          "metadata": {
+            "title": "Start a run and wait",
+            "description": "Start a new run and return accumulated plain text when its stream completes. The current response is `{\"role\":\"ai\",\"content\":\"...\"}`, not a Run record or a full graph state. This does not wait on an existing run_id. Use streaming for interruption and detailed progress handling."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "ai"
+                      ]
+                    },
+                    "content": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "content"
+                  ]
+                },
+                "example": {
+                  "role": "ai",
+                  "content": "Hello"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              },
+              "example": {
+                "assistant_id": "22222222-2222-4222-8222-222222222222",
+                "input": {
+                  "action": "send",
+                  "message": {
+                    "input": {
+                      "input": "Hello, introduce yourself briefly."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/threads/{thread_id}/runs/{run_id}": {
+      "get": {
+        "operationId": "get_run",
+        "summary": "Get a run",
+        "description": "Read the execution status and metadata.agentRun details, including error information when available.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.get",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/get-run",
+          "metadata": {
+            "title": "Get a run",
+            "description": "Read the execution status and metadata.agentRun details, including error information when available."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                },
+                "example": {
+                  "run_id": "33333333-3333-4333-8333-333333333333",
+                  "thread_id": "11111111-1111-4111-8111-111111111111",
+                  "assistant_id": "22222222-2222-4222-8222-222222222222",
+                  "status": "running",
+                  "created_at": "2026-10-12T00:00:00Z",
+                  "updated_at": "2026-10-12T00:00:00Z",
+                  "metadata": {}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/threads/{thread_id}/runs/{run_id}/stream": {
+      "get": {
+        "operationId": "join_run_stream",
+        "summary": "Reconnect to a run stream",
+        "description": "Subscribe to an existing run without starting another task. When resuming, send the last received SSE id in Last-Event-ID, in Redis cursor form such as 1791763200000-0. Replay depends on server-retained events; do not automatically start another run if replay is unavailable.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.joinStream",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/join-run-stream",
+          "metadata": {
+            "title": "Reconnect to a run stream",
+            "description": "Subscribe to an existing run without starting another task. When resuming, send the last received SSE id in Last-Event-ID, in Redis cursor form such as 1791763200000-0. Replay depends on server-retained events; do not automatically start another run if replay is unavailable."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Schematic SSE frames; real events contain additional fields. Preserve each id cursor, ignore colon-prefixed heartbeat comments and inspect lifecycle, interruption and error events. HTTP success or connection close alone is not task success.",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                },
+                "example": "id: 1791763200000-0\ndata: {\"type\":\"message\",\"data\":\"Hello\"}\n\nid: 1791763200001-0\ndata: {\"type\":\"event\",\"event\":\"on_conversation_end\",\"data\":{\"status\":\"idle\",\"error\":null}}\n\n"
+              }
+            },
+            "headers": {
+              "Content-Location": {
+                "description": "Run resource path; the final path segment is run_id.",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "/api/ai/threads/11111111-1111-4111-8111-111111111111/runs/33333333-3333-4333-8333-333333333333"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Last-Event-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d+-\\d+$",
+              "example": "1791763200000-0"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/threads/{thread_id}/runs/{run_id}/cancel": {
+      "post": {
+        "operationId": "cancel_run",
+        "summary": "Cancel a run",
+        "description": "Request cancellation of the specified run. Requires contribution permission. The acknowledgement body varies by execution type; query the run again to confirm its final status.",
+        "tags": [
+          "Runs"
+        ],
+        "x-sdk-method": "runs.cancel",
+        "x-mint": {
+          "href": "/en/sdk-api/runs/cancel-run",
+          "metadata": {
+            "title": "Cancel a run",
+            "description": "Request cancellation of the specified run. Requires contribution permission. The acknowledgement body varies by execution type; query the run again to confirm its final status."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Request accepted. Inspect the run status separately."
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/contexts/file": {
+      "post": {
+        "operationId": "upload_file",
+        "summary": "Upload an attachment",
+        "description": "Upload a multipart file with the default storage target, as used by contexts.uploadFile(). Use the returned FileAsset handle in input.message.input.files. Its id differs from storageFileId. File parsing may still be pending when the upload returns.",
+        "tags": [
+          "Contexts"
+        ],
+        "x-sdk-method": "contexts.uploadFile",
+        "x-mint": {
+          "href": "/en/sdk-api/contexts/upload-file",
+          "metadata": {
+            "title": "Upload an attachment",
+            "description": "Upload a multipart file with the default storage target, as used by contexts.uploadFile(). Use the returned FileAsset handle in input.message.input.files. Its id differs from storageFileId. File parsing may still be pending when the upload returns."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentFile"
+                },
+                "example": {
+                  "id": "55555555-5555-4555-8555-555555555555",
+                  "storageFileId": "66666666-6666-4666-8666-666666666666",
+                  "originalName": "manual.pdf",
+                  "mimeType": "application/pdf",
+                  "parseStatus": "pending"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/store/items": {
+      "put": {
+        "operationId": "put_store_item",
+        "summary": "Write a Store item",
+        "description": "Store JSON data under a namespace and key. This reference documents the namespace, key and value fields handled by the server.",
+        "tags": [
+          "Store"
+        ],
+        "x-sdk-method": "store.putItem",
+        "x-mint": {
+          "href": "/en/sdk-api/store/put-store-item",
+          "metadata": {
+            "title": "Write a Store item",
+            "description": "Store JSON data under a namespace and key. This reference documents the namespace, key and value fields handled by the server."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "example": {
+                  "success": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "namespace": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "The first namespace segment is the agent ID. Segments must not contain periods."
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "namespace",
+                  "key",
+                  "value"
+                ]
+              },
+              "example": {
+                "namespace": [
+                  "22222222-2222-4222-8222-222222222222",
+                  "sdk-example"
+                ],
+                "key": "key1",
+                "value": {
+                  "value": 42
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "get_store_item",
+        "summary": "Read a Store item",
+        "description": "Join namespace segments with periods in the query string. Returns null when no item exists. HTTP timestamps use created_at and updated_at; the SDK also exposes camelCase aliases.",
+        "tags": [
+          "Store"
+        ],
+        "x-sdk-method": "store.getItem",
+        "x-mint": {
+          "href": "/en/sdk-api/store/get-store-item",
+          "metadata": {
+            "title": "Read a Store item",
+            "description": "Join namespace segments with periods in the query string. Returns null when no item exists. HTTP timestamps use created_at and updated_at; the SDK also exposes camelCase aliases."
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoreItemOrNull"
+                },
+                "example": {
+                  "namespace": [
+                    "22222222-2222-4222-8222-222222222222",
+                    "sdk-example"
+                  ],
+                  "key": "key1",
+                  "value": {
+                    "value": 42
+                  },
+                  "created_at": "2026-10-12T00:00:00Z",
+                  "updated_at": "2026-10-12T00:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "parameters": [
+          {
+            "name": "namespace",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "22222222-2222-4222-8222-222222222222.sdk-example"
+            }
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "key1"
+            }
+          }
+        ]
+      }
+    },
+    "/api/ai/store/namespaces": {
+      "post": {
+        "operationId": "list_store_namespaces",
+        "summary": "List Store namespaces",
+        "description": "List namespaces below the supplied prefix. The first prefix segment is the agent ID. HTTP uses max_depth for the SDK maxDepth option.",
+        "tags": [
+          "Store"
+        ],
+        "x-sdk-method": "store.listNamespaces",
+        "x-mint": {
+          "href": "/en/sdk-api/store/list-store-namespaces",
+          "metadata": {
+            "title": "List Store namespaces",
+            "description": "List namespaces below the supplied prefix. The first prefix segment is the agent ID. HTTP uses max_depth for the SDK maxDepth option."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "namespaces": {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "namespaces": [
+                    [
+                      "22222222-2222-4222-8222-222222222222",
+                      "sdk-example"
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prefix": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "The first namespace segment is the agent ID. Segments must not contain periods."
+                  },
+                  "max_depth": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                  }
+                },
+                "required": [
+                  "prefix"
+                ]
+              },
+              "example": {
+                "prefix": [
+                  "22222222-2222-4222-8222-222222222222"
+                ],
+                "max_depth": 2,
+                "limit": 10,
+                "offset": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ai/store/items/search": {
+      "post": {
+        "operationId": "search_store_items",
+        "summary": "Search Store items",
+        "description": "Search beneath namespace_prefix. Omit query to list/filter values; semantic query search requires the agent memory model configuration. The SDK accepts the namespace array as its first method argument.",
+        "tags": [
+          "Store"
+        ],
+        "x-sdk-method": "store.searchItems",
+        "x-mint": {
+          "href": "/en/sdk-api/store/search-store-items",
+          "metadata": {
+            "title": "Search Store items",
+            "description": "Search beneath namespace_prefix. Omit query to list/filter values; semantic query search requires the agent memory model configuration. The SDK accepts the namespace array as its first method argument."
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StoreItem"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "items": [
+                    {
+                      "namespace": [
+                        "22222222-2222-4222-8222-222222222222",
+                        "sdk-example"
+                      ],
+                      "key": "key1",
+                      "value": {
+                        "value": 42
+                      },
+                      "created_at": "2026-10-12T00:00:00Z",
+                      "updated_at": "2026-10-12T00:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, identifier mismatch or invalid operation state."
+          },
+          "401": {
+            "description": "Missing or invalid API Key."
+          },
+          "403": {
+            "description": "The caller cannot access the requested resource."
+          },
+          "404": {
+            "description": "Resource not found or unavailable to the caller."
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "namespace_prefix": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "The first namespace segment is the agent ID. Segments must not contain periods."
+                  },
+                  "filter": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "query": {
+                    "type": "string"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10
+                  },
+                  "offset": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                  }
+                },
+                "required": [
+                  "namespace_prefix"
+                ]
+              },
+              "example": {
+                "namespace_prefix": [
+                  "22222222-2222-4222-8222-222222222222",
+                  "sdk-example"
+                ],
+                "limit": 10,
+                "offset": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Server-side API Key; do not expose it in browser code."
+      },
+      "ApiKeyHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "Assistant": {
+        "type": "object",
+        "properties": {
+          "assistant_id": {
+            "type": "string",
+            "description": "Published agent ID, also used as xpertId in SDK examples."
+          },
+          "graph_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "version": {
+            "type": "number"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "assistant_id"
+        ]
+      },
+      "Thread": {
+        "type": "object",
+        "properties": {
+          "thread_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "conversation_id": {
+                "type": "string",
+                "description": "Conversation ID; it is distinct from thread_id."
+              },
+              "assistant_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          },
+          "values": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "thread_id",
+          "status"
+        ]
+      },
+      "ThreadState": {
+        "type": "object",
+        "properties": {
+          "values": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "checkpoint": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "parent_checkpoint": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "values",
+          "checkpoint"
+        ]
+      },
+      "Run": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "thread_id": {
+            "type": "string"
+          },
+          "assistant_id": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "Execution status. Check the status and metadata.agentRun.error; HTTP success is not task success."
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "agentRun": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "run_id",
+          "thread_id",
+          "status"
+        ]
+      },
+      "AgentFile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "FileAsset ID. Pass the returned handle in message.input.files."
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "storageFileId": {
+            "type": "string",
+            "description": "StorageFile ID for knowledgebase document associations; do not substitute the FileAsset ID."
+          },
+          "url": {
+            "type": "string"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "parseStatus": {
+            "type": "string"
+          },
+          "parseMode": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "clientMessageId": {
+            "type": "string",
+            "description": "Caller message identifier; it is not a server-side idempotency guarantee."
+          },
+          "input": {
+            "type": "object",
+            "properties": {
+              "input": {
+                "type": "string",
+                "description": "User text. Additional inputs depend on the agent definition."
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AgentFile"
+                }
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "input"
+        ]
+      },
+      "Target": {
+        "type": "object",
+        "properties": {
+          "aiMessageId": {
+            "type": "string"
+          },
+          "executionId": {
+            "type": "string"
+          }
+        },
+        "description": "Use identifiers returned by the original execution or interruption; do not invent target IDs."
+      },
+      "SendInput": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "send"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "If supplied, must match the conversation owning the URL thread. Read metadata.conversation_id from the thread response."
+          },
+          "message": {
+            "$ref": "#/components/schemas/Message"
+          },
+          "state": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "environmentId": {
+            "type": "string"
+          },
+          "sandboxEnvironmentId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "message"
+        ]
+      },
+      "ResumeInput": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "resume"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "If supplied, must match the conversation owning the URL thread. Read metadata.conversation_id from the thread response."
+          },
+          "target": {
+            "$ref": "#/components/schemas/Target"
+          },
+          "decision": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "confirm",
+                  "reject"
+                ]
+              },
+              "payload": {}
+            },
+            "required": [
+              "type"
+            ]
+          },
+          "patch": {
+            "type": "object",
+            "properties": {
+              "agentKey": {
+                "type": "string"
+              },
+              "toolCalls": {
+                "type": "array",
+                "items": {}
+              },
+              "update": {}
+            }
+          },
+          "state": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "action",
+          "target",
+          "decision"
+        ]
+      },
+      "RetryInput": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "retry"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "If supplied, must match the conversation owning the URL thread. Read metadata.conversation_id from the thread response."
+          },
+          "source": {
+            "$ref": "#/components/schemas/Target"
+          },
+          "environmentId": {
+            "type": "string"
+          },
+          "sandboxEnvironmentId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "source"
+        ]
+      },
+      "FollowUpInput": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "follow_up"
+            ]
+          },
+          "conversationId": {
+            "type": "string",
+            "description": "If supplied, must match the conversation owning the URL thread. Read metadata.conversation_id from the thread response."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "queue",
+              "steer"
+            ]
+          },
+          "message": {
+            "$ref": "#/components/schemas/Message"
+          },
+          "target": {
+            "$ref": "#/components/schemas/Target"
+          },
+          "state": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "action",
+          "mode",
+          "message"
+        ]
+      },
+      "RunRequest": {
+        "type": "object",
+        "properties": {
+          "assistant_id": {
+            "type": "string",
+            "description": "Published agent ID. HTTP uses assistant_id; the SDK accepts assistantId as a method argument."
+          },
+          "input": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SendInput"
+              },
+              {
+                "$ref": "#/components/schemas/ResumeInput"
+              },
+              {
+                "$ref": "#/components/schemas/RetryInput"
+              },
+              {
+                "$ref": "#/components/schemas/FollowUpInput"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "action",
+              "mapping": {
+                "send": "#/components/schemas/SendInput",
+                "retry": "#/components/schemas/RetryInput",
+                "resume": "#/components/schemas/ResumeInput",
+                "follow_up": "#/components/schemas/FollowUpInput"
+              }
+            },
+            "description": "Chat action payload. Examples show send; retry, resume and follow_up require the appropriate execution state and access."
+          },
+          "context": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Optional runtime context. Use only fields supported by your deployed agent."
+          }
+        },
+        "required": [
+          "assistant_id",
+          "input"
+        ]
+      },
+      "StoreItem": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "namespace",
+          "key",
+          "value"
+        ]
+      },
+      "StoreItemOrNull": {
+        "type": "object",
+        "properties": {
+          "namespace": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "key": {
+            "type": "string"
+          },
+          "value": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "namespace",
+          "key",
+          "value"
+        ],
+        "nullable": true
+      }
+    }
+  }
+}

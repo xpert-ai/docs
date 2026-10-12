@@ -4,8 +4,9 @@
     "/api/ai/v1/chat": {
       "post": {
         "operationId": "AIV1Controller_chat",
+        "deprecated": true,
         "summary": "Chat with an agent",
-        "description": "POST a message to a published agent and receive SSE. Authenticate with Authorization: Bearer <API_KEY> or x-api-key. Save on_conversation_start.data.id for continuation. Each SSE data field contains JSON with type, optional event, and data. Text deltas have type=message; lifecycle events have type=event. Inspect on_conversation_end.data.status/error and SSE error events: HTTP success alone does not mean the agent succeeded. Internal runtime options are not public caller fields.",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).\n\nPOST a message to a published agent and receive SSE. Historical request and response details are retained below for reference only. Authenticate with Authorization: Bearer <API_KEY> or x-api-key. Save on_conversation_start.data.id for continuation. Each SSE data field contains JSON with type, optional event, and data. Text deltas have type=message; lifecycle events have type=event. Inspect on_conversation_end.data.status/error and SSE error events: HTTP success alone does not mean the agent succeeded. Internal runtime options are not public caller fields.",
         "tags": [
           "AI/v1"
         ],
@@ -100,6 +101,8 @@
     "/api/ai/v1/kb": {
       "post": {
         "operationId": "AIV1Controller_createKnowledgebase",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -128,6 +131,8 @@
     "/api/ai/v1/kb/{id}": {
       "put": {
         "operationId": "AIV1Controller_updateKnowledgebase",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -163,6 +168,8 @@
       },
       "delete": {
         "operationId": "AIV1Controller_deleteKnowledgebase",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -189,6 +196,8 @@
     "/api/ai/v1/kb/{id}/bulk": {
       "post": {
         "operationId": "AIV1Controller_createDocBulk",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -229,6 +238,8 @@
     "/api/ai/v1/kb/{id}/process": {
       "post": {
         "operationId": "AIV1Controller_start",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -268,6 +279,8 @@
     "/api/ai/v1/kb/{id}/status": {
       "get": {
         "operationId": "AIV1Controller_getStatus",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "ids",
@@ -294,6 +307,8 @@
     "/api/ai/v1/file": {
       "post": {
         "operationId": "AIV1Controller_create",
+        "deprecated": true,
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).\n\nHistorical file-upload endpoint. Use client.contexts.uploadFile() in the official XpertAI SDK for new integrations. With the default storage target, the SDK returns an AgentFile handle backed by a FileAsset and starts file-understanding parsing by default. Its id identifies the FileAsset; storageFileId identifies the stored file. Existing knowledgebase callers must adapt the response mapping.",
         "parameters": [],
         "responses": {
           "201": {
@@ -311,6 +326,7 @@
     "/api/ai/v1/chatkit/sessions": {
       "post": {
         "operationId": "AIV1Controller_createChatkitSession",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -328,6 +344,7 @@
     "/api/ai/contexts/file": {
       "post": {
         "operationId": "ContextsController_create",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -345,6 +362,7 @@
     "/api/ai/contexts/file/{id}": {
       "delete": {
         "operationId": "ContextsController_delete",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -371,6 +389,7 @@
     "/api/ai/knowledges": {
       "post": {
         "operationId": "KnowledgesController_createKnowledgebase",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -399,6 +418,7 @@
     "/api/ai/knowledges/{id}": {
       "put": {
         "operationId": "KnowledgesController_updateKnowledgebase",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -434,6 +454,7 @@
       },
       "delete": {
         "operationId": "KnowledgesController_deleteKnowledgebase",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -460,6 +481,7 @@
     "/api/ai/knowledges/{id}/bulk": {
       "post": {
         "operationId": "KnowledgesController_createDocBulk",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -500,6 +522,7 @@
     "/api/ai/knowledges/{id}/process": {
       "post": {
         "operationId": "KnowledgesController_start",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -539,6 +562,7 @@
     "/api/ai/knowledges/{id}/status": {
       "get": {
         "operationId": "KnowledgesController_getStatus",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "ids",
@@ -565,6 +589,7 @@
     "/api/ai/assistants/search": {
       "post": {
         "operationId": "AssistantsController_search",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -582,6 +607,7 @@
     "/api/ai/assistants/count": {
       "post": {
         "operationId": "AssistantsController_count",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -599,6 +625,7 @@
     "/api/ai/assistants/{id}": {
       "get": {
         "operationId": "AssistantsController_getOne",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "id",
@@ -625,6 +652,7 @@
     "/api/ai/threads": {
       "post": {
         "operationId": "ThreadsController_createThread",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -642,6 +670,7 @@
     "/api/ai/threads/search": {
       "post": {
         "operationId": "ThreadsController_searchThreads",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "200": {
@@ -659,6 +688,7 @@
     "/api/ai/threads/{thread_id}": {
       "get": {
         "operationId": "ThreadsController_getThread",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -683,6 +713,7 @@
       },
       "patch": {
         "operationId": "ThreadsController_patchThread",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -707,6 +738,7 @@
       },
       "delete": {
         "operationId": "ThreadsController_deleteThread",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -733,6 +765,7 @@
     "/api/ai/threads/{thread_id}/state": {
       "get": {
         "operationId": "ThreadsController_getThreadState",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -757,6 +790,7 @@
       },
       "post": {
         "operationId": "ThreadsController_updateThreadState",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -783,6 +817,7 @@
     "/api/ai/threads/{thread_id}/history": {
       "post": {
         "operationId": "ThreadsController_getThreadHistory",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -809,6 +844,7 @@
     "/api/ai/threads/{thread_id}/copy": {
       "post": {
         "operationId": "ThreadsController_copyThread",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -835,6 +871,7 @@
     "/api/ai/threads/{thread_id}/runs": {
       "get": {
         "operationId": "ThreadsController_getThreadRuns",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -875,6 +912,7 @@
       },
       "post": {
         "operationId": "ThreadsController_createRun",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -901,6 +939,7 @@
     "/api/ai/threads/{thread_id}/runs/stream": {
       "post": {
         "operationId": "ThreadsController_runStream",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -935,6 +974,7 @@
     "/api/ai/threads/{thread_id}/runs/wait": {
       "post": {
         "operationId": "ThreadsController_runWait",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -961,6 +1001,7 @@
     "/api/ai/threads/{thread_id}/runs/{run_id}/stream": {
       "get": {
         "operationId": "ThreadsController_joinRunStream",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -1003,6 +1044,7 @@
     "/api/ai/threads/{thread_id}/runs/{run_id}": {
       "get": {
         "operationId": "ThreadsController_getThreadRun",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -1037,6 +1079,7 @@
     "/api/ai/threads/{thread_id}/runs/{run_id}/cancel": {
       "post": {
         "operationId": "ThreadsController_cancelThreadRun",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -1071,6 +1114,7 @@
     "/api/ai/threads/{thread_id}/usage": {
       "get": {
         "operationId": "ThreadsController_getThreadUsage",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "thread_id",
@@ -1113,6 +1157,7 @@
     "/api/ai/conversations": {
       "post": {
         "operationId": "ConversationsController_createConversation",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -1130,6 +1175,7 @@
     "/api/ai/conversations/search": {
       "post": {
         "operationId": "ConversationsController_searchConversations",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "200": {
@@ -1147,6 +1193,7 @@
     "/api/ai/conversations/{conversation_id}": {
       "get": {
         "operationId": "ConversationsController_getConversation",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1171,6 +1218,7 @@
       },
       "patch": {
         "operationId": "ConversationsController_updateConversation",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1195,6 +1243,7 @@
       },
       "delete": {
         "operationId": "ConversationsController_deleteConversation",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1221,6 +1270,7 @@
     "/api/ai/conversations/{conversation_id}/messages": {
       "get": {
         "operationId": "ConversationsController_listMessages",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1261,6 +1311,7 @@
       },
       "post": {
         "operationId": "ConversationsController_createMessage",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1287,6 +1338,7 @@
     "/api/ai/conversations/{conversation_id}/messages/search": {
       "post": {
         "operationId": "ConversationsController_searchMessages",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1313,6 +1365,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}": {
       "get": {
         "operationId": "ConversationsController_getMessage",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1345,6 +1398,7 @@
       },
       "patch": {
         "operationId": "ConversationsController_updateMessage",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1377,6 +1431,7 @@
       },
       "delete": {
         "operationId": "ConversationsController_deleteMessage",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1411,6 +1466,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks": {
       "get": {
         "operationId": "ConversationsController_listFeedbacks",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1459,6 +1515,7 @@
       },
       "post": {
         "operationId": "ConversationsController_createFeedback",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1493,6 +1550,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks/search": {
       "post": {
         "operationId": "ConversationsController_searchFeedbacks",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1527,6 +1585,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks/{feedback_id}": {
       "get": {
         "operationId": "ConversationsController_getFeedback",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1567,6 +1626,7 @@
       },
       "patch": {
         "operationId": "ConversationsController_updateFeedback",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1607,6 +1667,7 @@
       },
       "delete": {
         "operationId": "ConversationsController_deleteFeedback",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1649,6 +1710,7 @@
     "/api/ai/store/items": {
       "get": {
         "operationId": "StoreController_findAll",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [
           {
             "name": "namespace",
@@ -1689,6 +1751,7 @@
       },
       "put": {
         "operationId": "StoreController_putItem",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "200": {
@@ -1704,6 +1767,7 @@
       },
       "delete": {
         "operationId": "StoreController_deleteItem",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "200": {
@@ -1721,6 +1785,7 @@
     "/api/ai/store/namespaces": {
       "post": {
         "operationId": "StoreController_namespaces",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -1738,6 +1803,7 @@
     "/api/ai/store/items/search": {
       "post": {
         "operationId": "StoreController_search",
+        "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
         "parameters": [],
         "responses": {
           "201": {
@@ -1755,7 +1821,7 @@
   },
   "info": {
     "title": "Xpert AI",
-    "description": "",
+    "description": "This historical OpenAPI reference is no longer maintained and may not reflect current server behavior. New integrations should use the official XpertAI SDK (@xpert-ai/xpert-sdk): [SDK guide](/en/ai/agent/development-api).",
     "version": "1.0",
     "contact": {}
   },

@@ -4,6 +4,10 @@ sidebar_position: 5
 ---
 This tutorial will provide a detailed guide on how to use the XperAI platform's Knowledgebase API to create a knowledgebase, upload files, and process documents.
 
+<Warning>
+The legacy OpenAPI integration used in this tutorial is deprecated and no longer maintained; availability is not guaranteed. Use the official SDK's `client.knowledges` and `client.contexts` for new integrations: [SDK guide](/en/ai/agent/development-api). The HTTP examples below are retained only as historical references.
+</Warning>
+
 <Info>
 Reference code: [XpertAI SDK Example](https://github.com/xpert-ai/xpertai-sdk)
 </Info>
@@ -96,6 +100,10 @@ async function createKnowledgebase() {
 ### 2. Upload a File
 
 Upload a local file to the XperAI platform:
+
+<Warning>
+This example uses the deprecated `POST /api/ai/v1/file` endpoint, retained for compatibility with the old knowledgebase flow. For new agent file uploads, use the official SDK's `client.contexts.uploadFile()`: [SDK guide](/en/ai/agent/development-api). With the default storage target, the replacement response's `id` identifies the FileAsset; use `storageFileId` for the knowledgebase document association in the next step. Migration requires updating this mapping, not just replacing the URL while continuing to pass `id`.
+</Warning>
 
 ```javascript
 async function uploadFile(filePath) {

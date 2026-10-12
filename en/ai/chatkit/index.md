@@ -17,6 +17,8 @@ ChatKit also includes product-level interaction patterns such as [Branch in new 
 
 Embed ChatKit in your frontend, customize the look and feel, and let users connect to backends hosted and extended through XpertAI Agent Builder. A dev server is required.
 
+For general server, script or custom-interface integration, see the independent [Development SDK guide](/en/ai/agent/development-api). ChatKit documentation covers embedding and customizing the chat UI.
+
 ## Getting Started with ChatKit
 
 ## Embedding ChatKit in Your Frontend

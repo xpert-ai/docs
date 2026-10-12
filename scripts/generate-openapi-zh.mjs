@@ -14,7 +14,7 @@ function translate(value) {
     value.forEach(translate);
   } else if (value && typeof value === 'object') {
     for (const [key, child] of Object.entries(value)) {
-      if ((key === 'summary' || key === 'description') && typeof child === 'string') {
+      if ((key === 'summary' || key === 'description') && typeof child === 'string' && child.length > 0) {
         assert.ok(Object.hasOwn(translations, child), `Missing Chinese translation: ${child}`);
         value[key] = translations[child];
         used.add(child);
@@ -25,10 +25,25 @@ function translate(value) {
   }
 }
 
+// Localize the shared maintenance notice separately from endpoint details.
+const notice = source.info.description;
+assert.ok(notice, 'The legacy OpenAPI reference must include a maintenance notice');
+translate(localized.info);
+const operations = Object.values(localized.paths)
+  .flatMap(path => Object.values(path))
+  .filter(value => value && typeof value === 'object' && value.operationId);
+for (const endpoint of operations) {
+  assert.ok(endpoint.description?.startsWith(notice), `Missing maintenance notice: ${endpoint.operationId}`);
+  endpoint.description = endpoint.description.slice(notice.length).trimStart();
+}
 const operation = localized.paths['/api/ai/v1/chat'].post;
 translate(operation);
+translate(localized.paths['/api/ai/v1/file'].post);
 for (const [name, schema] of Object.entries(localized.components.schemas)) {
   if (name.startsWith('AgentChat')) translate(schema);
+}
+for (const endpoint of operations) {
+  endpoint.description = localized.info.description + (endpoint.description ? `\n\n${endpoint.description}` : '');
 }
 assert.equal(used.size, Object.keys(translations).length, 'Remove stale translations after updating the source');
 // Keep the existing published URL even though the Chinese summary has changed.
