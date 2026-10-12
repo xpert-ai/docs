@@ -14,7 +14,7 @@ sidebar_hidden: true
 
 ## 接入前准备
 
-1. 发布要调用的智能体，取得其 ID（`xpertId`）。
+1. 发布要调用的智能体，取得其 ID（`xpertId`），即[查询智能体](/zh-hans/sdk-api/assistants/search-assistants)返回的 `assistant_id` 字段。
 2. 创建有权访问该智能体的 API Key，并保存在服务端环境变量中。
 3. 设置 `XPERTAI_API_URL`，例如 `https://api.xpertai.cn/api/ai`。私有部署请替换为自己的地址；不追加 `/v1`。
 4. 使用 Node.js 18 或更新版本，并安装 SDK：
@@ -111,10 +111,13 @@ for await (const chunk of client.runs.stream(thread.thread_id, xpertId, { input 
 
 ### 查询列表和读取单个智能体
 
+`client.assistants.search()` 对应 `POST /api/ai/assistants/search`，返回当前调用者有权访问的已发布智能体数组。选中目标条目后，将它的 `assistant_id` 填入 `XPERTAI_XPERT_ID`，也就是示例中的 `xpertId` 或 `XP`。如需按智能体标识筛选，可在查询选项中传入 `metadata: { slug: "your-xpert-slug" }`。
+
 ```ts
 const xperts = await client.assistants.search({ limit: 10, offset: 0 });
+console.table(xperts.map(({ assistant_id, name }) => ({ assistant_id, name })));
 const xpert = await client.assistants.get(xpertId);
-console.log(xperts, xpert);
+console.log(xpert.assistant_id, xpert.name);
 ```
 
 ## 创建和管理线程

@@ -56,6 +56,24 @@ test('thread examples bind the run agent while the protocol keeps the field opti
   assert.equal(response.metadata.assistant_id, request.example.assistant_id);
 });
 
+test('direct HTTP guide examples supply the required current run fields', async () => {
+  const schema = source.components.schemas.RunRequest;
+  for (const language of ['en', 'zh-Hans']) {
+    const guide = await readFile(new URL(`${language}/ai/chatkit/sdk/integrate-xpertai-api.md`, root), 'utf8');
+    const blocks = [...guide.matchAll(/^```bash\n([\s\S]*?)^```/gm)]
+      .map(match => match[1]).filter(block => block.includes('/runs/stream'));
+    assert.ok(blocks.length, `Missing run examples in ${language}`);
+    for (const block of blocks) {
+      const request = JSON.parse(block.match(/-d '([\s\S]*?)'/)[1]);
+      for (const field of schema.required) {
+        assert.ok(Object.hasOwn(request, field), `${language} run example is missing ${field}`);
+      }
+      assert.equal(request.input.action, 'send');
+      assert.equal(typeof request.input.message.input.input, 'string');
+    }
+  }
+});
+
 test('start, wait and replay retain distinct documented wire contracts', () => {
   const stream = source.paths['/api/ai/threads/{thread_id}/runs/stream'].post;
   const wait = source.paths['/api/ai/threads/{thread_id}/runs/wait'].post;
