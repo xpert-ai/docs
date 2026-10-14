@@ -1,48 +1,31 @@
 ---
-title: Query Logs
-sidebar_position: 11
+title: Query Troubleshooting and Run Records
+description: Diagnose data analysis issues from query errors, model state, and run records.
+sidebar_position: 5
 tags:
-  - MDX
-  - SQL
+  - Troubleshooting
+  - Queries
 ---
 
-The **Query Logs** feature helps users more comprehensively monitor and analyze the query performance of semantic models. This feature records detailed information about all queries, including query status, execution time, query parameters, and results. Users can view the query logs through the interface to optimize query performance, troubleshoot issues, and improve system stability.
+**Recent runs** on the Query workspace keeps the latest ten runs for the current page session. The system also records each query with its data source, language, statement, status, duration, row count, and error message. The data analysis page does not provide a separate permanent history list.
 
-## Feature Highlights
+## Troubleshooting order
 
-1. **Global Query Log Management (In Development):** Records all query requests, with filtering support based on model, query status, and other conditions.  
-2. **Visualized Log Interface:** Adds a query log page within the semantic model, providing an intuitive display of query execution details.  
-3. **Performance Monitoring:** Offers `executionTime` and `waitingTime` metrics to help users analyze query response speed.  
-4. **Error Tracking:** Includes an `error` field in the logs, making it easy for developers and administrators to troubleshoot issues.  
-5. **Historical Log Retrieval:** Supports storing and querying historical logs to facilitate query strategy optimization.  
-6. **Automatic Log Cleanup Mechanism:** Automatically clears expired logs based on a policy (30-day limit).  
+1. **Access**: confirm that your account can view the model and run queries, and that its business domain allows access.
+2. **Model state**: the model must have an available draft; metric queries also require a published model.
+3. **Query language**: use SQL for relational models and read-only MDX for XMLA models.
+4. **Structure**: refresh tables and columns in the data source browser and remote structure in the XMLA workspace. Copy exact catalog, cube, hierarchy, and measure names from the page.
+5. **Connection**: run a query probe in **Run and cache**. If it fails, check the data source connection test, network, and credentials.
+6. **Draft synchronization**: if the top bar shows a conflict or error, refresh and confirm the latest draft before saving or publishing again.
 
-<figure className="Large">  
-  <img src="/img/models/model-query-logs.png" alt="Model Query Logs" className="rounded-lg shadow-lg" />  
-  <figcaption>Model Query Logs</figcaption>  
-</figure>
+## Common errors
 
-## Query Logs Interface
+| Symptom | What to do |
+| --- | --- |
+| No model is available | Create a model or bind an organization data source, then confirm view permission. |
+| Query language is unsupported | Choose SQL or MDX according to the model type. |
+| An object does not exist | Copy the name from current structure information or the cube; for XMLA, check whether it is marked **Missing**. |
+| Publishing is blocked | Open Model quality and fix each error. Review warnings before publishing. |
+| Query times out or cannot connect | Run a query probe and data source connection test, then check the network path from the system to the database or XMLA service. |
 
-A dedicated **Query Logs Page** is provided under the "Manage" menu in the semantic model, where users can:  
-
-- **Filter Logs:** Filter by semantic model, query status, execution time, and other conditions.  
-- **View Details:** Click a log entry to expand and view full query parameters, execution results, and error messages.  
-- **Copy Logs:** Copy query information from the logs, including parameters, query statements, and results, for further analysis.  
-
-## Use Cases
-
-1. **Performance Optimization:** Analyze `executionTime` and `waitingTime` to identify slow queries and optimize the model.  
-2. **Troubleshooting:** When a query fails, check the `error` field to quickly pinpoint the cause.  
-3. **Data Compliance Review:** Query logs can be used to record and audit data access activities.  
-
-## Future Plans
-
-In future versions, we plan to further enhance the query logs feature, including:  
-
-- **Real-Time Monitoring Dashboard:** Provide query statistics and trend analysis.  
-- **Alert Notifications:** Trigger alerts to notify administrators when the query failure rate exceeds a threshold.  
-
-## Conclusion
-
-XpertAI’s **Query Logs** feature provides users with powerful query monitoring and analysis capabilities, helping to optimize semantic model query performance, enhance system stability, and improve troubleshooting efficiency. We welcome users to try it out and provide feedback so we can continuously improve and refine this feature.  
+Ask platform operations for complete historical records when needed; the browser session list is not permanent history.

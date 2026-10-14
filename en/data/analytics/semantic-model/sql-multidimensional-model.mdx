@@ -1,8 +1,29 @@
 ---
-title: SQL Cube
-sidebar_position: 20
+title: SQL Semantic Models
+description: Configure fact tables, relationships, dimensions, and SQL queries for relational data.
+sidebar_position: 10
+tags:
+  - SQL
+  - Relational models
 ---
 
-The SQL Cube is a method of using SQL statements to create dimensions, hierarchies, and multidimensional datasets to support complex data analysis. It achieves data modeling by directly converting multidimensional models into SQL statements for query and analysis. This is an intuitive and easy-to-use data analysis method that helps organizations explore data more quickly. This model is simple, easy to understand, and maintain, and can run independently on the client or server.
+A `SQL` model organizes tables and columns from a relational source into a managed cube. The model workspace is used for modeling, and the query workspace runs read-only SQL.
 
-[SQL Model](./sql-model/)
+## Scope
+
+Use this model type for PostgreSQL, MySQL, Doris, and other SQL connections supported by the platform connection service. Available types and fields depend on the options returned by the Data Sources page.
+
+## Modeling essentials
+
+- Refresh the data source browser structure and load table columns as needed.
+- Give each cube a fact table. Bind each measure to a fact-table column and choose its aggregation.
+- Level columns come from dimension tables. In the cube relationship settings, fill in the fact-table foreign key and dimension primary key.
+- Validate calculated-member expressions in the Query lab before publishing.
+
+Model quality errors such as **missing fact table**, **missing measure source column**, or **missing level source column** mean that the structure is incomplete; they are not query syntax errors.
+
+## Query
+
+Choose SQL in the Query lab. Start with the template or a simple aggregation to verify the connection, then add joins, filters, grouping, and sorting. Keep each statement read-only and single-statement; DDL, DML, and multi-statement queries are not supported.
+
+After publishing, queries use the published cube definition. Draft edits do not change live results. See [Cubes, fact tables, and measures](./multidimensional-dataset-designer/multidimensional-dataset-designer).

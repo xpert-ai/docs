@@ -1,8 +1,39 @@
 ---
-title: MDX Model
-sidebar_position: 30
+title: XMLA Multidimensional Models
+description: Discover and import remote cubes through XMLA, then validate read-only MDX and metric bindings.
+sidebar_position: 11
+tags:
+  - XMLA
+  - MDX
+  - SAP BW
 ---
 
-MDX (Multidimensional Expressions) is a language used for creating multidimensional data models, which can be utilized in OLAP (Online Analytical Processing) systems. It supports multidimensional arrays and provides a set of functions and operators specifically designed for analyzing data. MDX offers rich data analysis capabilities such as aggregating, grouping, and sorting data. The Xpert analytics cloud's MDX model executes language models on an MDX engine for parsing and execution.
+An `XMLA` model connects to remote multidimensional services such as SAP BW and Microsoft Analysis Services. The system keeps the remote cube's system names instead of converting it into local relational tables.
 
-The multidimensional modeling functionality primarily focuses on general modeling. This chapter introduces features related to MDX modeling.
+## Import a remote cube
+
+1. Create or bind an XMLA data source and test the connection.
+2. Click **Import cube** on the data source card, or choose XMLA in the semantic model creation flow.
+3. Run **Discover**, then select a target catalog and cube from the returned list.
+4. Open the XMLA workspace and check the binding status of dimensions, hierarchies, levels, measures, and variables.
+
+## XMLA workspace
+
+- **Overview** shows the current cube and binding summary.
+- **Dimensions, measures, and variables** let you edit display names, visibility, defaults, and metric bindings.
+- **Refresh preview** compares remote structure changes and applies them after confirmation.
+- **Query validation** runs a read-only MDX validation query.
+- Fix all `Missing` bindings and required SAP variable defaults before publishing.
+
+## MDX queries
+
+Choose MDX in the Query lab and use unique names returned by XMLA:
+
+```mdx
+SELECT {[Measures].[Sales]} ON COLUMNS
+FROM [Sales]
+```
+
+A remote cube's unique name may include a catalog or hierarchy path. Copy it from the current structure information. MDX remains read-only and subject to permissions; business metrics run through a published model and explicit bindings.
+
+See [Metric measures and XMLA bindings](../indicator-management/indicator-measure).

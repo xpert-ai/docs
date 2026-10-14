@@ -144,7 +144,6 @@
                       "en/ai/agent/agent-evolution",
                       "en/ai/agent/embed-webpage",
                       "en/ai/agent/conversation-logs",
-                      "en/ai/agent/development-api",
                       "en/ai/agent/monitoring-dashboard",
                       "en/ai/agent/chat-channels",
                       "en/ai/agent/supervised-architecture",
@@ -468,12 +467,6 @@
                       "en/ai/chatkit/chatkit-agent-plugins",
                       "en/ai/chatkit/chatkit-branch-in-new-chat"
                     ]
-                  },
-                  {
-                    "group": "SDK",
-                    "pages": [
-                      "en/ai/chatkit/sdk/integrate-xpertai-api"
-                    ]
                   }
                 ]
               },
@@ -567,13 +560,31 @@
                 ]
               },
               {
-                "tab": "OpenAPI",
+                "tab": "OpenAPI (Unmaintained)",
                 "groups": [
                   {
                     "group": "AI",
                     "openapi": {
                       "source": "api/openapi.ai.json",
                       "directory": "en/api-reference"
+                    }
+                  }
+                ]
+              },
+              {
+                "tab": "SDK",
+                "groups": [
+                  {
+                    "group": "Standalone Integration",
+                    "pages": [
+                      "en/ai/agent/development-api"
+                    ]
+                  },
+                  {
+                    "group": "HTTP API Reference",
+                    "openapi": {
+                      "source": "api/openapi.sdk.json",
+                      "directory": "en/sdk-api"
                     }
                   }
                 ]
@@ -584,14 +595,28 @@
             "product": "Ontology",
             "tabs": [
               {
-                "tab": "Overview",
+                "tab": "Getting Started",
                 "groups": [
                   {
-                    "group": "Default",
+                    "group": "Quick Start",
+                    "pages": [
+                      "en/data/getting-started/index",
+                      "en/data/getting-started/requirements",
+                      "en/data/getting-started/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "By Business Scenario",
+                    "pages": [
+                      "en/data/getting-started/roles"
+                    ]
+                  },
+                  {
+                    "group": "Understand the System",
                     "pages": [
                       "en/data/overview/concept",
+                      "en/data/overview/object-model",
                       "en/data/overview/ontology-theory",
-                      "en/data/overview/uose-theory",
                       "en/data/overview/product-purpose",
                       "en/data/overview/architecture"
                     ]
@@ -663,34 +688,46 @@
                 "tab": "Data and Analytics",
                 "groups": [
                   {
+                    "group": "Quickstart",
+                    "pages": [
+                      "en/data/analytics/quick-start",
+                      "en/data/analytics/data-sources"
+                    ]
+                  },
+                  {
                     "group": "Semantic Model",
                     "pages": [
                       "en/data/analytics/semantic-model/multidimensional-model-introduction",
                       "en/data/analytics/semantic-model/manage-semantic-model",
                       "en/data/analytics/semantic-model/semantic-modeling-workspace",
-                      "en/data/analytics/semantic-model/query-lab",
                       "en/data/analytics/semantic-model/dimension-designer/dimension-designer",
                       "en/data/analytics/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer",
-                      "en/data/analytics/semantic-model/dimension-member-retrieval",
-                      "en/data/analytics/semantic-model/ai-assistant",
-                      "en/data/analytics/semantic-model/query-log",
                       "en/data/analytics/semantic-model/sql-multidimensional-model",
-                      "en/data/analytics/semantic-model/mdx-multidimensional-model"
+                      "en/data/analytics/semantic-model/mdx-multidimensional-model",
+                      "en/data/analytics/semantic-model/dimension-member-retrieval",
+                      "en/data/analytics/semantic-model/ai-assistant"
                     ]
                   },
                   {
-                    "group": "Indicator Management",
+                    "group": "Query Analysis",
                     "pages": [
+                      "en/data/analytics/semantic-model/query-lab",
+                      "en/data/analytics/semantic-model/query-log"
+                    ]
+                  },
+                  {
+                    "group": "Metric Management",
+                    "pages": [
+                      "en/data/analytics/indicator-management/indicator-management",
                       "en/data/analytics/indicator-management/indicator-registration",
+                      "en/data/analytics/indicator-management/derived-indicator",
+                      "en/data/analytics/indicator-management/qualification-condition",
+                      "en/data/analytics/indicator-management/indicator-application",
+                      "en/data/analytics/indicator-management/indicator-measure",
                       "en/data/analytics/indicator-management/indicator-business-domain",
                       "en/data/analytics/indicator-management/indicator-certification",
-                      "en/data/analytics/indicator-management/derived-indicator",
-                      "en/data/analytics/indicator-management/indicator-management",
-                      "en/data/analytics/indicator-management/qualification-condition",
                       "en/data/analytics/indicator-management/indicator-market",
-                      "en/data/analytics/indicator-management/indicator-application",
-                      "en/data/analytics/indicator-management/ai-assistant",
-                      "en/data/analytics/indicator-management/indicator-measure"
+                      "en/data/analytics/indicator-management/ai-assistant"
                     ]
                   }
                 ]
@@ -704,6 +741,8 @@
                       "en/data/tutorial/sap-resource/sap-bpc",
                       "en/data/tutorial/sap-resource/sap-bpc-consolidated-reports",
                       "en/data/tutorial/sap-resource/how-to-analyze-sap-bw-data-models",
+                      "en/data/tutorial/sap-resource/how-to-analyze-sql-data-models",
+                      "en/data/tutorial/sap-resource/sap-procurement-operations-command-center",
                       "en/data/tutorial/sap-resource/sap-bw-calendar-dimension"
                     ]
                   },
@@ -761,6 +800,18 @@
                     "group": "Sales and Service",
                     "pages": [
                       "en/data/apps/sales-and-service/sales-ontology"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Reference",
+                "groups": [
+                  {
+                    "group": "Terms and Objects",
+                    "pages": [
+                      "en/data/reference/glossary",
+                      "en/data/overview/object-model"
                     ]
                   }
                 ]
@@ -894,7 +945,6 @@
                       "zh-Hans/ai/agent/agent-evolution",
                       "zh-Hans/ai/agent/embed-webpage",
                       "zh-Hans/ai/agent/conversation-logs",
-                      "zh-Hans/ai/agent/development-api",
                       "zh-Hans/ai/agent/monitoring-dashboard",
                       "zh-Hans/ai/agent/chat-channels",
                       "zh-Hans/ai/agent/supervised-architecture",
@@ -1208,12 +1258,6 @@
                       "zh-Hans/ai/chatkit/chatkit-agent-plugins",
                       "zh-Hans/ai/chatkit/chatkit-branch-in-new-chat"
                     ]
-                  },
-                  {
-                    "group": "SDK",
-                    "pages": [
-                      "zh-Hans/ai/chatkit/sdk/integrate-xpertai-api"
-                    ]
                   }
                 ]
               },
@@ -1305,13 +1349,31 @@
                 ]
               },
               {
-                "tab": "OpenAPI",
+                "tab": "OpenAPI（不再维护）",
                 "groups": [
                   {
                     "group": "AI",
                     "openapi": {
                       "source": "api/openapi.ai.zh-Hans.json",
                       "directory": "zh-Hans/api-reference"
+                    }
+                  }
+                ]
+              },
+              {
+                "tab": "SDK",
+                "groups": [
+                  {
+                    "group": "独立接入",
+                    "pages": [
+                      "zh-Hans/ai/agent/development-api"
+                    ]
+                  },
+                  {
+                    "group": "HTTP 接口参考",
+                    "openapi": {
+                      "source": "api/openapi.sdk.zh-Hans.json",
+                      "directory": "zh-Hans/sdk-api"
                     }
                   }
                 ]
@@ -1322,14 +1384,28 @@
             "product": "本体",
             "tabs": [
               {
-                "tab": "概述",
+                "tab": "开始使用",
                 "groups": [
                   {
-                    "group": "默认",
+                    "group": "快速开始",
+                    "pages": [
+                      "zh-Hans/data/getting-started/index",
+                      "zh-Hans/data/getting-started/requirements",
+                      "zh-Hans/data/getting-started/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "按业务场景",
+                    "pages": [
+                      "zh-Hans/data/getting-started/roles"
+                    ]
+                  },
+                  {
+                    "group": "理解系统",
                     "pages": [
                       "zh-Hans/data/overview/concept",
+                      "zh-Hans/data/overview/object-model",
                       "zh-Hans/data/overview/ontology-theory",
-                      "zh-Hans/data/overview/uose-theory",
                       "zh-Hans/data/overview/product-purpose",
                       "zh-Hans/data/overview/architecture"
                     ]
@@ -1401,34 +1477,46 @@
                 "tab": "数据分析",
                 "groups": [
                   {
+                    "group": "快速开始",
+                    "pages": [
+                      "zh-Hans/data/analytics/quick-start",
+                      "zh-Hans/data/analytics/data-sources"
+                    ]
+                  },
+                  {
                     "group": "语义模型",
                     "pages": [
                       "zh-Hans/data/analytics/semantic-model/multidimensional-model-introduction",
                       "zh-Hans/data/analytics/semantic-model/manage-semantic-model",
                       "zh-Hans/data/analytics/semantic-model/semantic-modeling-workspace",
-                      "zh-Hans/data/analytics/semantic-model/query-lab",
                       "zh-Hans/data/analytics/semantic-model/dimension-designer/dimension-designer",
                       "zh-Hans/data/analytics/semantic-model/multidimensional-dataset-designer/multidimensional-dataset-designer",
-                      "zh-Hans/data/analytics/semantic-model/dimension-member-retrieval",
-                      "zh-Hans/data/analytics/semantic-model/ai-assistant",
-                      "zh-Hans/data/analytics/semantic-model/query-log",
                       "zh-Hans/data/analytics/semantic-model/sql-multidimensional-model",
-                      "zh-Hans/data/analytics/semantic-model/mdx-multidimensional-model"
+                      "zh-Hans/data/analytics/semantic-model/mdx-multidimensional-model",
+                      "zh-Hans/data/analytics/semantic-model/dimension-member-retrieval",
+                      "zh-Hans/data/analytics/semantic-model/ai-assistant"
+                    ]
+                  },
+                  {
+                    "group": "查询分析",
+                    "pages": [
+                      "zh-Hans/data/analytics/semantic-model/query-lab",
+                      "zh-Hans/data/analytics/semantic-model/query-log"
                     ]
                   },
                   {
                     "group": "指标管理",
                     "pages": [
+                      "zh-Hans/data/analytics/indicator-management/indicator-management",
                       "zh-Hans/data/analytics/indicator-management/indicator-registration",
+                      "zh-Hans/data/analytics/indicator-management/derived-indicator",
+                      "zh-Hans/data/analytics/indicator-management/qualification-condition",
+                      "zh-Hans/data/analytics/indicator-management/indicator-application",
+                      "zh-Hans/data/analytics/indicator-management/indicator-measure",
                       "zh-Hans/data/analytics/indicator-management/indicator-business-domain",
                       "zh-Hans/data/analytics/indicator-management/indicator-certification",
-                      "zh-Hans/data/analytics/indicator-management/derived-indicator",
-                      "zh-Hans/data/analytics/indicator-management/indicator-management",
-                      "zh-Hans/data/analytics/indicator-management/qualification-condition",
                       "zh-Hans/data/analytics/indicator-management/indicator-market",
-                      "zh-Hans/data/analytics/indicator-management/indicator-application",
-                      "zh-Hans/data/analytics/indicator-management/ai-assistant",
-                      "zh-Hans/data/analytics/indicator-management/indicator-measure"
+                      "zh-Hans/data/analytics/indicator-management/ai-assistant"
                     ]
                   }
                 ]
@@ -1471,6 +1559,18 @@
                       "zh-Hans/data/practices/database-discovery",
                       "zh-Hans/data/practices/governance-playbook",
                       "zh-Hans/data/practices/troubleshooting"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "参考",
+                "groups": [
+                  {
+                    "group": "术语与对象",
+                    "pages": [
+                      "zh-Hans/data/reference/glossary",
+                      "zh-Hans/data/overview/object-model"
                     ]
                   }
                 ]

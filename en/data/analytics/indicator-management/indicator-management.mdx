@@ -1,35 +1,32 @@
 ---
-title: 💹 Indicator Management
-sidebar_position: 4
+title: Metric Management
+description: Manage metric drafts, certification, publishing, business domains, and execution.
+sidebar_position: 1
 tags:
-  - MDX
-  - SQL
+  - Metrics
+  - Governance
 ---
 
-Before introducing indicator management, let's unify the concepts and terms in our system:
+Metric management is the workspace catalog for business metrics. Open it from **Data Intelligence → Metric Management**. It packages measures or MDX expressions from semantic models into reusable, traceable metrics.
 
-* **Measure**: It refers to assigning a numerical value to a property of an object or event, allowing comparison with the same property of other objects or events. A measure must have a numerical value and a unit of measurement to be meaningful. Specifically in the context of multidimensional models, a measure refers to a numeric type field that measures a certain property of the model.
-* **Indicator**: It refers to the measured value under a specific time granularity and statistical basis. Here, time and basis are different dimensions of the multidimensional model. In other words, an indicator refers to the measured values in specific business scenarios.
+## Lifecycle
 
-> For example, let's consider a financial revenue model with dimensions such as **accounts**, **companies**, **departments**, **product lines**, **countries**, **time**, and a measure of **revenue amount**. When we mention revenue amount, we are referring to the revenue amount field in the model. When we mention revenue indicator, we are referring to the measured values under all or some dimensions.
-> For instance:
-> * "Revenue (amount measure) of Tesla (company) automobiles (product line) in China (country) in 2021 (time) under operating (account)": Here, we are discussing indicators.
-> * "Revenue amount": We are referring to the amount measure field in the model.
+    Create draft → edit definition → optional certification → publish → query or use with the assistant
 
-Indicator management consists of the following functionalities:
+Metric status is **Draft**, **Published**, or **Archived**. Certification is a separate state: publishing makes a metric executable, while certification confirms that its business definition has been reviewed.
 
-* [Indicator Registration](./register/)
-* [Indicator Market](./market/)
-* [Indicator Application](./app/)
-* [Indicator Measurement](./indicator-measure)
-* [Indicator Copilot](./copilot)
+## Metric types
 
-<Info>
+- **Basic metric (BASIC)**: binds to one model measure and can define dimensions, variables, filters, units, and aggregation.
+- **Derived metric (DERIVE)**: calculates a value from model measures or an MDX value expression. An XMLA expression must reference an existing measure.
 
-**Indicator Application Module** currently only supports [MDX models](../models/mdx-modeling/).
+## Recommended flow
 
-</Info>
+1. Publish a queryable semantic model.
+2. Click **New** in the metric list and enter the code, name, description, and model.
+3. Configure the basic or derived definition, free dimensions, variables, and filters.
+4. Save the draft. A user with metric certification permission can certify it when required.
+5. Click **Publish**. A successful check changes the metric status to **Published**.
+6. Click **Query** to verify the result. Both the metric and its model must be published.
 
-## Dimensionality Reduction
-
-A core capability of indicator functionality is **dimensionality reduction**, where indicators reduce the number of dimensions that need to be considered in analysis by setting dimension filters, thereby reducing the complexity for business users when utilizing the model.
+See [Creating and editing metrics](./indicator-registration) for field details.

@@ -1,10 +1,11 @@
 ---
 title: 接入 XpertAI API
 sidebar_position: 1
+sidebar_hidden: true
 ---
 
 <Info>
-本文介绍如何在 ChatKit 相关场景中接入 XpertAI 后端能力，包括通过 SDK 接入和通过 HTTP API 直接调用接入。
+SDK 是独立的程序接入方式，不依赖 ChatKit。通用服务端接入请参考 [开发 SDK](/zh-hans/ai/agent/development-api)；本页保留 SDK 和 ChatKit UI 嵌入相关说明。
 </Info>
 
 ## 接入方式概览
@@ -28,7 +29,7 @@ sidebar_position: 1
   - 建议使用服务端安全保存的长期凭据
   - 可通过 `x-api-key` 或 `Authorization: Bearer <apiKey>` 传递
 - `xpertId`
-  - 即目标已发布 xpert 的 `xpert_id`
+  - 即目标已发布智能体的 ID，取自 `client.assistants.search()` / `get()` 或对应 HTTP 接口返回的 `assistant_id` 字段。`xpertId` 是示例中的本地变量名。
 
 如果你的 xpert 依赖组织或终端用户上下文，还可以在请求里额外传递：
 
@@ -112,9 +113,9 @@ async function main() {
     throw new Error("Assistant not found");
   }
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpert.assistant_id });
 
-  const result = await client.runs.wait(thread.thread_id, xpert.xpert_id, {
+  const result = await client.runs.wait(thread.thread_id, xpert.assistant_id, {
     input: {
       action: "send",
       message: {
@@ -130,6 +131,8 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+创建线程时传入 `assistantId`，运行时使用同一个智能体 ID。如果创建成功但运行返回 403，请查看 [SDK 接入指南](/zh-hans/ai/agent/development-api)中的权限排查说明。
 
 ### 4. 常用能力
 
@@ -150,7 +153,6 @@ SDK 中最常用的子客户端包括：
 
 ```ts
 import fs from "node:fs/promises";
-import { Blob } from "node:buffer";
 import { Client } from "@xpert-ai/xpert-sdk";
 
 const client = new Client({
@@ -160,11 +162,12 @@ const client = new Client({
 
 async function runWithFile(xpertId: string) {
   const fileBuffer = await fs.readFile("./manual.pdf");
-  const file = await client.contexts.uploadFile(new Blob([fileBuffer]), {
-    filename: "manual.pdf",
-  });
+  const file = await client.contexts.uploadFile<{ id: string; url?: string }>(
+    new Blob([new Uint8Array(fileBuffer)]),
+    { filename: "manual.pdf" },
+  );
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpertId });
 
   const result = await client.runs.wait(thread.thread_id, xpertId, {
     input: {
@@ -183,6 +186,10 @@ async function runWithFile(xpertId: string) {
 ```
 
 ## 通过 API 直接调用
+
+<Note>
+以下 `assistants`、`threads`、`runs` 接口也是 SDK 使用的底层 HTTP 接口，并未废弃。一般程序接入推荐使用 [官方 SDK](/zh-hans/ai/agent/development-api)。旧 AI/v1 OpenAPI 接入与这些接口不同；旧接口及其示例不再维护，不保证可用。
+</Note>
 
 如果你不使用 SDK，也可以直接调用公开的 REST API。
 
@@ -212,7 +219,7 @@ curl -X POST "https://api.xpertai.cn/api/ai/assistants/search" \
   }'
 ```
 
-如果你已经拿到了 xpert ID，可以进一步确认详情：
+查询结果是数组。取目标条目的 `assistant_id`，填入后续创建线程和运行请求中的 `<xpert-id>`。如果已经拿到该 ID，可以进一步确认详情：
 
 ```bash
 curl "https://api.xpertai.cn/api/ai/assistants/<xpert-id>" \
@@ -225,10 +232,12 @@ curl "https://api.xpertai.cn/api/ai/assistants/<xpert-id>" \
 curl -X POST "https://api.xpertai.cn/api/ai/threads" \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
-  -d '{}'
+  -d '{"assistant_id": "<xpert-id>"}'
 ```
 
 返回结果中会包含 `thread_id`。后续运行 xpert 时要继续使用这个线程 ID。
+
+HTTP 字段名为 `assistant_id`，TypeScript SDK 参数名为 `assistantId`。接口允许创建未绑定的线程，但调用智能体时应在创建阶段绑定目标智能体，并在运行时使用同一个 ID。创建线程成功不代表具备运行权限；403 排查见 [SDK 接入指南](/zh-hans/ai/agent/development-api)。
 
 ### 4. 调用 `runs/stream`
 
@@ -237,7 +246,7 @@ curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" 
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
   -d '{
-    "xpert_id": "<xpert-id>",
+    "assistant_id": "<xpert-id>",
     "input": {
       "action": "send",
       "message": {
@@ -261,14 +270,14 @@ curl -X POST "https://api.xpertai.cn/api/ai/contexts/file" \
   -F "file=@./manual.pdf"
 ```
 
-上传成功后，可将返回结果中的文件对象作为 `files` 传给运行请求：
+上传成功后，将返回的文件对象放入 `files`。下例的 `<file-id>` 使用上传响应中的 `id`（FileAsset ID）；`storageFileId` 标识底层存储文件，不要把它填为附件 ID：
 
 ```bash
 curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
   -d '{
-    "xpert_id": "<xpert-id>",
+    "assistant_id": "<xpert-id>",
     "input": {
       "action": "send",
       "message": {
@@ -277,8 +286,7 @@ curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" 
           "files": [
             {
               "id": "<file-id>",
-              "name": "manual.pdf",
-              "url": "<file-url>"
+              "originalName": "manual.pdf"
             }
           ]
         }
@@ -318,7 +326,7 @@ curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" 
 
 ### `chatkit/sessions` 的正确调用方式
 
-`POST /api/ai/v1/chatkit/sessions` 只用于换取短期 `client_secret`。当前接口请求体只需要传递 `expires_after`：
+`POST /api/ai/v1/chatkit/sessions` 用于换取短期 `client_secret`。下面的示例使用服务端 API Key 鉴权；`expires_after` 是以秒为单位的可选正整数，省略时使用服务端默认值：
 
 ```bash
 curl -X POST "https://api.xpertai.cn/api/ai/v1/chatkit/sessions" \
@@ -331,8 +339,8 @@ curl -X POST "https://api.xpertai.cn/api/ai/v1/chatkit/sessions" \
 
 请注意：
 
-- 不需要在请求体中传 `xpert`
-- 不需要在请求体中传 `user`
+- 此 API Key 兑换方式无需传 `assistant` 或 `user`，资源范围由 API Key 决定
+- 使用用户登录凭据而非 API Key 创建会话时，智能体委托模式需要传 `assistant.id`，属于另一种接入流程
 - 如果需要固定组织或业务用户上下文，请通过请求头传递 `organization-id` 和 `x-principal-user-id`
 
 ### 安全建议
@@ -344,5 +352,5 @@ curl -X POST "https://api.xpertai.cn/api/ai/v1/chatkit/sessions" \
 
 ## 下一步
 
-- 如果你要嵌入前端聊天 UI，请先阅读 [💬 ChatKit SDK](./index)
-- 如果你要继续自定义视觉与交互，请查看 [主题和自定义](./chatkit-themes)、[小部件](./chatkit-widgets)、[客户端工具](./chatkit-tool)
+- 如果你要嵌入前端聊天 UI，请先阅读 [💬 ChatKit SDK](/zh-hans/ai/chatkit)
+- 如果你要继续自定义视觉与交互，请查看 [主题和自定义](/zh-hans/ai/chatkit/chatkit-themes)、[小部件](/zh-hans/ai/chatkit/chatkit-widgets)、[客户端工具](/zh-hans/ai/chatkit/chatkit-tool)

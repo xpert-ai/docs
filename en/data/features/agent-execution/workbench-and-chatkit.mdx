@@ -64,3 +64,7 @@ When these contexts are missing, tools should reject access instead of falling b
 - For high-risk operations, review the simulation result and approval reason first.
 - After execution, use audit references or workbench artifacts to review results.
 - For cross-resource questions, first locate resources in the ontology workspace, then enter single-resource execution.
+
+## Runtime Check
+
+ChatKit should open the current Assistant with tenant, organization, workspace, and user context. After a tool call completes, use **Governance → Execution Audit** to find the run by task ID.

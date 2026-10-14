@@ -1,0 +1,80 @@
+---
+title: Quick Start
+description: Start with a business question, then connect a resource, explore ontology entities, run a read-only action, and review the audit trail.
+sidebar_position: 1
+---
+
+This path is for first-time Data Xpert users. It introduces the system through a real business outcome instead of requiring you to learn every platform concept first.
+
+## Choose the business task you want to complete
+
+| What you want to do | Start here |
+| --- | --- |
+| Ask for sales, order, or procurement trends | [Semantic analysis](../practices/semantic-analysis) |
+| Connect SAP, a database, or a knowledge base | [Resource access](../features/control-plane/resource-access) |
+| Unify customers, orders, equipment, or other business objects | [Ontology Studio](../ontology/ontology-studio) |
+| Let an Assistant query data, build a dashboard, or prepare a work order | [Action discovery](../features/agent-execution/action-discovery) or [Apps](../apps/index) |
+| Control high-risk operations and trace decisions | [Policies](../features/governance/policies) and [Audit](../features/governance/audit) |
+
+For a first experience, start with a read-only question such as: “Tell me the number of purchase orders, suppliers, and products this month, and show the data source and update time.” The system maps the question to authorized entities and actions, then returns the result with audit evidence. See [Choose by business scenario](./roles) for more paths.
+
+## 1. Sign in and select a workspace
+
+Sign in to Data Xpert and confirm that the organization and AI workspace are correct. You need access to:
+
+- **Data and Ontology** for resource access, ontology workspace, and resource chat;
+- **Governance** for policies, approvals, and execution audit;
+- **Workspace data sources** for the sources that the workspace is allowed to use.
+
+If the target workspace or data source is not visible, ask an organization administrator to grant access before continuing.
+
+## 2. Connect a resource
+
+If the workspace already has a usable resource, open its details. Otherwise, go to **Data and Ontology → Resource Access** and select **Register External Resource**:
+
+1. Choose the resource type and enter its identifier, owner, and version.
+2. Select a connection reference from **Secrets** and complete the capability settings for the adapter.
+3. Create the resource and open its details.
+
+Keep credentials in the Secret manager. Do not put passwords, tokens, or certificates in documentation or action parameters. See [Resource Access Control Plane](../features/control-plane/resource-access) for resource-specific fields.
+
+## 3. Sync and publish the ontology
+
+In the resource details, open **Sync Jobs** and run a **Full Sync**. When the job completes, confirm that the resource has a current `snapshotId` and entity or relationship counts.
+
+Use a full sync for the first import. After the resource is stable, use incremental sync when the adapter supports it. If the job fails, inspect its error details and follow [Sync job failures](./troubleshooting#sync-job-failure).
+
+## 4. Search an entity and inspect its context
+
+Open **Data and Ontology → Ontology Workspace**, find the synced resource, and confirm that its health is `ready`. Search by entity type, name, or external key, then open the entity graph or neighborhood.
+
+You should see the entity type, attributes, relationships, source, and current ontology snapshot. If the resource is still `missing_snapshot`, `pending`, or `projection_failed`, resolve the sync or publication issue before asking an Assistant to use it.
+
+## 5. Discover and run a read-only action
+
+In resource chat or a configured Agent Workbench, ask the Assistant to describe the current resource and entity context before discovering actions. For example: “Find the sales entities that can be queried in this resource and tell me which action you will use.”
+
+Follow this order:
+
+1. Discover actions and confirm the target entity type and allowed operations.
+2. Simulate a low-risk query and review its parameters, policy, and runtime readiness.
+3. Execute the read-only action only after simulation succeeds.
+
+Technical integrations can call `discoverActions`, `simulateAction`, and `executeAction` in that order. Review [Approvals](../features/governance/approvals) before attempting writes, high-risk actions, or actions that require approval.
+
+## 6. Review the audit trail
+
+Open **Governance → Execution Audit** and filter by the resource, action, or task. Confirm that the record includes the caller, target entity, ontology snapshot, policy decision, execution status, and result summary.
+
+The audit should answer who called which action against which snapshot, why it was allowed, and what happened.
+
+## Completion checklist
+
+- [ ] The correct organization and AI workspace are selected.
+- [ ] The resource appears in the current organization's resource list.
+- [ ] The first full sync completed and produced a `snapshotId`.
+- [ ] The ontology workspace reports `ready` and entity search works.
+- [ ] A read-only action was discovered, simulated, and executed.
+- [ ] The audit trail contains the call, policy result, ontology snapshot, and result summary.
+
+Next, administrators can read [Resource Access Control Plane](../features/control-plane/resource-access), modelers can read [Ontology Studio](../ontology/ontology-studio), Agent builders can read [Action Discovery](../features/agent-execution/action-discovery), and governance users can read [Execution Audit](../features/governance/audit).

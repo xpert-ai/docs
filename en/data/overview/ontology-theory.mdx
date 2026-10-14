@@ -1,72 +1,72 @@
 ---
 title: Ontology Theory
-description: Explains the theoretical foundation of UOSE through entities, relationships, attributes, constraints, and reasoning.
+description: How entities, relationships, attributes, actions, policies, and constraints form governable business semantics.
 ---
 
-The value of ontology in the UOSE system is not to write business concepts into a static vocabulary. It is to express objects, relationships, attributes, constraints, and actions in enterprise systems as computable, verifiable, and governable semantic contracts. It changes the objects of agent reasoning from natural language fragments into stable business objects.
+Ontology theory represents the business world as an object space that can be identified, connected, and validated. It describes entities, relationships, and attributes together with the actions objects support, the policies that govern those actions, and the evidence required for execution.
 
 ## Entities
 
-An entity is an object in the business world that can be identified, referenced, and operated on. It can be a customer, an order, a metric, a semantic model, a database table, or a concept node in a knowledge graph.
+An entity is an object that can be identified, referenced, and operated on. It can be a customer, an order, a metric, a semantic model, a database table, or a concept node in a knowledge graph.
 
-In UOSE, an entity must have:
+An entity should have:
 
 - Stable identifiers, such as external keys, internal entity IDs, and ontology IDs.
-- Type ownership, such as `semantic_indicator` or `database_table`.
-- Readable names for search, display, and agent explanation.
-- Attribute sets used to describe object state, fields, granularity, evidence, and runtime context.
+- A type, such as `semantic_indicator` or `database_table`.
+- A readable name for search, display, and explanation.
+- Attributes describing state, fields, granularity, evidence, and runtime context.
 
-The point of entities is that an Agent no longer only says "sales amount metric"; it can locate the concrete metric object in a concrete resource and carry its model, Cube, time dimension, filterable fields, and other context.
+Entities let the system locate a concrete object in a concrete resource and carry its model, fields, relationships, and query contract as context.
 
-## Relationships
+## Relationships and Attributes
 
-Relationships express structural links between entities. They can represent containment, reference, navigation, dependency, derivation, or evidence association.
+Relationships express structural links between entities, including containment, reference, navigation, dependency, derivation, and evidence association. For example, a semantic model contains Cubes, a database table contains columns, and a SAP OData Entity Set points to an Entity Type.
 
-Typical relationships include:
+Attributes are structured descriptions on entities and relationships. They can carry:
 
-- A semantic model contains Cubes: `semantic_model_has_cube`.
-- A Cube contains metrics, measures, and dimensions.
-- A SAP OData Entity Set points to an Entity Type.
-- A database table contains columns, constraints, and indexes.
-- A knowledge base contains knowledge entities, and GraphRAG relationships exist between knowledge entities.
+- Resource state, version, and update time.
+- Execution context such as `analysis_contract`, `query_capabilities`, and `key_schema`.
+- Evidence such as aliases, sources, confidence, and mention samples.
+- Security boundaries such as write support, CSRF support, and sync truncation.
 
-Relationships allow Agents to read context along the graph. For example, starting from a metric, the Agent can find its Cube, available dimensions, and fact query contract. Starting from an OData Entity Set, the Agent can find field definitions and navigable objects.
+Structured attributes support reliable search, policy matching, and audit replay.
 
-## Attributes
+## Actions and Policies
 
-Attributes are structured descriptions on entities and relationships. They can carry both business information and runtime information.
+An action (affordance) describes how an object can be used. For example, a semantic metric can query trends, a database table can preview rows, and a SAP Entity Set can read a collection or update an entity. A policy decides whether an action is allowed, denied, or sent for approval under the current tenant, organization, resource, target, and risk.
 
-In UOSE, common uses of attributes include:
+Actions should declare a target type, input schema, risk level, idempotency requirements, and execution effect. Agents can then discover available capabilities while the system validates their boundaries before execution.
 
-- Describing resource objects: name, status, version, and updated time.
-- Describing execution context: `analysis_contract`, `query_capabilities`, and `key_schema`.
-- Describing graph evidence: aliases, sources, confidence, and mention samples.
-- Describing security boundaries: whether writes are allowed, whether CSRF is supported, and whether sync was truncated.
+## Constraints and Validation
 
-Attributes should be structured whenever possible. Only structured attributes can be read reliably by Agents, matched reliably by policies, and replayed reliably by audits.
+Constraints define how objects may be used:
 
-## Constraints
+- Type constraints: an action applies only to specified entity types.
+- Parameter constraints: inputs must satisfy the action schema.
+- Business constraints: write actions may require approval or an idempotency key.
+- Runtime constraints: query limits, sync limits, and source metadata restrictions.
+- Permission constraints: policy bindings return `allow`, `deny`, or `require_approval`.
 
-Constraints define how objects can be used legally. They answer "can this be done", "what conditions are required", and "which inputs are invalid".
+When the target object, action contract, parameter validity, or policy result cannot be confirmed, the system should reject execution or send it for approval instead of allowing an Agent to guess. This is the ontology system's fail-closed principle.
 
-Constraints include:
+## From Objects to Execution
 
-- Type constraints: actions can only apply to specified entity types.
-- Parameter constraints: action inputs must satisfy schemas.
-- Business constraints: whether write actions require approval or idempotency keys.
-- Runtime constraints: maximum query rows, maximum synced objects, source metadata restrictions, and sync-scoped selections.
-- Permission constraints: policy bindings decide `allow`, `deny`, or `require_approval`.
+Agent execution should proceed through the object-semantic space:
 
-Constraints keep UOSE execution controllable: Agents can generate plans, but the system must validate them.
+```text
+User intent -> object location -> neighborhood context -> action discovery -> simulation and validation -> real execution
+```
 
-## Reasoning and Validation
+- Object location identifies the entity referenced by the user.
+- Neighborhood context provides related models, fields, relationships, and constraints.
+- Action discovery shows what the object can do now.
+- Simulation and validation check parameters, policies, and runtime conditions.
+- Real execution calls the adapter and records the result.
 
-UOSE uses the ontology graph to help Agents perform explainable reasoning, but final execution does not rely on the Agent proving itself correct. The system adds a second gate through these mechanisms:
+Context is disclosed progressively: resources and entity candidates first, then neighborhood, schema, action contract, risk, and approval information, and finally results, audit evidence, and review details. This controls context cost and reduces misuse.
 
-- Ontology snapshots store resource semantic facts.
-- RDF or local projections support entity retrieval, neighborhood queries, and schema queries.
-- Action manifests define action contracts and risk levels.
-- `simulateAction` validates target, parameters, policy, and runtime readiness before execution.
-- Audit records store inputs, outputs, policy decisions, and evidence references.
+## Separating Semantics and Fact Execution
 
-Therefore, the role of ontology in the product is to turn enterprise knowledge into an operation space that Agents can read, systems can control, and users can trace.
+The ontology layer discovers objects, relationships, schemas, constraints, and context. The execution layer calls external resources, queries fact data, or triggers writes. For example, the ontology layer can identify which Cube contains a metric, while the semantic model adapter queries its value from the source; it can describe fields in a SAP Entity Set, while the SAP OData adapter performs the real read.
+
+Ontology snapshots, RDF, or local projections preserve reusable semantic facts. Action manifests and audit records preserve execution contracts and result evidence. This keeps semantics consistent while respecting each source system's fact and permission boundaries.

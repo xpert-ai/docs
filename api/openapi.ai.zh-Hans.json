@@ -4,8 +4,9 @@
     "/api/ai/v1/chat": {
       "post": {
         "operationId": "AIV1Controller_chat",
+        "deprecated": true,
         "summary": "调用智能体",
-        "description": "向已发布的智能体发送消息，通过 SSE 接收流式回复。使用 Authorization: Bearer <API_KEY> 或 x-api-key 鉴权。保存 on_conversation_start.data.id，并在后续请求中通过 conversationId 延续对话。每个 SSE data 字段包含 JSON，字段为 type、可选的 event 和 data。文本增量的 type 为 message，生命周期事件的 type 为 event。请检查 on_conversation_end.data.status、error 以及 SSE 错误事件：HTTP 请求成功不代表智能体执行成功。内部运行时选项不属于公开请求参数。",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。\n\n向已发布的智能体发送消息，通过 SSE 接收流式回复。以下请求和响应说明仅保留为历史参考。使用 Authorization: Bearer <API_KEY> 或 x-api-key 鉴权。保存 on_conversation_start.data.id，并在后续请求中通过 conversationId 延续对话。每个 SSE data 字段包含 JSON，字段为 type、可选的 event 和 data。文本增量的 type 为 message，生命周期事件的 type 为 event。请检查 on_conversation_end.data.status、error 以及 SSE 错误事件：HTTP 请求成功不代表智能体执行成功。内部运行时选项不属于公开请求参数。",
         "tags": [
           "AI/v1"
         ],
@@ -99,7 +100,7 @@
           "href": "/zh-hans/api-reference/aiv1/chat-with-an-agent",
           "metadata": {
             "title": "调用智能体",
-            "description": "向已发布的智能体发送消息，通过 SSE 接收流式回复。使用 Authorization: Bearer <API_KEY> 或 x-api-key 鉴权。保存 on_conversation_start.data.id，并在后续请求中通过 conversationId 延续对话。每个 SSE data 字段包含 JSON，字段为 type、可选的 event 和 data。文本增量的 type 为 message，生命周期事件的 type 为 event。请检查 on_conversation_end.data.status、error 以及 SSE 错误事件：HTTP 请求成功不代表智能体执行成功。内部运行时选项不属于公开请求参数。"
+            "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。\n\n向已发布的智能体发送消息，通过 SSE 接收流式回复。以下请求和响应说明仅保留为历史参考。使用 Authorization: Bearer <API_KEY> 或 x-api-key 鉴权。保存 on_conversation_start.data.id，并在后续请求中通过 conversationId 延续对话。每个 SSE data 字段包含 JSON，字段为 type、可选的 event 和 data。文本增量的 type 为 message，生命周期事件的 type 为 event。请检查 on_conversation_end.data.status、error 以及 SSE 错误事件：HTTP 请求成功不代表智能体执行成功。内部运行时选项不属于公开请求参数。"
           }
         }
       }
@@ -107,6 +108,8 @@
     "/api/ai/v1/kb": {
       "post": {
         "operationId": "AIV1Controller_createKnowledgebase",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -137,6 +140,8 @@
     "/api/ai/v1/kb/{id}": {
       "put": {
         "operationId": "AIV1Controller_updateKnowledgebase",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -174,6 +179,8 @@
       },
       "delete": {
         "operationId": "AIV1Controller_deleteKnowledgebase",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -202,6 +209,8 @@
     "/api/ai/v1/kb/{id}/bulk": {
       "post": {
         "operationId": "AIV1Controller_createDocBulk",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -244,6 +253,8 @@
     "/api/ai/v1/kb/{id}/process": {
       "post": {
         "operationId": "AIV1Controller_start",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -285,6 +296,8 @@
     "/api/ai/v1/kb/{id}/status": {
       "get": {
         "operationId": "AIV1Controller_getStatus",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "ids",
@@ -313,6 +326,8 @@
     "/api/ai/v1/file": {
       "post": {
         "operationId": "AIV1Controller_create",
+        "deprecated": true,
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。\n\n历史文件上传接口。新接入请使用官方 XpertAI SDK 的 client.contexts.uploadFile()。在默认存储目标下，SDK 返回关联 FileAsset 的 AgentFile 句柄，并默认启动文件理解解析。其中 id 是 FileAsset ID，storageFileId 是存储文件 ID。已有知识库调用方迁移时须调整返回值映射。",
         "parameters": [],
         "responses": {
           "201": {
@@ -332,6 +347,7 @@
     "/api/ai/v1/chatkit/sessions": {
       "post": {
         "operationId": "AIV1Controller_createChatkitSession",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -351,6 +367,7 @@
     "/api/ai/contexts/file": {
       "post": {
         "operationId": "ContextsController_create",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -370,6 +387,7 @@
     "/api/ai/contexts/file/{id}": {
       "delete": {
         "operationId": "ContextsController_delete",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -398,6 +416,7 @@
     "/api/ai/knowledges": {
       "post": {
         "operationId": "KnowledgesController_createKnowledgebase",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -428,6 +447,7 @@
     "/api/ai/knowledges/{id}": {
       "put": {
         "operationId": "KnowledgesController_updateKnowledgebase",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -465,6 +485,7 @@
       },
       "delete": {
         "operationId": "KnowledgesController_deleteKnowledgebase",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -493,6 +514,7 @@
     "/api/ai/knowledges/{id}/bulk": {
       "post": {
         "operationId": "KnowledgesController_createDocBulk",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -535,6 +557,7 @@
     "/api/ai/knowledges/{id}/process": {
       "post": {
         "operationId": "KnowledgesController_start",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -576,6 +599,7 @@
     "/api/ai/knowledges/{id}/status": {
       "get": {
         "operationId": "KnowledgesController_getStatus",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "ids",
@@ -604,6 +628,7 @@
     "/api/ai/assistants/search": {
       "post": {
         "operationId": "AssistantsController_search",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -623,6 +648,7 @@
     "/api/ai/assistants/count": {
       "post": {
         "operationId": "AssistantsController_count",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -642,6 +668,7 @@
     "/api/ai/assistants/{id}": {
       "get": {
         "operationId": "AssistantsController_getOne",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "id",
@@ -670,6 +697,7 @@
     "/api/ai/threads": {
       "post": {
         "operationId": "ThreadsController_createThread",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -689,6 +717,7 @@
     "/api/ai/threads/search": {
       "post": {
         "operationId": "ThreadsController_searchThreads",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "200": {
@@ -708,6 +737,7 @@
     "/api/ai/threads/{thread_id}": {
       "get": {
         "operationId": "ThreadsController_getThread",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -734,6 +764,7 @@
       },
       "patch": {
         "operationId": "ThreadsController_patchThread",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -760,6 +791,7 @@
       },
       "delete": {
         "operationId": "ThreadsController_deleteThread",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -788,6 +820,7 @@
     "/api/ai/threads/{thread_id}/state": {
       "get": {
         "operationId": "ThreadsController_getThreadState",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -814,6 +847,7 @@
       },
       "post": {
         "operationId": "ThreadsController_updateThreadState",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -842,6 +876,7 @@
     "/api/ai/threads/{thread_id}/history": {
       "post": {
         "operationId": "ThreadsController_getThreadHistory",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -870,6 +905,7 @@
     "/api/ai/threads/{thread_id}/copy": {
       "post": {
         "operationId": "ThreadsController_copyThread",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -898,6 +934,7 @@
     "/api/ai/threads/{thread_id}/runs": {
       "get": {
         "operationId": "ThreadsController_getThreadRuns",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -940,6 +977,7 @@
       },
       "post": {
         "operationId": "ThreadsController_createRun",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -968,6 +1006,7 @@
     "/api/ai/threads/{thread_id}/runs/stream": {
       "post": {
         "operationId": "ThreadsController_runStream",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -1004,6 +1043,7 @@
     "/api/ai/threads/{thread_id}/runs/wait": {
       "post": {
         "operationId": "ThreadsController_runWait",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -1032,6 +1072,7 @@
     "/api/ai/threads/{thread_id}/runs/{run_id}/stream": {
       "get": {
         "operationId": "ThreadsController_joinRunStream",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -1076,6 +1117,7 @@
     "/api/ai/threads/{thread_id}/runs/{run_id}": {
       "get": {
         "operationId": "ThreadsController_getThreadRun",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -1112,6 +1154,7 @@
     "/api/ai/threads/{thread_id}/runs/{run_id}/cancel": {
       "post": {
         "operationId": "ThreadsController_cancelThreadRun",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -1148,6 +1191,7 @@
     "/api/ai/threads/{thread_id}/usage": {
       "get": {
         "operationId": "ThreadsController_getThreadUsage",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "thread_id",
@@ -1192,6 +1236,7 @@
     "/api/ai/conversations": {
       "post": {
         "operationId": "ConversationsController_createConversation",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -1211,6 +1256,7 @@
     "/api/ai/conversations/search": {
       "post": {
         "operationId": "ConversationsController_searchConversations",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "200": {
@@ -1230,6 +1276,7 @@
     "/api/ai/conversations/{conversation_id}": {
       "get": {
         "operationId": "ConversationsController_getConversation",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1256,6 +1303,7 @@
       },
       "patch": {
         "operationId": "ConversationsController_updateConversation",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1282,6 +1330,7 @@
       },
       "delete": {
         "operationId": "ConversationsController_deleteConversation",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1310,6 +1359,7 @@
     "/api/ai/conversations/{conversation_id}/messages": {
       "get": {
         "operationId": "ConversationsController_listMessages",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1352,6 +1402,7 @@
       },
       "post": {
         "operationId": "ConversationsController_createMessage",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1380,6 +1431,7 @@
     "/api/ai/conversations/{conversation_id}/messages/search": {
       "post": {
         "operationId": "ConversationsController_searchMessages",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1408,6 +1460,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}": {
       "get": {
         "operationId": "ConversationsController_getMessage",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1442,6 +1495,7 @@
       },
       "patch": {
         "operationId": "ConversationsController_updateMessage",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1476,6 +1530,7 @@
       },
       "delete": {
         "operationId": "ConversationsController_deleteMessage",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1512,6 +1567,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks": {
       "get": {
         "operationId": "ConversationsController_listFeedbacks",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1562,6 +1618,7 @@
       },
       "post": {
         "operationId": "ConversationsController_createFeedback",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1598,6 +1655,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks/search": {
       "post": {
         "operationId": "ConversationsController_searchFeedbacks",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1634,6 +1692,7 @@
     "/api/ai/conversations/{conversation_id}/messages/{message_id}/feedbacks/{feedback_id}": {
       "get": {
         "operationId": "ConversationsController_getFeedback",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1676,6 +1735,7 @@
       },
       "patch": {
         "operationId": "ConversationsController_updateFeedback",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1718,6 +1778,7 @@
       },
       "delete": {
         "operationId": "ConversationsController_deleteFeedback",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "conversation_id",
@@ -1762,6 +1823,7 @@
     "/api/ai/store/items": {
       "get": {
         "operationId": "StoreController_findAll",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [
           {
             "name": "namespace",
@@ -1804,6 +1866,7 @@
       },
       "put": {
         "operationId": "StoreController_putItem",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "200": {
@@ -1821,6 +1884,7 @@
       },
       "delete": {
         "operationId": "StoreController_deleteItem",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "200": {
@@ -1840,6 +1904,7 @@
     "/api/ai/store/namespaces": {
       "post": {
         "operationId": "StoreController_namespaces",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -1859,6 +1924,7 @@
     "/api/ai/store/items/search": {
       "post": {
         "operationId": "StoreController_search",
+        "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
         "parameters": [],
         "responses": {
           "201": {
@@ -1878,7 +1944,7 @@
   },
   "info": {
     "title": "Xpert AI",
-    "description": "",
+    "description": "这份历史 OpenAPI 参考文档已不再维护，内容可能不符合当前服务器行为。新接入请使用官方 XpertAI SDK（@xpert-ai/xpert-sdk）：[SDK 接入指南](/zh-hans/ai/agent/development-api)。",
     "version": "1.0",
     "contact": {}
   },

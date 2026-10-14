@@ -1,5 +1,6 @@
 ---
 title: SAP BW Calendar Dimension
+description: Configure reusable calendar dimensions and time hierarchies for SAP BW semantic models.
 sidebar_position: 4
 tags:
   - MDX
@@ -7,9 +8,18 @@ tags:
   - BW
 ---
 
+<Info>
+**Applies to:** Current Data Xpert version.
+
+**Prerequisites:** An accessible SAP BW/BPC system, a Secret, semantic-model permissions, and an available Assistant.
+
+**External dependency:** This tutorial requires an accessible SAP system and related permissions. If no source is available, start with [Quick Start](../../getting-started/index).
+</Info>
+
+
 ## Introduction to the Calendar Dimension
 
-In a multidimensional dataset (Cube), the [Calendar Dimension](../../models/mdx-modeling/calendar-dimension) is a critical dimension used to represent and organize time-related data. The calendar dimension provides a structured time framework, enabling users to slice and analyze data by time periods. Typical calendar dimensions include levels such as year, quarter, month, week, and day, as well as other related time attributes like fiscal year, fiscal quarter, and workdays.
+In a multidimensional dataset (Cube), the [Calendar Dimension](/en/data/analytics/semantic-model/dimension-designer/dimension-designer) is a critical dimension used to represent and organize time-related data. The calendar dimension provides a structured time framework, enabling users to slice and analyze data by time periods. Typical calendar dimensions include levels such as year, quarter, month, week, and day, as well as other related time attributes like fiscal year, fiscal quarter, and workdays.
 
 The calendar dimension plays a vital role in data analysis and business intelligence because most business data involves time factors. By using the calendar dimension, users can easily perform the following tasks:
 
@@ -86,10 +96,10 @@ The format string should be set according to the actual format of the member key
 
 The semantically enhanced model can then be freely used in the metabase analysis cloud system, involving calendar dimension scenarios in the following components (not limited to):
 
-- [Difference Calculation for Calculated Members](../../stories/calculations/#5-差值度量-difference-from)
-- [Calendar Dimension in Indicator Registration](../../indicators/register#注册指标)
-- [Filter Bar in Story Widgets](../../widgets/filter-bar/calendar-select/)
-- [Input Control in Story Widgets](../../widgets/input-control/calendar/)
+- [Difference Calculation for Calculated Members](/en/data/practices/semantic-analysis)
+- [Indicator Registration](/en/data/analytics/indicator-management/indicator-registration)
+- Filter Bar in Story Widgets
+- Input Control in Story Widgets
 
 ## Conclusion
 

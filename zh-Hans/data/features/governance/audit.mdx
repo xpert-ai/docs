@@ -72,3 +72,15 @@ description: UOSE如何记录 Agent 调用、策略判定、执行结果与证�
 - 对高风险动作保留审批单和策略命中原因。
 - 不在审计中保存 token、password、cookie 或完整敏感业务数据。
 
+## Web 操作路径
+
+进入**治理 → 执行审计**，按资源、状态、时间或 task ID 筛选。打开一条记录后依次核对 tool/action、actor、resource、Snapshot、策略决定、状态、证据引用和结果摘要；通过审批单中的 `auditRef` 可以跳回同一条链路。
+
+**成功信号：**一次执行至少能通过 `taskId` 或 `traceId` 串起 discovery、simulate、policy、approval（如有）和 execute 事件，并能看到最终状态。
+
+## 验收清单
+
+- [ ] 审计记录包含调用者和组织上下文。
+- [ ] 记录引用了实际 Snapshot / graph version。
+- [ ] 策略允许、拒绝或审批原因可解释。
+- [ ] 结果只保存摘要或 artifact 引用，没有凭据和完整敏感数据。

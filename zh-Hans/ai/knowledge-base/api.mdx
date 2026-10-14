@@ -5,6 +5,10 @@ sidebar_position: 5
 
 本教程将详细介绍如何使用 XperAI 平台的知识库 API 来创建知识库、上传文件并处理文档。
 
+<Warning>
+本文使用的旧 OpenAPI 接入方式已废弃，不再维护，不保证可用。新的知识库接入请使用官方 SDK 的 `client.knowledges` 和 `client.contexts`，参考 [SDK 接入指南](/zh-hans/ai/agent/development-api)。以下 HTTP 示例仅保留为历史参考。
+</Warning>
+
 <Info>
 参考代码 [XpertAI SDK 示例](https://github.com/xpert-ai/xpertai-sdk)
 </Info>
@@ -97,6 +101,10 @@ async function createKnowledgebase() {
 ### 2. 上传文件
 
 将本地文件上传到 XperAI 平台：
+
+<Warning>
+本节示例使用的 `POST /api/ai/v1/file` 已废弃，保留用于兼容旧知识库流程。新的智能体文件上传请使用官方 SDK 的 `client.contexts.uploadFile()`，参考 [SDK 接入指南](/zh-hans/ai/agent/development-api)。在默认存储目标下，新接口返回的 `id` 是 FileAsset ID，`storageFileId` 才是下一步知识库文档关联所需的存储文件 ID；迁移时不能只替换 URL 后继续传入 `id`。
+</Warning>
 
 ```javascript
 async function uploadFile(filePath) {

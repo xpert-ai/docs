@@ -1,0 +1,36 @@
+---
+title: 按业务场景选择
+description: 从真实业务目标进入数据接入、语义建模、智能分析、助手执行和治理流程。
+sidebar_position: 3
+---
+
+先确定你要解决的业务问题，再进入对应功能。你不需要先读完所有概念；完成一个真实场景后，再回头了解[统一对象模型](../overview/object-model)会更快。
+
+| 你的业务目标 | 建议入口 | 你将看到的结果 |
+| --- | --- | --- |
+| 回答“销售额、订单量、采购趋势是多少？” | [多维模型介绍](../analytics/semantic-model/multidimensional-model-introduction)、[查询实验室](../analytics/semantic-model/query-lab)、[语义分析实践](../practices/semantic-analysis) | 指标、维度和查询结果有明确口径 |
+| 把 SAP、数据库或知识库接入系统 | [资源接入](../features/control-plane/resource-access)、[资源类型与扩展模型](../ontology/integrations/overview)、[本体空间](../ontology/ontology-workspace) | 外部系统变成可搜索的资源和实体 |
+| 统一客户、订单、设备等业务对象 | [本体工作室](../ontology/ontology-studio)、[本体总览](../ontology/overview)、[快照与投影](../ontology/snapshot-and-projection) | 发布可复用的实体、关系和业务 Action |
+| 让助手查询数据、生成看板或准备工单 | [Action 发现](../features/agent-execution/action-discovery)、[工作台与资源对话](../features/agent-execution/workbench-and-chatkit)、[业务应用](../apps/index) | 助手在业务上下文中完成受控任务 |
+| 控制高风险操作并追溯结果 | [策略](../features/governance/policies)、[审批](../features/governance/approvals)、[执行审计](../features/governance/audit) | 每次执行都有权限判断、审批和证据 |
+
+## 推荐的第一次业务体验
+
+如果你只是想快速理解系统价值，可以从一个只读问题开始：
+
+> “请告诉我本月采购订单数量、供应商数量和产品分布，并说明数据来源和更新时间。”
+
+系统会先从已授权资源中定位业务对象，再发现并模拟查询 Action，最后返回结果和审计信息。拥有 SAP OData 资源时，可参考[SAP 采购运营指挥中心](../tutorial/sap-resource/sap-procurement-operations-command-center)；没有 SAP 时，可使用已有语义模型，参考[语义分析实践](../practices/semantic-analysis)。
+
+## 按角色继续深入
+
+业务场景确定后，再按职责分工：
+
+- **平台管理员**：先完成 [Secret 管理](../features/control-plane/secret-management)、[资源接入](../features/control-plane/resource-access) 和[同步作业](../features/control-plane/sync-jobs)。
+- **本体建模人员**：定义实体、关系和 Action，并在[本体工作室](../ontology/ontology-studio)发布版本。
+- **数据分析人员**：在[语义模型工作空间](../analytics/semantic-model/semantic-modeling-workspace)和[查询实验室](../analytics/semantic-model/query-lab)验证指标口径。
+- **Assistant / Agent 构建者**：阅读 [Agent Tools](../features/agent-execution/agent-tools) 和 [Action 发现](../features/agent-execution/action-discovery)。
+- **治理与审计人员**：使用[策略](../features/governance/policies)、[审批](../features/governance/approvals)和[执行审计](../features/governance/audit)复盘边界。
+- **插件开发者**：从[适配器扩展](../ontology/integrations/extensibility)和[插件场景中的本体](../ontology/cases/plugin-scenarios)开始。
+
+任何环节失败时，按[第一次失败如何排查](./troubleshooting)从页面状态向前追溯。

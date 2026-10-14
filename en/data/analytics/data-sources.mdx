@@ -1,0 +1,52 @@
+---
+title: Data Sources
+description: Create, test, bind, and maintain data sources used by data analysis.
+sidebar_position: 2
+tags:
+  - Data sources
+  - Permissions
+---
+
+A data source is the connection definition that lets a semantic model access a database or XMLA service. Credentials stay in the data source; a model stores only the data source reference, catalog, and cube information.
+
+## Page layout
+
+Open **Data Intelligence → Data Sources**. The page has two areas:
+
+- **Authorized**: connections already bound to the current workspace and available for model creation.
+- **Available to the organization**: connections provided by an organization administrator but not yet bound to this workspace. Click **Bind** to add one to Authorized.
+
+Search filters names, types, and connection methods. Edit, copy, unbind, and delete actions depend on your permissions.
+
+## Create a data source
+
+1. Click **New** and choose a data source type returned by the system.
+2. Enter the name, authentication method, and connection fields. The fields are generated from the selected type.
+3. Click **Test connection**. Testing a new draft does not save it; editing an existing source tests its current values.
+4. After the test succeeds, click **Save** and confirm the source status in the list.
+
+Do not put passwords, tokens, or private keys in the description. Use the authentication fields or the platform's key management.
+
+## Bind an organization data source
+
+Click **Bind** in **Available to the organization**. Binding links the workspace to the organization source without copying its configuration. Click **Unbind** when it is no longer needed. If a model still references the source, the system reports a dependency and you must move the model first.
+
+## Catalog and structure information
+
+When you create a model, the catalog selector loads structure information from the data source:
+
+- SQL sources usually return databases, schemas, and tables.
+- XMLA sources return remote catalogs; importing a cube also discovers dimensions, hierarchies, levels, measures, and variables.
+
+Do not guess a catalog when the list is empty. Edit the source, test the connection, and refresh the catalog. A connection service or permission problem can also prevent the list from loading.
+
+## Common issues
+
+| Symptom | What to check |
+| --- | --- |
+| Connection test times out | Host and port, network allowlists, TLS, and credentials; confirm that the system can reach the database. |
+| Connection succeeds but the catalog is empty | Check structure permissions, refresh the catalog, and confirm the XMLA catalog name. |
+| The source cannot be bound | Check workspace permissions and whether the organization source is still available. |
+| Deletion is refused | Confirm in the semantic model list that no model still references the source. |
+
+When the source is ready, continue with [Creating and managing semantic models](./semantic-model/manage-semantic-model).

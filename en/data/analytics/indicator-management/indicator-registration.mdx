@@ -1,130 +1,36 @@
 ---
-title: 📝 Indicator Registration
-sidebar_position: 1
+title: Create and Edit Metrics
+description: Fill in the code, model, measure binding, dimensions, and filters in the current metric editor.
+sidebar_position: 2
 tags:
-  - MDX
+  - Metrics
+  - Configuration
 ---
 
-The Indicator Registration page is a functional page used to register individual new indicators or to bulk upload indicator definitions. Below are the main contents and functions of this page:
+Open **Data Intelligence → Metric Management** and click **New** or an edit action. The current editor is a dialog; the old YAML bulk-registration flow is no longer supported.
 
-1. **Basic Information**: Basic information about the indicator, such as indicator name, description, unit, etc. These information are the basic attributes of the indicator, used to help users better understand and use the indicator.
-2. **Model Information**: Model information related to the indicator, such as model name, model entity, dimensions, and measures, etc.
+## Basic fields
 
-## Creating Business Domains
+| Field | Description |
+| --- | --- |
+| Code | A stable code used to identify the metric in the workspace. Required. |
+| Name | Display name. Required. |
+| Type | Basic metric (BASIC) or derived metric (DERIVE). |
+| Model | Semantic model used by the metric. A published model is recommended. |
+| Description | Explanation of the metric definition. |
+| Business definition | Definition written for business users. |
+| Owner / validity | Optional owner and validity period. |
 
-In the management of indicators, whether through business domains, product lines, or departments for classification and management of indicators, an organizational structure is needed to manage indicators of different attribute categories. We manage indicators by grouping them under business domains.
+## Basic metrics (BASIC)
 
-Refer to [Business Domain Management](../server/organization/business-area)
+After you select an XMLA model, the editor loads available measures, levels, variables, and time grains from the cube. Select one measure, then add dimension bindings, filters, variables, or a time dimension as needed.
 
-1. First, open the **Business Domain** page, click on "Create Business Domain," and enter a name such as **Finance**.
-2. Click the add button on the Finance row to continue adding child business domains, such as **Management Reports**.
-3. Continue adding sub-sections of Management Reports: **Core Indicators**, **Revenue Indicators**, **Profit and Loss Indicators**, etc.
+## Derived metrics (DERIVE)
 
-## Registering Indicators
+A derived metric accepts a formula. For XMLA, use a restricted MDX value expression that references at least one existing measure; do not submit a complete SELECT statement, comments, or modification statements. Relational drafts still save formulas and filter definitions, subject to current validation support.
 
-Next, create specific indicators.
+## Save, publish, and delete
 
-<Tip>
-**Unique Code**
+Save updates only the draft. Return to the list to search by name, code, or description and filter by Draft, Published, or Archived. Publishing checks model bindings, measures, dimensions, and filters. Deletion requires confirmation and may be refused for a published metric or a metric referenced by another asset.
 
-
-Indicator codes are only limited to uniqueness within the semantic model's multidimensional dataset; there are no restrictions at the business domain or global level, and users regulate them themselves.
-
-</Tip>
-
-1. Open the indicator registration page and enter the following indicator information:
-
-- Basic Information
-
-| Name         | Description                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| Indicator Name | Language description of the indicator. From a management perspective, indicator names are unique, but the system itself does not enforce this uniqueness. |
-| Indicator Code | Unified indicator code, facilitating user memory and query of indicators.                       |
-| Business Domain | The business sector to which the indicator belongs (i.e., business domain). For example, we can put **Total Company Revenue** into the core indicator business domain. |
-| Authentication Process | The authentication process of the indicator in the indicator system.                       |
-| Creator | The creator of the indicator.                                                                              |
-| Responsible Person | The person responsible for the indicator in the business.                                                     |
-| Unit of Measure | The unit of measure for the indicator, such as **RMB**.                                                        |
-| Validity Period | The validity period of the indicator.                                                                |
-| Activation Status | Whether the indicator is in an active state.                                                               |
-| Indicator Application Availability | Whether the indicator is available for use in indicator applications.                                            |
-| Business Caliber | A language description of the indicator from a caliber perspective. The definition of indicator business caliber needs to be determined according to specific business scenarios and requirements, generally formulated jointly by business experts, data analysts, data managers, etc. At the same time, the indicator business caliber also needs to match the design of the data source to ensure the correctness, reliability, and repeatability of the indicator calculation results. |
-
-- Model Information
-
-| Name         | Description                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------- |
-| Semantic Model | The semantic model to which the indicator belongs.                                                      |
-| Model Entity | A specific multidimensional model in the semantic model where the indicator data comes from.                      |
-| Indicator Type | **Basic Indicator**: Select a measure from the existing measure fields in the semantic model for the indicator to use as the quantity value. <br/> [**Derived Indicator**](./derivative-indicator/): Data values obtained by combining existing measures and dimensions through calculation formulas. |
-| Visibility | Whether the indicator is visible to users when used in the frontend.                                                          |
-| Measure | When the indicator type is **Basic Indicator**, select a measure as the quantity value of the indicator.                                                                  |
-| Calculation Formula | When the indicator type is **Derived Indicator**, enter the calculation formula for the indicator measure value.                                                                      |
-| Aggregation Type | When the indicator type is **Derived Indicator**, specify an aggregation type for the calculation formula; defaults to using the aggregation type of the measure for **Basic Indicator**.                                          |
-| Free Dimensions | Dimensions on the multidimensional model unrestricted for this indicator. Will be selected or restricted when displayed.                                               |
-| Restrictive Conditions | Restrictions on other dimensions besides free dimensions on the multidimensional model for this indicator. See [Indicator Restrictive Conditions](./restrictive-condition/) for details.                                 |
-
-1. Submit to save.
-2. Download Template: You can download a template file for bulk upload, fill in indicator information in bulk, and then upload the file for bulk entry of indicators.
-3. Bulk Upload: Upload a template file format of the indicator file for bulk entry of indicators.
-
-After registration, you can view the indicators on the My Indicators page.
-
-## Preview
-
-On the indicator registration page, you can preview the data trends of indicators in real-time, so that users can better understand the source and trends of indicator data when entering indicators. After completing the indicator registration, click the **Data Preview** button to view the data trends of the indicator.
-
-![Preview of indicator](/public/img/indicator/indicator-register-preview.png)
-
-## Bulk Upload
-
-For initial indicator entry or bulk indicator creation, you can use the bulk upload feature.
-
-First, download the model file for bulk uploading indicator data. To facilitate manual organization of indicator data, you can download data similar to a particular indicator, then modify it by copying, open an existing indicator, or enter a new one, then click the **Download Template** button to download the current indicator data as a template. After organizing the indicator data, click the **Bulk Upload** button to upload.
-
-As shown in the figure below, during bulk import, users can modify the attribute configuration of indicators one by one, and then click the "Import" button to complete the bulk import of indicators.
-
-![Indicator Batch Import](/public/img/indicator/indicator-batch-import.png)
-
-Below is a YAML format template for an indicator:
-
-```yaml
-- name: ADJ Rosy Sunglasses Profit
-  code: 'Demo: ADJ-R-Sun Profit'
-  isActive: true
-  isApplication: true
-  visible: true
-  businessAreaId: 13ce2de2-a53f-4ad8-9c9d-8806291c77ec
-  authentication: ERP
-  business: |-
-    Profit of the product "ADJ Rosy Sunglasses" is the profit obtained by deducting the main business income from the main business cost and the main business taxes and surcharges.
-    Since the profit from the main business has not yet deducted period expenses such as sales expenses, management expenses, financial expenses, etc., it cannot fully reflect the profit status of the company's main business.
-  principal: Wang Tiwen
-  validity: '2023-04-29T16:00:00.000Z'
-  type: BASIC
-  modelId: a379cb26-19bd-4f82-84d7-db8a7c782385
-  entity: Sales
-  filters:
-    - members:
-        - value: '[ADJ].[ADJ Rosy Sunglasses]'
-          label: ADJ Rosy Sunglasses
-      dimension:
-        dimension: '[Product]'
-  dimensions:
-    - '[Time]'
-    - '[Store]'
-    - '[Promotions]'
-    - '[Customers]'
-  measure: Profit
-  formula: null
-  unit: RMB
-  tags:
-    - name: Sales
-      category: indicator
-      color: blue
-    -
-
- name: Finance
-      category: indicator
-      color: blue
-```
+See [Basic and derived metrics](./derived-indicator) and [Metric dimensions and conditions](./qualification-condition).

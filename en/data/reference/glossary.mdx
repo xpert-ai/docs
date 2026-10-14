@@ -1,0 +1,33 @@
+---
+title: Ontology System Glossary
+description: Display names, stable codes, and usage contexts for Data Xpert ontology features.
+sidebar_position: 1
+---
+
+| Name | English / stable code | Where it appears | When you use it |
+| --- | --- | --- | --- |
+| External resource | external resource | Data and Ontology → Resource Access | Registering SAP, semantic-model, knowledge, or database sources |
+| Resource | Resource / `resourceId` | Resource list and details | Maintaining connection, owner, version, and capabilities |
+| Resource type | Resource Type / `resourceType` | Register External Resource form | Selecting an adapter such as `semantic_model`, `sap_odata_api`, `knowledge`, or `database` |
+| Connection reference | `connectionRef` | Resource form and Secrets | Binding a resource to a Secret version |
+| Capabilities | capabilities | Resource form and Settings | Restricting sync scope, query endpoints, and execution boundaries |
+| Sync job | Sync Job | Resource details → Sync Jobs | Running full or incremental syncs, retries, cancellation, or cleanup |
+| Ontology snapshot | Ontology Snapshot / `snapshotId` | Ontology Workspace and Audit | Fixing one published view of entities, relationships, and actions |
+| Graph version | Graph Version / `graphVersion` | Ontology Workspace and entity graphs | Reproducing graph queries and Assistant context |
+| Ontology definition | Ontology Definition | Ontology Studio | Designing entity types, relationships, actions, and versions |
+| Runtime projection | Runtime Projection | Ontology Workspace health | Turning a published snapshot into searchable entities and relationships |
+| Entity | Entity | Entity search and graphs | Locating a business object by type, name, or external key |
+| Relation | Relation | Entity graphs | Inspecting direction, endpoints, and properties between objects |
+| Action | Action / `actionTypeCode` | Agent Tools and resource chat | Discovering, simulating, and executing an object capability |
+| Discovery mode | discovery mode | Action contract | Deciding whether an action can be planned automatically or must be triggered manually |
+| Policy binding | Policy Binding | Governance → Policies | Returning allow, deny, or require approval for a resource, entity type, or action |
+| Approval request | Approval Request / `approvalRequestId` | Governance → Approvals | Getting human approval for a high-risk action |
+| Execution audit | Execution Audit / `taskId`, `traceId` | Governance → Execution Audit | Reviewing caller, policy, snapshot, evidence, and result |
+| Semantic-model resource | `semantic_model` | Resource types and Data & Analytics | Querying and syncing an existing BI or OLAP model |
+| Business ontology resource | `business_ontology` | Ontology Studio and plugins | Defining cross-resource domain semantics and governance contracts |
+| Adapter | Adapter | Resource type catalog | Mapping an external protocol to the canonical IR and actions |
+| Canonical ontology IR | Canonical Ontology IR | Sync logs and architecture | Unifying adapter output before snapshot publication |
+| Ontology Assistant | Ontology Assistant | Ontology Workspace and resource chat | Explaining semantics using the current resource and snapshot |
+| ChatKit | ChatKit | Agent Workbench and resource chat | Triggering Agent Tools and visualized results through conversation |
+
+Stable codes are used by APIs, plugins, and audits. Display names can be localized, but integrations must continue to use the stable codes.

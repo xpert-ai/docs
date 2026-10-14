@@ -94,3 +94,16 @@ Action 是 UOSE系统把本体对象连接到真实系统能力的方式。一�
 - `policy_binding:deny`：策略拒绝。
 - `approval_required`：需要审批。
 
+## Web 与 ChatKit 操作路径
+
+从资源详情或本体空间打开资源对话，或使用已配置的 ChatKit。先让助手说明当前资源、Snapshot 和可用实体，再要求发现 Action；不要在没有实体上下文时直接要求执行。技术集成按以下顺序调用：`discoverActions` → `simulateAction` →（必要时审批）→ `executeAction` → `getAuditTrace`。
+
+**成功信号：**对话或工具响应同时包含 `allowedActions` / `deniedActions`、模拟结果和审计引用。ChatKit 请求必须沿用当前 tenant、organization、workspace、user 和 Assistant 上下文。
+
+## 验收清单
+
+- [ ] 目标实体唯一且来自 `ready` Snapshot。
+- [ ] `discoverActions` 的拒绝项有 `reasonCode` 和 `stage`。
+- [ ] 低风险动作先 `simulateAction`，模拟通过后才执行。
+- [ ] 写动作提供 `idempotencyKey` 和 `expectedEffect`。
+- [ ] 高风险动作使用 `approvalRequestId` 并在审计中可回看。

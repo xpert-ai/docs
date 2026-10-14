@@ -1,186 +1,299 @@
 ---
 title: Development SDK
 sidebar_position: 13
+sidebar_hidden: true
 ---
-Digital Xpert provides a set of APIs and an [SDK](https://github.com/xpert-ai/xpertai-sdk) for developers to interact with Xpert intelligent agents. These APIs allow you to create custom applications to communicate with Digital Xpert's intelligent agents.
 
-The Xpert agent interface follows the [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html) standard, which is a protocol for communication between agents. The Agent Protocol provides a universal way for agents to exchange messages, facilitating interoperability between agents.
+Use the official [XpertAI TypeScript SDK](https://github.com/xpert-ai/xpert-sdk-js), published as `@xpert-ai/xpert-sdk`, for new integrations in TypeScript or JavaScript projects. The SDK supports servers, scripts and backend workflows independently of ChatKit.
 
-- First, create a Key for authentication to access the Xpert intelligent agent program.
+If your development environment uses Python, Java, Go or another language, use the TypeScript SDK implementation and the HTTP API reference below to build a client or SDK in that language. Preserve the authentication, request and response structures, SSE event handling and reconnection behavior. Follow the latest official documentation and TypeScript SDK source for current usage.
 
-![Develop key](/public/img/ai/xpert-develop-key.png)
+<Warning>
+Legacy AI/v1 OpenAPI integration, such as `POST /api/ai/v1/chat`, is deprecated and no longer maintained; availability is not guaranteed. This notice applies to old endpoints. The SDK use cases below remain available and have been updated to use the official SDK.
+</Warning>
 
-- Use the Key to access the Xpert intelligent agent's REST APIs or use the [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) to access the XpertAI platform.
+## Before you start
 
-## Using the LangGraph SDK to Call the XpertAI Platform
-
-The XpertAI intelligent agent platform can be interacted with via the [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) (`@langchain/langgraph-sdk` (JS/TS SDK) / langgraph-sdk Python SDK). This SDK encapsulates the core capabilities for communicating with the LangGraph REST API, making it easy to manage core components such as assistants, threads, runs, and persistent storage (store).
-
-<Info>
-Reference code: [XpertAI SDK Examples](https://github.com/xpert-ai/xpertai-sdk)
-</Info>
-
-### 1. Installation
-
-Ensure that the Node.js environment is installed, then install the SDK in your project:
+1. Publish the agent and obtain its ID (`xpertId`), the `assistant_id` field from [agent search](/en/sdk-api/assistants/search-assistants).
+2. Create an API Key with access to that agent and store it in a server environment variable.
+3. Set `XPERTAI_API_URL`, for example `https://api.xpertai.cn/api/ai`. Use your own address for private deployments; do not append `/v1`.
+4. Use Node.js 18 or later and install the SDK:
 
 ```bash
-# Install with pnpm
-pnpm add @langchain/langgraph-sdk
-# Or install with npm
-npm install @langchain/langgraph-sdk
+npm install @xpert-ai/xpert-sdk
 ```
 
-By default, the SDK connects to `http://localhost:8123` (e.g., when started locally with `langgraph-cli`). Otherwise, you need to specify the API URL or `apiKey` during configuration ([npm][1]).
+Create your API Key here:
 
-### 2. Initialize the Client
+![Create an API Key](/public/img/ai/xpert-develop-key.png)
 
-In JavaScript/TypeScript, you can create a `Client` instance as follows:
+## Start a conversation with the SDK
 
-```ts
-import { Client } from "@langchain/langgraph-sdk";
-
-const client = new Client({
-  apiUrl: "https://api.xpertai.cn/api/ai/", // Your baseUrl of XpertAI server.
-  apiKey: "your-api-key", // API Key of xpert
-})
-```
-
-If not explicitly configured, the SDK will connect to `http://localhost:8123` by default ([npm][2]).
-
-### 3. Managing Digital Xperts (Agents)
-
-#### List Existing Digital Xperts
+This example creates a thread and starts a run, then waits for its result. Set `XPERTAI_API_KEY` and `XPERTAI_XPERT_ID` before running it.
 
 ```ts
-import { Client, Assistant } from "@langchain/langgraph-sdk";
+import { Client, type ChatSendRequest } from "@xpert-ai/xpert-sdk";
 
-// List all xperts
-const xperts: Assistant[] = await client.assistants.search({
-  metadata: null,
-  offset: 0,
-  limit: 10,
-})
-console.log("Experts:", xperts);
-```
+async function main() {
+  const apiKey = process.env.XPERTAI_API_KEY;
+  const xpertId = process.env.XPERTAI_XPERT_ID;
+  if (!apiKey || !xpertId) {
+    throw new Error("Set XPERTAI_API_KEY and XPERTAI_XPERT_ID");
+  }
 
-Each Digital Xpert is an assistant ([npm][2], [LangGraph][3]).
+  const client = new Client({
+    apiUrl: process.env.XPERTAI_API_URL ?? "https://api.xpertai.cn/api/ai",
+    apiKey,
+  });
+  const thread = await client.threads.create({ assistantId: xpertId });
+  const input: ChatSendRequest = {
+    action: "send",
+    message: { input: { input: "Hello, what can you help me with?" } },
+  };
+  const result = await client.runs.wait(thread.thread_id, xpertId, { input });
 
-#### Retrieve a Single Digital Xpert
+  console.log("thread_id:", thread.thread_id);
+  console.log(result);
+}
 
-```ts
-const xpert = await client.assistants.get(xpertId);
-```
-
-### 4. Creating and Managing Threads
-
-#### Create a New Thread (Empty State)
-
-```ts
-const thread = await client.threads.create(); // Or pass threadId, metadata, etc., as initialization parameters
-console.log("New Thread:", thread);
-```
-
-In the example, it returns properties such as `thread_id`, `status`, etc. ([LangGraph][4]).
-
-#### Pre-fill State
-
-```ts
-const threadWithState = await client.threads.create({
-  threadId: "xxxxxxx",
-  ifExists: 'raise'
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
 });
 ```
 
-This allows you to inject a thread ID during creation ([LangGraph][4]).
+Save `thread.thread_id` and reuse the thread for subsequent messages with `client.runs.wait()` or `client.runs.stream()`.
 
-#### Query Thread List & Retrieve State
+For an agent conversation, pass `assistantId` when creating the thread and use the same agent ID for subsequent runs. The SDK serializes `assistantId` as the HTTP field `assistant_id`. The protocol allows omission to create an unbound thread under the current request identity. If a later run uses a different execution identity, conversation access checks can return 403. Binding the agent at creation establishes its scope early; it does not grant additional access.
+
+### Thread creation succeeds, but the run returns 403
+
+`201 Created` confirms thread creation, not permission to run the agent. If a run returns `You do not have access to this conversation`:
+
+1. Confirm that the API Key can access the published agent. Create a new thread with `client.threads.create({ assistantId: xpertId })`, then pass the same `xpertId` to the run. Changing the example does not repair a previously created thread.
+2. Use the same credentials and caller identity when creating and running the thread. Do not reuse a thread belonging to another user or an unrelated agent.
+3. If a new, bound thread still returns 403, have the administrator check the API Key's effective caller, the conversation's owner (`createdById`) and agent binding (`xpertId`), and the deployed server version. Supplying `assistantId` does not bypass ownership or scope checks and cannot resolve every 403.
+
+## Receive streaming output
+
+For real-time progress, replace the `runs.wait()` call in the same `main()` function with:
 
 ```ts
-const list = await client.threads.search({ limit: 10, offset: 0 });
-const singleThread = await client.threads.get(thread.thread_id);
-const history = await client.threads.getHistory(thread.thread_id, { limit: 50 });
+for await (const chunk of client.runs.stream(thread.thread_id, xpertId, { input })) {
+  console.log(chunk.event, chunk.data);
+}
 ```
 
-### 5. Starting Runs
+For streaming calls, check run completion, error and interrupt events. HTTP success or a closed connection alone does not prove the task succeeded. Reconnect to an existing run with `client.runs.joinStream(threadId, runId)`; it subscribes to an existing run and does not start a new one.
 
-You can initiate a run for a specific Digital Xpert within a thread, including support for streaming responses.
-
-#### Start a Streaming Run
+To print only answer text as it arrives, replace the loop above with the following. Handle other events in your application's lifecycle logic; filtering text alone does not establish whether the run succeeded.
 
 ```ts
-const stream = client.runs.stream(thread.thread_id, assistant.assistant_id, {
-  input: { 
-    input: "Tell me a joke.", // more parameters 
-  },
-});
-for await (const chunk of streamResponse) {
-  const data = (<{ type: 'message', data: string | {type: 'text' | string; text?: string; data?: any} }>chunk.data)
-  // Output text messages only
-  if (data.type === 'message') {
-    if (typeof data.data === 'string') {
-      process.stdout.write(data.data)
-    } else if (data.data.type === 'text') {
-      process.stdout.write(data.data.text ?? '')
-    } else {
-      // console.log(`Component:`, data.data);
-    }
+for await (const chunk of client.runs.stream(thread.thread_id, xpertId, { input })) {
+  const event = chunk.data;
+  if (!event || typeof event !== "object" ||
+      !("type" in event) || event.type !== "message" || !("data" in event)) continue;
+
+  const data = event.data;
+  if (typeof data === "string") {
+    process.stdout.write(data);
+  } else if (data && typeof data === "object" &&
+             "type" in data && data.type === "text" &&
+             "text" in data && typeof data.text === "string") {
+    process.stdout.write(data.text);
   }
 }
 ```
 
-This allows processing responses as they are generated, suitable for interactive scenarios ([npm][2]).
+## Query agents
 
-#### Other Run Operation Examples
+The snippets below reuse `client`, `xpertId`, `thread` and `input` from the first example. Use them as needed in the same `main()`. They retain the original agent, thread, run and storage use cases.
+
+### Search and retrieve an agent
+
+`client.assistants.search()` calls `POST /api/ai/assistants/search` and returns an array of accessible published agents. Select the target agent and use its `assistant_id` as `XPERTAI_XPERT_ID` (the `xpertId` or `XP` variable in examples). To find a specific agent, pass `metadata: { slug: "your-xpert-slug" }` with the search options.
 
 ```ts
-const run = await client.runs.create(thread.thread_id, assistant.assistant_id, { input: { ... } });
-const result = await client.runs.join(thread.thread_id, run.run_id);
-await client.runs.cancel(thread.thread_id, run.run_id);
-const runsList = await client.runs.list(thread.thread_id, { limit: 10 });
+const xperts = await client.assistants.search({ limit: 10, offset: 0 });
+console.table(xperts.map(({ assistant_id, name }) => ({ assistant_id, name })));
+const xpert = await client.assistants.get(xpertId);
+console.log(xpert.assistant_id, xpert.name);
 ```
 
-### 6. Using Store (Persistent Storage)
+## Create and manage threads
 
-Store data that needs to be saved across requests in sessions or tasks.
+### Specify a thread ID
 
 ```ts
-// Write
-await client.store.putItem([xpert_id], "key1", { value: 42 });
-
-// Read
-const item = await client.store.getItem([xpert_id], "key1");
-
-// List namespaces
-const namespaces = await client.store.listNamespaces({
-  prefix: [xpert_id],
-  maxDepth: 2,
-  limit: 10
+const { randomUUID } = await import("node:crypto");
+const customThread = await client.threads.create({
+  assistantId: xpertId,
+  threadId: randomUUID(),
+  ifExists: "raise",
 });
-
-// Search
-const found = await client.store.searchItems({ namespacePrefix: "my", query: "42" });
+console.log(customThread.thread_id);
 ```
 
-Detailed interfaces are defined in `StoreClient` ([LangGraph][3]).
+This specifies the creation ID; it does not pre-fill agent state.
 
-### 7. XpertAI Platform Integration Tips
+### Read thread lists, details and current state
 
-* **Configure Default API Address and Key**: The API address must be explicitly specified, and the key can be configured uniformly using the environment variable `LANGGRAPH_API_KEY`.
-* **Stream Output to Frontend**: Suitable for React and other frontends, you can use the SDK's streaming capabilities to build real-time conversational interfaces.
-* **Persistent Memory**: Use the Store feature to save key session data, enhancing the agent's memory capabilities.
+```ts
+const threads = await client.threads.search({ limit: 10, offset: 0 });
+const currentThread = await client.threads.get(thread.thread_id);
+const state = await client.threads.getState(thread.thread_id);
+console.log(threads, currentThread, state);
+```
 
-[1]: https://www.npmjs.com/package/%40langchain/langgraph-sdk "@langchain/langgraph-sdk - npm"
-[2]: https://www.npmjs.com/package/%40langchain/langgraph-sdk "@langchain/langgraph-sdk - npm"
-[3]: https://langgraph.com.cn/cloud/reference/sdk/js_ts_sdk_ref/index.html "SDK (JS/TS) - LangChain Framework"
-[4]: https://github.langchain.ac.cn/langgraph/cloud/how-tos/use_threads/ "Threads - LangChain Framework"
-[5]: https://github.langchain.ac.cn/langgraph/cloud/reference/sdk/js_ts_sdk_ref/ "Js ts sdk ref - LangChain Framework"
+Current state comes from the thread checkpoint and can be read after the first run. See the compatibility section for `getHistory()` support.
 
-## References
+### Continue a conversation in the same thread
 
-- [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html)
-- [Agent Protocol: Interoperability for LLM agents](https://blog.langchain.dev/agent-protocol-interoperability-for-llm-agents/)
+```ts
+const followUp: ChatSendRequest = {
+  action: "send",
+  message: { input: { input: "Please continue the previous topic." } },
+};
+const nextResult = await client.runs.wait(thread.thread_id, xpertId, {
+  input: followUp,
+});
+console.log(nextResult);
+```
 
-## More Information
+Reuse the existing thread ID instead of creating a thread for every message.
 
-The SDK is still being improved. If you encounter any issues or have suggestions, please add WeChat: xpertai to contact us for technical discussions.
+## Background runs and run management
+
+### Create a background run
+
+```ts
+const run = await client.runs.create(thread.thread_id, xpertId, { input });
+console.log(run.run_id);
+```
+
+`create()` returns a run record while execution continues in the background. `wait()` starts a new run and waits for its result. These are alternative invocation styles; do not call both for the same message.
+
+### Read status and list runs
+
+Reuse `run.run_id` returned by background creation:
+
+```ts
+const currentRun = await client.runs.get(thread.thread_id, run.run_id);
+const runs = await client.runs.list(thread.thread_id, { limit: 10, offset: 0 });
+console.log(currentRun.status, runs);
+```
+
+### Cancel an active run
+
+Execute this when cancellation of that run is intended:
+
+```ts
+await client.runs.cancel(thread.thread_id, run.run_id);
+```
+
+## Reconnect to an existing run
+
+Save `thread_id` and `run_id` from creation. Streaming creation also exposes the run ID through the `onRunCreated` callback of `runs.stream()`. After a disconnection, use `joinStream()` to subscribe to that existing run:
+
+```ts
+for await (const chunk of client.runs.joinStream(thread.thread_id, run.run_id)) {
+  console.log(chunk.event, chunk.data);
+}
+```
+
+This subscribes to an existing run instead of starting another task. A new `runs.create()` or `runs.wait()` call is not a reconnection and can repeat execution.
+
+## Upload an attachment before a conversation
+
+Upload through the current SDK's `contexts` client, then pass the returned file handle to the agent:
+
+```ts
+const { readFile } = await import("node:fs/promises");
+const buffer = await readFile("./manual.pdf");
+const file = await client.contexts.uploadFile<{ id: string; url?: string }>(
+  new Blob([new Uint8Array(buffer)]),
+  { filename: "manual.pdf" },
+);
+const attachmentInput: ChatSendRequest = {
+  action: "send",
+  message: {
+    input: { input: "Summarize the attachment.", files: [file] },
+  },
+};
+const attachmentResult = await client.runs.wait(thread.thread_id, xpertId, {
+  input: attachmentInput,
+});
+console.log(attachmentResult);
+```
+
+## Persistent Store
+
+Store examples remain available for saving and reading data across runs. Use the agent ID as the first namespace segment; this example adds a child namespace.
+
+### Write and read
+
+```ts
+const namespace = [xpertId, "sdk-example"];
+await client.store.putItem(namespace, "key1", { value: 42 });
+const item = await client.store.getItem(namespace, "key1");
+console.log(item);
+```
+
+### List namespaces and search data
+
+```ts
+const namespace = [xpertId, "sdk-example"];
+const namespaces = await client.store.listNamespaces({
+  prefix: [xpertId],
+  maxDepth: 2,
+  limit: 10,
+});
+const found = await client.store.searchItems(namespace, { limit: 10 });
+console.log(namespaces, found.items);
+```
+
+`searchItems()` accepts the namespace array as its first argument and query options as its second. Semantic `query` search requires the appropriate memory model configuration; the example only lists data in the namespace.
+
+## Compatibility and unsupported calls
+
+A method exposed by the SDK is not proof that the target deployment implements its server capability. In the current platform source, the following calls from the old examples cannot be presented as runnable cases:
+
+| Call | Current platform status | Integration guidance |
+| --- | --- | --- |
+| `threads.getHistory()` | Server-side history query is not implemented | Read the current thread and `getState()`; neither is a complete history |
+| `threads.updateState()`, `threads.update()` | Server-side state updates and thread PATCH are not implemented | Use supported run inputs and conversation operations |
+| `runs.join()` | No corresponding server-side join route | Use `wait()` for a new run, or `get()` / `joinStream()` for an existing run |
+
+These are specific support limits, not deprecation of agent queries, thread management, runs or Store examples. Verify SDK and server versions for private deployments.
+
+## Common SDK capabilities
+
+| Client | Purpose |
+| --- | --- |
+| `client.assistants` | Find agents |
+| `client.threads` | Create and manage conversation threads |
+| `client.runs` | Start runs, wait for results, stream and reconnect |
+| `client.contexts` | Upload attachments with `uploadFile()` |
+| `client.knowledges` | Create and manage knowledgebase resources |
+
+See the [SDK repository](https://github.com/xpert-ai/xpert-sdk-js) for SDK updates and complete examples.
+
+## HTTP API reference
+
+For direct HTTP integration, the **HTTP API Reference** sidebar group provides method badges, request fields, responses, cURL examples and a playground for the endpoints used above. These are the current SDK endpoints, independent of ChatKit. Authenticate with your server-side API Key using `Authorization: Bearer <API_KEY>` or `x-api-key`.
+
+Start by [creating a thread](/en/sdk-api/threads/create-thread), then [start a streaming run](/en/sdk-api/runs/stream-run), or [create a background run](/en/sdk-api/runs/create-run). To recover an interrupted connection, [subscribe to the existing run](/en/sdk-api/runs/join-run-stream); do not start the same task again.
+
+| SDK capability | HTTP reference |
+| --- | --- |
+| `client.assistants.search()` / `get()` | [Query agents](/en/sdk-api/assistants/search-assistants) |
+| `client.threads.create()` / `search()` / `get()` / `getState()` | [Create and manage threads](/en/sdk-api/threads/create-thread) |
+| `client.runs.stream()` / `create()` / `wait()` / `get()` / `list()` / `cancel()` / `joinStream()` | [Start and manage runs](/en/sdk-api/runs/stream-run) |
+| `client.contexts.uploadFile()` | [Upload an attachment](/en/sdk-api/contexts/upload-file) |
+| `client.store.putItem()` / `getItem()` / `listNamespaces()` / `searchItems()` | [Store data](/en/sdk-api/store/put-store-item) |
+
+HTTP wire fields can differ from SDK option names: for example, `assistant_id`, `thread_id` and `max_depth`. Use the request schema on the specific endpoint page. This reference covers the guide's examples; methods listed above as unsupported are not presented as available endpoints.
+
+## Technical support
+
+The SDK continues to evolve. For questions or suggestions, contact **xpertai** on WeChat for technical discussions.

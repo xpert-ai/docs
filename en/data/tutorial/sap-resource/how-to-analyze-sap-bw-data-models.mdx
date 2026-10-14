@@ -1,9 +1,19 @@
 ---
 title: How to Analyze SAP BW Data Model
+description: Analyze SAP BW data resources with a published ontology model.
 sidebar_position: 3
 tags:
   - MDX
 ---
+
+<Info>
+**Applies to:** Current Data Xpert version.
+
+**Prerequisites:** An accessible SAP BW/XMLA system, a Secret, semantic-model permissions, and an available Assistant.
+
+**External dependency:** This tutorial requires an accessible SAP BW system and related permissions. If no source is available, start with [Quick Start](../../getting-started/index).
+</Info>
+
 
 SAP BW (SAP Business Warehouse) is an enterprise data warehouse system developed by SAP, designed to support data analysis and decision-making in businesses. It is an integrated, enterprise-level solution that consolidates data from different systems into a single data repository. The data model of SAP BW adopts a star schema, where data is stored in a central repository and can be efficiently queried and analyzed. Data can be collected from multiple sources, including SAP applications and other external systems. SAP BW also supports multidimensional analysis and data mining capabilities, enabling efficient data analysis using OLAP (Online Analytical Processing) technology.
 
@@ -13,7 +23,7 @@ In this tutorial, we will introduce how to connect to the SAP BW system using Me
 
 ## Data Source
 
-Refer to the document [SAP BW Data Sources](../../../../server/datasources/sap-bw/) to create a data source.
+Refer to the document [SAP BW Data Sources](/en/data/features/control-plane/resource-access) to create a data source.
 
 ## Semantic Model
 
@@ -31,7 +41,7 @@ The semantic model provides a simple way to enhance the semantics of the data mo
 
 The semantic model allows for the configuration of caching for querying BW data, including enabling caching and setting cache expiration time, to improve query efficiency.
 
-For more details, refer to the document [Semantic Enhancement for Third-Party OLAP Cube](../../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube).
+For more details, refer to the document [Semantic Enhancement for Third-Party OLAP Cube](/en/data/ontology/overview).
 
 ### Creating a Semantic Model
 
@@ -57,7 +67,7 @@ By dragging the model to the **Table Structure** area, users can view the dimens
   </figure>
 </div>
 
-For more general functionalities, refer to the document [🧪Query Lab](../../../../models/query-lab/).
+For more general functionalities, refer to the document [🧪Query Lab](/en/data/analytics/semantic-model/query-lab).
 
 ### Cube Semantic Enhancement
 
@@ -103,7 +113,7 @@ Users can create their own chart logic script by selecting the **Custom** chart 
 
 ![Story Custom Chart Logic](/public/en/img/story/story-dashboard-custom-chart-code.png)
 
-For more details on custom chart types, refer to the document [Custom Chart](../../../../widgets/analytical-card/custom/).
+For more details on custom chart types, refer to the document Custom Chart.
 
 ### Calculations
 
@@ -116,9 +126,9 @@ In the Story Dashboard, you can also create calculated members. Unlike the [calc
 
 In addition to creating different types of calculated members separately, users can create another calculated member using an already created calculated measure, allowing for nested calculations to achieve complex logic calculations.
 
-Furthermore, when creating calculated members, users can use [parameters](../../../../stories/parameter/) to control the input of calculation formulas and dynamically change the parameter values using input controls in the Story Dashboard for dynamic calculations.
+Furthermore, when creating calculated members, users can use parameters to control the input of calculation formulas and dynamically change the parameter values using input controls in the Story Dashboard for dynamic calculations.
 
-For more details, refer to the document [Calculated Measures](../../../../stories/calculations/).
+For more details, refer to the document [Calculated Measures](/en/data/practices/semantic-analysis).
 
 ## Summary
 

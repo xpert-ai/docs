@@ -1,10 +1,11 @@
 ---
 title: Integrate XpertAI API
 sidebar_position: 1
+sidebar_hidden: true
 ---
 
 <Info>
-This article explains how to integrate XpertAI backend capabilities in ChatKit-related scenarios, including integration via SDK and direct HTTP API calls.
+SDK integration is independent of ChatKit. For general server integration, see [Development SDK](/en/ai/agent/development-api). This page retains SDK and ChatKit UI embedding details.
 </Info>
 
 ## Integration Overview
@@ -28,7 +29,7 @@ Before getting started, prepare the following information:
   - It is recommended to use a long-term credential stored securely on the server side
   - Can be passed via `x-api-key` or `Authorization: Bearer <apiKey>`
 - `xpertId`
-  - The `xpert_id` of the target published xpert
+  - The target published agent ID: the `assistant_id` field returned by `client.assistants.search()` / `get()` or the corresponding HTTP endpoints. `xpertId` is the local variable name used in examples.
 
 If your xpert depends on organization or end-user context, you can also pass these additional headers in your requests:
 
@@ -112,9 +113,9 @@ async function main() {
     throw new Error("Assistant not found");
   }
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpert.assistant_id });
 
-  const result = await client.runs.wait(thread.thread_id, xpert.xpert_id, {
+  const result = await client.runs.wait(thread.thread_id, xpert.assistant_id, {
     input: {
       action: "send",
       message: {
@@ -130,6 +131,8 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+Create the thread with `assistantId` and use the same agent ID for the run. If creation succeeds but the run returns 403, see the permission troubleshooting section in the [SDK guide](/en/ai/agent/development-api).
 
 ### 4. Common Capabilities
 
@@ -150,7 +153,6 @@ For example, when you need to upload a file for the xpert to use:
 
 ```ts
 import fs from "node:fs/promises";
-import { Blob } from "node:buffer";
 import { Client } from "@xpert-ai/xpert-sdk";
 
 const client = new Client({
@@ -160,11 +162,12 @@ const client = new Client({
 
 async function runWithFile(xpertId: string) {
   const fileBuffer = await fs.readFile("./manual.pdf");
-  const file = await client.contexts.uploadFile(new Blob([fileBuffer]), {
-    filename: "manual.pdf",
-  });
+  const file = await client.contexts.uploadFile<{ id: string; url?: string }>(
+    new Blob([new Uint8Array(fileBuffer)]),
+    { filename: "manual.pdf" },
+  );
 
-  const thread = await client.threads.create();
+  const thread = await client.threads.create({ assistantId: xpertId });
 
   const result = await client.runs.wait(thread.thread_id, xpertId, {
     input: {
@@ -183,6 +186,10 @@ async function runWithFile(xpertId: string) {
 ```
 
 ## Direct API Calls
+
+<Note>
+The following assistants, threads and runs endpoints are the same HTTP endpoints used by the SDK; they are not deprecated. The [official SDK](/en/ai/agent/development-api) is recommended for general application integration. Legacy AI/v1 OpenAPI integration is separate: those old endpoints and examples are no longer maintained, and their availability is not guaranteed.
+</Note>
 
 If you are not using the SDK, you can also call the public REST API directly.
 
@@ -212,7 +219,7 @@ curl -X POST "https://api.xpertai.cn/api/ai/assistants/search" \
   }'
 ```
 
-If you already have the xpert ID, you can further confirm the details:
+The search response is an array. Use the target item's `assistant_id` as `<xpert-id>` in thread creation and run requests. If you already have that ID, you can confirm the details:
 
 ```bash
 curl "https://api.xpertai.cn/api/ai/assistants/<xpert-id>" \
@@ -225,10 +232,12 @@ curl "https://api.xpertai.cn/api/ai/assistants/<xpert-id>" \
 curl -X POST "https://api.xpertai.cn/api/ai/threads" \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
-  -d '{}'
+  -d '{"assistant_id": "<xpert-id>"}'
 ```
 
 The response will contain a `thread_id`. You will need to continue using this thread ID for subsequent xpert runs.
+
+The HTTP field is `assistant_id`; the TypeScript SDK uses `assistantId`. Although the protocol accepts an unbound thread, agent integrations should bind the target agent at creation and use the same ID for the run. Successful thread creation does not guarantee run permission; see the [SDK guide](/en/ai/agent/development-api) for 403 troubleshooting.
 
 ### 4. Call `runs/stream`
 
@@ -237,7 +246,7 @@ curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" 
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
   -d '{
-    "xpert_id": "<xpert-id>",
+    "assistant_id": "<xpert-id>",
     "input": {
       "action": "send",
       "message": {
@@ -261,14 +270,14 @@ curl -X POST "https://api.xpertai.cn/api/ai/contexts/file" \
   -F "file=@./manual.pdf"
 ```
 
-After a successful upload, you can pass the returned file object as `files` in the run request:
+After a successful upload, pass the returned file object in `files`. In the example below, replace `<file-id>` with the upload response's `id` (the FileAsset ID); `storageFileId` identifies the underlying storage file and is not the attachment ID:
 
 ```bash
 curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" \
   -H "Content-Type: application/json" \
   -H "x-api-key: sk-x-your-api-key" \
   -d '{
-    "xpert_id": "<xpert-id>",
+    "assistant_id": "<xpert-id>",
     "input": {
       "action": "send",
       "message": {
@@ -277,8 +286,7 @@ curl -N -X POST "https://api.xpertai.cn/api/ai/threads/<thread-id>/runs/stream" 
           "files": [
             {
               "id": "<file-id>",
-              "name": "manual.pdf",
-              "url": "<file-url>"
+              "originalName": "manual.pdf"
             }
           ]
         }
@@ -318,7 +326,7 @@ Then your backend should obtain a `client_secret` and return it to the frontend.
 
 ### Correct Usage of `chatkit/sessions`
 
-`POST /api/ai/v1/chatkit/sessions` is only used to obtain a short-term `client_secret`. The current endpoint request body only requires `expires_after`:
+`POST /api/ai/v1/chatkit/sessions` obtains a short-term `client_secret`. The following example authenticates with a server-side API Key. `expires_after` is an optional positive integer in seconds; omitting it uses the server default:
 
 ```bash
 curl -X POST "https://api.xpertai.cn/api/ai/v1/chatkit/sessions" \
@@ -331,8 +339,8 @@ curl -X POST "https://api.xpertai.cn/api/ai/v1/chatkit/sessions" \
 
 Please note:
 
-- You do not need to pass `xpert` in the request body
-- You do not need to pass `user` in the request body
+- In this API Key exchange, you do not need to pass `assistant` or `user`; the key supplies the resource scope
+- A session created with a logged-in user credential instead of an API Key follows a different flow and requires `assistant.id` for agent delegation
 - If you need to fix organization or business user context, pass `organization-id` and `x-principal-user-id` via request headers
 
 ### Security Recommendations
@@ -344,5 +352,5 @@ Please note:
 
 ## Next Steps
 
-- If you want to embed a frontend chat UI, start by reading [💬 ChatKit SDK](./index)
-- If you want to further customize visuals and interactions, check out [Themes and Customization](./chatkit-themes), [Widgets](./chatkit-widgets), [Client Tools](./chatkit-tool)
+- If you want to embed a frontend chat UI, start by reading [💬 ChatKit SDK](/en/ai/chatkit)
+- If you want to further customize visuals and interactions, check out [Themes and Customization](/en/ai/chatkit/chatkit-themes), [Widgets](/en/ai/chatkit/chatkit-widgets), [Client Tools](/en/ai/chatkit/chatkit-tool)

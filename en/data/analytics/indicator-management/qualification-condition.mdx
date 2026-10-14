@@ -1,21 +1,27 @@
 ---
-title: 🔏限定条件
-sidebar_position: 5
+title: Metric Dimensions and Conditions
+description: Configure free dimensions, member filters, time grains, and XMLA variables for metrics.
+sidebar_position: 4
 tags:
-  - SQL
+  - Metrics
+  - Filters
   - MDX
-  - 切片器
 ---
 
-指标限定条件是通过对多维数据集进行 **切片**,**切块**和**组合切片** 操作来减少数据集的维度数量进而降低数据分析的复杂度.
+A metric definition has an analysis range and fixed conditions. Dimension bindings determine which fields can be grouped; filters and variables provide fixed or interactive conditions.
 
-例如下图演示的, 源数据集有三个维度: **时间**, **产品**和**地区**. 如果创建某指标设定了限定条件为时间等于 `2004` 那么此指标对应的数据集(降维后的数据集非物理存在)维度减少为 **产品**和**地区**两个.
+## Dimension bindings
 
-![](./OLAP_slicing_en.png)
-By Original: InfopedianDerivative work: Jay - OLAP slicing.png, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=105680876
+In the XMLA metric editor, choose a dimension → hierarchy → level from the current cube. The selected level is stored in the binding and returned in query results. Do not type a display name in place of the unique name.
 
-指标定义时可以将未设置限定条件的维度设置为 **自由维度**, 这样可以明确告诉用户数据集降维后的可用维度. 但这个并不是强制要求, 用户仍然可以选择使用任何维度进行分析.
+## Member filters
 
-限定条件的详细设置可以参见 [切片器](../../../stories/slicer/).
+A filter contains a dimension binding, an Include or Exclude operator, and a member unique name. First find the member in **Members** in the workspace, then copy its exact unique name. Keep multiple filters clear and avoid contradictory Include and Exclude combinations.
 
-对于使用 SQL 模型的指标来说, 还可以设置组合切片器以实现复杂限定条件, 详细参见 [组合切片器](../../../stories/combination-slicer/).
+## SAP variables and time
+
+Required variables in an XMLA/SAP cube need a default value or a value supplied at query time. A metric can bind a time dimension and default grain such as year, quarter, month, week, or day. Query-time ranges and grains remain subject to model and metric checks.
+
+## Publishing checks
+
+The system checks that cubes, measures, levels, members, and variables still exist. If a structure refresh marks a binding as Missing, return to the XMLA workspace, click **Refresh preview**, fix the metric binding, and publish again.

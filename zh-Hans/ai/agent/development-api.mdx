@@ -1,17 +1,306 @@
 ---
-title: 开发接口
+title: 开发 SDK
 sidebar_position: 13
+sidebar_hidden: true
 ---
 
-数字专家提供了一组 API 及 [SDK](https://github.com/xpert-ai/xpertai-sdk) 用于开发者与专家智能体进行交互。这些 API 使您可以创建自定义应用程序，以便与数字专家的智能体进行通信。
+新的程序接入请使用官方 [XpertAI TypeScript SDK](https://github.com/xpert-ai/xpert-sdk-js)，安装包名为 `@xpert-ai/xpert-sdk`，可在 TypeScript / JavaScript 项目中使用。SDK 可用于服务端、脚本和后端工作流，不依赖 ChatKit。
 
-Xpert 智能体接口遵循 [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html) 标准，这是一种用于智能体之间通信的协议。Agent Protocol 为智能体提供了一种通用的方式来交换消息，以便于智能体之间的互操作性。
+如果你的开发环境使用 Python、Java、Go 等其他语言，可以参照 TypeScript SDK 的实现，结合下方的 HTTP 接口参考，编写对应语言的客户端或 SDK。保持鉴权、请求与响应结构、SSE 事件处理和重连逻辑一致即可；具体用法以最新官方文档和 TypeScript SDK 源码为准。
 
-- 首选为访问专家智能体的程序创建一个 Key，用于身份验证。
+<Warning>
+旧 AI/v1 OpenAPI 接入方式（例如 `POST /api/ai/v1/chat`）已废弃，不再维护，不保证可用。此提示只针对旧接口；下方 SDK 业务案例继续保留，并已改成官方 SDK 写法。
+</Warning>
 
-![Develop key](/public/img/ai/xpert-develop-key.png)
+## 接入前准备
 
-- 使用 Key 访问专家智能体的 Rest APIs，或者使用 [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) 访问 XpertAI 平台。
+1. 发布要调用的智能体，取得其 ID（`xpertId`），即[查询智能体](/zh-hans/sdk-api/assistants/search-assistants)返回的 `assistant_id` 字段。
+2. 创建有权访问该智能体的 API Key，并保存在服务端环境变量中。
+3. 设置 `XPERTAI_API_URL`，例如 `https://api.xpertai.cn/api/ai`。私有部署请替换为自己的地址；不追加 `/v1`。
+4. 使用 Node.js 18 或更新版本，并安装 SDK：
+
+```bash
+npm install @xpert-ai/xpert-sdk
+```
+
+API Key 创建入口：
+
+![创建 API Key](/public/img/ai/xpert-develop-key.png)
+
+## 使用 SDK 发起对话
+
+下面的示例创建线程并发起一次运行，等待结果返回。请先设置 `XPERTAI_API_KEY` 和 `XPERTAI_XPERT_ID`。
+
+```ts
+import { Client, type ChatSendRequest } from "@xpert-ai/xpert-sdk";
+
+async function main() {
+  const apiKey = process.env.XPERTAI_API_KEY;
+  const xpertId = process.env.XPERTAI_XPERT_ID;
+  if (!apiKey || !xpertId) {
+    throw new Error("Set XPERTAI_API_KEY and XPERTAI_XPERT_ID");
+  }
+
+  const client = new Client({
+    apiUrl: process.env.XPERTAI_API_URL ?? "https://api.xpertai.cn/api/ai",
+    apiKey,
+  });
+  const thread = await client.threads.create({ assistantId: xpertId });
+  const input: ChatSendRequest = {
+    action: "send",
+    message: { input: { input: "你好，请介绍一下你能做什么。" } },
+  };
+  const result = await client.runs.wait(thread.thread_id, xpertId, { input });
+
+  console.log("thread_id:", thread.thread_id);
+  console.log(result);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});
+```
+
+保存 `thread.thread_id`；后续对话复用同一个线程，通过 `client.runs.wait()` 或 `client.runs.stream()` 发送新的消息，不需要重新创建线程。
+
+调用智能体时，创建线程应显式传入 `assistantId`，后续运行使用同一个智能体 ID。SDK 会将 `assistantId` 转换为 HTTP 请求字段 `assistant_id`。接口允许省略该字段，此时按当前请求身份创建未绑定智能体的线程；后续运行若使用不同的执行身份，可能在对话权限检查时返回 403。创建时绑定智能体可提前确定其作用域，但不会授予额外权限。
+
+### 创建线程成功，但运行返回 403
+
+`201 Created` 只表示线程创建成功，不代表具备后续运行权限。如果运行返回 `You do not have access to this conversation`：
+
+1. 确认 API Key 有权访问已发布的目标智能体。用 `client.threads.create({ assistantId: xpertId })` 创建新线程，再把同一个 `xpertId` 传给运行方法。修改示例不会修复此前已创建的线程。
+2. 创建和运行线程时使用相同的凭据及调用者身份，不要复用其他用户或无关智能体的线程。
+3. 如果新建并绑定的线程仍返回 403，请管理员核查 API Key 的实际调用身份、对话所有者（`createdById`）、智能体绑定（`xpertId`）和部署版本。传入 `assistantId` 不会跳过所有权或作用域检查，不能解决所有 403。
+
+## 实时接收输出
+
+若需要实时进度，可把上例中的 `runs.wait()` 替换为以下代码，在相同的 `main()` 中消费事件流：
+
+```ts
+for await (const chunk of client.runs.stream(thread.thread_id, xpertId, { input })) {
+  console.log(chunk.event, chunk.data);
+}
+```
+
+使用流式调用时，请检查运行结束状态、错误和中断事件，不能仅凭 HTTP 请求成功或连接结束判断任务成功。已有运行的重连使用 `client.runs.joinStream(threadId, runId)`；它只订阅已有运行，不会启动新任务。
+
+如果只需要逐段打印回答文本，可将上面的循环替换为以下代码。其他事件交给应用自己的生命周期处理逻辑；文本筛选本身不能判断运行是否成功。
+
+```ts
+for await (const chunk of client.runs.stream(thread.thread_id, xpertId, { input })) {
+  const event = chunk.data;
+  if (!event || typeof event !== "object" ||
+      !("type" in event) || event.type !== "message" || !("data" in event)) continue;
+
+  const data = event.data;
+  if (typeof data === "string") {
+    process.stdout.write(data);
+  } else if (data && typeof data === "object" &&
+             "type" in data && data.type === "text" &&
+             "text" in data && typeof data.text === "string") {
+    process.stdout.write(data.text);
+  }
+}
+```
+
+## 查询智能体
+
+下面的片段复用首个示例中的 `client`、`xpertId`、`thread` 和 `input`，可放在同一个 `main()` 中按需使用。它们对应原来的智能体、线程、运行和存储案例。
+
+### 查询列表和读取单个智能体
+
+`client.assistants.search()` 对应 `POST /api/ai/assistants/search`，返回当前调用者有权访问的已发布智能体数组。选中目标条目后，将它的 `assistant_id` 填入 `XPERTAI_XPERT_ID`，也就是示例中的 `xpertId` 或 `XP`。如需按智能体标识筛选，可在查询选项中传入 `metadata: { slug: "your-xpert-slug" }`。
+
+```ts
+const xperts = await client.assistants.search({ limit: 10, offset: 0 });
+console.table(xperts.map(({ assistant_id, name }) => ({ assistant_id, name })));
+const xpert = await client.assistants.get(xpertId);
+console.log(xpert.assistant_id, xpert.name);
+```
+
+## 创建和管理线程
+
+### 指定线程 ID
+
+```ts
+const { randomUUID } = await import("node:crypto");
+const customThread = await client.threads.create({
+  assistantId: xpertId,
+  threadId: randomUUID(),
+  ifExists: "raise",
+});
+console.log(customThread.thread_id);
+```
+
+此例指定创建时的 ID，不是预填充智能体状态。
+
+### 查询线程列表、详情和当前状态
+
+```ts
+const threads = await client.threads.search({ limit: 10, offset: 0 });
+const currentThread = await client.threads.get(thread.thread_id);
+const state = await client.threads.getState(thread.thread_id);
+console.log(threads, currentThread, state);
+```
+
+当前状态取自线程的检查点，可在首轮运行后读取。`getHistory()` 的支持情况见下方兼容性说明。
+
+### 在同一线程继续对话
+
+```ts
+const followUp: ChatSendRequest = {
+  action: "send",
+  message: { input: { input: "请继续刚才的话题。" } },
+};
+const nextResult = await client.runs.wait(thread.thread_id, xpertId, {
+  input: followUp,
+});
+console.log(nextResult);
+```
+
+复用已有线程 ID，而不是为每条消息创建新线程。
+
+## 后台运行与运行管理
+
+### 创建后台运行
+
+```ts
+const run = await client.runs.create(thread.thread_id, xpertId, { input });
+console.log(run.run_id);
+```
+
+`create()` 返回运行记录，后台继续执行；`wait()` 发起一次新的运行并等待其结果。这两个示例是不同的调用方式，不应为同一条消息连续调用两次。
+
+### 查询状态和运行列表
+
+以下片段复用后台创建返回的 `run.run_id`。
+
+```ts
+const currentRun = await client.runs.get(thread.thread_id, run.run_id);
+const runs = await client.runs.list(thread.thread_id, { limit: 10, offset: 0 });
+console.log(currentRun.status, runs);
+```
+
+### 取消正在运行的任务
+
+需要取消上述运行时再执行：
+
+```ts
+await client.runs.cancel(thread.thread_id, run.run_id);
+```
+
+## 断线后接续运行
+
+保存创建返回的 `thread_id` 和 `run_id`。流式创建时也可从 `runs.stream()` 的 `onRunCreated` 回调保存运行 ID。已有运行发生断线后，用 `joinStream()` 接续订阅：
+
+```ts
+for await (const chunk of client.runs.joinStream(thread.thread_id, run.run_id)) {
+  console.log(chunk.event, chunk.data);
+}
+```
+
+此调用订阅已有运行，不会重新启动任务。不要用新的 `runs.create()` 或 `runs.wait()` 代替重连，以免重复执行。
+
+## 上传附件后发起对话
+
+使用当前 SDK 的 `contexts` 子客户端上传文件，再把返回的文件句柄交给智能体：
+
+```ts
+const { readFile } = await import("node:fs/promises");
+const buffer = await readFile("./manual.pdf");
+const file = await client.contexts.uploadFile<{ id: string; url?: string }>(
+  new Blob([new Uint8Array(buffer)]),
+  { filename: "manual.pdf" },
+);
+const attachmentInput: ChatSendRequest = {
+  action: "send",
+  message: {
+    input: { input: "请总结附件重点。", files: [file] },
+  },
+};
+const attachmentResult = await client.runs.wait(thread.thread_id, xpertId, {
+  input: attachmentInput,
+});
+console.log(attachmentResult);
+```
+
+## Store 持久存储
+
+Store 案例继续保留，用于跨运行保存和读取数据。命名空间的首段使用智能体 ID，以下示例在它下面建立一个子命名空间。
+
+### 写入和读取
+
+```ts
+const namespace = [xpertId, "sdk-example"];
+await client.store.putItem(namespace, "key1", { value: 42 });
+const item = await client.store.getItem(namespace, "key1");
+console.log(item);
+```
+
+### 列出命名空间和搜索数据
+
+```ts
+const namespace = [xpertId, "sdk-example"];
+const namespaces = await client.store.listNamespaces({
+  prefix: [xpertId],
+  maxDepth: 2,
+  limit: 10,
+});
+const found = await client.store.searchItems(namespace, { limit: 10 });
+console.log(namespaces, found.items);
+```
+
+`searchItems()` 的首个参数是命名空间数组；筛选和查询选项放在第二个参数中。语义搜索的 `query` 依赖相应的记忆模型配置，上例只列出该命名空间中的数据。
+
+## 兼容性与暂未支持的调用
+
+SDK 暴露某个方法，不代表目标部署已实现对应服务端能力。按当前平台源码，原示例中的以下调用不能作为可直接运行的案例：
+
+| 调用 | 当前平台情况 | 接入建议 |
+| --- | --- | --- |
+| `threads.getHistory()` | 服务端历史查询尚未实现 | 查询当前线程和 `getState()`，不能把它们当作完整历史 |
+| `threads.updateState()`、`threads.update()` | 服务端状态更新及线程 PATCH 尚未实现 | 使用已支持的运行输入和对话操作 |
+| `runs.join()` | 服务端没有对应的 join 路由 | 新运行用 `wait()`；已有运行用 `get()` 查询或 `joinStream()` 订阅 |
+
+这是具体调用的支持限制，不代表智能体查询、线程管理、运行和 Store 案例被废弃。私有部署请核对所用 SDK 与服务端版本。
+
+## 常用 SDK 能力
+
+| 子客户端 | 用途 |
+| --- | --- |
+| `client.assistants` | 查询智能体 |
+| `client.threads` | 创建和管理对话线程 |
+| `client.runs` | 发起运行、等待结果、消费和重连事件流 |
+| `client.contexts` | 通过 `uploadFile()` 上传附件 |
+| `client.knowledges` | 创建和管理知识库资源 |
+
+SDK 更新和完整示例以 [SDK 仓库](https://github.com/xpert-ai/xpert-sdk-js) 为准。
+
+## HTTP 接口参考
+
+直接使用 HTTP 接入时，可在侧栏的 **HTTP 接口参考** 查看上方案例对应的请求方式、参数、响应、cURL 示例和调试面板。这些是当前 SDK 使用的接口，不依赖 ChatKit。使用服务端 API Key，通过 `Authorization: Bearer <API_KEY>` 或 `x-api-key` 鉴权。
+
+先 [创建线程](/zh-hans/sdk-api/threads/create-thread)，再 [发起流式运行](/zh-hans/sdk-api/runs/stream-run) 或 [创建后台运行](/zh-hans/sdk-api/runs/create-run)。连接断开后，应 [订阅已有运行](/zh-hans/sdk-api/runs/join-run-stream)，避免重复启动同一任务。
+
+| SDK 能力 | HTTP 接口参考 |
+| --- | --- |
+| `client.assistants.search()` / `get()` | [查询智能体](/zh-hans/sdk-api/assistants/search-assistants) |
+| `client.threads.create()` / `search()` / `get()` / `getState()` | [创建和管理线程](/zh-hans/sdk-api/threads/create-thread) |
+| `client.runs.stream()` / `create()` / `wait()` / `get()` / `list()` / `cancel()` / `joinStream()` | [发起和管理运行](/zh-hans/sdk-api/runs/stream-run) |
+| `client.contexts.uploadFile()` | [上传附件](/zh-hans/sdk-api/contexts/upload-file) |
+| `client.store.putItem()` / `getItem()` / `listNamespaces()` / `searchItems()` | [Store 数据存储](/zh-hans/sdk-api/store/put-store-item) |
+
+HTTP 字段名与 SDK 选项名可能不同，例如 `assistant_id`、`thread_id` 和 `max_depth`，请以对应接口页的请求结构为准。本参考覆盖指南中的案例；上方标为暂未支持的方法不作为可用接口展示。
+
+## 技术支持
+
+SDK 还在不断完善中。如有问题或建议，请添加微信 **xpertai** 进行技术交流。
+
+<Accordion title="旧 AI/v1 REST 接入示例（已废弃）">
+
+以下仅保留旧 AI/v1 REST 接入示例，不再维护，不保证可用。SDK 案例在上方正文中继续提供。
 
 ## 直接使用 REST API 调用智能体
 
@@ -35,7 +324,7 @@ export XPERT_ID='YOUR_PUBLISHED_XPERT_ID'
 ```
 
 认证头使用 `Authorization: Bearer <API_KEY>`，也可使用 `x-api-key`。
-本教程使用 API Key；ChatKit 的临时 client secret 有有效期和绑定范围，不能当成通用 API Key。
+历史示例使用服务端 API Key。
 
 ### 首次发送消息
 
@@ -130,180 +419,4 @@ node agent-chat.mjs
 上线前用目标部署及实际调用身份验证：首轮能回复；第二轮复用同一会话并理解前文；无效 Key 被拒绝；模型/工具失败和断流不会误报成功。
 对于带工具的专家，还应测试中断确认和对应工具行为。
 
-
-## 使用 LangGraph SDK 调用 XpertAI 平台
-
-XpertAI 智能体平台，可通过 [LangGraph SDK](https://docs.langchain.com/langgraph-platform/sdk) （`@langchain/langgraph-sdk`（JS/TS SDK） / langgraph-sdk Python SDK）与其交互。
-该 SDK 封装了与 LangGraph REST API 通信的核心能力，可以方便地管理助手 (assistants)、线程 (threads)、运行 (runs)、持久存储 (store) 等核心组件。
-
-<Info>
-参考代码 [XpertAI SDK 示例](https://github.com/xpert-ai/xpertai-sdk)
-</Info>
-
-### 1. 安装
-
-确保已经安装 Node.js 环境，然后在项目中安装 SDK：
-
-```bash
-# 使用 pnpm 安装
-pnpm add @langchain/langgraph-sdk
-# 或使用 npm
-npm install @langchain/langgraph-sdk
-```
-
-SDK 默认会连接到 `http://localhost:8123`（如使用 `langgraph-cli` 本地启动）；否则需在配置时指定 API URL 或 `apiKey` ([npm][1])。
-
-### 2. 初始化客户端
-
-在 JavaScript/TypeScript 中，可以这样创建一个 `Client` 实例：
-
-```ts
-import { Client } from "@langchain/langgraph-sdk";
-
-const client = new Client({
-  apiUrl: `${process.env.XPERT_BASE_URL}/api/ai`,
-  apiKey: process.env.XPERT_API_KEY,
-})
-```
-
-如未显式配置，SDK 会默认连接到本地 `http://localhost:8123` ([npm][2])。
-
-### 3. 管理数字专家（智能体）
-
-#### 列出已有数字专家
-
-```ts
-import { Client, Assistant } from "@langchain/langgraph-sdk";
-
-// List all xperts
-const xperts: Assistant[] = await client.assistants.search({
-  metadata: null,
-  offset: 0,
-  limit: 10,
-})
-console.log("Experts:", xperts);
-```
-
-每个数字专家就是一个 assistant ([npm][2], [LangGraph][3])。
-
-#### 获取单个数字专家
-
-```ts
-const xpertId = process.env.XPERT_ID;
-if (!xpertId) throw new Error("Set XPERT_ID");
-const xpert = await client.assistants.get(xpertId);
-```
-
-### 4. 创建与管理 Threads（线程）
-
-#### 创建新线程（空状态）
-
-```ts
-const thread = await client.threads.create(); // 或传入 threadId、metadata 等初始化参数
-console.log("New Thread:", thread);
-```
-
-示例中，返回包含 `thread_id`、`status` 等属性 ([LangGraph][4])。
-
-#### 指定线程 ID
-
-```ts
-const threadWithState = await client.threads.create({
-  threadId: "xxxxxxx",
-  ifExists: 'raise'
-});
-```
-
-这样可在创建时指定线程 ID；此例没有预填充智能体状态 ([LangGraph][4])。
-
-#### 查询线程列表 & 获取状态
-
-```ts
-const list = await client.threads.search({ limit: 10, offset: 0 });
-const singleThread = await client.threads.get(thread.thread_id);
-const history = await client.threads.getHistory(thread.thread_id, { limit: 50 });
-```
-
-### 5. 启动运行（Runs）
-
-可以发起对某个数字专家在线程中的运行，包括支持流式返回。
-
-#### 启动流式返回的运行
-
-```ts
-const stream = client.runs.stream(thread.thread_id, xpert.assistant_id, {
-  input: {
-    action: "send",
-    message: { input: { input: "Tell me a joke." } },
-  },
-});
-for await (const chunk of stream) {
-  const data = chunk.data
-  // Output text messages only
-  if (data?.type === 'message') {
-    if (typeof data.data === 'string') {
-      process.stdout.write(data.data)
-    } else if (data.data?.type === 'text') {
-      process.stdout.write(data.data.text ?? '')
-    } else {
-      // console.log(`Component:`, data.data);
-    }
-  }
-}
-```
-
-这样可边生成边处理响应，适合交互式场景 ([npm][2])。
-
-#### 其他运行操作示例
-
-```ts
-const run = await client.runs.create(thread.thread_id, xpert.assistant_id, { input: { action: "send", message: { input: { input: "Tell me a joke." } } } });
-const result = await client.runs.join(thread.thread_id, run.run_id);
-await client.runs.cancel(thread.thread_id, run.run_id);
-const runsList = await client.runs.list(thread.thread_id, { limit: 10 });
-```
-
-### 6. 使用 Store（持久存储）
-
-存储会话中或任务中需要跨请求保存的数据。
-
-```ts
-// 写入
-await client.store.putItem([xpert.assistant_id], "key1", { value: 42 });
-
-// 读取
-const item = await client.store.getItem([xpert.assistant_id], "key1");
-
-// 列出命名空间
-const namespaces = await client.store.listNamespaces({
-  prefix: [xpert.assistant_id],
-  maxDepth: 2,
-  limit: 10
-});
-
-// 搜索
-const found = await client.store.searchItems({ namespacePrefix: "my", query: "42" });
-```
-
-详细接口如 `StoreClient` 所定义 ([LangGraph][3])。
-
-### 7. XpertAI 平台集成 Tips
-
-* **配置默认 API 地址与密钥**：API 地址需要显式指定，密钥可使用环境变量 `LANGGRAPH_API_KEY` 统一配置。
-* **Stream 输出到前端**：适用 React 等前端，可以通过 SDK 的流式能力构建实时对话界面。
-* **持久记忆**：通过 Store 功能保存会话关键数据，增强智能体的记忆能力。
-
-[1]: https://www.npmjs.com/package/%40langchain/langgraph-sdk "@langchain/langgraph-sdk - npm"
-[2]: https://www.npmjs.com/package/%40langchain/langgraph-sdk "@langchain/langgraph-sdk - npm"
-[3]: https://langgraph.com.cn/cloud/reference/sdk/js_ts_sdk_ref/index.html "SDK (JS/TS) - LangChain 框架"
-[4]: https://github.langchain.ac.cn/langgraph/cloud/how-tos/use_threads/ "线程 - LangChain 框架"
-[5]: https://github.langchain.ac.cn/langgraph/cloud/reference/sdk/js_ts_sdk_ref/ "Js ts sdk ref - LangChain 框架"
-
-## 参考
-
-- [Agent Protocol](https://langchain-ai.github.io/agent-protocol/api.html)
-- [Agent Protocol: Interoperability for LLM agents](https://blog.langchain.dev/agent-protocol-interoperability-for-llm-agents/)
-
-## 更多信息
-
-SDK 还在不断完善中，如有遇到问题或有建议，请加微信：xpertai 联系我们进行技术交流。
+</Accordion>

@@ -1,25 +1,26 @@
 ---
 title: SAP BPC 合并报表
+description: 以 SAP BPC 合并报表为例搭建语义模型、指标和分析看板。
 sidebar_position: 2
 ---
 
-本文以 SAP BPC 系统中的环境 **BPC420_00** 中的模型 **Consolidation** 为例介绍如何搭建财务合并报表的分析体系.
+<Info>
+**适用版本：** Data Xpert / UOSE 当前版本。
+
+**前置条件：** 可访问的 SAP BW/BPC 系统、对应 Secret、语义模型权限和可用的 Assistant。
+
+**外部依赖：** 需要可访问的 SAP BPC/BW 系统、对应 Secret 和语义模型权限；没有 SAP 时请先阅读[数据本体系统快速开始](../../getting-started/index)。
+</Info>
+
+本文以 SAP BPC 系统中的示例环境和合并模型为例介绍如何搭建财务合并报表的分析体系。
 
 BPC 环境:
 
-![SAP BPC 环境：BPC420_00](/public/img/data/sap-bpc/bpc-environment.svg)
+![SAP BPC 环境示例](/public/img/data/sap-bpc/bpc-environment.svg)
 
 BPC 模型:
 
-![SAP BPC Consolidation 模型](/public/img/data/sap-bpc/consolidation-model.svg)
-
-<Tip>
-**环境**
-
-
-本文所用系统环境: Personal Edition 账号
-
-</Tip>
+![SAP BPC 合并模型示例](/public/img/data/sap-bpc/consolidation-model.svg)
 
 ## 如何基于 SAP BPC 系统创建看板
 
@@ -30,11 +31,11 @@ BPC 模型:
 
 ### 1. 创建 BPC 系统数据源
 
-SAP BPC 是基于 SAP BW 系统的, 所以创建 SAP BPC 系统的数据源请参考 [SAP BW 数据源](../../../../server/datasources/sap-bw).
+SAP BPC 是基于 SAP BW 系统的, 所以创建 SAP BPC 系统的数据源请参考 [SAP BW 数据源](/zh-Hans/data/features/control-plane/resource-access).
 
 ### 2. 创建业务分组
 
-语义模型, 指标和故事都是按业务域进行管理的, 所以要进行分组和权限控制, 需要创建相应的业务域分组架构. 参考[业务域文档](../../../../server/organization/business-area)
+语义模型, 指标和故事都是按业务域进行管理的, 所以要进行分组和权限控制, 需要创建相应的业务域分组架构. 参考[业务域文档](/zh-Hans/data/features/governance/policies)
 
 创建一个业务域命名为 **财务**.
 
@@ -48,7 +49,7 @@ SAP BPC 是基于 SAP BW 系统的, 所以创建 SAP BPC 系统的数据源请�
 
 现在创建好的语义模型是一个只有基础配置的, 如果需要对 SAP BW 模型的元数据进行增强的话需要在此语义模型中创建相应的 Cube 或者 Dimension 并新增相应的增强元数据.
 
-通过以下方式找到 BPC 模型对应的 BW 模型, 打开 BW 系统 SAP GUI, 使用事务码 **SE11** 查看表 **UJA_APPL** 内容, 选择条件为 APPSET_ID: *BPC420_00*, APPLICATION_ID: *Consolidation*. 会得到一条表记录, 找到字段 INFOCUBE 的值如 */CPMB/FOITS7D* 即为 BW 模型.
+通过以下方式找到 BPC 模型对应的 BW 模型, 打开 BW 系统 SAP GUI, 使用事务码 **SE11** 查看表 **UJA_APPL** 内容, 选择条件为 APPSET_ID: *示例 BPC 环境*, APPLICATION_ID: *示例合并模型*. 会得到一条表记录, 找到字段 INFOCUBE 的值如 */CPMB/FOITS7D* 即为 BW 模型.
 
 ![通过 UJA_APPL 定位 BW 模型](/public/img/data/sap-bpc/bpc-applications.svg)
 
@@ -59,7 +60,7 @@ SAP BPC 是基于 SAP BW 系统的, 所以创建 SAP BPC 系统的数据源请�
 
 创建 BW 模型在语义模型中对应的实体后, 页面会跳转到模型编辑界面, 左边栏会出现系统自动获取到的此模型的维度和度量信息结构.
 
-现在要对此原始元数据进行增强增加默认的时间层级和计算度量信息 [增强时间层级维度](../../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube#增强日历类型维度):
+现在要对此原始元数据进行增强增加默认的时间层级和计算度量信息 [增强时间层级维度](/zh-Hans/data/analytics/semantic-model/semantic-modeling-workspace):
 
 #### 创建计算度量
 
@@ -85,15 +86,15 @@ SAP BPC 是基于 SAP BW 系统的, 所以创建 SAP BPC 系统的数据源请�
 
 ### 2. 创建指标
 
-以偿债能力中的**资产负债率**为例创建指标, 参考 [指标注册](../../../../indicators/register) 文档填写相应信息. 这里指标名称和代码的命名规范需要客户根据自己的需要进行规范管理, 系统本身没有限制. 选择数据源和模型后, 指标类型选择为**衍生指标**, 在衍生指标下可以设置计算度量公式: `([Account Dim].[负债合计], [Measures].[金额]) / ([Account Dim].[资产合计], [Measures].[金额])` , 并在基础信息中将单位设置为 **%**.
+以偿债能力中的**资产负债率**为例创建指标, 参考 [指标注册](/zh-Hans/data/analytics/indicator-management/indicator-registration) 文档填写相应信息. 这里指标名称和代码的命名规范需要客户根据自己的需要进行规范管理, 系统本身没有限制. 选择数据源和模型后, 指标类型选择为**衍生指标**, 在衍生指标下可以设置计算度量公式: `([Account Dim].[负债合计], [Measures].[金额]) / ([Account Dim].[资产合计], [Measures].[金额])` , 并在基础信息中将单位设置为 **%**.
 
-在指标注册页面通过手工录入或者批量上传的方式将指标注册进系统. 然后在 Story 中就可以选择使用指标进行展示了. 也可以在 [指标应用](../../../../indicators/app/) 中查看和收藏指标列表.
+在指标注册页面通过手工录入或者批量上传的方式将指标注册进系统. 然后在 Story 中就可以选择使用指标进行展示了. 也可以在 [指标应用](/zh-Hans/data/analytics/indicator-management/indicator-application) 中查看和收藏指标列表.
 
 ### 3. 明细指标
 
 基于不同公司的管理方法不同, 核心指标还可以下钻到明细指标进行定义. 例如盈利能力中的毛利率, 核心指标中可以定义为集团总的毛利率, 也可以为不同销售区域定义明细的毛利率如: **中国区毛利率**, **海外毛利率**. 还可以针对不同产品线定义: **汽车产品毛利率**, **手机产品毛利率**, **家电产品毛利率** 等.
 
-这种情况下毛利率公式不变, 变化的是不同的维度成员. 这样我们可以将毛利率公式放到语义模型中进行定义. 在 [语义模型 #创建计算成员](../../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube#创建计算成员) 中新增毛利率的计算度量成员, 并在指标定义时选择此度量, 然后针对不同的明细指标添加不同的筛选条件(维度成员限制).
+这种情况下毛利率公式不变, 变化的是不同的维度成员. 这样我们可以将毛利率公式放到语义模型中进行定义. 在 [语义模型 #创建计算成员](/zh-Hans/data/analytics/semantic-model/mdx-multidimensional-model#计算成员) 中新增毛利率的计算度量成员, 并在指标定义时选择此度量, 然后针对不同的明细指标添加不同的筛选条件(维度成员限制).
 
 <Tip>
 **Solve Order**
@@ -109,4 +110,4 @@ SAP BPC 是基于 SAP BW 系统的, 所以创建 SAP BPC 系统的数据源请�
 
 因为财务数据都是对期间的分析, 所以需要用到日历维度作为公共的时间轴. 在语义模型中设置相应的默认日历维度:
 
-参考 [Calendar Dimension](../../../../models/mdx-modeling/calendar-dimension)
+参考 [Calendar Dimension](/zh-Hans/data/analytics/semantic-model/dimension-designer/dimension-designer)

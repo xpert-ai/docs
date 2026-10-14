@@ -6,6 +6,10 @@ sidebar_position: 3
 
 Ontology Workspace is the runtime inspection surface for published semantics. It groups ontology definitions, ontology-owned data, connected business objects, and partitioned project graphs so users can verify what is ready for search, Assistant reasoning, and plugin use.
 
+<Info>
+**Roles:** Ontology modelers, analysts, and Agent builders. **Minimum permissions:** read access to published ontologies and resources. **Outcome:** searchable entities, neighborhood graphs, and snapshot or graph-version context that can be passed to an Assistant.
+</Info>
+
 Use Ontology Studio to change a definition. Use Ontology Workspace to answer: **what semantic version is active, which objects exist, how are they connected, and what exact snapshot supports this result?**
 
 ## Workspace layout
@@ -131,6 +135,12 @@ The unified ontology definition and other project partitions are not deleted. A 
 <Warning>
 Runtime-instance deletion is different from deleting or archiving an ontology definition in Ontology Studio. Confirm the selected resource ID and partition key before continuing.
 </Warning>
+
+## Web Verification Path
+
+Open **Data and Ontology → Ontology Workspace**, select the target ontology definition or resource in the navigator, and inspect its health and current snapshot. Choose a `ready` resource, search for an entity, and open its instance graph. When asking the Assistant for an explanation, confirm that the resource, snapshot, and graph version match the current selection.
+
+**Success signal:** summary cards and resource cards show entity and relationship counts, search results show the entity type and external key, and graph details include the snapshot and graph version. Resolve `missing_snapshot`, `publish_failed`, and `projection_failed` before continuing.
 
 ## Verification checklist
 

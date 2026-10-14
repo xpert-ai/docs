@@ -1,0 +1,53 @@
+---
+title: 第一次失败如何排查
+description: 根据 Data Xpert 页面状态、同步作业、Snapshot、Action 和审计字段定位首次闭环失败。
+sidebar_position: 4
+---
+
+排障从左到右进行：**组织与权限 → Resource → Secret → Sync Job → Snapshot → Entity → Action → Policy / Approval → Audit**。不要在上游状态未就绪时反复执行下游操作。
+
+## 资源注册失败
+
+在**数据与本体 → 资源接入**查看表单错误和 Resource 详情。确认资源 ID 唯一、资源类型在目录中、连接引用来自已保存的 Secret，能力配置符合所选 adapter schema。若页面没有目标资源类型，先检查服务版本和 adapter registry；不要手写一个未注册的 `resourceType`。
+
+## 同步作业失败
+
+在资源详情的**同步作业**查看状态、阶段、进度和 `failedReason`；在**错误**页查看 dead-letter payload。修正 Secret、网络、认证或能力范围后再重试。首次接入优先 full sync；SAP OData 先缩小服务选择，数据库先缩小 allowlist 和表列上限。
+
+## Snapshot 缺失或投影失败
+
+本体空间中的 `missing_snapshot` 表示尚无当前快照，`publish_failed` 表示发布阶段失败，`projection_failed` 表示快照存在但运行时投影失败。回到资源详情确认最近一次 sync 已完成并记录 snapshot ID；必要时执行 full sync。修复前不要让 Agent 消费该资源。
+
+## 实体搜索为空
+
+在本体空间先按资源和实体类型缩小范围，再检查关键词、外部键和别名。确认图谱健康状态为 `ready`，目标服务在同步时已选择，数据库 capabilities 没有过滤目标表。宽泛查询达到上限时缩小关键词，不要把截断结果当成完整导出。
+
+## Action 不可用
+
+查看 `discoverActions` 的 `deniedActions.reasonCode` 和 `stage`：
+
+- `discovery_mode_manual_only`：动作不能自动规划；
+- `target_entity_type_not_supported`：目标实体类型不匹配；
+- `analysis_contract_missing` 或 `query_endpoint_missing`：语义模型契约或查询端点未准备好；
+- `policy_binding:deny`：策略拒绝；
+- `policy_binding:require_approval` / `approval_required`：需要审批。
+
+先在资源上下文中修复运行时 readiness，再重新 discovery。
+
+## 模拟或执行失败
+
+先用同一 target 和 params 重跑 `simulateAction`。检查实体是否唯一、input schema、连接解析、策略结果、审批 fingerprint、`approvalRequestId` 和 `expectedEffect`。只读动作模拟成功后再执行；高风险动作进入**治理 → 审批**。
+
+## ChatKit 或审计异常
+
+确认 ChatKit 已配置为当前组织和工作空间使用的地址，请求携带当前 tenant、organization、user、workspace 和 Assistant 上下文。若 ChatKit 能打开但工具调用失败，查看 Data Xpert API 响应和执行审计中的 `policyDecision`、`snapshotId`、`traceId`，并确认没有使用另一个组织的 token。
+
+## 页面验收卡
+
+| 页面 | 应查看字段 | 下一步 |
+| --- | --- | --- |
+| 资源接入 | Resource ID、类型、负责人、状态 | 打开资源详情 |
+| 同步作业 | job 状态、阶段、failedReason、snapshot ID | 重试或进入本体空间 |
+| 本体空间 | 健康状态、实体数、graph version | 搜索实体 |
+| 资源对话 / ChatKit | allowed / denied actions、simulate 结果 | 低风险执行或申请审批 |
+| 执行审计 | task、tool/action、策略、证据、结果 | 复盘或修复配置 |

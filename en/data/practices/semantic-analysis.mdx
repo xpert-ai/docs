@@ -29,11 +29,11 @@ First use `queryEntities` to query the target object. For metric questions, pref
 
 ```json
 {
-  "resourceId": "inner-bi",
-  "intent": "Query daily changes in bread transaction volume over the last 7 days",
+  "resourceId": "<resourceId>",
+  "intent": "Query daily changes in the target metric over a recent period",
   "scope": {
     "entityTypeCode": "semantic_indicator",
-    "query": "bread transaction volume",
+    "query": "target metric",
     "limit": 5
   }
 }
@@ -69,16 +69,16 @@ Simulate before execution. Example metric trend request:
 
 ```json
 {
-  "resourceId": "inner-bi",
+  "resourceId": "<resourceId>",
   "actionTypeCode": "semantic_model.query_metric_snapshot",
   "target": {
-    "entityRef": "bread transaction volume",
+    "entityRef": "<indicatorRef>",
     "entityTypeCode": "semantic_indicator"
   },
   "params": {
     "window": {
-      "from": "2026-03-15T00:00:00.000Z",
-      "to": "2026-03-21T23:59:59.999Z"
+      "from": "<start-time>",
+      "to": "<end-time>"
     },
     "granularity": "day"
   }

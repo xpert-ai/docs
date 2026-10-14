@@ -1,25 +1,27 @@
 ---
 title: SAP BPC Consolidated Reports
+description: Build a financial consolidation report using SAP BPC models, indicators, and semantic enhancements.
 sidebar_position: 2
 ---
 
-This article uses the **Consolidation** model in the **BPC420_00** environment of the SAP BPC system as an example to introduce how to build a financial consolidated reporting analysis system.
+<Info>
+**Applies to:** Current Data Xpert version.
+
+**Prerequisites:** An accessible SAP BW/BPC system, a Secret, semantic-model permissions, and an available Assistant.
+
+**External dependency:** This tutorial requires an accessible SAP BPC system and related permissions. If no source is available, start with [Quick Start](../../getting-started/index).
+</Info>
+
+
+This article uses an example environment and consolidation model in an SAP BPC system to introduce how to build a financial consolidation analysis system.
 
 BPC Environment:
 
-![SAP BPC environment: BPC420_00](/public/img/data/sap-bpc/bpc-environment.svg)
+![SAP BPC environment example](/public/img/data/sap-bpc/bpc-environment.svg)
 
 BPC Model:
 
-![SAP BPC Consolidation model](/public/img/data/sap-bpc/consolidation-model.svg)
-
-<Tip>
-**Environment**
-
-
-System environment used in this article: Personal Edition account
-
-</Tip>
+![SAP BPC consolidation model example](/public/img/data/sap-bpc/consolidation-model.svg)
 
 ## How to Create Dashboards Based on SAP BPC System
 
@@ -30,11 +32,11 @@ System environment used in this article: Personal Edition account
 
 ### 1. Create BPC System Data Source
 
-SAP BPC is based on the SAP BW system, so for creating SAP BPC system data sources, please refer to [SAP BW Data Source](../../../../server/datasources/sap-bw).
+SAP BPC is based on the SAP BW system, so for creating SAP BPC system data sources, please refer to [SAP BW Data Source](/en/data/features/control-plane/resource-access).
 
 ### 2. Create Business Grouping
 
-Semantic models, indicators, and stories are all managed by business domain, so for grouping and permission control, corresponding business domain grouping architecture needs to be created. Refer to [Business Domain Documentation](../../../../server/organization/business-area)
+Semantic models, indicators, and stories are all managed by business domain, so for grouping and permission control, corresponding business domain grouping architecture needs to be created. Refer to [Business Domain Documentation](/en/data/features/governance/policies)
 
 Create a business domain named **Finance**.
 
@@ -47,7 +49,7 @@ Semantic models, as metadata management objects, are the foundation for system d
 
 The semantic model created now only has basic configuration. If you need to enhance metadata for SAP BW models, you need to create corresponding Cubes or Dimensions in this semantic model and add corresponding enhanced metadata.
 
-Find the BW model corresponding to the BPC model through the following method: Open BW system SAP GUI, use transaction code **SE11** to view table **UJA_APPL** content, select conditions as APPSET_ID: *BPC420_00*, APPLICATION_ID: *Consolidation*. You will get a table record, find the INFOCUBE field value such as */CPMB/FOITS7D* which is the BW model.
+Find the BW model corresponding to the BPC model through the following method: Open the BW system SAP GUI, use transaction code **SE11** to view table **UJA_APPL**, and filter by the environment and consolidation model used by your organization. Find the INFOCUBE field value, which identifies the BW model.
 
 ![Find the BW model in UJA_APPL](/public/img/data/sap-bpc/bpc-applications.svg)
 
@@ -58,7 +60,7 @@ Find this model in the data table area of the semantic model interface, drag it 
 
 After creating the entity corresponding to the BW model in the semantic model, the page will jump to the model editing interface, and the left sidebar will show the dimension and measure information structure automatically obtained by the system for this model.
 
-Now enhance this original metadata by adding default time hierarchy and calculated measure information [Enhance Time Hierarchy Dimension](../../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube#enhance-calendar-type-dimension):
+Now enhance this original metadata by adding default time hierarchy and calculated measure information [Enhance Time Hierarchy Dimension](/en/data/ontology/overview#enhance-calendar-type-dimension):
 
 #### Create Calculated Measure
 
@@ -84,15 +86,15 @@ To better manage financial indicators, we create a separate **Core Indicators** 
 
 ### 2. Create Indicators
 
-Take **Asset-Liability Ratio** in solvency as an example to create an indicator. Refer to [Indicator Registration](../../../../indicators/register) documentation to fill in corresponding information. Here, the naming conventions for indicator names and codes need to be managed according to customer needs, the system itself has no restrictions. After selecting data source and model, select indicator type as **Derived Indicator**, under derived indicators you can set calculated measure formula: `([Account Dim].[Total Liabilities], [Measures].[Amount]) / ([Account Dim].[Total Assets], [Measures].[Amount])`, and set the unit to **%** in basic information.
+Take **Asset-Liability Ratio** in solvency as an example to create an indicator. Refer to [Indicator Registration](/en/data/analytics/indicator-management/indicator-registration) documentation to fill in corresponding information. Here, the naming conventions for indicator names and codes need to be managed according to customer needs, the system itself has no restrictions. After selecting data source and model, select indicator type as **Derived Indicator**, under derived indicators you can set calculated measure formula: `([Account Dim].[Total Liabilities], [Measures].[Amount]) / ([Account Dim].[Total Assets], [Measures].[Amount])`, and set the unit to **%** in basic information.
 
-Register indicators into the system through manual entry or batch upload on the indicator registration page. Then you can select and use indicators for display in Story. You can also view and favorite indicator lists in [Indicator Application](../../../../indicators/app/).
+Register indicators into the system through manual entry or batch upload on the indicator registration page. Then you can select and use indicators for display in Story. You can also view and favorite indicator lists in [Indicator Application](/en/data/analytics/indicator-management/indicator-application).
 
 ### 3. Detail Indicators
 
 Based on different management methods of different companies, core indicators can also drill down to detail indicators for definition. For example, gross profit margin in profitability can be defined as the group's total gross profit margin in core indicators, or detailed gross profit margins can be defined for different sales regions such as: **China Region Gross Profit Margin**, **Overseas Gross Profit Margin**. You can also define for different product lines: **Automotive Product Gross Profit Margin**, **Mobile Phone Product Gross Profit Margin**, **Home Appliance Product Gross Profit Margin**, etc.
 
-In this case, the gross profit margin formula remains unchanged, what changes are different dimension members. This way we can define the gross profit margin formula in the semantic model. Add a calculated measure member for gross profit margin in [Semantic Model #Create Calculated Member](../../../../models/mdx-modeling/semantic-enhancement-for-third-party-olap-cube#create-calculated-member), and select this measure when defining indicators, then add different filter conditions (dimension member restrictions) for different detail indicators.
+In this case, the gross profit margin formula remains unchanged, what changes are different dimension members. This way we can define the gross profit margin formula in the semantic model. Add a calculated measure member for gross profit margin in [Semantic Model #Create Calculated Member](/en/data/ontology/overview#create-calculated-member), and select this measure when defining indicators, then add different filter conditions (dimension member restrictions) for different detail indicators.
 
 <Tip>
 **Solve Order**
@@ -108,4 +110,4 @@ When defining calculated measure members, pay attention to the Solve Order prope
 
 Since financial data is all period-based analysis, calendar dimensions are needed as a common time axis. Set corresponding default calendar dimensions in the semantic model:
 
-Refer to [Calendar Dimension](../../../../models/mdx-modeling/calendar-dimension)
+Refer to [Calendar Dimension](/en/data/analytics/semantic-model/dimension-designer/dimension-designer)

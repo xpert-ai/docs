@@ -1,51 +1,51 @@
 ---
-title: 🧪 Query Laboratory
-sidebar_position: 5
+title: Query Workspace
+description: Run read-only SQL or MDX queries, review results, and inspect recent runs for a semantic model.
+sidebar_position: 4
 tags:
-  - MDX
+  - Queries
   - SQL
+  - MDX
 ---
 
-Query Laboratory provides the functionality to flexibly manipulate data source entities (physical table views or multidimensional datasets) using query statements, assisting users in their daily data operation and maintenance work.
+Open **Data Intelligence → Query Analysis**, or enter **Query lab** from a model workspace. The page loads semantic models visible to the current workspace. Create and authorize a model first if none is available.
 
-Query Laboratory supports three types of query scenarios using statement queries:
+## Query steps
 
-* Source database tables of SQL models;
-* Source database tables of MDX models;
-* Source multidimensional datasets (Cubes) of XMLA data sources;
+1. Select a model from the model list.
+2. Choose the query language: **SQL** for relational models or **MDX** for XMLA models.
+3. Click **Template** and replace names with values from the data source browser or current structure information.
+4. Click **Run**, or press Ctrl/⌘+Enter in the query editor.
+5. Check the row count, data source identifier, columns, and data in the result area. If it fails, read the error and correct the name or binding in the model structure.
 
-In other words, queries can only be performed on data source entities within the **Data Tables** area of the model interface, and not on models within the **Model** area.
+SQL example:
 
-## Common Operations
+    SELECT customer_id, SUM(amount) AS total_amount
+    FROM sales
+    GROUP BY customer_id
+    ORDER BY total_amount DESC
+    LIMIT 20
 
-Open the semantic model, click the **Query** menu button on the toolbar, to navigate to the Query Laboratory interface. Initially, the system will create an empty query, and users can also click on *New Query* to add one.
+MDX example:
 
-Dragging a data table to the table structure area allows querying its detailed field information and member composition. Dragging a table, field, or member to the code editing area allows inserting the corresponding names. After writing the query statement, clicking *Execute* will execute the query statement and view the data results.
-Dragging tables or fields from the table structure area to the query result area allows querying the corresponding data results directly. Dragging the table name will query data for all fields in the table, while dragging the field name will query member data for that field.
+    SELECT {[Measures].[Sales]} ON COLUMNS
+    FROM [Sales]
 
-Clicking the more button on the left side of the result toolbar allows closing all result sets or clicking to download the current result set.
+## Query limits
 
-### Save as Model
+The query service accepts one read-only statement. SQL runs through the data source connection service, and XMLA MDX runs through the XMLA connection service. Do not use SQL on an XMLA model or SQL table syntax in MDX.
 
-If in an SQL semantic model, after editing the statement, the current statement can be saved as an SQL model for subsequent modeling work. (To be completed)
+## Results and recent runs
 
-## SQL Data Source Table Query
+The right side of the workspace shows the latest ten runs for the current session, including model, language, statement, success or failure, duration, and row count. Refreshing the page clears this session list. The system still records query runs for operational review.
 
-When the semantic model uses an SQL data source for an MDX multidimensional model or an SQL multidimensional model, the Query Laboratory can query the tables/views in the data source. To query MDX statements for the created MDX multidimensional dataset, you can go to the query interface in the multidimensional dataset designer.
+## Common failures
 
-Dragging the table name from the data table area to the table structure area of the query, clicking the expand button of the table to pull the table fields, continuing to expand fields of type `D` can pull their field value lists.
+| Problem | What to do |
+| --- | --- |
+| No model is available | Return to the semantic model list and confirm that the model exists and you have view permission. |
+| Language does not match the model | Choose SQL or MDX according to the model type. |
+| Table, column, or cube does not exist | Copy the exact name from the data source browser, cube, or XMLA structure. |
+| A published model query fails | Run a new query probe in **Run and cache**, then check the data source network and credentials. |
 
-All information can be dragged to the right editor to assist users in writing SQL statements.
-
-
-## Multidimensional Dataset Query of XMLA Data Source
-
-When the semantic model is connected to an XMLA data source, Query Laboratory uses MDX statements for data querying.
-
-In this scenario, the entities in the data table area are lists of multidimensional datasets from the XMLA data source.
-
-Create a new query and drag the multidimensional dataset from the data table area to the table structure area of the query. Then click the expand button to pull the dimensions and measures of the multidimensional dataset.
-
-Expanding downwards can pull **dimensions/hierarchies/levels/members/members...**
-
-All these information nodes can be dragged to the right editor to assist users in writing MDX statements.
+See [Query troubleshooting and run records](./query-log) for more help.

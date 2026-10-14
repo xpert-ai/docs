@@ -15,11 +15,7 @@ ChatKit 还内置了[在新对话中分叉](./chatkit-branch-in-new-chat)、计�
 
 将 ChatKit 嵌入你的前端，自定义外观与体验，并让用户通过 XpertAI Agent Builder 托管和扩展后端。
 
-如果你当前的重点是接入 XpertAI 后端能力，而不是先处理前端 UI，请先阅读 [接入 XpertAI API](./integrate-xpertai-api)。该文档包含：
-
-- 通过 `@xpert-ai/xpert-sdk` 在 Node.js / TypeScript 服务端接入
-- 通过 HTTP API 直接调用 `assistants`、`threads`、`runs` 等公开端点
-- 在需要嵌入 ChatKit UI 时，如何通过 `POST /api/ai/v1/chatkit/sessions` 换取 `client_secret`
+通用服务端、脚本或自建界面的程序接入请阅读独立的 [开发 SDK 文档](/zh-hans/ai/agent/development-api)。ChatKit 文档介绍聊天 UI 的嵌入与定制。
 
 ## 开始使用 ChatKit
 
@@ -40,7 +36,7 @@ ChatKit 还内置了[在新对话中分叉](./chatkit-branch-in-new-chat)、计�
 嵌入到你的前端的聊天将指向你创建的数字专家工作流程作为后端。
 
 2. 在您的产品中设置 ChatKit<br/>
-要设置 ChatKit，你需要让自己的后端负责创建 ChatKit 会话，并把短期 `client_secret` 返回给前端。具体的会话换取流程、请求头和安全约束请阅读 [接入 XpertAI API](./integrate-xpertai-api)。
+要设置 ChatKit，你需要让自己的后端负责创建 ChatKit 会话，并把短期 `client_secret` 返回给前端。具体的会话换取流程、请求头和安全约束请阅读 [ChatKit 会话接入说明](/zh-hans/ai/chatkit/sdk/integrate-xpertai-api)。
 
 2.1. 在项目目录中，安装 ChatKit React 绑定：
 
