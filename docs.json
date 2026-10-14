@@ -168,6 +168,7 @@
                     "pages": [
                       "en/ai/agent/conversation/conversation",
                       "en/ai/agent/conversation/discover-and-add",
+                      "en/ai/agent/conversation/assistant-templates",
                       "en/ai/agent/conversation/projects"
                     ]
                   },
@@ -364,6 +365,7 @@
                     "group": "Default",
                     "pages": [
                       "en/ai/plugin/overview",
+                      "en/ai/plugin/extension-model",
                       "en/ai/plugin/application-config",
                       "en/ai/plugin/host-native-mcp-tools",
                       "en/ai/plugin/mcp-tools-and-apps",
@@ -916,6 +918,7 @@
                     "pages": [
                       "zh-Hans/ai/agent/conversation/conversation",
                       "zh-Hans/ai/agent/conversation/discover-and-add",
+                      "zh-Hans/ai/agent/conversation/assistant-templates",
                       "zh-Hans/ai/agent/conversation/projects"
                     ]
                   },
@@ -1112,6 +1115,7 @@
                     "group": "默认",
                     "pages": [
                       "zh-Hans/ai/plugin/overview",
+                      "zh-Hans/ai/plugin/extension-model",
                       "zh-Hans/ai/plugin/core-concepts",
                       "zh-Hans/ai/plugin/development-steps",
                       "zh-Hans/ai/plugin/application-config",

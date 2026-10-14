@@ -5,6 +5,8 @@ description: 用 appConfig 声明组织应用、私有工作空间和 Assistant 
 
 `appConfig` 是插件向宿主提交的应用初始化声明，用于在 Explore 展示应用，并由宿主创建专用工作空间、可选知识库及已发布 Assistant。它不包含用户凭据，也不能替代 Assistant 的运行授权。
 
+应用声明、插件包与独立模板导入的区别见[插件、应用与智能体模板](/zh-Hans/ai/plugin/extension-model)。
+
 ## 声明应用
 
 将应用放在插件运行时元数据 `targetAppMeta.xpert.marketplace.contents` 中，以稳定的应用名关联同一插件贡献的 Assistant 模板：

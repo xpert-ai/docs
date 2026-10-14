@@ -3,6 +3,8 @@ sidebar_position: 1
 title: Overview
 ---
 
+Xpert supports both file-based **Agent Plugins** and native **Xpert Plugins**. This page describes the native server extension model. For package selection and the relationships between apps and templates, see [Plugins, apps, and Assistant templates](/en/ai/plugin/extension-model).
+
 ### Goals of the Plugin System
 
 The Xpert AI plugin system aims to provide developers with an **extensible, reusable, and loosely coupled** extension mechanism, enabling business features to be integrated into the system in a modular way. Through plugin-based design, we can:
@@ -13,7 +15,7 @@ The Xpert AI plugin system aims to provide developers with an **extensible, reus
 
 ### Design Philosophy
 
-The plugin system is built on the **[NestJS](https://nestjs.com/) + [TypeORM](https://typeorm.io/)** tech stack, combining dependency injection, modularization, decorator pattern, and strategy pattern to provide a comprehensive extension point mechanism:
+The native plugin system is built on the **[NestJS](https://nestjs.com/) + [TypeORM](https://typeorm.io/)** tech stack, combining dependency injection, modularization, decorator pattern, and strategy pattern to provide a comprehensive extension point mechanism:
 
 1. **Modular Design**: Each plugin is an independent NestJS module with its own `controller`, `service`, `strategy`, and `entity`.
 2. **Strategy-Based Extension**: Through [strategy mechanisms](https://en.wikipedia.org/wiki/Strategy_pattern) such as `IntegrationStrategy` and `DocumentSourceStrategy`, plugins can be mounted to the host system using the strategy pattern, enabling integration with external systems or document data sources.

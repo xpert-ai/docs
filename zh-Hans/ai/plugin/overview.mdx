@@ -4,6 +4,8 @@ title: 概述
 ---
 
 
+Xpert 同时支持文件配置型的 **Agent Plugins（智能体插件）** 与原生 **Xpert Plugins**。本文介绍原生服务器扩展；交付方式选型及应用、模板之间的关系见[插件、应用与智能体模板](/zh-Hans/ai/plugin/extension-model)。
+
 ## 1. 概述
 
 ### 插件系统的目标
@@ -16,7 +18,7 @@ Xpert AI 插件系统旨在为开发者提供一种**可扩展、可复用、低
 
 ### 设计理念
 
-插件系统基于 **[NestJS](https://nestjs.com/) + [TypeORM](https://typeorm.io/)** 技术栈，结合了依赖注入、模块化、装饰器模式和策略模式，提供了一套完整的扩展点机制：
+原生插件系统基于 **[NestJS](https://nestjs.com/) + [TypeORM](https://typeorm.io/)** 技术栈，结合了依赖注入、模块化、装饰器模式和策略模式，提供了一套完整的扩展点机制：
 
 1. **模块化设计**：每个插件作为独立的 NestJS 模块，具备自己的 `controller`、`service`、`strategy`、`entity`。
 2. **策略化扩展**：通过 [策略机制](https://en.wikipedia.org/wiki/Strategy_pattern) 例如 `IntegrationStrategy` 和 `DocumentSourceStrategy`，插件能够以策略模式挂载到宿主系统中，从而实现外部系统集成或文档数据源接入。

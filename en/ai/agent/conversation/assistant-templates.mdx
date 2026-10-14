@@ -1,0 +1,79 @@
+---
+title: Using Assistant templates
+sidebar_position: 3
+description: Discover and import templates in Web and Desktop, configure integrations and routines, and manage sharing and upgrades.
+---
+
+Assistant templates give you a prepared role to start from. Importing creates your own Assistant, with an editable name, model, and working instructions. Use Digital experts to work with an existing expert, or Apps to deploy a complete business solution. See [Plugins, apps, and Assistant templates](/en/ai/plugin/extension-model) for the differences.
+
+## Discover and compare
+
+Open Agent templates from Web Explore or Desktop's Discover & add. Sources appear in this order: **Agent Plugins → Xpert Plugins → Built-in → Shared templates**. Selecting a source updates its categories and counts. Search by name, use case, or capability.
+
+The catalog loads in batches, so you can inspect templates already displayed. Counts depend on the current organization, access rights, and content available in your language, and may change until loading finishes.
+
+Click a card for details covering responsibilities, working instructions, initial knowledge, skills, routines, and integrations. **Use template** takes you directly to configuration.
+
+## Import your Assistant
+
+1. Select **Import as Assistant** in the details. On Web, **Open in Desktop** continues preview and import in the desktop client.
+2. Choose a workspace you can edit and confirm the name, avatar, and required model.
+3. Review dependencies and execution requirements. Resolve missing mandatory plugins or unsupported capabilities as prompted. Accounts and preferences may be completed in permitted follow-up setup steps.
+4. Start installation and inspect creation, dependency installation, publication, and initialization progress.
+5. Open the created Assistant, complete first-use setup, and check its first business result.
+
+If installation fails or is interrupted, refresh its status and retry from the existing record. Refreshing or reopening a client does not require creating another copy. Start a new installation only when you want another independent instance.
+
+If the source changes before recovery, the system requests another check instead of continuing with unseen replacement content.
+
+## First-use setup and external connections
+
+Provide the role's required timezone, language, and business preferences. Completed steps are saved and can resume after interruption. The template defines completion criteria, usually including an actual ledger, digest, or draft.
+
+Integrations list required and optional services. Select an existing connection you may use, or ask an authorized connection manager to complete authorization. Authorization happens in the destination environment; templates do not carry the publisher's accounts, passwords, or tokens.
+
+Missing, expired, and insufficient-permission connections prompt corrective action. Optional services can be skipped, leaving their tools unavailable. Missing mandatory services prevent corresponding work. A plugin being installed, an account being authorized, and a business operation succeeding are separate states.
+
+External sends, changes, or deletions may require approval. Inspect the proposed action before deciding. Rejection prevents that tool operation from executing.
+
+## Files and ongoing work
+
+Templates can prepare working directories, initial instructions, and empty ledgers. Initialization creates missing files without overwriting existing business records. Roles should read and update current records rather than treating conversation history as the only business ledger.
+
+The template indicates whether files are isolated per user or shared among authorized collaborators. Existing file and business access rules still apply. Upgrading a template does not automatically replace your business files.
+
+## Enable routines
+
+Routines start paused. Review the work, schedule, timezone, and output location before enabling one. Pause it whenever you want to stop future automatic runs.
+
+Server tasks can continue after Web and Desktop close. Tasks requiring capabilities available only on your computer cannot automatically move to server execution. Scheduled tasks are supported; event-trigger requirements are marked unavailable.
+
+Use activity records to inspect results, failures, and pending approvals. Read state belongs to your account, and the view refreshes periodically. These are in-app records, not a promise of email, SMS, or system push delivery.
+
+## Share your template
+
+Authorized maintainers can inspect a publication preview and choose organization or public sharing. Recipients must sign into the platform even for public content.
+
+Sharing excludes conversations, business files, account bindings, personal preferences, and enabled-task state. Authors must still inspect free-text instructions for sensitive material. Unsupported portable configurations display a blocking reason.
+
+Recipients preview the template, import their own instance, and configure accounts. Revocation stops future discovery and imports without deleting Assistants recipients have already created. Shared links do not automatically install anything.
+
+## Update an existing Assistant
+
+When a new template version is available, open the upgrade preview to compare upstream changes with local edits. Explicitly resolve conflicts, save a draft, and publish it.
+
+Upgrades preserve Assistant identity, conversations, business data, and compatible configuration. New routines remain paused. Incompatible data scope or existing routine definitions require resolution rather than automatic overwriting.
+
+Resume installation and upgrade work from their existing records. Supported configuration rollback can restore a prior definition, but it does not undo messages already sent, external writes, or business-data changes.
+
+## Common questions
+
+**Why is Office Ops an Agent Plugin rather than built-in?** It is delivered by an Agent Plugin file package. Source classification is independent of its displayed role name.
+
+**Why are skills still in English after the description is translated?** Display content follows the interface language. Internal skills, execution instructions, and business files are not automatically translated.
+
+**Why does an installed Assistant still need setup?** Installation creates the template instance and selected resources. Models, external accounts, preferences, publication, and routine enablement have separate states.
+
+**Why is my workspace missing?** Check the selected organization and account, then the workspace's edit access. Permission to use a published Assistant does not grant edit access to its workspace.
+
+**Can every connector be used immediately?** Availability depends on installed service capabilities, account authorization, and permissions. Services such as Notion, Slack, Linear, Google Sheets, Gmail, and Calendar need their own configuration and verification of real business operations.

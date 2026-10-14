@@ -5,6 +5,8 @@ description: Use appConfig to declare organization applications, private workspa
 
 `appConfig` declares how the host initializes a plugin application. It presents the application in Explore and lets the host create a dedicated workspace, optional knowledge bases and a published Assistant. It contains no user credentials and does not grant permission to run the Assistant.
 
+For the distinction between an app declaration, its plugin package, and standalone template imports, see [Plugins, apps, and Assistant templates](/en/ai/plugin/extension-model).
+
 ## Declare an application
 
 Place the application in the plugin's runtime metadata at `targetAppMeta.xpert.marketplace.contents`. Use a stable application name and reference an Assistant template contributed by the same plugin:

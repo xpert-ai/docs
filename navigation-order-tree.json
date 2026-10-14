@@ -63,6 +63,7 @@
               "pages": [
                 "conversation",
                 "discover-and-add",
+                "assistant-templates",
                 "projects"
               ]
             },
@@ -164,6 +165,7 @@
               "slug": "__default__",
               "pages": [
                 "overview",
+                "extension-model",
                 "core-concepts",
                 "development-steps",
                 "application-config",
