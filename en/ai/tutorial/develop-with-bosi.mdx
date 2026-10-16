@@ -1,0 +1,227 @@
+---
+title: Develop with Bosi
+description: Work with assistants on development tasks in the Bosi desktop app, approve local commands one at a time through the local terminal, connect to your own Xpert service, and configure automations.
+tags:
+  - AI
+  - Xpert
+  - Bosi
+  - Desktop
+  - Shell
+---
+
+In everyday development, you may want an assistant to inspect your local environment, run commands in a specific directory, generate files, or summarize project progress on a daily schedule. The Bosi desktop app brings these capabilities into one window. The assistant and its default sandbox still run on the Xpert server, and commands run on your computer only after you explicitly approve them.
+
+This tutorial uses "have the assistant run commands in a local test directory and verify the result" as an example. It covers how to prepare the assistant, configure the local terminal, approve commands, connect to your own Xpert service, and configure automations.
+
+## What you will learn
+
+- Work with assistants on development tasks in Bosi, and use plugins and delivered files.
+- Configure the local terminal and understand the three execution permissions.
+- Approve or deny local commands requested by an assistant in a conversation.
+- Distinguish three execution locations: local commands, server sandbox commands, and the cloud computer.
+- Connect Bosi to a self-hosted or local development Xpert service.
+- Configure automations such as schedules for an assistant.
+
+If you have not installed Bosi yet, read the [Bosi Desktop App User Guide](/en/ai/tutorial/bosi-desktop-user-guide) first.
+
+## Before you begin
+
+| Requirement | How to check |
+| --- | --- |
+| Bosi, signed in | You can select an organization and an assistant in Bosi and chat normally. |
+| The native macOS app | The local terminal is available only in the native macOS app. |
+| A model with tool calling | The model your organization configured for the assistant supports tool calling. |
+| An assistant with Desktop Shell | An administrator has connected the **Desktop Shell** middleware to the assistant in Xpert Studio and published it. |
+| Matching server versions | The versions of the Xpert server, Bosi, and ChatKit match each other. |
+| A test directory | Prepare a directory where files can be written freely, for the first verification. |
+
+The features and limits of the local terminal may change between versions. Follow the on-screen messages of the version you use.
+
+## Step 1: Work with an assistant on development tasks
+
+After you select an assistant in Bosi, the chat area on the right provides messages, attachments, conversation history, tools, skills, connectors, and the Workbench. Common ways to handle development tasks include:
+
+- **Describe the goal and let the assistant break it down**: State the work to be done and how to verify it, for example, "Check the directory structure of the current project and explain how to run the tests."
+- **Upload attachments**: Send files that need analysis to the assistant as attachments.
+- **Select plugins**: After an administrator imports a plugin, users with edit access can add it to the expert's workspace in **Discover & add → Plugins**, then select it from the conversation's **Plugins** menu. Adding a plugin does not select it in a conversation automatically.
+- **View delivered files**: After the assistant generates a file, click the delivery card in the conversation to preview the version saved at delivery and download it. Formats that cannot be previewed can be downloaded directly.
+
+If you have workspace edit access, you can change the model, capabilities, and instructions in the assistant's **Edit profile**. Changes take effect after you click **Save & publish**. These assistant settings affect everyone who uses this expert; the personal profile is saved only on this computer. For more complex orchestration, select **Edit workflow in Xpert Studio**.
+
+## Step 2: Configure the local terminal
+
+Open **Settings → Local terminal** to manage command execution on this computer:
+
+| Setting | Description |
+| --- | --- |
+| Computer name | The computer name shown in approval cards and command results |
+| Shell | Choose zsh or bash |
+| Default working directory | The starting directory for commands. For the first verification, set it to your test directory. |
+| Command search path | The path used to find executables when running commands |
+| Execution permission | Ask for every command (default), Always allow in this organization, or Never allow |
+
+After making changes, click **Apply Shell settings**. Local terminal changes are applied separately on this page and are not affected by **Save settings** at the bottom of the Settings page. Applying Shell settings disconnects the current connection and revokes any authorizations that have not run yet. The next command request reconnects with the new settings.
+
+The three execution permissions differ as follows:
+
+| Execution permission | Effect |
+| --- | --- |
+| Ask for every command | The default. An approval card appears in the message before each command, and one approval runs only that command. |
+| Always allow in this organization | Commands are no longer approved one by one; later commands run directly. |
+| Never allow | No approval card is shown and no local command runs. Commands that are running are stopped. |
+
+Execution permissions apply only to the current account, the current organization, and this computer. Unless you fully trust the assistants in this organization that may request local commands, keep **Ask for every command**.
+
+No manual connection or per-conversation authorization is needed: Bosi connects automatically when an assistant requests a local command.
+
+## Step 3: Request and approve a local command
+
+In a conversation with an assistant that has Desktop Shell enabled, send:
+
+```text
+Run commands on this computer: show the current operating system and current directory,
+then write a file named bosi-test.txt in the current directory with the content hello.
+When you finish, tell me the exit code of the command.
+```
+
+With the default **Ask for every command**:
+
+1. After the assistant requests a local command, an approval card appears in the message. It shows the command to run, the computer, the working directory, and an access notice.
+2. Review the command. The command does not run until you make a choice.
+3. On the card, choose to allow this one execution, or deny it. The permissions entry on the card opens the local terminal settings.
+4. After you approve, the command runs on your computer, and its output and exit code are returned to the assistant. The next command requires approval again.
+5. If you deny, the command does not run. The assistant should stop this operation and does not fall back to a server Shell to run it instead.
+
+When it finishes, open `bosi-test.txt` in the test directory and confirm that its content is what you expected. Rely on the actual file and exit code, not only on the assistant's text description.
+
+### View and stop commands
+
+In **Settings → Local terminal**, you can view recent commands and their status (Pending, Running, Succeeded, Failed, Cancelled, Timed out, Rejected, Unknown). To interrupt a running command, click **Stop command**.
+
+The Unknown status means Bosi cannot confirm whether the command completed. Bosi does not run the command again; check the actual result yourself before deciding whether to request it again.
+
+## Understand how local commands run
+
+### Security boundaries
+
+- Commands run with the permissions of the operating-system user you are signed in as. The working directory is only a starting directory, not an isolated sandbox, and it does not restrict file access.
+- Command output is sent to Xpert and stored on the server. Output may contain business data, so avoid running commands that print sensitive information.
+- Each command runs in a fresh, non-interactive shell that inherits only a small set of environment variables. It does not inherit platform account or device credentials.
+- There is no interactive terminal (PTY), interactive input, persistent Shell session, file synchronization, or local agent runtime. Commands that require interactive input cannot work properly.
+
+### Limits
+
+| Item | Limit |
+| --- | --- |
+| Concurrent commands | Each computer runs only 1 command at a time; other requests are rejected. |
+| Computer offline | An offline result is returned immediately. Requests are not queued and do not fall back to the server sandbox. |
+| Synchronous wait | 10 seconds; after that, the assistant queries the status to get the final result. |
+| Command timeout | 60 seconds by default; at most 600 seconds per command. |
+| Output retained per command | 1 MiB; anything beyond that is discarded. |
+
+### When it stops
+
+- After you close the macOS window, the app and the local terminal keep running.
+- Switching organizations, changing the service connection, signing out, or quitting the app stops the local terminal.
+- After the app restarts, the selected execution permission is kept, but temporary authorizations are not.
+- Expired approvals cannot run. Deny or stop that request, then make a new one.
+
+## Distinguish the three execution locations
+
+One assistant can have several execution capabilities at the same time. When you ask, state where you want the work to run, and check the execution location in the returned result.
+
+| Execution location | Provided by | Suitable tasks |
+| --- | --- | --- |
+| Your computer | The **Desktop Shell** middleware + the Bosi local terminal | Inspect or work with projects and files on your computer; requires your approval |
+| Server sandbox | The **Sandbox Shell** middleware | Run code and commands in an isolated server environment. See [Sandbox Feature](/en/ai/agent/sandbox). |
+| Cloud computer | Cloud computer assistants | Let the assistant operate a server computer and its applications |
+
+When commands also need to run on the server, an administrator can keep Sandbox Shell connected while connecting Desktop Shell to the assistant. When verifying local execution, a result from the server sandbox does not count as local execution.
+
+Cloud computer tasks require a model with vision and tool calling. Whether your organization offers such assistants depends on the server configuration.
+
+## Connect to your own Xpert service
+
+For development or testing, you can connect Bosi to a self-hosted or locally running Xpert service:
+
+1. Click **Connection settings** on the sign-in screen, or open **Settings → Service connection** after you sign in.
+2. Enter the API service URL, Xpert web URL, and ChatKit URL. Remote services require HTTPS; `localhost` addresses on your own computer may use HTTP.
+3. Wait for the page to check the URLs and certificates. For a self-signed certificate you trust, turn on **Allow untrusted service certificates**. This setting also applies to the local terminal's connection to the configured API service.
+4. Save the settings and sign in again.
+
+Notes for deployers:
+
+- The local terminal establishes a WebSocket connection through the API service's Socket.IO endpoint (`/socket.io/`). The reverse proxy must allow WebSocket upgrades.
+- Your computer does not open any listening port; Bosi initiates the connection.
+- When upgrading, deploy matching versions of the server, Bosi, and ChatKit together. Updating only Bosi does not give an older ChatKit new capabilities.
+
+## Configure automations
+
+Automations let an assistant start working at a specific time, on a schedule, or when an event happens, reusing the assistant's published instructions, skills, tools, and connectors. Managing automations requires a published assistant and workspace edit access.
+
+1. Hover over the assistant's avatar in the sidebar to open the assistant profile panel, and switch to **Automations**.
+2. Create a new automation.
+3. Choose a trigger:
+
+   | Trigger | When it runs |
+   | --- | --- |
+   | Schedule | At a specific time or on a schedule |
+   | App event | When something happens in an app |
+   | Webhook | When an HTTP request is received |
+   | Email | When a new email is received |
+
+   Triggers other than Schedule require installing a provider plugin of that type in Xpert first.
+
+4. Set the conditions and scope. For a schedule, choose Every hour, Every day, Every weekday, or Every week, or use Custom schedule and enter a cron expression (minute, hour, day of month, month, day of week). Schedules follow the Xpert server's timezone.
+5. Optionally enter additional instructions, for example, "Summarize yesterday's merged code changes and open issues." The assistant's role, skills, tools, and connectors are inherited automatically and do not need to be configured again.
+6. Review the configuration and save it.
+
+After saving, you can view the last run time in the automation list, and pause or enable the automation. Each provider supports only one trigger per assistant; to change it, edit the existing configuration.
+
+## Verify that everything works
+
+| Check | Action | Expected result |
+| --- | --- | --- |
+| Local terminal settings | Set the test directory in Settings and apply Shell settings | The settings are applied with no error message |
+| Approval flow | Request a local command | An approval card appears in the message, and the command does not run before approval |
+| Local execution | Check the test directory after approving | The file content matches what you expected, and the exit code is 0 |
+| Denial flow | Request another command and deny it | The command does not run, and the assistant stops this operation |
+| Automation | Create a schedule | The schedule appears in the automation list |
+
+## FAQ
+
+### Settings says Desktop Shell requires the native macOS app
+
+The local terminal is currently available only in the native macOS app. Install Bosi on a Mac and sign in.
+
+### The assistant does not request a local command
+
+Make sure an administrator has connected the **Desktop Shell** middleware to the assistant and published it again, the model supports tool calling, and your request explicitly asks for local execution.
+
+### It says Local Shell is disabled in permissions
+
+The execution permission is set to **Never allow**. Change the execution permission in **Settings → Local terminal**, apply it, and then make a new command request.
+
+### It says this computer is offline
+
+Bosi is not currently connected, and commands are not queued. Make sure Bosi is running and signed in, then request again. Do not let the assistant retry automatically.
+
+### It says the command permission expired or was revoked
+
+Approvals have a validity period, and applying Shell settings also revokes authorizations that have not run yet. Request the command again in the current conversation.
+
+### Commands cannot run after switching account or organization
+
+Switching account or organization stops the local terminal. Request permission again in the current conversation.
+
+### I cannot create an automation in the list
+
+Make sure the assistant is published and you have workspace edit access. Triggers other than Schedule require installing the matching provider plugin first.
+
+## Related documentation
+
+- [Bosi Desktop App User Guide](/en/ai/tutorial/bosi-desktop-user-guide)
+- [Discover & add](/en/ai/agent/conversation/discover-and-add)
+- [Sandbox Feature](/en/ai/agent/sandbox)
+- [Human-in-the-Loop Middleware](/en/ai/middleware/built-in/human-in-the-loop)
+- [Assistant Profile](/en/ai/agent/assistant-profile)
