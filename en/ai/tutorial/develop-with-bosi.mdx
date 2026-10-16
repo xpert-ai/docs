@@ -1,6 +1,6 @@
 ---
 title: Develop with Bosi
-description: Organize development work with projects in the Bosi desktop app, use the built-in local Shell to approve and run commands one at a time, connect to your own Xpert service, and configure automations.
+description: Organize development work with projects in the Bosi desktop app, use the built-in local Shell to approve and run commands one at a time, open coding tools on the cloud computer, connect to your own Xpert service, and configure automations.
 tags:
   - AI
   - Xpert
@@ -12,7 +12,7 @@ tags:
 
 In everyday development, you may want an assistant to keep working from a project's materials, inspect your local environment, run commands in a specific directory, generate files, or summarize project progress on a daily schedule. The Bosi desktop app brings these capabilities into one window. The assistant and its default sandbox still run on the Xpert server, and commands run on your computer only after you explicitly approve them.
 
-This tutorial covers two ways to develop with Bosi: organizing development materials and conversations with **projects**, and letting the assistant run commands on your computer through Bosi's built-in **local Shell**. It uses "have the assistant run commands in a local test directory and verify the result" as an example to walk through command approval, and also explains how to connect to your own Xpert service and configure automations.
+This tutorial covers three ways to develop with Bosi: organizing development materials and conversations with **projects**, letting the assistant run commands on your computer through Bosi's built-in **local Shell**, and opening coding command-line tools from **Coding tools** on the **cloud computer**. It uses "have the assistant run commands in a local test directory and verify the result" as an example to walk through command approval, and also explains how to connect to your own Xpert service and configure automations.
 
 ## What you will learn
 
@@ -21,20 +21,22 @@ This tutorial covers two ways to develop with Bosi: organizing development mater
 - Turn on the local Shell through "Create your Bosi", or use an assistant with Desktop Shell enabled.
 - Configure the local terminal and understand the three execution permissions.
 - Approve or deny local commands requested by an assistant in a conversation.
+- Open coding tools on the cloud computer, and understand what labels such as "Model compatible" mean.
 - Distinguish three execution locations: local commands, server sandbox commands, and the cloud computer.
 - Connect Bosi to a self-hosted or local development Xpert service.
 - Configure automations such as schedules for an assistant.
 
 If you have not installed Bosi yet, read the [Bosi Desktop App User Guide](/en/ai/tutorial/bosi-desktop-user-guide) first.
 
-## Two ways to develop
+## Three ways to develop
 
 | Approach | Suitable scenarios | Where it runs |
 | --- | --- | --- |
 | Develop with projects | Keep materials, tools, and conversations for one project together, so the assistant keeps moving the task forward from shared context | The Xpert server |
 | Develop with the built-in local Shell | Let the assistant inspect directories, run build or test commands, and write files on your computer | Your Mac; each command is approved according to the execution permission |
+| Develop with the cloud computer's coding tools | Open coding command-line tools such as Codex or Claude Code on the cloud computer, and work on code with this conversation's model | The cloud computer on the server |
 
-You can combine the two: work on the task in a project conversation, and have the assistant request local commands when it needs to work on your computer.
+You can combine these approaches: work on the task in a project conversation, have the assistant request local commands when it needs to work on your computer, and open coding command-line tools on the cloud computer when you need them.
 
 ## Before you begin
 
@@ -46,8 +48,9 @@ You can combine the two: work on the task in a project conversation, and have th
 | The native macOS app (when using the local Shell) | The local Shell is available only in the native macOS app. |
 | A model with tool calling (when using the local Shell) | The model your organization configured for the assistant supports tool calling. |
 | A test directory (when using the local Shell) | Prepare a directory where files can be written freely, for the first verification. |
+| The cloud computer (when using coding tools) | The connected server provides a cloud computer for the assistant, and you can open the **Computer** view in the assistant's Workbench. |
 
-The features and limits of projects and the local Shell may change between versions. Follow the on-screen messages of the version you use.
+The features and limits of projects, the local Shell, and the cloud computer may change between versions. Follow the on-screen messages of the version you use.
 
 ## Work with an assistant on development tasks
 
@@ -88,7 +91,7 @@ If the assistant bound to the project has Desktop Shell enabled, you can also re
 
 Bosi has a built-in "This computer Shell" (shown in Settings as **Local terminal**). After the assistant requests a command in a conversation, the command runs on your Mac, and its output and exit code are returned to the conversation.
 
-Bosi does not provide an interactive terminal window where you type commands yourself. Every command is initiated by the assistant, runs in a fresh non-interactive shell, and is approved according to the execution permission you set.
+The local Shell does not provide an interactive terminal window where you type commands yourself. Every command is initiated by the assistant, runs in a fresh non-interactive shell, and is approved according to the execution permission you set. To use coding command-line tools directly, use the coding tools on the cloud computer, described in Approach 3 below.
 
 ### Step 1: Turn on the local Shell for an assistant
 
@@ -200,9 +203,61 @@ One assistant can have several execution capabilities at the same time. When you
 | --- | --- | --- |
 | Your computer | This computer Shell (the Desktop Shell middleware + the Bosi local terminal) | Inspect or work with projects and files on your computer; requires your approval |
 | Server sandbox | The **Sandbox Shell** middleware | Run code and commands in an isolated server environment. See [Sandbox Feature](/en/ai/agent/sandbox). |
-| Cloud computer | Bosi’s computer or other cloud computer assistants | Let the assistant operate a server computer and its applications |
+| Cloud computer | Bosi’s computer or other cloud computer assistants | Let the assistant operate a server computer and its applications, or open coding tools on it |
 
 When verifying local execution, a result from the server sandbox does not count as local execution. Cloud computer tasks require a model with vision and tool calling. Whether your organization offers this capability depends on the server configuration.
+
+## Approach 3: Develop with the cloud computer's coding tools
+
+The cloud computer is a private Ubuntu desktop that the server provides for you, which you and your Agents can operate at the same time. **Coding tools** on the cloud computer panel lists the coding command-line tools (CLIs) that this conversation can use, such as Codex, OpenCode, Aider, Claude Code, Qwen Code, Kimi Code, and CodeBuddy. The tools actually listed depend on your organization's configuration.
+
+Unlike the local Shell, coding tools run on the cloud computer and use the current conversation assistant's model, and you can open them directly to work on code.
+
+### Connect to and operate the cloud computer
+
+1. Open the **Computer** view in the assistant's Workbench to go to the **Cloud computer** panel.
+2. Click **Connect to view**. After you connect, **People and Agents share this desktop** appears above the desktop, and a control bar appears at the bottom.
+3. To operate the desktop, click **Start interacting** in the control bar. The left side of the control bar shows **You can interact**.
+4. To only watch, click **View only**.
+
+An input session lasts up to 15 minutes and ends after 5 minutes without input. Disconnecting the view does not delete apps or files installed on the cloud computer.
+
+### Open a coding tool
+
+1. Click the terminal icon in the control bar to open **Coding tools**.
+2. The top of the panel shows the hint "Uses this conversation’s models. Runs continue when you release control.", along with the current assistant, model, and working directory.
+3. Find the tool you need in the list, check its labels, and click **Open**.
+
+**Open** can be clicked only after you have clicked **Start interacting** and only when the tool is available. When the tool is not available, the button shows the hint "No enabled compatible model in this conversation".
+
+If the current assistant does not have a conversation yet, the panel shows "Create a conversation with this Assistant to use coding tools. No chat message is needed." Click **Create conversation**.
+
+In a project conversation, the default working directory of coding tools is the project's file root, so code and files are shared with the other assistants in the project.
+
+### Understand the tool labels
+
+Each tool shows three labels:
+
+| Label | Meaning |
+| --- | --- |
+| Installed / Not installed / Version mismatch / Installation unknown | Whether the tool is installed on the cloud computer |
+| Model compatible | The current conversation's default model can be used with this tool |
+| Model incompatible | The current conversation's model cannot be used with this tool |
+| Managed tasks supported | The tool can run in the background as a managed task |
+| Interactive only | The tool can only be used interactively and does not support managed background tasks |
+
+Only tools labeled both **Installed** and **Model compatible** can be opened.
+
+Coding tools do not use a separate model. They use the current conversation's model, and that model must support the protocol the tool uses. When a tool is labeled **Model incompatible**, it cannot use this conversation's model and cannot be opened even if it is installed. For example, when Codex is labeled Model incompatible, running it in this conversation may return the error "requested model is not available for this execution". To use such a tool, select a model compatible with it for the assistant and try again.
+
+The model is provided by the platform for each conversation, so you do not need to configure your own model API key on the cloud computer.
+
+### Manage coding sessions
+
+After you open a tool, its coding session appears in the list at the bottom of the panel, with the tool name, status, assistant and model, and working directory. Statuses include Starting, Running, Stopping, Exited, and Status unknown. When there are no sessions yet, the list shows **No coding sessions**.
+
+- To end a session, click **Stop** next to it. Exited sessions no longer show a Stop button.
+- After you click **View only** to release control of the computer, coding tasks can keep running.
 
 ## Connect to your own Xpert service
 
@@ -251,6 +306,7 @@ After saving, you can view the last run time in the automation list, and pause o
 | Approval flow | Request a local command | An approval card appears in the message, and the command does not run before approval |
 | Local execution | Check the test directory after approving | The file content matches what you expected, and the exit code is 0 |
 | Denial flow | Request another command and deny it | The command does not run, and the assistant stops this operation |
+| Coding tools | On the cloud computer, click **Start interacting** and open a tool labeled Installed and Model compatible | The tool appears in the panel's coding session list with the status Starting or Running |
 | Automation | Create a schedule | The schedule appears in the automation list |
 
 ## FAQ
@@ -290,6 +346,14 @@ Approvals have a validity period, and applying Shell settings also revokes autho
 ### Commands cannot run after switching account or organization
 
 Switching account or organization stops the local terminal. Request permission again in the current conversation.
+
+### The coding tools icon does not appear on the cloud computer
+
+When the current conversation has no available coding tools, no coding sessions, and no message to show, the control bar does not show the coding tools icon. Ask your administrator to confirm that coding tools are configured for the cloud computer in your organization.
+
+### The Open button for a coding tool cannot be clicked
+
+Make sure you have clicked **Start interacting**, and that the tool is labeled both **Installed** and **Model compatible**. When it is labeled **Model incompatible**, the current conversation's model cannot be used with that tool; select a compatible model for the assistant.
 
 ### I cannot create an automation in the list
 
