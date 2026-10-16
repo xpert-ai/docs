@@ -259,6 +259,16 @@ After you open a tool, its coding session appears in the list at the bottom of t
 - To end a session, click **Stop** next to it. Exited sessions no longer show a Stop button.
 - After you click **View only** to release control of the computer, coding tasks can keep running.
 
+### Recommended instruction for coding assistants
+
+The cloud computer's default image includes the built-in cloud coding skill `/opt/xpert/skills/cloud-coding/SKILL.md`, which provides command-line-first guidance for tasks, approvals, recovery, and delivery. To have the assistant follow this workflow for development tasks, add the following to the instructions in the assistant's **Edit profile**, and then click **Save & publish**:
+
+```text
+When a task involves code development, modification, debugging, or testing, first use sandbox_shell to read /opt/xpert/skills/cloud-coding/SKILL.md, and then complete the task by following the workflow in it. When more details are needed, read the relevant files in references/ as that file instructs.
+```
+
+With this instruction, when the assistant handles code development, modification, debugging, or testing tasks, it first reads the cloud coding skill in the sandbox and then completes the task by following its workflow. This instruction relies on the `sandbox_shell` tool provided by the **Sandbox Shell** middleware. If you turned on **Bosi’s computer** when creating Bosi, Bosi's instructions already include guidance for the cloud coding skill, so you do not need to add it again.
+
 ## Connect to your own Xpert service
 
 For development or testing, you can connect Bosi to a self-hosted or locally running Xpert service:
