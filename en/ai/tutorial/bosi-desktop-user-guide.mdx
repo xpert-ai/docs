@@ -1,0 +1,231 @@
+---
+title: Bosi Desktop App User Guide
+description: Download and install the Xpert Bosi desktop app, connect to an Xpert service and sign in, then chat, manage assistants, adjust settings, and update the app.
+tags:
+  - AI
+  - Xpert
+  - Bosi
+  - Desktop
+---
+
+Bosi (full name Xpert Bosi) is the desktop app of the Xpert platform, positioned as "your AI team leader": you set the goal, Bosi leads the team. After you sign in with your Xpert account, you can find and add digital experts, apps, and agent templates, chat with assistants, and use the files, tools, and Workbench in a conversation, all from one desktop window.
+
+This tutorial takes you from download and installation through first sign-in to everyday use, and covers common settings, app updates, and frequently asked questions.
+
+## What you will learn
+
+- Choose and install the right Bosi installer for your computer.
+- Connect to the official Xpert service or a self-hosted Xpert service, and sign in.
+- Select an organization and an assistant, start chatting, and organize the assistant list in the sidebar.
+- Adjust language, appearance, and service connection in Settings, and view usage and points.
+- Update Bosi and troubleshoot common connection and sign-in issues.
+
+Bosi does not include the Xpert backend. It needs a network connection to an Xpert service. The experts, apps, and tools you can see depend on your organization's permissions and configuration.
+
+## Before you begin
+
+| Requirement | How to check |
+| --- | --- |
+| An Xpert account | You can sign in to Xpert with your email and password, and you have joined the intended organization. |
+| Service URLs (self-hosted only) | You have received the API service, Xpert web, and ChatKit URLs from your administrator. |
+| A published assistant | Your organization has at least one published assistant you can use, or you can add one from the catalog. |
+| A network connection | Your computer can reach the Xpert service. |
+
+If you use the official service, you do not need any service URLs. Bosi connects to the official service by default.
+
+## Step 1: Download and install Bosi
+
+Download an installer from either location:
+
+- [Bosi download page](https://xpertai.cn/zh-CN/download/)
+- [GitHub Releases](https://github.com/xpert-ai/xpert/releases): desktop app releases start with `desktop-v` and include all installers, archives, and the SHA-256 checksum file.
+
+Each platform has x64 and ARM64 installers. Choose the one that matches your computer's processor:
+
+| Platform | Installer format | How to check the processor | How to install |
+| --- | --- | --- | --- |
+| macOS | `.dmg` | In Apple menu → About This Mac, check the chip or processor. | Open the DMG and drag Bosi into Applications. |
+| Windows | `.exe` | In Settings → System → About, check the system type. | Run the EXE installer. |
+| Linux | `.AppImage` | Run `uname -m`: `x86_64` means x64, and `aarch64` means ARM64. | In the file properties, allow the AppImage to run as a program, then open it. |
+
+The signing and notarization status of each platform's installer is described in the release notes for that version. For an unsigned installer, you may need to confirm an operating-system security prompt when installing or opening it for the first time.
+
+## Step 2: Connect to an Xpert service
+
+Skip this step if you use the official service. By default, Bosi connects to these URLs:
+
+| Setting | Default |
+| --- | --- |
+| API service URL | `https://api.xpertai.cn/api/` |
+| Xpert web URL | `https://app.xpertai.cn/` |
+| ChatKit URL | `https://app.xpertai.cn/chatkit` |
+
+To connect to a self-hosted Xpert service:
+
+1. On the sign-in screen, click **Connection settings**.
+2. Enter the API service URL, Xpert web URL, and ChatKit URL provided by your administrator. The API URL can include `/api`; existing service root URLs also work.
+3. Wait for the page to check the URLs and certificates automatically, and make sure no errors are shown.
+4. Click **Save settings**, then click **Back to sign in**.
+
+When entering service URLs, note the following:
+
+- Service URLs require HTTPS. Only `localhost` addresses on your own computer may use HTTP. URLs cannot include credentials or query parameters.
+- If your organization uses a self-signed certificate or a private deployment you trust, you can turn on **Allow untrusted service certificates**. It is off by default and applies only to the configured API, web, and ChatKit hosts. When it is on, certificate identity is not verified for these hosts.
+- After you change a service URL or the certificate setting and save, Bosi reloads the connection and you need to sign in again.
+- If your organization provides a customized installer, the service URLs may already be configured. Connection settings you have already saved take precedence over the defaults of a new installer.
+
+## Step 3: Create an account and sign in
+
+1. If you do not have an Xpert account yet, click **Create account** on the sign-in screen. Bosi opens the registration page in your system browser. After you finish registration and verification, return to Bosi to sign in.
+2. **Sign in** with your Xpert email and password.
+3. After you sign in, Bosi loads your organizations and the published assistants you can use. Switch to the intended organization in the sidebar.
+4. Select an assistant in the sidebar to start chatting, or add experts, apps, and assistants from the catalog.
+
+Sign-in credentials are encrypted with the operating system's secure storage, so your session is restored the next time you open Bosi. Your password is never saved. On macOS, Bosi stores credentials in the Keychain, and a Keychain access prompt may appear at startup.
+
+## Step 4: Add an assistant and start chatting
+
+### Discover & add
+
+Click **+** in the sidebar to open **Discover & add**, where you can search for and add:
+
+- **Digital experts**: Use accessible experts immediately. For experts that require authorization, describe your use case and submit a request. You can use the expert after it is approved.
+- **Apps**: Use installed apps immediately. For apps that are not installed yet, review the installation requirements, select the required embedding or vision models, and then complete initialization. Click an app's name or view its details to browse the app's screenshots.
+- **Plugins**: View the plugins installed for your tenant or organization. Installed plugins can be selected directly from the conversation's **Plugins** menu.
+- **Agent templates**: Select a workspace you can edit, enter an assistant name, and complete initialization and publishing.
+
+After an item is added successfully, the sidebar refreshes and opens a conversation with that assistant. For details on each category, see [Discover & add](/en/ai/agent/conversation/discover-and-add).
+
+### Chat
+
+The right side of the window is the chat area, which embeds Xpert ChatKit. Messages, attachments, conversation history, tools, skills, connectors, and the Workbench are all used here. Which capabilities are available depends on the features of the connected Xpert service and your permissions.
+
+### Group chats
+
+From the **File → New group** menu, or with the `Cmd/Ctrl+Shift+G` shortcut, you can create a group and bring colleagues and digital experts into one conversation. When no member is mentioned in a group, the default assistant replies. You can invite more members after creating the group.
+
+## Step 5: Manage assistants in the sidebar
+
+### Context menu
+
+Right-click an assistant (including pinned cards and the collapsed avatar rail) to:
+
+- Pin or unpin it.
+- Move it to a personal section, or create a new section.
+- Mark it as read or unread.
+- Edit its profile or duplicate it.
+- Copy the conversation ID.
+
+These actions have different scopes:
+
+- Editing the personal profile and creating a duplicate affect only the list on this computer. They do not change the assistant on the server. A duplicate connects to the same assistant and shares its conversation history.
+- Pins, personal sections, and the sidebar layout are saved on this computer, separately for each service, account, and organization. They do not sync to other devices.
+- Reading a conversation or selecting **Mark as read** updates the read state on the platform. **Mark as unread** is only a local reminder.
+
+### Activity and unread reminders
+
+Bosi refreshes assistant activity about every 15 seconds, and also when the window regains focus. The list shows the latest conversation title for each assistant. On macOS, the Dock icon shows the total number of unread messages in the current organization. macOS must allow Bosi to display notifications and badges.
+
+### Resize the sidebar
+
+- Drag the sidebar divider to set a width between 240 and 520 pixels.
+- Drag past the minimum width to collapse the sidebar into an avatar rail.
+- Double-click the divider to restore the default width.
+
+### Assistant profile panel
+
+Hover over an assistant's avatar to open the assistant profile panel, which includes tabs such as **Activity**, **Channels**, **Automations**, and **About**. You can also focus the avatar and press `Alt+Down` to pin the panel open.
+
+- **Activity**: View recent conversations. Click one to open it.
+- **Channels**: Chat with the current assistant from the apps you already use. When the Feishu plugin is installed, you can use **Connect with QR code**. Whether other channels can be connected depends on whether the matching provider plugin is installed on the server.
+- **Automations**: Let the assistant start working automatically at a specific time, on a schedule, or when an event happens.
+- **About**: View the assistant's detailed description, publication information, and the number of published skills, tools, and sub-agents.
+
+Managing channels and automations requires a published assistant and workspace edit access. For details on the profile panel, see [Assistant Profile](/en/ai/agent/assistant-profile). For how to configure automations, see [Develop with Bosi](/en/ai/tutorial/develop-with-bosi).
+
+## Step 6: Adjust settings
+
+To open Settings:
+
+- Open the user menu in the sidebar and select **Settings**.
+- Use the `Cmd/Ctrl+,` shortcut.
+- On macOS, select **Settings** in the **Bosi** menu. On Windows and Linux, select **Settings** in the **File** menu.
+
+Settings contains the following pages. You can also use the search box at the top to find a setting:
+
+| Group | Page | What you can set |
+| --- | --- | --- |
+| Basic settings | General | Interface language (Simplified Chinese, Traditional Chinese, Japanese, English) and everyday display preferences |
+| Basic settings | Appearance | Desktop light/dark/follow-system mode, colors, font size, fonts, corner radius, and sidebar list spacing; chat colors, fonts, corner radius, density, and message display |
+| — | Usage & points | Current plan, point balances, 7-day and 30-day point trends, and deduction details |
+| Connections & capabilities | Service connection | API service, Xpert web, and ChatKit URLs, and Allow untrusted service certificates |
+| Connections & capabilities | Local terminal | Manage command execution on this computer. See [Develop with Bosi](/en/ai/tutorial/develop-with-bosi). |
+
+When you change settings:
+
+- Changes preview immediately. Click **Save settings** to save them, or **Cancel changes** to restore the saved values.
+- Click **Back to workspace** to return to the same assistant and conversation. If you have unsaved changes, Bosi asks whether to discard them.
+- Local terminal settings are applied separately on that page.
+- On first launch, the interface language follows your system language. After you sign in, the language set for your account on the platform takes priority.
+
+## Step 7: Update Bosi
+
+Installed stable builds support in-app updates:
+
+1. When a new version is available, a download icon appears in the account area at the bottom of the sidebar. Hover over it to show **Update**.
+2. Click it to start the download and view its progress.
+3. When the download is complete, choose **Install and restart** or **Later**. If you choose to install and restart, Bosi quits, installs the update, and reopens, so save your work first.
+
+You can also select **Check for updates…** in the menu to check manually. On macOS it is in the **Bosi** menu; on Windows and Linux it is in the **File** menu. If you see "Updates are not available in this build.", download the new installer from the download page and install it manually.
+
+## Verify that everything works
+
+| Check | Action | Expected result |
+| --- | --- | --- |
+| Installation | Open Bosi | The sign-in screen appears |
+| Service connection | Review the URL check results in Connection settings | No certificate or network errors are shown |
+| Sign-in | Sign in with your Xpert email and password | The sidebar shows your organizations and assistants |
+| Chat | Select an assistant and send a simple question | The chat area loads and you receive a reply |
+| Adding an assistant | Add an expert or app in Discover & add | The assistant appears in the sidebar and its conversation opens |
+
+## FAQ
+
+### The chat area is blank
+
+Usually the ChatKit URL is wrong, or the server has not deployed the matching ChatKit version. Check the ChatKit URL in **Settings → Service connection**, and ask your administrator to confirm that it points to a trusted Xpert ChatKit deployment.
+
+### I cannot connect to a self-hosted Xpert service
+
+First make sure the remote URL uses HTTPS. The **Service connection** page checks URLs automatically after you type them, and shows certificate problems separately from network problems (hostname not resolved, connection timed out, connection refused). If it is a self-signed certificate you trust, turn on **Allow untrusted service certificates**, save, and sign in again.
+
+### I was signed out after changing a service URL
+
+This is expected. Changing any service URL or the certificate setting clears your sign-in. Sign in again.
+
+### macOS asks for Keychain access every time I open Bosi
+
+Bosi stores your sign-in credentials in the Keychain. If you deny access, you need to sign in again; your connection and language settings are not affected.
+
+### I am still signed in after reinstalling
+
+Reinstalling can keep the user data directory and the session stored in it. To clear it, **Sign out** first.
+
+### Installing a template says no model is available
+
+Your organization needs an authorized primary language model, and you must have permission to use it. Ask an administrator to set a default primary model in Xpert and grant access, then refresh settings. App initialization may also require an embedding or vision model.
+
+### No assistants are available in the sidebar
+
+The current workspace has no published assistants you can use yet. Publish an assistant in Xpert and refresh, or add one from **Discover & add**.
+
+### The Dock icon does not show an unread count
+
+In macOS System Settings, allow Bosi to display notifications and badges.
+
+## Related documentation
+
+- [Develop with Bosi](/en/ai/tutorial/develop-with-bosi)
+- [Discover & add](/en/ai/agent/conversation/discover-and-add)
+- [Using Assistant templates](/en/ai/agent/conversation/assistant-templates)
+- [Assistant Profile](/en/ai/agent/assistant-profile)
+- [Chat Channels](/en/ai/agent/chat-channels)

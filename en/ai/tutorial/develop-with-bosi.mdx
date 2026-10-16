@@ -1,0 +1,379 @@
+---
+title: Develop with Bosi
+description: Organize development work with projects in the Bosi desktop app, use the built-in local Shell to approve and run commands one at a time, open coding tools on the cloud computer, connect to your own Xpert service, and configure automations.
+tags:
+  - AI
+  - Xpert
+  - Bosi
+  - Desktop
+  - Project
+  - Shell
+---
+
+In everyday development, you may want an assistant to keep working from a project's materials, inspect your local environment, run commands in a specific directory, generate files, or summarize project progress on a daily schedule. The Bosi desktop app brings these capabilities into one window. The assistant and its default sandbox still run on the Xpert server, and commands run on your computer only after you explicitly approve them.
+
+This tutorial covers three ways to develop with Bosi: organizing development materials and conversations with **projects**, letting the assistant run commands on your computer through Bosi's built-in **local Shell**, and opening coding command-line tools from **Coding tools** on the **cloud computer**. It uses "have the assistant run commands in a local test directory and verify the result" as an example to walk through command approval, and also explains how to connect to your own Xpert service and configure automations.
+
+## What you will learn
+
+- Work with assistants on development tasks in Bosi, and use plugins and delivered files.
+- Use projects in Bosi conversations and understand how project conversations are switched.
+- Turn on the local Shell through "Create your Bosi", or use an assistant with Desktop Shell enabled.
+- Configure the local terminal and understand the three execution permissions.
+- Approve or deny local commands requested by an assistant in a conversation.
+- Open coding tools on the cloud computer, and understand what labels such as "Model compatible" mean.
+- Distinguish three execution locations: local commands, server sandbox commands, and the cloud computer.
+- Connect Bosi to a self-hosted or local development Xpert service.
+- Configure automations such as schedules for an assistant.
+
+If you have not installed Bosi yet, read the [Bosi Desktop App User Guide](/en/ai/tutorial/bosi-desktop-user-guide) first.
+
+## Three ways to develop
+
+| Approach | Suitable scenarios | Where it runs |
+| --- | --- | --- |
+| Develop with projects | Keep materials, tools, and conversations for one project together, so the assistant keeps moving the task forward from shared context | The Xpert server |
+| Develop with the built-in local Shell | Let the assistant inspect directories, run build or test commands, and write files on your computer | Your Mac; each command is approved according to the execution permission |
+| Develop with the cloud computer's coding tools | Open coding command-line tools such as Codex or Claude Code on the cloud computer, and work on code with this conversation's model | The cloud computer on the server |
+
+You can combine these approaches: work on the task in a project conversation, have the assistant request local commands when it needs to work on your computer, and open coding command-line tools on the cloud computer when you need them.
+
+## Before you begin
+
+| Requirement | How to check |
+| --- | --- |
+| Bosi, signed in | You can select an organization and an assistant in Bosi and chat normally. |
+| Matching server versions | The versions of the Xpert server, Bosi, and ChatKit match each other. |
+| The projects feature (when using projects) | The connected Xpert service and ChatKit provide projects, and you can access the target project. |
+| The native macOS app (when using the local Shell) | The local Shell is available only in the native macOS app. |
+| A model with tool calling (when using the local Shell) | The model your organization configured for the assistant supports tool calling. |
+| A test directory (when using the local Shell) | Prepare a directory where files can be written freely, for the first verification. |
+| The cloud computer (when using coding tools) | The connected server provides a cloud computer for the assistant, and you can open the **Computer** view in the assistant's Workbench. |
+
+The features and limits of projects, the local Shell, and the cloud computer may change between versions. Follow the on-screen messages of the version you use.
+
+## Work with an assistant on development tasks
+
+After you select an assistant in Bosi, the chat area on the right provides messages, attachments, conversation history, tools, skills, connectors, and the Workbench. Common ways to handle development tasks include:
+
+- **Describe the goal and let the assistant break it down**: State the work to be done and how to verify it, for example, "Check the directory structure of the current project and explain how to run the tests."
+- **Upload attachments**: Send files that need analysis to the assistant as attachments.
+- **Select plugins**: In **Discover & add → Plugins**, you can view the plugins installed for your tenant or organization and the capabilities they include. Installed plugins can be selected directly from the conversation's **Plugins** menu; required connections are still configured and authorized through the existing flow.
+- **View delivered files**: After the assistant generates a file, click the delivery card in the conversation to preview the version saved at delivery and download it. Formats that cannot be previewed can be downloaded directly.
+
+If you have workspace edit access, you can change the model, capabilities, and instructions in the assistant's **Edit profile**. Changes take effect after you click **Save & publish**. These assistant settings affect everyone who uses this expert; the personal profile is saved only on this computer. For more complex orchestration, select **Edit workflow in Xpert Studio**.
+
+## Approach 1: Develop with projects
+
+Projects are a collaboration feature of the Xpert platform. A project brings digital experts, toolsets, file resources, and conversation history together, so the participating agents can complete tasks based on shared files and project-level instructions. For creating projects and managing their members, files, toolsets, and execution modes, see [Project](/en/ai/agent/conversation/projects).
+
+### Use projects in Bosi
+
+Bosi's chat area embeds Xpert ChatKit and enables the projects feature in the composer. You can therefore use projects directly in Bosi conversations without switching to the web app. The project-related buttons, menus, and confirmation steps are provided by ChatKit; their names and locations depend on the connected ChatKit version.
+
+When developing with a project, we recommend that you:
+
+1. Upload materials such as requirement documents and API descriptions as project files, so that all agents in the project can read them.
+2. Add the toolsets you need to the project, and set project-level instructions, such as coding conventions, directory conventions, and commit requirements.
+3. Describe the development goal in a project conversation, and let the assistant break down the task and move it forward step by step.
+4. When you need to inspect code or run commands on your computer, use the local Shell described below.
+
+### Open projects and switch conversations
+
+- When you open a project from the Workbench or a conversation, Bosi switches to that project's conversation and uses the assistant bound to the project.
+- When you open a past conversation that belongs to a project, Bosi continues it under that conversation's project and assistant.
+- Project access is checked by the server. Without access, opening the project fails, and Bosi keeps the current assistant; it does not open the project with a different assistant.
+- When you reopen a conversation, project actions in it that are still awaiting confirmation are kept, so you can continue handling them.
+
+If the assistant bound to the project has Desktop Shell enabled, you can also request local commands in project conversations, with the same approval flow as in ordinary conversations.
+
+## Approach 2: Develop with the built-in local Shell
+
+Bosi has a built-in "This computer Shell" (shown in Settings as **Local terminal**). After the assistant requests a command in a conversation, the command runs on your Mac, and its output and exit code are returned to the conversation.
+
+The local Shell does not provide an interactive terminal window where you type commands yourself. Every command is initiated by the assistant, runs in a fresh non-interactive shell, and is approved according to the execution permission you set. To use coding command-line tools directly, use the coding tools on the cloud computer, described in Approach 3 below.
+
+### Step 1: Turn on the local Shell for an assistant
+
+You can give an assistant local command capability in either of the following ways.
+
+**Turn it on through "Create your Bosi"**
+
+When the connected server supports it and you have not yet created a personal Bosi in the current organization, the main area shows **Create your Bosi** after you sign in:
+
+1. Read the introduction and click **Continue**.
+2. In **Make Bosi more helpful**, choose the capabilities you need and connect accounts, or click **Set up later**.
+3. In **Choose where Bosi can work**, turn on the capabilities you need:
+   - **Bosi’s computer**: Work with a server computer and its applications. It is on by default when the server provides this capability.
+   - **This computer Shell**: Run local commands with the existing command approvals. It can be turned on only in the native macOS app.
+4. Choose the assistant model. When Bosi’s computer is on, choose a compatible model with vision and tool calling.
+5. Click **Create Bosi**. If initialization is interrupted, click **Resume setup** to continue.
+
+Turning on This computer Shell does not relax the execution permission: the default is still to ask for every command. When a capability is unavailable, the reason is shown below its switch, for example that the capability is unavailable on this server.
+
+**Use an assistant with Desktop Shell enabled**
+
+For other assistants, an administrator needs to connect the **Desktop Shell** middleware to the assistant in Xpert Studio and publish it. When the assistant also needs to run commands on the server, keep the **Sandbox Shell** middleware connected.
+
+### Step 2: Configure the local terminal
+
+Open **Settings → Local terminal** to manage command execution on this computer:
+
+| Setting | Description |
+| --- | --- |
+| Execution permission | Ask for every command (default), Always allow in this organization, or Never allow. Takes effect as soon as you select it. |
+| Computer name | The computer name shown in approval cards and command results |
+| Shell | Choose zsh or bash |
+| Default working directory | The starting directory for commands. For the first verification, set it to your test directory. |
+| Command search path | The path used to find executables when running commands |
+
+After changing the computer name, Shell, default working directory, or command search path, click **Apply Shell settings**. These changes are applied separately in the local terminal and are not affected by **Save settings** at the bottom of the Settings page. Applying Shell settings disconnects the current connection and revokes any authorizations that have not run yet. The next command request reconnects with the new settings.
+
+The three execution permissions differ as follows:
+
+| Execution permission | Effect |
+| --- | --- |
+| Ask for every command | The default. An approval card appears in the message before each command, and one approval runs only that command. |
+| Always allow in this organization | Commands are no longer approved one by one; later commands run directly. |
+| Never allow | No approval card is shown and no local command runs. Commands that are running are stopped. |
+
+Execution permissions apply only to the current account, the current organization, and this computer. Unless you fully trust the assistants in this organization that may request local commands, keep **Ask for every command**.
+
+No manual connection or per-conversation authorization is needed: Bosi connects automatically when an assistant requests a local command. The local terminal page shows the current status, such as connects when needed, connecting, or connected.
+
+### Step 3: Request and approve a local command
+
+In a conversation with an assistant that has the local Shell turned on, send:
+
+```text
+Run commands on this computer: show the current operating system and current directory,
+then write a file named bosi-test.txt in the current directory with the content hello.
+When you finish, tell me the exit code of the command.
+```
+
+With the default **Ask for every command**:
+
+1. After the assistant requests a local command, an approval card appears in the message. It shows the command to run, the computer, the working directory, and an access notice.
+2. Review the command. The command does not run until you make a choice.
+3. On the card, choose to allow this one execution, or deny it. The permissions entry on the card opens the **Local execution permissions** window, which has the same content as the local terminal settings.
+4. After you approve, the command runs on your computer, and its output and exit code are returned to the assistant. The next command requires approval again.
+5. If you deny, the command does not run. The assistant should stop this operation and does not fall back to a server Shell to run it instead.
+
+When it finishes, open `bosi-test.txt` in the test directory and confirm that its content is what you expected. Rely on the actual file and exit code, not only on the assistant's text description.
+
+The conversation header can show the computers the assistant can use and their status. When you open the local computer from a conversation, Bosi also opens the **Local execution permissions** window.
+
+### View and stop commands
+
+In **Settings → Local terminal** or the **Local execution permissions** window, you can view recent commands, including the working directory, status (Pending, Running, Stopping, Succeeded, Failed, Cancelled, Timed out, Rejected, Unknown), and recent output. To interrupt a running command, click **Stop command**.
+
+The Unknown status means Bosi cannot confirm whether the command completed. Bosi does not run the command again; check the actual result yourself before deciding whether to request it again.
+
+### Understand how local commands run
+
+**Security boundaries**
+
+- Commands run with the permissions of the operating-system user you are signed in as. The working directory is only a starting directory, not an isolated sandbox, and it does not restrict file access.
+- Command output is sent to Xpert and stored on the server. Output may contain business data, so avoid running commands that print sensitive information.
+- Each command runs in a fresh, non-interactive shell that inherits only a small set of environment variables. It does not inherit platform account or device credentials.
+- There is no interactive terminal (PTY), interactive input, persistent Shell session, file synchronization, or local agent runtime. Commands that require interactive input cannot work properly.
+
+**Limits**
+
+| Item | Limit |
+| --- | --- |
+| Concurrent commands | Each computer runs only 1 command at a time; other requests are rejected. |
+| Computer offline | An offline result is returned immediately. Requests are not queued and do not fall back to the server sandbox. |
+| Synchronous wait | 10 seconds; after that, the assistant queries the status to get the final result. |
+| Command timeout | 60 seconds by default; at most 600 seconds per command. |
+| Output retained per command | 1 MiB; anything beyond that is discarded. |
+
+**When it stops**
+
+- After you close the macOS window, the app and the local terminal keep running.
+- Switching organizations, changing the service connection, signing out, or quitting the app stops the local terminal.
+- After the app restarts, the selected execution permission is kept, but temporary authorizations are not.
+- Expired approvals cannot run. Deny or stop that request, then make a new one.
+
+### Distinguish the three execution locations
+
+One assistant can have several execution capabilities at the same time. When you ask, state where you want the work to run, and check the execution location in the returned result.
+
+| Execution location | Provided by | Suitable tasks |
+| --- | --- | --- |
+| Your computer | This computer Shell (the Desktop Shell middleware + the Bosi local terminal) | Inspect or work with projects and files on your computer; requires your approval |
+| Server sandbox | The **Sandbox Shell** middleware | Run code and commands in an isolated server environment. See [Sandbox Feature](/en/ai/agent/sandbox). |
+| Cloud computer | Bosi’s computer or other cloud computer assistants | Let the assistant operate a server computer and its applications, or open coding tools on it |
+
+When verifying local execution, a result from the server sandbox does not count as local execution. Cloud computer tasks require a model with vision and tool calling. Whether your organization offers this capability depends on the server configuration.
+
+## Approach 3: Develop with the cloud computer's coding tools
+
+The cloud computer is a private Ubuntu desktop that the server provides for you, which you and your Agents can operate at the same time. **Coding tools** on the cloud computer panel lists the coding command-line tools (CLIs) that this conversation can use, such as Codex, OpenCode, Aider, Claude Code, Qwen Code, Kimi Code, and CodeBuddy. The tools actually listed depend on your organization's configuration.
+
+Unlike the local Shell, coding tools run on the cloud computer and use the current conversation assistant's model, and you can open them directly to work on code.
+
+### Connect to and operate the cloud computer
+
+1. Open the **Computer** view in the assistant's Workbench to go to the **Cloud computer** panel.
+2. Click **Connect to view**. After you connect, **People and Agents share this desktop** appears above the desktop, and a control bar appears at the bottom.
+3. To operate the desktop, click **Start interacting** in the control bar. The left side of the control bar shows **You can interact**.
+4. To only watch, click **View only**.
+
+An input session lasts up to 15 minutes and ends after 5 minutes without input. Disconnecting the view does not delete apps or files installed on the cloud computer.
+
+### Open a coding tool
+
+1. Click the terminal icon in the control bar to open **Coding tools**.
+2. The top of the panel shows the hint "Uses this conversation’s models. Runs continue when you release control.", along with the current assistant, model, and working directory.
+3. Find the tool you need in the list, check its labels, and click **Open**.
+
+**Open** can be clicked only after you have clicked **Start interacting** and only when the tool is available. When the tool is not available, the button shows the hint "No enabled compatible model in this conversation".
+
+If the current assistant does not have a conversation yet, the panel shows "Create a conversation with this Assistant to use coding tools. No chat message is needed." Click **Create conversation**.
+
+In a project conversation, the default working directory of coding tools is the project's file root, so code and files are shared with the other assistants in the project.
+
+### Understand the tool labels
+
+Each tool shows three labels:
+
+| Label | Meaning |
+| --- | --- |
+| Installed / Not installed / Version mismatch / Installation unknown | Whether the tool is installed on the cloud computer |
+| Model compatible | The current conversation's default model can be used with this tool |
+| Model incompatible | The current conversation's model cannot be used with this tool |
+| Managed tasks supported | The tool can run in the background as a managed task |
+| Interactive only | The tool can only be used interactively and does not support managed background tasks |
+
+Only tools labeled both **Installed** and **Model compatible** can be opened.
+
+Coding tools do not use a separate model. They use the current conversation's model, and that model must support the protocol the tool uses. When a tool is labeled **Model incompatible**, it cannot use this conversation's model and cannot be opened even if it is installed. For example, when Codex is labeled Model incompatible, running it in this conversation may return the error "requested model is not available for this execution". To use such a tool, select a model compatible with it for the assistant and try again.
+
+The model is provided by the platform for each conversation, so you do not need to configure your own model API key on the cloud computer.
+
+### Manage coding sessions
+
+After you open a tool, its coding session appears in the list at the bottom of the panel, with the tool name, status, assistant and model, and working directory. Statuses include Starting, Running, Stopping, Exited, and Status unknown. When there are no sessions yet, the list shows **No coding sessions**.
+
+- To end a session, click **Stop** next to it. Exited sessions no longer show a Stop button.
+- After you click **View only** to release control of the computer, coding tasks can keep running.
+
+### Recommended instruction for coding assistants
+
+The cloud computer's default image includes the built-in cloud coding skill `/opt/xpert/skills/cloud-coding/SKILL.md`, which provides command-line-first guidance for tasks, approvals, recovery, and delivery. To have the assistant follow this workflow for development tasks, add the following to the instructions in the assistant's **Edit profile**, and then click **Save & publish**:
+
+```text
+When a task involves code development, modification, debugging, or testing, first use sandbox_shell to read /opt/xpert/skills/cloud-coding/SKILL.md, and then complete the task by following the workflow in it. When more details are needed, read the relevant files in references/ as that file instructs.
+```
+
+With this instruction, when the assistant handles code development, modification, debugging, or testing tasks, it first reads the cloud coding skill in the sandbox and then completes the task by following its workflow. This instruction relies on the `sandbox_shell` tool provided by the **Sandbox Shell** middleware. If you turned on **Bosi’s computer** when creating Bosi, Bosi's instructions already include guidance for the cloud coding skill, so you do not need to add it again.
+
+## Connect to your own Xpert service
+
+For development or testing, you can connect Bosi to a self-hosted or locally running Xpert service:
+
+1. Click **Connection settings** on the sign-in screen, or open **Settings → Service connection** after you sign in.
+2. Enter the API service URL, Xpert web URL, and ChatKit URL. Remote services require HTTPS; `localhost` addresses on your own computer may use HTTP.
+3. Wait for the page to check the URLs and certificates. For a self-signed certificate you trust, turn on **Allow untrusted service certificates**. This setting also applies to the local terminal's connection to the configured API service.
+4. Save the settings and sign in again.
+
+Notes for deployers:
+
+- The local terminal establishes a WebSocket connection through the API service's Socket.IO endpoint (`/socket.io/`). The reverse proxy must allow WebSocket upgrades.
+- Your computer does not open any listening port; Bosi initiates the connection.
+- When upgrading, deploy matching versions of the server, Bosi, and ChatKit together. Updating only Bosi does not give an older ChatKit new capabilities.
+
+## Configure automations
+
+Automations let an assistant start working at a specific time, on a schedule, or when an event happens, reusing the assistant's published instructions, skills, tools, and connectors. Managing automations requires a published assistant and workspace edit access.
+
+1. Hover over the assistant's avatar in the sidebar to open the assistant profile panel, and switch to **Automations**.
+2. Create a new automation.
+3. Choose a trigger:
+
+   | Trigger | When it runs |
+   | --- | --- |
+   | Schedule | At a specific time or on a schedule |
+   | App event | When something happens in an app |
+   | Webhook | When an HTTP request is received |
+   | Email | When a new email is received |
+
+   Triggers other than Schedule require installing a provider plugin of that type in Xpert first.
+
+4. Set the conditions and scope. For a schedule, choose Every hour, Every day, Every weekday, or Every week, or use Custom schedule and enter a cron expression (minute, hour, day of month, month, day of week). Schedules follow the Xpert server's timezone.
+5. Optionally enter additional instructions, for example, "Summarize yesterday's merged code changes and open issues." The assistant's role, skills, tools, and connectors are inherited automatically and do not need to be configured again.
+6. Review the configuration and save it.
+
+After saving, you can view the last run time in the automation list, and pause or enable the automation. Each provider supports only one trigger per assistant; to change it, edit the existing configuration.
+
+## Verify that everything works
+
+| Check | Action | Expected result |
+| --- | --- | --- |
+| Project conversation | Open a project you can access in Bosi | The conversation switches to that project and uses the assistant bound to it |
+| Local terminal settings | Set the test directory in Settings and apply Shell settings | The settings are applied with no error message |
+| Approval flow | Request a local command | An approval card appears in the message, and the command does not run before approval |
+| Local execution | Check the test directory after approving | The file content matches what you expected, and the exit code is 0 |
+| Denial flow | Request another command and deny it | The command does not run, and the assistant stops this operation |
+| Coding tools | On the cloud computer, click **Start interacting** and open a tool labeled Installed and Model compatible | The tool appears in the panel's coding session list with the status Starting or Running |
+| Automation | Create a schedule | The schedule appears in the automation list |
+
+## FAQ
+
+### I cannot find the project entry in a Bosi conversation
+
+The project-related interface is provided by the connected ChatKit. Ask your administrator to confirm that the Xpert server and ChatKit are deployed in matching versions that support projects.
+
+### Opening a project says I do not have access
+
+Project access is checked by the server. Ask a project member or an administrator to grant you access. Without access, Bosi keeps the current assistant.
+
+### I do not see "Create your Bosi"
+
+This flow appears only when the server supports it and you do not have a personal Bosi in the current organization yet. If it says "Update the Xpert server to initialize Bosi.", the Xpert server needs to be updated. You can also use an assistant with Desktop Shell enabled instead.
+
+### Settings says Desktop Shell requires the native macOS app
+
+The local Shell is currently available only in the native macOS app. Install Bosi on a Mac and sign in.
+
+### The assistant does not request a local command
+
+Make sure the assistant has This computer Shell turned on, or an administrator has connected the **Desktop Shell** middleware to the assistant and published it again. Also make sure the model supports tool calling and your request explicitly asks for local execution.
+
+### It says Local Shell is disabled in permissions
+
+The execution permission is set to **Never allow**. Change the execution permission in **Settings → Local terminal**, and then make a new command request.
+
+### It says this computer is offline
+
+Bosi is not currently connected, and commands are not queued. Make sure Bosi is running and signed in, then request again. Do not let the assistant retry automatically.
+
+### It says the command permission expired or was revoked
+
+Approvals have a validity period, and applying Shell settings also revokes authorizations that have not run yet. Request the command again in the current conversation.
+
+### Commands cannot run after switching account or organization
+
+Switching account or organization stops the local terminal. Request permission again in the current conversation.
+
+### The coding tools icon does not appear on the cloud computer
+
+When the current conversation has no available coding tools, no coding sessions, and no message to show, the control bar does not show the coding tools icon. Ask your administrator to confirm that coding tools are configured for the cloud computer in your organization.
+
+### The Open button for a coding tool cannot be clicked
+
+Make sure you have clicked **Start interacting**, and that the tool is labeled both **Installed** and **Model compatible**. When it is labeled **Model incompatible**, the current conversation's model cannot be used with that tool; select a compatible model for the assistant.
+
+### I cannot create an automation in the list
+
+Make sure the assistant is published and you have workspace edit access. Triggers other than Schedule require installing the matching provider plugin first.
+
+## Related documentation
+
+- [Bosi Desktop App User Guide](/en/ai/tutorial/bosi-desktop-user-guide)
+- [Project](/en/ai/agent/conversation/projects)
+- [Discover & add](/en/ai/agent/conversation/discover-and-add)
+- [Sandbox Feature](/en/ai/agent/sandbox)
+- [Human-in-the-Loop Middleware](/en/ai/middleware/built-in/human-in-the-loop)
+- [Assistant Profile](/en/ai/agent/assistant-profile)
