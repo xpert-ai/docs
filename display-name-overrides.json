@@ -57,7 +57,9 @@
     "plugin-apps": "Plugin App Integration",
     "bosi": "Bosi App",
     "daily-work": "Daily Work",
-    "desktop-guide": "Settings & Help"
+    "desktop-guide": "Settings & Help",
+    "applications": "Plugin Apps",
+    "app-guide": "App Guide"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -143,6 +145,8 @@
     "plugin-apps": "插件应用集成",
     "bosi": "Bosi App",
     "daily-work": "日常工作",
-    "desktop-guide": "设置与帮助"
+    "desktop-guide": "设置与帮助",
+    "applications": "插件应用",
+    "app-guide": "应用使用指南"
   }
 }

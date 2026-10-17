@@ -160,6 +160,29 @@
                 ]
               },
               {
+                "tab": "Plugin Apps",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/applications/index",
+                      "en/ai/applications/quickstart",
+                      "en/ai/applications/catalog"
+                    ]
+                  },
+                  {
+                    "group": "App Guide",
+                    "pages": [
+                      "en/ai/applications/app-guide/discovery-and-setup",
+                      "en/ai/applications/app-guide/workbench-and-delivery",
+                      "en/ai/applications/app-guide/projects-and-tasks",
+                      "en/ai/applications/app-guide/access-and-updates",
+                      "en/ai/applications/app-guide/troubleshooting"
+                    ]
+                  }
+                ]
+              },
+              {
                 "tab": "Agent",
                 "groups": [
                   {
@@ -1050,6 +1073,29 @@
                     "pages": [
                       "zh-Hans/ai/bosi/desktop-guide/personalization-and-settings",
                       "zh-Hans/ai/bosi/desktop-guide/troubleshooting"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "插件应用",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/applications/index",
+                      "zh-Hans/ai/applications/quickstart",
+                      "zh-Hans/ai/applications/catalog"
+                    ]
+                  },
+                  {
+                    "group": "应用使用指南",
+                    "pages": [
+                      "zh-Hans/ai/applications/app-guide/discovery-and-setup",
+                      "zh-Hans/ai/applications/app-guide/workbench-and-delivery",
+                      "zh-Hans/ai/applications/app-guide/projects-and-tasks",
+                      "zh-Hans/ai/applications/app-guide/access-and-updates",
+                      "zh-Hans/ai/applications/app-guide/troubleshooting"
                     ]
                   }
                 ]

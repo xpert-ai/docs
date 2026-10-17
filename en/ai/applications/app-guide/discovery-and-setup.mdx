@@ -1,0 +1,49 @@
+---
+title: "Discover and enable apps"
+description: "Inspect app composition, prepare models and tools, and initialize the app in the correct organization."
+---
+
+In Bosi, open **Discover and add → Apps** to find applications available in the current scope. Before enabling one, read its details to understand its purpose, prerequisites and entry point.
+
+## Read the app details
+
+Descriptions and screenshots explain the business experience. The app composition lists its declared entry Assistant, collaborating or standalone roles, workspace and knowledge resources. Apps with several roles can organize specialized work according to their configuration.
+
+The initialization checks identify missing prerequisites. Confirm the organization and permissions first, then address model, tool provider and configuration requirements. If an app is absent, ask an administrator to check whether its plugin is installed, actually loaded and available in the current scope.
+
+## Prepare models and tools
+
+| Prerequisite | Action |
+| --- | --- |
+| Primary model | Ensure the organization has a model configuration the app can use |
+| Embedding, vision or speech recognition model | When required, select a model suited to the purpose in the wizard |
+| Required toolsets | Select an available configuration for each requirement, or use Add configuration to authorize and configure one |
+| External accounts and data | Complete the service's authorization process and verify access to the relevant business data |
+
+Each app declares its requirements; not every app needs all these options. Installing a tool provider plugin still requires a configured tool instance that can actually be called.
+
+When adding a tool configuration through the wizard, the platform first prepares the app's dedicated workspace and saves the configuration for activation. If you select a source configuration from another workspace, activation creates an independent copy for the app. Later source changes do not update that copy, and source environment variables or other resources are not copied with it.
+
+## Initialize in the current organization
+
+1. Confirm the organization and the prerequisites shown in the app details.
+2. Complete the required model and tool settings and review the resources the app will create.
+3. Submit initialization and wait while the platform creates or reuses the dedicated workspace, knowledge resources and Assistants.
+4. When ready, open the app's published entry Assistant.
+5. Grant other employees access, then complete any app-specific business setup and a first task.
+
+Current initialization creates a private workspace within the organization, maintained by the initializer. It does not automatically add all employees to the workspace or grant them Assistant access. See [Access and app maintenance](./access-and-updates).
+
+## Understand configuration and readiness
+
+| State | Meaning and next step |
+| --- | --- |
+| Not enabled | Complete the prerequisites and initialize |
+| Configuring | Configuration resources have been prepared; finish setup and enable the app |
+| Initializing | Resources are being prepared; wait and refresh the status |
+| Ready | Resource initialization is complete; authorized users can enter the app |
+| Failed or needing repair | Inspect the cause, address it and retry or repair through the same app entry |
+
+Repeated initialization in the same organization reuses the app's installation record and valid resources. Closing the wizard keeps saved tool configurations so you can continue later. Simply viewing details or opening the wizard creates no resources.
+
+For an app that has not been enabled and meets cleanup conditions, an administrator can use **Discard configuration** to remove the prepared workspace and toolsets. This does not apply to enabled apps, initialization in progress or workspaces containing additional resources. If setup fails, inspect the cause and continue from the existing configuration. See [Troubleshooting](./troubleshooting).

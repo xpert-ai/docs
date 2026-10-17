@@ -51,6 +51,29 @@
           ]
         },
         {
+          "slug": "applications",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "quickstart",
+                "catalog"
+              ]
+            },
+            {
+              "slug": "app-guide",
+              "pages": [
+                "discovery-and-setup",
+                "workbench-and-delivery",
+                "projects-and-tasks",
+                "access-and-updates",
+                "troubleshooting"
+              ]
+            }
+          ]
+        },
+        {
           "slug": "digital-expert",
           "groups": []
         },

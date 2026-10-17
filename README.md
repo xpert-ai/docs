@@ -166,6 +166,68 @@ previews, queued work is not completion, and ending a voice call or desktop take
 does not cancel accepted background work. Feature documentation and source checks
 do not establish availability in a particular installed release or live environment.
 
+## Plugin Apps product documentation
+
+AI → **Plugin Apps / 插件应用** is a standalone product tab immediately after
+Bosi App, mirrored in English and Simplified Chinese. Its routes use
+`{language}/ai/applications/`; the existing `projects/plugin-apps/` group remains
+the project integration topic, and `ai/plugin/` remains the developer reference.
+
+| Route suffix | Product topic |
+| --- | --- |
+| `index` | App positioning, business value and relationship to Bosi, plugins and templates |
+| `quickstart` | A first business task, from inputs through review and delivery |
+| `catalog` | Official application documentation directory and related product sections |
+| `app-guide/discovery-and-setup` | Discovery, model and tool prerequisites, setup and initialization |
+| `app-guide/workbench-and-delivery` | Chat, business views, result inspection and delivery |
+| `app-guide/projects-and-tasks` | Project context, business-owned tasks and shared views |
+| `app-guide/access-and-updates` | Usage authorization, maintenance, repair and upgrades |
+| `app-guide/troubleshooting` | Discovery, configuration, access, execution and result problems |
+
+### Adding an official application
+
+Add one directory per product at `{language}/ai/applications/{app-slug}/`, using a
+stable product slug and matching English and Chinese paths. Each application gets
+its own navigation group after the shared guide. Begin with `index.mdx` and
+`quickstart.mdx`, then add workflow, delivery, configuration or troubleshooting
+pages as the product needs. Do not publish empty product groups or invented app
+entries to reserve future navigation.
+
+The product introduction should identify intended users, the problem, inputs,
+outputs and supported scope. The quickstart should show a real first result with
+concrete inputs and review criteria. Use actual UI labels and verified screenshots;
+describe app-specific project types, task states, confirmation steps, exports and
+failure recovery where implemented. Link shared initialization, authorization and
+project concepts to these common guides rather than duplicating their contracts.
+
+Add the product and quickstart links to `catalog.mdx` in both languages when the
+manual is ready. The catalog currently has no app-specific manuals; related Bosi,
+Ontology apps and Live Dashboard links are not claims that those products are new
+official app entries. Keep documentation coverage separate from deployment availability.
+
+Update `navigation-order-tree.json`, `display-name-overrides.json` and `docs.json`
+together. Preview the navigation generator and apply only the affected tab, preserving
+other curated navigation and redirects. Validate bilingual path parity, local links,
+navigation tests and the Mintlify build. The AI overview, Bosi app guide, discovery,
+plugin overview and project integration pages link to this product section.
+
+Research on 2026-10-18 used the local Xpert checkout, in particular:
+
+- `packages/server-ai/src/plugin-resource/plugin-application.service.ts`,
+  `plugin-application.controller.ts` and `plugin-application-composition.ts`.
+- `docs/zh-Hans/guides/application-toolsets.mdx` and `project-application-types.mdx`.
+- `apps/desktop/src/CatalogDialog.tsx`, `apps/desktop/src/catalog/` and
+  `apps/cloud/src/app/features/explore/app-detail/`.
+- Existing product references for application configuration, Assistant authorization,
+  ChatKit project selection, Artifacts and plugin project/task integration.
+
+Document organization-scoped initialization, private authoring workspaces and user
+group runtime grants separately. Tool provider installation, saved tool configuration,
+resource readiness, business execution and acceptance are different states. Repair
+does not upgrade existing templates or migrate business data. Project tasks, views,
+exports and multi-role behavior depend on each app. Source inspection does not verify
+availability in a deployed environment.
+
 ## Projects & Tasks product documentation
 
 AI → Projects & Tasks (项目与任务) is a separate tab immediately after Agent.

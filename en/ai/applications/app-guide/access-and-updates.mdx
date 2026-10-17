@@ -1,0 +1,52 @@
+---
+title: "Access and app maintenance"
+description: "Assign app usage and maintenance responsibilities, manage data access, and distinguish plugin updates, repair and Assistant upgrades."
+---
+
+After enabling an organization app, establish who can use it, who maintains it and which business data they can access. Daily users generally enter through the published Assistant. Maintainers manage the workspace configuration and resources.
+
+## Assign usage and maintenance responsibilities
+
+| Responsibility | Main work |
+| --- | --- |
+| Platform or organization administrator | Install capabilities according to plugin requirements, prepare models and connections, and perform authorized initialization |
+| App maintainer | Maintain the app workspace, Assistant configuration and supporting resources |
+| Business user | Use an authorized Assistant to process accessible business objects |
+| Business reviewer | Inspect results and complete confirmation steps under the app's rules |
+
+These describe responsibilities. Actual actions still follow platform roles, workspace membership and the app's own permission checks.
+
+Current initialization creates a dedicated private workspace and makes the initializer its owner. To grant employee access, an administrator with the appropriate permissions:
+
+1. Switches to the app's organization.
+2. Selects or creates a user group in **Settings → User groups** and adds employees.
+3. Grants the group permission to use the app's published Assistant.
+4. Asks employees to refresh the entry and try a business operation within their access scope.
+
+The workspace owner separately adds people who need to edit Assistants or workspace resources. See [Assistant and application authorization](/en/ai/system/permissions/assistant-application-authorization) for authorization paths and revocation rules.
+
+## Business data retains separate authorization
+
+Access to the entry Assistant grants that usage path. Project membership, application business objects, knowledge bases, files and external services still apply their own access rules.
+
+When troubleshooting, confirm the service, account, organization and target object first, then check the relevant resource permissions. For collaborating roles, ensure the resources actually used by the app are configured. Data-scope descriptions explain intended use; services enforce access.
+
+## Distinguish maintenance and upgrade actions
+
+| Action | Effect |
+| --- | --- |
+| Update a plugin package | Update the loaded implementation and available template resources |
+| Initialize or repair an app | Create or restore missing managed organization resources, reusing valid resources |
+| Upgrade an Assistant template | Follow the applicable template upgrade workflow, review differences, handle local changes and publish |
+| Change tool configuration | Affect subsequent calls using that configuration; maintain app copies separately |
+| Migrate business data | Apply the app's migration instructions to existing business records |
+
+A successful plugin refresh does not show that existing Assistants use the new template. A ready app does not establish that a data migration is complete. Follow the app's release instructions for each action and verify the outcome through actual business work.
+
+See [Assistant templates](/en/ai/agent/conversation/assistant-templates) for instance upgrades. Developers and deployment maintainers can also read [Application initialization configuration](/en/ai/plugin/application-config).
+
+## Preserve existing configuration and data
+
+Repeated initialization or repair preserves the membership and visibility settings of a workspace that still exists. Owners must explicitly adjust sharing for older apps; a host upgrade does not automatically change existing maintenance access.
+
+Disabling a plugin, revoking employee access and deleting business data are separate operations. The app defines its archive, migration and cleanup workflows. Discard configuration applies only to eligible setup resources for apps that have not been enabled. Before cleanup, use the app's instructions to identify the affected objects and consequences.

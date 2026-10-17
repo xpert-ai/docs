@@ -1,0 +1,44 @@
+---
+title: "Workbench and delivery"
+description: "Assign business work through chat, inspect and edit results in Workbench, and follow the app's review and delivery process."
+---
+
+Plugin apps connect conversations with business interfaces. The Assistant interprets goals, calls configured capabilities and explains progress. Business Workbench provides actionable records, forms, editors or result views. The interface depends on the app.
+
+## Use chat and Workbench together
+
+| Stage | In chat | In the business interface |
+| --- | --- | --- |
+| Define the task | Explain the goal, scope and constraints | Select the business object, project and materials |
+| Execute work | Supply missing information and follow progress | Inspect structured content, stage states or task records |
+| Revise results | Identify the location and reason for changes | Use the app's editing, retry or review actions |
+| Confirm delivery | Clarify what should happen next | Save, confirm, export or submit supported results |
+
+Open Workbench through the app's business entry. Some views open from resource cards returned by the Assistant; apps integrated with ChatKit may also expose views through the Workbench add menu. Available views depend on the implementation, current context and user permissions.
+
+## Keep work on the same business object
+
+Confirm the current project and business object before starting. Keep subsequent conversations, file selections and view actions within that scope so materials or results from another project are not used as this task's inputs.
+
+An app may define stages such as awaiting materials, pending review or confirmed. Use its saved business state and actual records as evidence. Progress messages explain the process; the app defines the final completion conditions.
+
+Apps with several Assistants can assign specialized steps to different roles. A successful execution by one role may still leave other steps or human confirmation pending. For apps with shared task views, see [Projects and task collaboration](./projects-and-tasks).
+
+## Check where results are saved
+
+| Result form | How to inspect it |
+| --- | --- |
+| Business record | Reopen the object through the app and check its saved content and state |
+| Working file | Use the current project or app file entry and confirm whether it remains a working draft |
+| Formal file or Artifact | Open its delivery entry and inspect the version, content and available download or preview actions |
+| Action result | Check the record, state or receipt actually returned by the business system |
+
+Each app determines when versions are saved, which formats are supported and whether approval is required. When a message supplies a filename, path or summary, open the actual result to verify it. See [Project files and deliverables](/en/ai/projects/setup/files-and-deliverables) for the distinction between working files and formal deliverables.
+
+## Review and continue execution
+
+Check that the result matches the requested scope, has adequate evidence and has any required business approval. Use the app's editing and retry entry points to preserve business records and state relationships.
+
+For writes to external systems or other actions requiring confirmation, follow the app's confirmation steps. Before handing results to colleagues, check their app, project and file access. Sending a link does not grant additional permissions.
+
+See [Artifacts](/en/ai/agent/artifacts/index) for shared storage and version concepts, and [ChatKit](/en/ai/chatkit/index) for the conversation and Workbench experience.

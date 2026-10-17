@@ -5,6 +5,8 @@ title: Overview
 
 Xpert supports both file-based **Agent Plugins** and native **Xpert Plugins**. This page describes the native server extension model. For package selection and the relationships between apps and templates, see [Plugins, apps, and Assistant templates](/en/ai/plugin/extension-model).
 
+For app product introductions, setup workflows and the official app directory, see the standalone [Plugin Apps](/en/ai/applications/index) section.
+
 ### Goals of the Plugin System
 
 The Xpert AI plugin system aims to provide developers with an **extensible, reusable, and loosely coupled** extension mechanism, enabling business features to be integrated into the system in a modular way. Through plugin-based design, we can:
