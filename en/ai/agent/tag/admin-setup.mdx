@@ -12,7 +12,7 @@ Today, setup is done by combining system integrations, plugin triggers, and digi
 ## Setup Flow
 
 1. Install the communication plugin at tenant level.
-2. Create a [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), or [WeCom](../plugin/integration/wecom-integration) system integration.
+2. Create a [Lark](../../plugin/integration/lark-integration), [DingTalk](../../plugin/integration/dingtalk-integration), or [WeCom](../../plugin/integration/wecom-integration) system integration.
 3. Add the matching Trigger to the target digital expert workflow.
 4. Select the integration and configure session timeout, message aggregation, group scope, or DM scope.
 5. Connect downstream Agent, knowledge, toolset, skill, and business-process nodes.
@@ -25,15 +25,15 @@ The future Tag admin console should compress steps 2 through 6 into “create Ta
 
 | Platform | Current integration path | Key configuration | Related docs |
 | --- | --- | --- | --- |
-| [Lark / Feishu](../plugin/integration/lark-integration) | Custom app bot with webhook or long connection. Long connection is recommended. | `App ID`, `App Secret`, event subscription, bot permissions, availability scope. | [Lark integration](../plugin/integration/lark-integration), [Lark Trigger](../plugin/trigger/lark-trigger) |
-| [DingTalk](../plugin/integration/dingtalk-integration) | Internal app bot with Stream or HTTP. Stream is recommended. | `Client ID/AppKey`, `Client Secret`, `Robot Code`, Stream or callback configuration. | [DingTalk integration](../plugin/integration/dingtalk-integration), [DingTalk Trigger](../plugin/trigger/dingtalk-trigger) |
-| [WeCom](../plugin/integration/wecom-integration) | Short callback or long-connection AI bot. Long connection is recommended. | `Token/EncodingAESKey` or `Bot ID/Secret`. | [WeCom integration](../plugin/integration/wecom-integration), [WeCom Trigger](../plugin/trigger/wecom-trigger) |
+| [Lark / Feishu](../../plugin/integration/lark-integration) | Custom app bot with webhook or long connection. Long connection is recommended. | `App ID`, `App Secret`, event subscription, bot permissions, availability scope. | [Lark integration](../../plugin/integration/lark-integration), [Lark Trigger](../../plugin/trigger/lark-trigger) |
+| [DingTalk](../../plugin/integration/dingtalk-integration) | Internal app bot with Stream or HTTP. Stream is recommended. | `Client ID/AppKey`, `Client Secret`, `Robot Code`, Stream or callback configuration. | [DingTalk integration](../../plugin/integration/dingtalk-integration), [DingTalk Trigger](../../plugin/trigger/dingtalk-trigger) |
+| [WeCom](../../plugin/integration/wecom-integration) | Short callback or long-connection AI bot. Long connection is recommended. | `Token/EncodingAESKey` or `Bot ID/Secret`. | [WeCom integration](../../plugin/integration/wecom-integration), [WeCom Trigger](../../plugin/trigger/wecom-trigger) |
 
 ## Bind Digital Experts
 
 Current triggers use an explicit binding model:
 
-- [Lark](../plugin/trigger/lark-trigger), [DingTalk](../plugin/trigger/dingtalk-trigger), and [WeCom](../plugin/trigger/wecom-trigger) triggers bind one `integrationId` to one `xpertId`.
+- [Lark](../../plugin/trigger/lark-trigger), [DingTalk](../../plugin/trigger/dingtalk-trigger), and [WeCom](../../plugin/trigger/wecom-trigger) triggers bind one `integrationId` to one `xpertId`.
 - A single IM integration usually binds to one digital expert at a time, preventing one bot message from triggering multiple experts.
 - Conversation bindings take priority over trigger bindings, so an active conversation continues with the same expert until timeout.
 - Users can end or reset conversations through supported card actions or `/new`-style commands, depending on the plugin.

@@ -38,7 +38,7 @@ Xpert Tag 的默认记忆策略应更保守：
 - 群管理员可以删除、锁定或修正群记忆。
 - 所有记忆变更都要进入审计。
 
-以上均为 `未实现（规划）`。当前可复用 [长期记忆](../agent/long-term-memory) 和 [文件记忆](../agent/file-memory-dreaming) 的基础能力，但它们还不是群级 Tag memory store。
+以上均为 `未实现（规划）`。当前可复用 [长期记忆](../long-term-memory) 和 [文件记忆](../file-memory-dreaming) 的基础能力，但它们还不是群级 Tag memory store。
 
 ## 例行任务 Routines
 
@@ -52,7 +52,7 @@ Routine 是由群创建和管理的长期任务。它使用该群绑定的数字
 | 跟踪任务 | 持续追踪一个合同、审批、PR 或问题直到关闭。 | 未实现（规划） |
 | 自然语言创建 | 用户在群里说一句话即可创建 routine。 | 未实现（规划） |
 
-当前 Xpert 可通过 [Schedule Trigger](../plugin/trigger/schedule-trigger) 和定时任务工具实现固定周期任务，但还没有“从群聊自然语言创建、列出、修改、暂停、恢复、删除 routine”的统一产品体验。
+当前 Xpert 可通过 [Schedule Trigger](../../plugin/trigger/schedule-trigger) 和定时任务工具实现固定周期任务，但还没有“从群聊自然语言创建、列出、修改、暂停、恢复、删除 routine”的统一产品体验。
 
 ## Routine 管理命令
 
@@ -88,7 +88,7 @@ Xpert Tag 的工程类 routine 目标包括：
 - 追踪工单状态，超时后提醒负责人。
 - 把群讨论沉淀为 Issue、需求或审批草稿。
 
-当前 [Coding Expert](../agent/toolset/coding-expert) 已具备代码平台连接、Issue/PR 和代码任务基础能力，因此 GitHub/GitLab/Gitee/云效方向为 **部分实现**。但“从群聊直接创建 PR follow routine 并持续回群”的完整 Xpert Tag 流程为 `未实现（规划）`。
+当前 [Coding Expert](../toolset/coding-expert) 已具备代码平台连接、Issue/PR 和代码任务基础能力，因此 GitHub/GitLab/Gitee/云效方向为 **部分实现**。但“从群聊直接创建 PR follow routine 并持续回群”的完整 Xpert Tag 流程为 `未实现（规划）`。
 
 ## 与技能的关系
 

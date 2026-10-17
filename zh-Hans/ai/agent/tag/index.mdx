@@ -3,7 +3,7 @@ title: Xpert Tag
 sidebar_position: 1
 ---
 
-Xpert Tag 是把 Xpert 数字专家接入企业 IM 群聊和单聊的频道级智能体能力。团队成员可以在 [飞书](../plugin/integration/lark-integration)、[钉钉](../plugin/integration/dingtalk-integration)、[企业微信](../plugin/integration/wecom-integration) 会话中通过 @ 机器人把任务交给数字专家，数字专家基于当前会话上下文、知识库、工具集、工作流和业务系统完成工作，并把过程和结果回到原会话。
+Xpert Tag 是把 Xpert 数字专家接入企业 IM 群聊和单聊的频道级智能体能力。团队成员可以在 [飞书](../../plugin/integration/lark-integration)、[钉钉](../../plugin/integration/dingtalk-integration)、[企业微信](../../plugin/integration/wecom-integration) 会话中通过 @ 机器人把任务交给数字专家，数字专家基于当前会话上下文、知识库、工具集、工作流和业务系统完成工作，并把过程和结果回到原会话。
 
 <Tip>
 当前 Xpert 已具备多 IM 接入、触发器、会话续接、消息汇总、卡片/通知和部分上下文读取等基础能力。本文档中的 `未实现（规划）` 能力表示 Xpert Tag 产品化目标，不代表当前版本已经可用。
@@ -11,7 +11,7 @@ Xpert Tag 是把 Xpert 数字专家接入企业 IM 群聊和单聊的频道级�
 
 ## 产品定位
 
-Xpert Tag 不是简单的 IM webhook 机器人，也不是要把 [飞书](../plugin/integration/lark-integration)、[钉钉](../plugin/integration/dingtalk-integration)、[企业微信](../plugin/integration/wecom-integration) 插件重写成一个统一插件。它是在已有通信插件和 Xpert 平台能力之上，形成一套可治理的群组智能体产品体验：
+Xpert Tag 不是简单的 IM webhook 机器人，也不是要把 [飞书](../../plugin/integration/lark-integration)、[钉钉](../../plugin/integration/dingtalk-integration)、[企业微信](../../plugin/integration/wecom-integration) 插件重写成一个统一插件。它是在已有通信插件和 Xpert 平台能力之上，形成一套可治理的群组智能体产品体验：
 
 - **群组即工作空间**：项目群、支持群、告警群、销售群和需求群都可以拥有自己的数字专家。
 - **权限跟随群组**：群里能用什么知识库、工具、插件和业务系统，由管理员配置，而不是由提问者个人权限临时决定。
@@ -23,9 +23,9 @@ Xpert Tag 不是简单的 IM webhook 机器人，也不是要把 [飞书](../plu
 
 | 平台 | 当前基础能力 | Xpert Tag 产品化方向 |
 | --- | --- | --- |
-| [飞书 / Lark](../plugin/integration/lark-integration) | 长连接或 Webhook、群聊 @、单聊、会话绑定、群消息范围、消息汇总、卡片/更新、消息历史与资源读取、文档源能力。 | 在群/频道维度配置数字专家、知识库、工具包、记忆、routine 和审计。 |
-| [钉钉](../plugin/integration/dingtalk-integration) | Stream 或 HTTP、群聊 @、单聊、会话绑定、消息汇总、文本/Markdown/交互卡片、卡片回调、更新/撤回。 | 用统一的 Tag session、进度卡片和群级权限模型承载长任务。 |
-| [企业微信](../plugin/integration/wecom-integration) | 短连接或长连接、单聊/群聊、会话绑定、消息汇总、模板卡片、流式/思考提示、图片输入、`/new` 重置。 | 按平台能力差异提供 Tag 体验，并对不支持的群能力做降级说明。 |
+| [飞书 / Lark](../../plugin/integration/lark-integration) | 长连接或 Webhook、群聊 @、单聊、会话绑定、群消息范围、消息汇总、卡片/更新、消息历史与资源读取、文档源能力。 | 在群/频道维度配置数字专家、知识库、工具包、记忆、routine 和审计。 |
+| [钉钉](../../plugin/integration/dingtalk-integration) | Stream 或 HTTP、群聊 @、单聊、会话绑定、消息汇总、文本/Markdown/交互卡片、卡片回调、更新/撤回。 | 用统一的 Tag session、进度卡片和群级权限模型承载长任务。 |
+| [企业微信](../../plugin/integration/wecom-integration) | 短连接或长连接、单聊/群聊、会话绑定、消息汇总、模板卡片、流式/思考提示、图片输入、`/new` 重置。 | 按平台能力差异提供 Tag 体验，并对不支持的群能力做降级说明。 |
 
 ## 复用的 Xpert 能力
 

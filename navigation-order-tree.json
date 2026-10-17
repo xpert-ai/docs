@@ -74,6 +74,18 @@
               ]
             },
             {
+              "slug": "tag",
+              "pages": [
+                "index",
+                "how-it-works",
+                "admin-setup",
+                "access-and-security",
+                "memory-and-routines",
+                "use-cases",
+                "capability-status"
+              ]
+            },
+            {
               "slug": "ai-assistant",
               "pages": [
                 "configure-ai-provider",
@@ -103,23 +115,6 @@
                 "data-sources",
                 "sharing",
                 "troubleshooting"
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "tag",
-          "groups": [
-            {
-              "slug": "__default__",
-              "pages": [
-                "index",
-                "how-it-works",
-                "admin-setup",
-                "access-and-security",
-                "memory-and-routines",
-                "use-cases",
-                "capability-status"
               ]
             }
           ]

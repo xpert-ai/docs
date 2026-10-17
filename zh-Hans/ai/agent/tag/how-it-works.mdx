@@ -22,12 +22,12 @@ Xpert Tag 的核心是把一次 IM 请求转换成一个可追踪的 Agent sessi
 
 | 触发方式 | 说明 | 状态 |
 | --- | --- | --- |
-| 群聊 @ 机器人 | 在 [飞书](../plugin/integration/lark-integration)、[钉钉](../plugin/integration/dingtalk-integration)、[企业微信](../plugin/integration/wecom-integration) 群聊中通过 @ 机器人触发数字专家。 | 已实现基础能力 |
+| 群聊 @ 机器人 | 在 [飞书](../../plugin/integration/lark-integration)、[钉钉](../../plugin/integration/dingtalk-integration)、[企业微信](../../plugin/integration/wecom-integration) 群聊中通过 @ 机器人触发数字专家。 | 已实现基础能力 |
 | 单聊直接发送 | 用户在机器人单聊中发送消息，直接进入数字专家。 | 已实现基础能力 |
 | 线程或会话续接 | 同一会话在超时时间内继续进入已有数字专家上下文。 | 已实现基础能力 |
 | 消息汇总窗口 | 连续短消息可在 `summaryWindowSeconds` 内合并后再交给数字专家。 | 已实现基础能力 |
 | 定时触发 | 使用 Schedule Trigger 按 Cron 触发数字专家。 | 已实现基础能力 |
-| 卡片按钮 | [钉钉](../plugin/integration/dingtalk-integration)、[飞书](../plugin/integration/lark-integration)、[企业微信](../plugin/integration/wecom-integration) 可通过卡片回调继续或结束会话。 | 部分实现 |
+| 卡片按钮 | [钉钉](../../plugin/integration/dingtalk-integration)、[飞书](../../plugin/integration/lark-integration)、[企业微信](../../plugin/integration/wecom-integration) 可通过卡片回调继续或结束会话。 | 部分实现 |
 | 群消息 watch | 监听指定群内符合条件的消息并主动触发任务。 | 未实现（规划） |
 | 自然语言创建 routine | 用户在群里说“每天 9 点总结本群”即可创建例行任务。 | 未实现（规划） |
 | PR / 工单跟踪 | 订阅 PR、CI、工单、审批状态并回群更新。 | 未实现（规划） |
@@ -40,8 +40,8 @@ Xpert Tag 的核心是把一次 IM 请求转换成一个可追踪的 Agent sessi
 | --- | --- | --- |
 | 当前触发消息 | 各 IM 触发器可读取消息正文、发送者和会话信息。 | 已实现基础能力 |
 | 单聊/群聊会话 | 会话绑定表维护外部会话与 Xpert conversation 的关系。 | 已实现基础能力 |
-| 附件 | [飞书](../plugin/integration/lark-integration) 可读取消息资源；[企业微信](../plugin/integration/wecom-integration) 支持图片输入；[钉钉](../plugin/integration/dingtalk-integration) 依平台能力处理附件。 | 部分实现 |
-| 群历史消息 | [飞书](../plugin/integration/lark-integration) 已有消息历史与资源读取工具；[钉钉](../plugin/integration/dingtalk-integration) 和[企业微信](../plugin/integration/wecom-integration) 依能力差异处理。 | 部分实现 |
+| 附件 | [飞书](../../plugin/integration/lark-integration) 可读取消息资源；[企业微信](../../plugin/integration/wecom-integration) 支持图片输入；[钉钉](../../plugin/integration/dingtalk-integration) 依平台能力处理附件。 | 部分实现 |
+| 群历史消息 | [飞书](../../plugin/integration/lark-integration) 已有消息历史与资源读取工具；[钉钉](../../plugin/integration/dingtalk-integration) 和[企业微信](../../plugin/integration/wecom-integration) 依能力差异处理。 | 部分实现 |
 | 知识库检索 | 数字专家可绑定知识库和检索节点。 | 已实现基础能力 |
 | 工具和技能 | 工作流、工具集、技能中间件可参与执行。 | 已实现基础能力 |
 | 群记忆 | 群规则、项目事实、输出格式等长期记忆。 | 未实现（规划） |
@@ -53,9 +53,9 @@ Xpert Tag 的核心是把一次 IM 请求转换成一个可追踪的 Agent sessi
 
 | 平台 | 当前可用展示 | 目标展示 |
 | --- | --- | --- |
-| [飞书 / Lark](../plugin/integration/lark-integration) | 文本、富文本、互动卡片、消息更新、流式更新窗口。 | 统一 Tag 进度卡片、步骤状态、工具调用摘要、取消/继续按钮。 |
-| [钉钉](../plugin/integration/dingtalk-integration) | 文本、Markdown、交互卡片、卡片回调、消息更新/撤回。 | 统一 Tag 进度卡片和长任务状态。 |
-| [企业微信](../plugin/integration/wecom-integration) | 思考提示、长连接流式回复、模板卡片、卡片更新。 | 按平台能力展示状态、结果和重置/继续操作。 |
+| [飞书 / Lark](../../plugin/integration/lark-integration) | 文本、富文本、互动卡片、消息更新、流式更新窗口。 | 统一 Tag 进度卡片、步骤状态、工具调用摘要、取消/继续按钮。 |
+| [钉钉](../../plugin/integration/dingtalk-integration) | 文本、Markdown、交互卡片、卡片回调、消息更新/撤回。 | 统一 Tag 进度卡片和长任务状态。 |
+| [企业微信](../../plugin/integration/wecom-integration) | 思考提示、长连接流式回复、模板卡片、卡片更新。 | 按平台能力展示状态、结果和重置/继续操作。 |
 
 通用 live checklist/progress renderer 当前为 **部分实现**。后续应由 Xpert Tag runtime 统一生成状态事件，再由各 IM adapter 渲染为对应平台最合适的消息形态。
 

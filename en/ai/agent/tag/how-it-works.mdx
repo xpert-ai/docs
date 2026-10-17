@@ -22,7 +22,7 @@ The core of Xpert Tag is turning an IM request into a traceable Agent session. T
 
 | Trigger | Description | Status |
 | --- | --- | --- |
-| Group mention | A user mentions the bot in a [Lark](../plugin/integration/lark-integration), [DingTalk](../plugin/integration/dingtalk-integration), or [WeCom](../plugin/integration/wecom-integration) group chat. | Available foundation |
+| Group mention | A user mentions the bot in a [Lark](../../plugin/integration/lark-integration), [DingTalk](../../plugin/integration/dingtalk-integration), or [WeCom](../../plugin/integration/wecom-integration) group chat. | Available foundation |
 | Direct message | A user sends a message directly to the bot. | Available foundation |
 | Thread or conversation continuation | Messages continue into the existing expert context before timeout. | Available foundation |
 | Message aggregation window | Short consecutive messages can be merged through `summaryWindowSeconds`. | Available foundation |
@@ -40,8 +40,8 @@ A Tag session should build a unified context package. Current behavior comes fro
 | --- | --- | --- |
 | Current triggering message | IM triggers read message text, sender, and conversation details. | Available foundation |
 | Direct/group conversation | Conversation binding tables map external conversations to Xpert conversations. | Available foundation |
-| Attachments | [Lark](../plugin/integration/lark-integration) can read message resources; [WeCom](../plugin/integration/wecom-integration) supports image input; [DingTalk](../plugin/integration/dingtalk-integration) handles attachments according to platform capability. | Partially available |
-| Group message history | [Lark](../plugin/integration/lark-integration) has message history and resource tools; [DingTalk](../plugin/integration/dingtalk-integration) and [WeCom](../plugin/integration/wecom-integration) depend on platform capability. | Partially available |
+| Attachments | [Lark](../../plugin/integration/lark-integration) can read message resources; [WeCom](../../plugin/integration/wecom-integration) supports image input; [DingTalk](../../plugin/integration/dingtalk-integration) handles attachments according to platform capability. | Partially available |
+| Group message history | [Lark](../../plugin/integration/lark-integration) has message history and resource tools; [DingTalk](../../plugin/integration/dingtalk-integration) and [WeCom](../../plugin/integration/wecom-integration) depend on platform capability. | Partially available |
 | Knowledge retrieval | Digital experts can bind knowledge bases and retrieval nodes. | Available foundation |
 | Tools and skills | Workflows, toolsets, and Skills Middleware can participate in execution. | Available foundation |
 | Group memory | Stable group rules, project facts, and output formats. | Planned |
@@ -53,9 +53,9 @@ Current IM plugins already support some message update patterns, but Xpert does 
 
 | Platform | Current display | Target display |
 | --- | --- | --- |
-| [Lark / Feishu](../plugin/integration/lark-integration) | Text, rich text, interactive cards, message updates, streaming update window. | Unified Tag progress card, step state, tool-call summary, cancel/continue buttons. |
-| [DingTalk](../plugin/integration/dingtalk-integration) | Text, Markdown, interactive cards, card callbacks, update/recall. | Unified Tag progress card and long-task status. |
-| [WeCom](../plugin/integration/wecom-integration) | Thinking hints, long-connection streaming replies, template cards, card updates. | Status, result, reset, and continuation controls according to platform capabilities. |
+| [Lark / Feishu](../../plugin/integration/lark-integration) | Text, rich text, interactive cards, message updates, streaming update window. | Unified Tag progress card, step state, tool-call summary, cancel/continue buttons. |
+| [DingTalk](../../plugin/integration/dingtalk-integration) | Text, Markdown, interactive cards, card callbacks, update/recall. | Unified Tag progress card and long-task status. |
+| [WeCom](../../plugin/integration/wecom-integration) | Thinking hints, long-connection streaming replies, template cards, card updates. | Status, result, reset, and continuation controls according to platform capabilities. |
 
 The common live checklist/progress renderer is **Partially available**. The future Xpert Tag runtime should emit platform-neutral progress events, and each IM adapter should render them in the best platform-native shape.
 

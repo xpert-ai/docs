@@ -12,7 +12,7 @@ Xpert Tag 的管理员配置目标是让企业先把 IM 平台接入 Xpert，再
 ## 接入流程
 
 1. 在租户级安装对应通信插件。
-2. 在系统集成中创建 [飞书](../plugin/integration/lark-integration)、[钉钉](../plugin/integration/dingtalk-integration) 或[企业微信](../plugin/integration/wecom-integration)集成。
+2. 在系统集成中创建 [飞书](../../plugin/integration/lark-integration)、[钉钉](../../plugin/integration/dingtalk-integration) 或[企业微信](../../plugin/integration/wecom-integration)集成。
 3. 在目标数字专家工作流中添加对应 Trigger。
 4. 选择集成实例，配置会话超时、消息汇总、群聊范围或单聊范围。
 5. 连接后续 Agent、知识库、工具集、技能和业务流程节点。
@@ -25,15 +25,15 @@ Xpert Tag 的管理员配置目标是让企业先把 IM 平台接入 Xpert，再
 
 | 平台 | 当前接入方式 | 关键配置 | 相关文档 |
 | --- | --- | --- | --- |
-| [飞书 / Lark](../plugin/integration/lark-integration) | 自建应用机器人，支持 Webhook 或长连接。推荐长连接。 | `App ID`、`App Secret`、事件订阅、机器人权限、可用范围。 | [飞书集成](../plugin/integration/lark-integration)、[飞书触发器](../plugin/trigger/lark-trigger) |
-| [钉钉](../plugin/integration/dingtalk-integration) | 企业内部应用机器人，支持 Stream 或 HTTP。推荐 Stream。 | `Client ID/AppKey`、`Client Secret`、`Robot Code`、Stream 或回调配置。 | [钉钉集成](../plugin/integration/dingtalk-integration)、[钉钉触发器](../plugin/trigger/dingtalk-trigger) |
-| [企业微信](../plugin/integration/wecom-integration) | 短连接回调或长连接智能机器人。推荐长连接。 | `Token/EncodingAESKey` 或 `Bot ID/Secret`。 | [企业微信集成](../plugin/integration/wecom-integration)、[企业微信触发器](../plugin/trigger/wecom-trigger) |
+| [飞书 / Lark](../../plugin/integration/lark-integration) | 自建应用机器人，支持 Webhook 或长连接。推荐长连接。 | `App ID`、`App Secret`、事件订阅、机器人权限、可用范围。 | [飞书集成](../../plugin/integration/lark-integration)、[飞书触发器](../../plugin/trigger/lark-trigger) |
+| [钉钉](../../plugin/integration/dingtalk-integration) | 企业内部应用机器人，支持 Stream 或 HTTP。推荐 Stream。 | `Client ID/AppKey`、`Client Secret`、`Robot Code`、Stream 或回调配置。 | [钉钉集成](../../plugin/integration/dingtalk-integration)、[钉钉触发器](../../plugin/trigger/dingtalk-trigger) |
+| [企业微信](../../plugin/integration/wecom-integration) | 短连接回调或长连接智能机器人。推荐长连接。 | `Token/EncodingAESKey` 或 `Bot ID/Secret`。 | [企业微信集成](../../plugin/integration/wecom-integration)、[企业微信触发器](../../plugin/trigger/wecom-trigger) |
 
 ## 数字专家绑定
 
 当前触发器采用明确绑定模型：
 
-- [飞书](../plugin/trigger/lark-trigger)、[钉钉](../plugin/trigger/dingtalk-trigger)、[企业微信](../plugin/trigger/wecom-trigger) 触发器会将一个 `integrationId` 绑定到一个 `xpertId`。
+- [飞书](../../plugin/trigger/lark-trigger)、[钉钉](../../plugin/trigger/dingtalk-trigger)、[企业微信](../../plugin/trigger/wecom-trigger) 触发器会将一个 `integrationId` 绑定到一个 `xpertId`。
 - 同一个 IM 集成同一时间通常只能绑定一个数字专家，避免一个机器人消息同时触发多个专家。
 - 会话绑定优先于触发器绑定，已有会话在超时时间内会继续进入原数字专家上下文。
 - 用户可以通过平台支持的结束会话按钮或 `/new` 类命令开启新会话，具体取决于 IM 插件。

@@ -178,6 +178,18 @@
                     ]
                   },
                   {
+                    "group": "Tag",
+                    "pages": [
+                      "en/ai/agent/tag/index",
+                      "en/ai/agent/tag/how-it-works",
+                      "en/ai/agent/tag/admin-setup",
+                      "en/ai/agent/tag/access-and-security",
+                      "en/ai/agent/tag/memory-and-routines",
+                      "en/ai/agent/tag/use-cases",
+                      "en/ai/agent/tag/capability-status"
+                    ]
+                  },
+                  {
                     "group": "AI Assistant",
                     "pages": [
                       "en/ai/agent/ai-assistant/command",
@@ -240,23 +252,6 @@
                       "en/ai/live-dashboard/data-sources",
                       "en/ai/live-dashboard/sharing",
                       "en/ai/live-dashboard/troubleshooting"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Tag",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/ai/tag/index",
-                      "en/ai/tag/how-it-works",
-                      "en/ai/tag/admin-setup",
-                      "en/ai/tag/access-and-security",
-                      "en/ai/tag/memory-and-routines",
-                      "en/ai/tag/use-cases",
-                      "en/ai/tag/capability-status"
                     ]
                   }
                 ]
@@ -1005,6 +1000,18 @@
                     ]
                   },
                   {
+                    "group": "Tag",
+                    "pages": [
+                      "zh-Hans/ai/agent/tag/index",
+                      "zh-Hans/ai/agent/tag/how-it-works",
+                      "zh-Hans/ai/agent/tag/admin-setup",
+                      "zh-Hans/ai/agent/tag/access-and-security",
+                      "zh-Hans/ai/agent/tag/memory-and-routines",
+                      "zh-Hans/ai/agent/tag/use-cases",
+                      "zh-Hans/ai/agent/tag/capability-status"
+                    ]
+                  },
+                  {
                     "group": "AI 助手",
                     "pages": [
                       "zh-Hans/ai/agent/ai-assistant/configure-ai-provider",
@@ -1065,23 +1072,6 @@
                       "zh-Hans/ai/live-dashboard/data-sources",
                       "zh-Hans/ai/live-dashboard/sharing",
                       "zh-Hans/ai/live-dashboard/troubleshooting"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Tag",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/ai/tag/index",
-                      "zh-Hans/ai/tag/how-it-works",
-                      "zh-Hans/ai/tag/admin-setup",
-                      "zh-Hans/ai/tag/access-and-security",
-                      "zh-Hans/ai/tag/memory-and-routines",
-                      "zh-Hans/ai/tag/use-cases",
-                      "zh-Hans/ai/tag/capability-status"
                     ]
                   }
                 ]
@@ -1761,6 +1751,62 @@
     {
       "source": "/zh-Hans/ai/agent/artifacts/dashboard-troubleshooting",
       "destination": "/zh-Hans/ai/live-dashboard/troubleshooting"
+    },
+    {
+      "source": "/en/ai/tag/index",
+      "destination": "/en/ai/agent/tag/index"
+    },
+    {
+      "source": "/en/ai/tag/how-it-works",
+      "destination": "/en/ai/agent/tag/how-it-works"
+    },
+    {
+      "source": "/en/ai/tag/admin-setup",
+      "destination": "/en/ai/agent/tag/admin-setup"
+    },
+    {
+      "source": "/en/ai/tag/access-and-security",
+      "destination": "/en/ai/agent/tag/access-and-security"
+    },
+    {
+      "source": "/en/ai/tag/memory-and-routines",
+      "destination": "/en/ai/agent/tag/memory-and-routines"
+    },
+    {
+      "source": "/en/ai/tag/use-cases",
+      "destination": "/en/ai/agent/tag/use-cases"
+    },
+    {
+      "source": "/en/ai/tag/capability-status",
+      "destination": "/en/ai/agent/tag/capability-status"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/index",
+      "destination": "/zh-Hans/ai/agent/tag/index"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/how-it-works",
+      "destination": "/zh-Hans/ai/agent/tag/how-it-works"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/admin-setup",
+      "destination": "/zh-Hans/ai/agent/tag/admin-setup"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/access-and-security",
+      "destination": "/zh-Hans/ai/agent/tag/access-and-security"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/memory-and-routines",
+      "destination": "/zh-Hans/ai/agent/tag/memory-and-routines"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/use-cases",
+      "destination": "/zh-Hans/ai/agent/tag/use-cases"
+    },
+    {
+      "source": "/zh-Hans/ai/tag/capability-status",
+      "destination": "/zh-Hans/ai/agent/tag/capability-status"
     }
   ]
 }
