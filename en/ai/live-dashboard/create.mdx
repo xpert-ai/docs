@@ -1,0 +1,42 @@
+---
+title: "Create a dashboard"
+description: "Describe the business definition and layout, then inspect the saved dashboard in Workbench."
+---
+
+## Before you start
+
+Choose an Assistant with live dashboard tools and confirm access to the source. Input files must already exist in an authorized Assistant or Project workspace. HTML pages and scripts require the corresponding administrator-configured runtimes.
+
+You do not need to provide database passwords, API tokens or hand-written queries. Use the configured source name. If names are ambiguous, ask the Assistant to list available sources and resolve the target first.
+
+## Describe the request
+
+Include the **source, metric definition, period, grouping, filters and layout**. Replace the example source name with your own:
+
+> Use the Sales source to create a Q3 2026 dashboard. Net sales means paid amount minus refunds, for paid orders only, grouped by month and region. Put the total at the top, the trend on the left and details on the right. Include a region filter and manual refresh. Use a platinum and metallic-blue style with ECharts.
+
+For file processing:
+
+> Use Python to process workspace sales/orders.csv with the accompanying metric definitions. Create monthly net sales by region, with a region filter and refresh that rereads the latest file.
+
+These are example requests; they do not create the named sources or files. You can also request standard charts and refine the presentation later.
+
+## What the Assistant does
+
+The Assistant discovers the source, reads fields and business descriptions, previews real data and generates the page. Ambiguous metrics or missing fields require clarification, not a substituted metric.
+
+Saving checks data configuration and filters. HTML also receives an initial-render check. A successful save produces a chat resource card identifying a working draft. Initial generation does not automatically publish a formal version.
+
+An HTML file or a reply saying “done” is not proof of a saved dashboard. Check the save status and a draft that reopens in Workbench. If the card is missing, search the live dashboard selector for the saved item; see [Troubleshooting](./troubleshooting).
+
+## Open and check
+
+1. Click **Open** on the resource card to view the target in ChatKit Workbench.
+2. Check its title, units, period, grouping and metric definition.
+3. Select a real region and confirm that totals, trends and details all update, then return to all regions.
+4. Refresh and confirm that the filter remains selected and fetch status updates.
+5. Reopen the saved dashboard and confirm the page is restored. Filters return to the definition's defaults.
+
+Empty or partial results require checking the source and query range. Do not interpret them as complete business totals. A working page does not by itself prove a correct metric.
+
+[Continue editing the same dashboard](./edit) when changes are needed.

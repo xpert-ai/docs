@@ -1,0 +1,42 @@
+---
+title: "Edit and publish"
+description: "Keep one dashboard identity, save working drafts and publish a formal version after review."
+---
+
+## Edit the current dashboard
+
+Open the target in Live dashboards, then describe the change:
+
+> Change the current dashboard to a light layout titled “Quarterly business review.” Put the total at the top, trends on the left and details on the right. Preserve the metric, region filter and refresh behavior. Save a draft of this dashboard.
+
+The Assistant reads the current content and saves changes to the same dashboard. Style-only edits retain the data configuration. Metric, source or filter-semantic changes require fresh queries and validation.
+
+When discussing several dashboards, select the target through its card or the searchable selector first. Without a selection, the Assistant should resolve the intended item rather than guess the newest one.
+
+## Drafts and formal versions
+
+| State | Purpose | Who advances it |
+| --- | --- | --- |
+| Working draft | Ongoing edits, automatic saves and preview | The Assistant edits as requested; the owner can inspect it |
+| Formal version | A human-confirmed definition for history and sharing | The owner confirms publication in Workbench |
+
+Each successful Agent save advances the draft revision, not the formal version number. Saved drafts survive closing and reopening chat. An edited file that has not successfully saved is not a dashboard draft.
+
+## Publish after review
+
+1. Check values, units, filters, charts and refresh behavior.
+2. Select **Publish draft** in Workbench.
+3. Review the confirmation and publish. Cancelling does not publish.
+4. Find the new formal version in the version menu. Further edits continue in a working draft.
+
+If the draft changes while confirmation is open, publication reports a conflict and requires another review. It does not silently publish a different revision. Save conflicts also require rereading and reconciling the current content rather than overwriting another update.
+
+## History and chat cards
+
+The version menu opens historical formal versions. Their layout, data configuration and library dependencies remain unchanged, but queries still depend on current access and source data.
+
+A chat card records the state saved during that reply. An old draft card opens the current saved draft, not an intermediate historical revision. A card explicitly targeting a formal historical version opens that version. Reloading chat does not automatically open every card.
+
+There is no browsable intermediate-draft history, one-click rollback or simultaneous team editing UI. Publish a formal version to preserve a reviewed definition. This freezes the definition, not its data results.
+
+After publication, you can [share with your team](./sharing).

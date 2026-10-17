@@ -1,0 +1,55 @@
+---
+title: "Dashboard troubleshooting"
+description: "Resolve generation, save, chart, filter, version and sharing problems."
+---
+
+## The Assistant did not create a dashboard
+
+Confirm that the selected Assistant has live dashboard tools enabled. A visible Workbench entry does not mean those tools are enabled for the current conversation. The data source must also be configured and accessible.
+
+If the Assistant asks for a metric definition, period or target source, provide that business context and continue. Credentials do not replace source configuration, and missing fields should not be guessed.
+
+## HTML was written, but no dashboard was saved
+
+Writing a file is only one step. HTML must pass page checks and be saved as a dashboard draft. Ask the Assistant to address the error and complete the save, then check the actual draft rather than only the reply text.
+
+A saved draft is not a new formal version. You must select **Publish draft** and confirm. If a card is missing after a successful save, reopen the item through the searchable dashboard selector.
+
+## The chart is blank or retains old data after filtering
+
+Check that data exists and that units and grouping are correct. Custom pages may have container-size, field-mapping or update-logic issues. Ask the Assistant to repair the current dashboard while preserving its source and metric.
+
+Request a check of “all → one region → another region → all,” verifying totals, chart series and details together. Query success does not prove correct drawing.
+
+HTML cannot load ECharts from a CDN. Ask for the system-provided library; no external script link is needed.
+
+## Refresh changes nothing, or results are incomplete
+
+Refresh retains selected filters and queries again. Values may remain unchanged if the source did not change. Distinguish fetch time from business-data modification time.
+
+For partial or truncated results, narrow the range or aggregate at the source. Empty results may reflect filters, permissions or dates, not zero business activity.
+
+Timed refresh works only when the page implements a timer. It is not a default background job, and closing the page should not be expected to keep it running.
+
+## The draft card and opened revision differ
+
+Older messages retain their recorded save status. A draft card opens the current saved draft. Use the version menu or an explicitly historical card to inspect a formal version. Intermediate draft history cannot currently be restored.
+
+On a save or publish conflict, reread the latest content and reconcile changes. Repeated overwrites or a duplicate dashboard should not be used to hide the conflict.
+
+## Sharing or standalone access fails
+
+| Symptom | Action |
+| --- | --- |
+| Only a draft exists | Review and publish a formal version first |
+| Private script or file dependency message | Workspace script dashboards cannot currently be shared |
+| A member opens the page but cannot query | Check organization membership and database/ontology access |
+| No new page opens | Check popup blocking, or copy the link into a new tab |
+| Login succeeds but viewing still fails | Ask an administrator to inspect login return and matching platform/plugin configuration |
+| Link is invalid or the version changed | Obtain the current link or reopen the latest page |
+
+Sharing does not transfer the creator's source permissions. Changing a policy invalidates the old link, and revoked access should remain denied.
+
+## What to report
+
+Provide reproduction steps, dashboard name, source, draft/formal-version status, selected filters, the error and its time. Avoid including database passwords, API tokens or full sensitive datasets in screenshots or chat. An administrator can inspect tool calls, save records, permissions and runtime availability.

@@ -20,16 +20,20 @@ Open **Data Intelligence → Query Analysis**, or enter **Query lab** from a mod
 
 SQL example:
 
-    SELECT customer_id, SUM(amount) AS total_amount
-    FROM sales
-    GROUP BY customer_id
-    ORDER BY total_amount DESC
-    LIMIT 20
+```sql
+SELECT customer_id, SUM(amount) AS total_amount
+FROM sales
+GROUP BY customer_id
+ORDER BY total_amount DESC
+LIMIT 20
+```
 
 MDX example:
 
-    SELECT {[Measures].[Sales]} ON COLUMNS
-    FROM [Sales]
+```mdx
+SELECT {[Measures].[Sales]} ON COLUMNS
+FROM [Sales]
+```
 
 ## Query limits
 

@@ -87,3 +87,40 @@ node --test scripts/test-sdk-openapi.mjs scripts/test-navigation.mjs
 ```
 
 Do not edit `api/openapi.sdk.zh-Hans.json` directly. The localization generator preserves endpoint paths, schemas and examples. Navigation uses [Mintlify OpenAPI groups](https://mintlify.com/docs/api-playground/openapi-setup) to render the method badges, parameter reference, generated code samples and API playground. A successful documentation render does not verify live API execution.
+
+## Live Dashboard product documentation
+
+AI → Live Dashboard (实时看板) is a separate tab immediately after Agent, mirrored
+in `en` and `zh-Hans`. Its six task-oriented pages live under
+`{language}/ai/live-dashboard/`:
+
+| Route suffix | User task |
+| --- | --- |
+| `index` | Understand live dashboards, drafts and versioned definitions |
+| `create` | Describe a business request, open the card and verify the result |
+| `edit` | Continue editing the same dashboard and confirm publication |
+| `data-sources` | Choose supported sources, files and refresh behavior |
+| `sharing` | Share a formal version and use the floating standalone toolbar |
+| `troubleshooting` | Resolve save, chart, filter, version and access problems |
+
+The AI overview at `{language}/ai/getting-started/index` is the first page under
+Getting Started and features a Live Dashboard entry. Keep the general Artifact
+overview under AI → Agent → Artifacts, and cross-link to the dashboard section
+from conversation, data source and ontology Workbench guides.
+
+Keep this order in `navigation-order-tree.json` as well as `docs.json`, and keep
+the tab's bilingual labels in `display-name-overrides.json`, so navigation
+regeneration retains the reading flow. The 12 previous
+`/{language}/ai/agent/artifacts/dashboard-*` routes redirect to their new pages
+through `docs.json`'s `redirects` array; preserve these mappings when reorganizing
+navigation. Internal links should point directly to the new routes.
+
+The pages describe existing functionality;
+they do not schedule feature development or promise general public-package availability.
+Internal architecture, contracts and verification limits belong in the Xpert source
+repository's `docs/{language}/guides/artifacts-dashboard/` feature documentation.
+
+When updating these pages, distinguish saved definitions from data snapshots, page
+timers from background subscriptions, draft revisions from formal versions, and
+team read-only sharing from private Workspace script dependencies. Keep commands,
+local accounts, test receipts and release checklists out of the product workflow.

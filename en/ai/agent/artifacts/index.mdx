@@ -4,15 +4,21 @@ sidebar_position: 1
 description: Turn Agent and plugin output into durable, versioned, previewable, downloadable, and shareable results.
 ---
 
-# Artifacts
-
 Artifacts turn the work produced by Xpert Agents and plugins into durable results that people can open, revisit, download, and share.
 
-An Artifact is a persistent product object with a stable identity. Its content is stored as immutable versions in Workspace Files, while access is provided through separately managed Artifact Links. A report can therefore gain a new version without changing its identity, and a shared link can either follow the latest version or remain pinned to one version.
+An Artifact is a persistent product object with a stable identity. Formal content is stored as immutable versions in Workspace Files. Applications that support drafts can also maintain a separate working copy. Artifact Links manage access, allowing content to evolve and publish without changing its identity.
 
 <Tip>
 An Artifact is more than a file link. The Artifact owns the result's identity and lifecycle; an Artifact Version owns one immutable content snapshot; an Artifact Link controls who can open which version.
 </Tip>
+
+## Live dashboards
+
+[Artifacts Dashboard](/en/ai/live-dashboard/index) saves a page definition with governed data queries. It supports standard charts, HTML/ECharts pages, draft edits across turns, human publication and chat resource cards. Cards open in ChatKit's own Workbench.
+
+Formal dashboards use `/artifacts/view/:slug` for authenticated, read-only organization viewing. This differs from the generic `/artifacts/share/:slug` content/download route described below. Dashboards do not expose anonymous sharing or download, and do not automatically share drafts, source permissions or Workspace script dependencies.
+
+A formal dashboard version pins its definition and frontend dependencies. Refresh still queries currently accessible data. See [Create](/en/ai/live-dashboard/create), [Edit and publish](/en/ai/live-dashboard/edit), and [Team sharing](/en/ai/live-dashboard/sharing).
 
 ## When to use an Artifact
 
@@ -29,12 +35,12 @@ For example, a Presentation Studio deck can remain editable in its Workbench whi
 
 ## What an Artifact is not
 
-An Artifact is a published result, not a full hosted application runtime.
+An Artifact manages a result's identity, drafts, formal versions and access. It is not a full hosted application runtime.
 
 - It does not expose a plugin's backend or credentials to viewers.
 - It is not a replacement for a database-backed, multi-route application.
 - It does not make the shared content collaboratively editable.
-- Interactive HTML can run client-side interactions allowed by its security profile, but it should not depend on external services or platform APIs at view time.
+- Generic HTML content sharing supports client-side interactions allowed by its security profile. Live dashboards use a separate authorized presentation channel for declared data; page code cannot call external services or platform APIs directly.
 - Version updates are durable, but an already open viewer currently needs to refresh to resolve a newer `latest` version.
 
 Use an Agentic App or Sites deployment when the experience needs authenticated backend operations, durable form submissions, multiple routes, or real-time collaboration.
@@ -44,6 +50,7 @@ Use an Agentic App or Sites deployment when the experience needs authenticated b
 | Object | Purpose | Mutability |
 | --- | --- | --- |
 | **Artifact** | Stable container for a generated result, including its source, kind, scope, title, description, and current version. | Metadata and lifecycle can change. |
+| **Artifact Draft** | Current working copy in applications that support drafts, with a revision and formal-version base. | Can be saved again; does not automatically publish or provide browsable intermediate history. |
 | **Artifact Version** | One content snapshot stored through a portable Workspace Files reference, with MIME type, checksum, size, and source version metadata. | Immutable after creation. |
 | **Artifact Link** | An access entry point with a short slug, audience policy, expiry, download policy, and `latest` or fixed-version behavior. | Access and presentation policy can change; the link can be revoked. |
 | **Artifact Access Log** | Audit record for access, download, denial, expiry, revocation, archive, and deletion events. | Append-only audit data. |
@@ -233,7 +240,7 @@ The capability provides operations to create, version, get, list, archive, and d
 
 ## Current release boundaries
 
-The current platform capability provides the Artifact data model, immutable versions, Workspace Files-backed content, scoped and public links, signed previews, access counters, and audit records. Product surfaces such as a platform-wide Artifact gallery, automatic in-page live updates, organization retention controls, and a compliance administration UI can be added on top of the same model; do not assume those surfaces are available unless your Xpert deployment exposes them.
+The platform provides Artifact identity, working drafts, immutable formal versions, Workspace Files content, links and audit capabilities. Each application decides which editing, sharing and download controls it exposes. Live dashboards provide resource cards, filters, refresh and read-only organization viewing. They do not provide a universal background refresh scheduler, anonymous dashboard sharing or team editing. A platform-wide gallery or retention-policy UI cannot be inferred from the generic model.
 
 ## Related resources
 

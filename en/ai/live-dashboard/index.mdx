@@ -1,0 +1,68 @@
+---
+title: "Live Dashboard overview"
+description: "Generate business dashboards from natural language, refine them in chat, filter and refresh in Workbench, and share formal versions with your team."
+---
+
+Live Dashboard, also called Artifacts Dashboard, turns a business request into a saved dashboard that you can refine and refresh. Choose standard charts or ask for an HTML page with a custom layout, colors and interactions. The dashboard remains one Artifact as you edit its draft, publish formal versions and share it.
+
+For example, request quarterly net sales by month and region, with a total at the top, a trend on the left, details on the right and a region filter. The Assistant checks available data and metric definitions before creating a draft.
+
+<CardGroup cols={2}>
+  <Card title="Create your first dashboard" icon="chart-column" href="/en/ai/live-dashboard/create">
+    Prepare data and business rules, describe a page in natural language and check the result in Workbench.
+  </Card>
+  <Card title="Share with your team" icon="users" href="/en/ai/live-dashboard/sharing">
+    Publish a reviewed version so members can filter and refresh authorized data on a standalone page.
+  </Card>
+</CardGroup>
+
+## When to use it
+
+- **Business and metric tracking:** combine totals, trends and details on one page, with filters such as region or period.
+- **File analysis summaries:** clean and aggregate authorized workspace files using explicit metric definitions, then visualize the results.
+- **Ongoing review and team viewing:** refine the same dashboard's presentation or analysis requirements, then share a human-confirmed formal version.
+
+## A dashboard's workflow
+
+1. **Create:** choose an Assistant with dashboard capabilities and describe the source, metric, period and layout.
+2. **View:** after a successful save, click **Open** on the chat resource card to open **Live dashboards** in ChatKit's Workbench.
+3. **Edit:** open the target and continue describing changes. They are saved as a draft under the same dashboard identity.
+4. **Publish:** check the data and interactions, select **Publish draft**, then confirm a formal version.
+5. **Share:** enable read-only organization sharing. Members can filter and refresh data they are authorized to access.
+
+The chat resource card provides a return point: **Open** takes you directly into ChatKit's own Workbench. A team sharing link opens a standalone dashboard. Its toolbar collapses into a translucent button and expands on hover or click to leave more room for viewing.
+
+## What you can create
+
+| Mode | Suitable uses |
+| --- | --- |
+| Standard charts | Bar, line, area, pie and scatter charts, plus data tables |
+| Custom page | Business summaries, KPI layouts, trends and details with ECharts |
+| File or script results | Python/JavaScript processing of authorized files or sources |
+
+Custom pages control their layout but use configured data access. They cannot connect to arbitrary websites, load CDN scripts or read platform credentials. Three.js core is available; 3D pages still need separate browser and GPU compatibility checks.
+
+## What live data and versions mean
+
+- Opening, filtering and refreshing query data again. Fetch time is not necessarily the last business-data modification time.
+- Custom HTML can include a refresh timer. There is no universal automatic-refresh switch or guaranteed change-stream push subscription.
+- Drafts and formal versions save the page definition, metric configuration and library dependencies, not all query results at that moment.
+- Historical versions query current accessible data with their older definition. They are not historical data snapshots.
+
+Team sharing is read-only and requires a formal version. Drafts remain owner-managed. Workspace script dashboards currently cannot be shared with a team.
+
+## Start here
+
+- [Create a dashboard from a request](./create)
+- [Edit and publish](./edit)
+- [Data sources, files and refresh](./data-sources)
+- [Team sharing and standalone viewing](./sharing)
+- [Troubleshooting](./troubleshooting)
+
+If sources or dashboard tools are missing, ask an administrator to configure the required plugins, permissions and runtimes. Availability depends on your deployment.
+
+## Related capabilities
+
+- [Assistant conversations](/en/ai/agent/conversation/conversation) capture requests and ongoing edits; Live Dashboard saves, displays and refreshes the resulting analysis page.
+- [Artifacts](/en/ai/agent/artifacts/index) supplies result identity, drafts, versions and access management. This section covers the dashboard-specific workflow.
+- [Ontology Workbench and resource chat](/en/data/features/agent-execution/workbench-and-chatkit) explains data-xpert resource context. Dashboards can use configured ontology sources, subject to their permissions and permitted read-only operations.

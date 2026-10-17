@@ -47,7 +47,8 @@
     "semantic-model": "Semantic Model",
     "harness": "Harness",
     "overview": "Overview",
-    "cases": "Case Studies"
+    "cases": "Case Studies",
+    "live-dashboard": "Live Dashboard"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -123,6 +124,7 @@
     "built-in": "内置",
     "harness": "Harness",
     "overview": "概述",
-    "cases": "案例"
+    "cases": "案例",
+    "live-dashboard": "实时看板"
   }
 }

@@ -7,6 +7,12 @@
           "slug": "getting-started",
           "groups": [
             {
+              "slug": "__default__",
+              "pages": [
+                "index"
+              ]
+            },
+            {
               "slug": "community",
               "pages": []
             },
@@ -81,6 +87,22 @@
               "slug": "artifacts",
               "pages": [
                 "index"
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "live-dashboard",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "create",
+                "edit",
+                "data-sources",
+                "sharing",
+                "troubleshooting"
               ]
             }
           ]

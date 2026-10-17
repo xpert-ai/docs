@@ -91,6 +91,12 @@
                 "tab": "Getting Started",
                 "groups": [
                   {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/getting-started/index"
+                    ]
+                  },
+                  {
                     "group": "Community",
                     "pages": [
                       "en/ai/getting-started/community/index",
@@ -218,6 +224,22 @@
                       "en/ai/agent/toolset/coding-expert",
                       "en/ai/agent/toolset/virtual-environment/git-tools",
                       "en/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Live Dashboard",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/live-dashboard/index",
+                      "en/ai/live-dashboard/create",
+                      "en/ai/live-dashboard/edit",
+                      "en/ai/live-dashboard/data-sources",
+                      "en/ai/live-dashboard/sharing",
+                      "en/ai/live-dashboard/troubleshooting"
                     ]
                   }
                 ]
@@ -895,6 +917,12 @@
                 "tab": "快速开始",
                 "groups": [
                   {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/getting-started/index"
+                    ]
+                  },
+                  {
                     "group": "社区",
                     "pages": [
                       "zh-Hans/ai/getting-started/community/index",
@@ -1021,6 +1049,22 @@
                       "zh-Hans/ai/agent/toolset/coding-expert",
                       "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
                       "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "实时看板",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/live-dashboard/index",
+                      "zh-Hans/ai/live-dashboard/create",
+                      "zh-Hans/ai/live-dashboard/edit",
+                      "zh-Hans/ai/live-dashboard/data-sources",
+                      "zh-Hans/ai/live-dashboard/sharing",
+                      "zh-Hans/ai/live-dashboard/troubleshooting"
                     ]
                   }
                 ]
@@ -1668,5 +1712,55 @@
       ]
     }
   },
-  "css": "/public/styles.css"
+  "css": "/public/styles.css",
+  "redirects": [
+    {
+      "source": "/en/ai/agent/artifacts/dashboard-overview",
+      "destination": "/en/ai/live-dashboard/index"
+    },
+    {
+      "source": "/en/ai/agent/artifacts/dashboard-create",
+      "destination": "/en/ai/live-dashboard/create"
+    },
+    {
+      "source": "/en/ai/agent/artifacts/dashboard-edit",
+      "destination": "/en/ai/live-dashboard/edit"
+    },
+    {
+      "source": "/en/ai/agent/artifacts/dashboard-data-sources",
+      "destination": "/en/ai/live-dashboard/data-sources"
+    },
+    {
+      "source": "/en/ai/agent/artifacts/dashboard-share",
+      "destination": "/en/ai/live-dashboard/sharing"
+    },
+    {
+      "source": "/en/ai/agent/artifacts/dashboard-troubleshooting",
+      "destination": "/en/ai/live-dashboard/troubleshooting"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/artifacts/dashboard-overview",
+      "destination": "/zh-Hans/ai/live-dashboard/index"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/artifacts/dashboard-create",
+      "destination": "/zh-Hans/ai/live-dashboard/create"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/artifacts/dashboard-edit",
+      "destination": "/zh-Hans/ai/live-dashboard/edit"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/artifacts/dashboard-data-sources",
+      "destination": "/zh-Hans/ai/live-dashboard/data-sources"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/artifacts/dashboard-share",
+      "destination": "/zh-Hans/ai/live-dashboard/sharing"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/artifacts/dashboard-troubleshooting",
+      "destination": "/zh-Hans/ai/live-dashboard/troubleshooting"
+    }
+  ]
 }

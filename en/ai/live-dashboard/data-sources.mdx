@@ -1,0 +1,49 @@
+---
+title: "Data sources, files and refresh"
+description: "Choose supported sources and understand scripts, filters and data updates."
+---
+
+## Available sources
+
+| Source | Usage | Considerations |
+| --- | --- | --- |
+| PostgreSQL | Query a configured database | Requires source access and read-only query capability |
+| MySQL and Doris | Query configured databases and tables | Doris acceptance covers the internal catalog, not every compatible database |
+| data-xpert ontology | Use published resources and permitted read-only operations | Requires identity integration, resource bindings and viewer policy |
+| Workspace Python/JavaScript | Process authorized files or combine declared source results | Definitions are currently private and cannot support team sharing |
+
+The dashboard lists sources that are both accessible and supported by an available adapter. Sharing a page does not grant database, ontology or file access.
+
+Data-xpert can expose resources through its published ontology adapters. Each resource defines its fields and operations. This does not imply direct access to arbitrary REST URLs or every semantic model.
+
+## Files and scripts
+
+Place input files and metric definitions in an authorized workspace, then give the Assistant the exact filenames and processing rules. It can write Python or JavaScript to clean, group and calculate data for the dashboard.
+
+Refresh runs the script again against currently authorized inputs. A definition can pin code or read current code on each execution. This is separate from refreshing input data: fixed code does not freeze the business rows in a file.
+
+Scripts currently use standard libraries and UTF-8 files. They do not automatically install pandas or npm packages. Complex processing or large inputs may require a smaller scope or a different source query.
+
+## Filters and refresh
+
+- Filter options come from the definition and returned data. Selecting an option queries again.
+- Manual refresh retains selected filters. Reopening restores the definition's defaults.
+- Custom pages can implement a requested timer; not every dashboard has one automatically.
+- A new fetch time proves a query occurred, not that upstream business data changed.
+- Partial, truncated or empty results require checking the business scope; they are not automatically a complete total or zero business activity.
+
+The source, page and current permissions all affect refresh. Historical versions and pinned links still use current access checks and cannot restore revoked permissions.
+
+## Administrator setup
+
+Deploy Live Dashboard and required source plugins, configure database drivers or ontology connections, and enable dashboard tools and skills for the Assistant. HTML save checks require a browser runtime; scripts need a restricted Python/JavaScript runtime. Enabling the Workbench View alone does not enable tools.
+
+One platform query is limited to 30 seconds, 1,000 rows and 2 MB. Scripts have additional file and invocation limits. Aggregate at the source where appropriate. Repeatedly fetching truncated data does not establish a complete result.
+
+See [Troubleshooting](./troubleshooting) for query failures.
+
+## Related documentation
+
+- [Data sources for data analysis](/en/data/analytics/data-sources): connections, catalogs and workspace bindings. Configurable types there are not the same as supported dashboard sources.
+- [Ontology Workbench and resource chat](/en/data/features/agent-execution/workbench-and-chatkit): data-xpert resource context and user identity.
+- [Team sharing and standalone viewing](./sharing): viewer permissions and the sharing restrictions for Workspace script sources.

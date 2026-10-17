@@ -1,0 +1,45 @@
+---
+title: "Team sharing and standalone pages"
+description: "Share a confirmed formal version so organization members can view, filter and refresh it."
+---
+
+## Enable sharing
+
+1. Open a dashboard you own. If it has only a draft, [publish a formal version](./edit) first.
+2. Select **Team sharing**.
+3. Follow the latest formal version or pin an existing formal version.
+4. Enable sharing, then copy the link or select **Open shared page** to view it directly.
+
+The link is for members of the current organization. Visitors must sign in before returning to the dashboard. They also need access to its sources; the link does not grant those permissions.
+
+## Choose a version policy
+
+| Policy | Suitable use | Behavior |
+| --- | --- | --- |
+| Latest formal version | An evolving team dashboard | Reopening loads the latest published definition, never an unpublished draft |
+| Fixed formal version | Retain a reviewed layout and metric configuration | Uses the selected definition, while refresh still reads currently accessible data |
+
+Publishing while a latest-following page is open may produce a target-change message. Reopen to load the new definition without mixing old page code and new data configuration.
+
+Changing the policy or fixed target replaces the link and invalidates the old one. Send the new link to recipients. Repeating the same configuration reuses the existing link.
+
+## Use the standalone page
+
+The page gives the dashboard the full canvas, with a translucent floating button:
+
+- Hover to expand temporarily; moving away collapses it.
+- Click to keep it open. Touch devices use the same click interaction.
+- The toolbar shows title, formal version, fetch time and refresh. Standard-chart filters appear there too.
+- Close, Escape or a canvas click collapses it. Expanding does not reduce canvas height.
+
+HTML pages may also include their own filters and refresh controls. Manual refresh retains current filters; reopening restores defaults.
+
+## Permissions and revocation
+
+Members can view, filter and refresh. They cannot access working drafts, edit, publish or manage links. Source queries use their permissions, not the creator's identity.
+
+The owner can revoke the link in Team sharing. Subsequent access and queries are denied; data already displayed cannot be retracted from a recipient's screen.
+
+Workspace script sources currently contain private code, definitions or file dependencies and block team sharing. Do not bypass this restriction by changing links or exposing personal files. Dashboard sharing provides no anonymous public access, download or team editing entry.
+
+Chat resource cards open dashboards in Workbench; team links open the independent read-only page.
