@@ -7,12 +7,20 @@ A project is a collaboration space for ongoing work. Bring together the relevant
 
 For example, preparing a competitor report may involve an analyst researching products, a data specialist checking prices and a writer composing the report after both inputs are accepted. The project holds shared resources and rules; tasks record responsibility, dependencies, execution attempts and acceptance decisions.
 
+Projects also provide shared collaboration capabilities for plugin apps. An app can use the SDK to associate a project and synchronize its plans, business tasks and execution records. Users track specialized workflows in the shared task view while the app retains its business rules and acceptance process.
+
 <CardGroup cols={2}>
   <Card title="Complete your first project task" icon="list-check" href="/en/ai/projects/quickstart">
     Create a project, prepare materials, ask an Assistant to plan and execute work, then check the deliverables.
   </Card>
   <Card title="Coordinate work in a group chat" icon="users" href="/en/ai/projects/tasks/group-collaboration">
     Connect a project, select participating Assistants and dispatch work in dependent batches.
+  </Card>
+  <Card title="Use projects in plugin apps" icon="puzzle-piece" href="/en/ai/projects/plugin-apps/index">
+    Connect application tasks to projects and reuse the task tree, Gantt chart and execution history.
+  </Card>
+  <Card title="Integrate through the SDK" icon="code" href="/en/ai/projects/plugin-apps/sdk-integration">
+    Understand project associations, business task synchronization, resources and access responsibilities.
   </Card>
 </CardGroup>
 
@@ -27,6 +35,7 @@ For example, preparing a competitor report may involve an analyst researching pr
 | Plans and tasks | Organize milestones, assignees, priorities, dates and dependencies |
 | Execution and acceptance records | Distinguish attempts, independent reviews, rework and final decisions |
 | Scheduled tasks | Run a selected Assistant at a configured time as a confirmed user |
+| Application business tasks | Bring specialized plugin workflows into shared views with source ownership and execution traceability |
 
 Human project membership, connected Assistants and group-chat membership are separate relationships. Joining a chat or enabling Project management on an Assistant does not grant project editing rights.
 
@@ -43,7 +52,7 @@ flowchart LR
   G --> C
 ```
 
-Creating a task saves the plan. Dispatch starts execution; successful implementation normally moves the task to **Review**. The responsible Assistant or an authorized user then accepts the result. A 100% progress indicator, successful tool call or “done” message does not replace an acceptance decision.
+Creating an ordinary project task saves the plan. Dispatch starts execution, and successful implementation normally moves the task to **Review** before the responsible Assistant or an authorized user accepts it. Plugin application tasks start and receive acceptance through [their owning application's workflow](./plugin-apps/business-tasks). A 100% progress indicator, successful tool call or “done” message does not replace the relevant acceptance decision.
 
 ## Choose an entry point
 
@@ -55,6 +64,7 @@ Creating a task saves the plan. Dispatch starts execution; successful implementa
 | Project selector in an Assistant conversation | Select the work context before sending a request |
 | Project tasks in conversation Workbench | Track work and acceptance alongside the conversation |
 | Project menu below the group composer | Let the group owner connect a project and confirm participating Assistants |
+| Plugin application's business entry | Create or open an application project, advance its business workflow and synchronize tasks |
 
 Cloud and Desktop conversations share the Project tasks view. Full project-workspace instructions in this section use the Cloud entry. Available Assistants, application types, connectors and executors depend on your deployment and access.
 
@@ -63,5 +73,6 @@ Cloud and Desktop conversations share the Project tasks view. Full project-works
 - First use: [Quickstart](./quickstart).
 - Prepare the workspace: [Project types](./setup/project-types), [Assistants and context](./setup/assistants-and-context), [Members and permissions](./setup/members-and-permissions), [Shared files](./setup/files-and-deliverables).
 - Manage delivery: [Planning](./tasks/planning), [Task views](./tasks/views), [Execution, acceptance and rework](./tasks/execution-and-review).
+- Integrate business apps: [Plugin apps and projects](./plugin-apps/index), [Business task synchronization](./plugin-apps/business-tasks), [Shared resources and permissions](./plugin-apps/shared-context), [SDK integration guide](./plugin-apps/sdk-integration).
 - Coordinate ongoing work: [Group collaboration](./tasks/group-collaboration), [Scheduled tasks](./automation/scheduled-tasks).
 - Resolve an issue: [Troubleshooting](./help/troubleshooting).

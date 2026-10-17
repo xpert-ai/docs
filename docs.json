@@ -189,6 +189,18 @@
                     ]
                   },
                   {
+                    "group": "Skill",
+                    "pages": [
+                      "en/ai/agent/skill/index",
+                      "en/ai/agent/skill/marketplace",
+                      "en/ai/agent/skill/skill-repository-registration-and-use",
+                      "en/ai/agent/skill/workspace",
+                      "en/ai/agent/skill/use-in-agent",
+                      "en/ai/agent/skill/administration",
+                      "en/ai/agent/skill/skill-package-format"
+                    ]
+                  },
+                  {
                     "group": "AI Assistant",
                     "pages": [
                       "en/ai/agent/ai-assistant/command",
@@ -268,6 +280,15 @@
                     ]
                   },
                   {
+                    "group": "Plugin App Integration",
+                    "pages": [
+                      "en/ai/projects/plugin-apps/index",
+                      "en/ai/projects/plugin-apps/business-tasks",
+                      "en/ai/projects/plugin-apps/shared-context",
+                      "en/ai/projects/plugin-apps/sdk-integration"
+                    ]
+                  },
+                  {
                     "group": "Project Automation",
                     "pages": [
                       "en/ai/projects/automation/scheduled-tasks"
@@ -293,23 +314,6 @@
                       "en/ai/live-dashboard/data-sources",
                       "en/ai/live-dashboard/sharing",
                       "en/ai/live-dashboard/troubleshooting"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Skill",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/ai/skill/index",
-                      "en/ai/skill/marketplace",
-                      "en/ai/skill/skill-repository-registration-and-use",
-                      "en/ai/skill/workspace",
-                      "en/ai/skill/use-in-agent",
-                      "en/ai/skill/administration",
-                      "en/ai/skill/skill-package-format"
                     ]
                   }
                 ]
@@ -1052,6 +1056,18 @@
                     ]
                   },
                   {
+                    "group": "技能",
+                    "pages": [
+                      "zh-Hans/ai/agent/skill/index",
+                      "zh-Hans/ai/agent/skill/marketplace",
+                      "zh-Hans/ai/agent/skill/skill-repository-registration-and-use",
+                      "zh-Hans/ai/agent/skill/workspace",
+                      "zh-Hans/ai/agent/skill/use-in-agent",
+                      "zh-Hans/ai/agent/skill/administration",
+                      "zh-Hans/ai/agent/skill/skill-package-format"
+                    ]
+                  },
+                  {
                     "group": "AI 助手",
                     "pages": [
                       "zh-Hans/ai/agent/ai-assistant/configure-ai-provider",
@@ -1129,6 +1145,15 @@
                     ]
                   },
                   {
+                    "group": "插件应用集成",
+                    "pages": [
+                      "zh-Hans/ai/projects/plugin-apps/index",
+                      "zh-Hans/ai/projects/plugin-apps/business-tasks",
+                      "zh-Hans/ai/projects/plugin-apps/shared-context",
+                      "zh-Hans/ai/projects/plugin-apps/sdk-integration"
+                    ]
+                  },
+                  {
                     "group": "项目自动化",
                     "pages": [
                       "zh-Hans/ai/projects/automation/scheduled-tasks"
@@ -1154,23 +1179,6 @@
                       "zh-Hans/ai/live-dashboard/data-sources",
                       "zh-Hans/ai/live-dashboard/sharing",
                       "zh-Hans/ai/live-dashboard/troubleshooting"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "技能",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/ai/skill/index",
-                      "zh-Hans/ai/skill/marketplace",
-                      "zh-Hans/ai/skill/skill-repository-registration-and-use",
-                      "zh-Hans/ai/skill/workspace",
-                      "zh-Hans/ai/skill/use-in-agent",
-                      "zh-Hans/ai/skill/administration",
-                      "zh-Hans/ai/skill/skill-package-format"
                     ]
                   }
                 ]
@@ -1897,6 +1905,62 @@
     {
       "source": "/zh-Hans/ai/agent/conversation/projects",
       "destination": "/zh-Hans/ai/projects/index"
+    },
+    {
+      "source": "/en/ai/skill/index",
+      "destination": "/en/ai/agent/skill/index"
+    },
+    {
+      "source": "/en/ai/skill/marketplace",
+      "destination": "/en/ai/agent/skill/marketplace"
+    },
+    {
+      "source": "/en/ai/skill/skill-repository-registration-and-use",
+      "destination": "/en/ai/agent/skill/skill-repository-registration-and-use"
+    },
+    {
+      "source": "/en/ai/skill/workspace",
+      "destination": "/en/ai/agent/skill/workspace"
+    },
+    {
+      "source": "/en/ai/skill/use-in-agent",
+      "destination": "/en/ai/agent/skill/use-in-agent"
+    },
+    {
+      "source": "/en/ai/skill/administration",
+      "destination": "/en/ai/agent/skill/administration"
+    },
+    {
+      "source": "/en/ai/skill/skill-package-format",
+      "destination": "/en/ai/agent/skill/skill-package-format"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/index",
+      "destination": "/zh-Hans/ai/agent/skill/index"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/marketplace",
+      "destination": "/zh-Hans/ai/agent/skill/marketplace"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/skill-repository-registration-and-use",
+      "destination": "/zh-Hans/ai/agent/skill/skill-repository-registration-and-use"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/workspace",
+      "destination": "/zh-Hans/ai/agent/skill/workspace"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/use-in-agent",
+      "destination": "/zh-Hans/ai/agent/skill/use-in-agent"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/administration",
+      "destination": "/zh-Hans/ai/agent/skill/administration"
+    },
+    {
+      "source": "/zh-Hans/ai/skill/skill-package-format",
+      "destination": "/zh-Hans/ai/agent/skill/skill-package-format"
     }
   ]
 }

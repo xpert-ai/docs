@@ -137,6 +137,9 @@ export class ExportService {
 | `ActorTokenRuntimeCapability` | `platform.actor-token` | 为出站 API 调用签发短生命周期的宿主操作者令牌。 |
 | `ProjectAccessRuntimeCapability` | `platform.project.access` | 列出用户可读项目，并校验人类编辑或管理角色。 |
 | `ProjectProvisioningRuntimeCapability` | `platform.project.provisioning` | 幂等创建或协调对话项目，并连接助手。 |
+| `ProjectTasksRuntimeCapability` | `platform.project.tasks` | 读取已保存任务、请求后台同步、管理排期并定位特定执行；业务规则由插件维护。 |
+
+将预配、项目访问与业务任务能力组合使用的产品体验和步骤，见 [SDK 项目集成指南](/zh-Hans/ai/projects/plugin-apps/sdk-integration)。
 
 继续阅读详细参考：
 

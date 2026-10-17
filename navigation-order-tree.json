@@ -85,6 +85,18 @@
               ]
             },
             {
+              "slug": "skill",
+              "pages": [
+                "index",
+                "marketplace",
+                "skill-repository-registration-and-use",
+                "workspace",
+                "use-in-agent",
+                "administration",
+                "skill-package-format"
+              ]
+            },
+            {
               "slug": "ai-assistant",
               "pages": [
                 "configure-ai-provider",
@@ -131,6 +143,15 @@
               ]
             },
             {
+              "slug": "plugin-apps",
+              "pages": [
+                "index",
+                "business-tasks",
+                "shared-context",
+                "sdk-integration"
+              ]
+            },
+            {
               "slug": "automation",
               "pages": [
                 "scheduled-tasks"
@@ -156,23 +177,6 @@
                 "data-sources",
                 "sharing",
                 "troubleshooting"
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "skill",
-          "groups": [
-            {
-              "slug": "__default__",
-              "pages": [
-                "index",
-                "marketplace",
-                "skill-repository-registration-and-use",
-                "workspace",
-                "use-in-agent",
-                "administration",
-                "skill-package-format"
               ]
             }
           ]

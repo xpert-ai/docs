@@ -1,0 +1,101 @@
+---
+title: "SDK 接入指南"
+description: "按项目关联、任务映射、同步和视图接入完成插件集成，验证业务结果与平台体验一致。"
+---
+
+本页面向应用设计者与插件开发者，说明如何把应用任务接入平台项目。用户操作入口见[集成概览](./index)。SDK 提供类型、Provider 扩展点和运行时能力；插件不需要直接写平台的项目任务表。
+
+## 能力对应关系
+
+| 产品需求 | SDK 或扩展契约 | 接入职责 |
+| --- | --- | --- |
+| 让项目列表识别并打开业务项目 | 应用 `projectTypes`、`IProjectTypeProvider` | 声明应用类型，验证已保存的业务关联，返回应用创建和打开入口 |
+| 创建或协调关联项目 | `ProjectProvisioningRuntimeCapability` | 通过 `ensure()` 复用稳定项目 ID，协调名称与生命周期 |
+| 复用项目访问控制 | `ProjectAccessRuntimeCapability` | 查询可读项目，检查编辑或管理权限，并继续检查应用业务授权 |
+| 将业务任务映射到平台 | `@ProjectTaskProvider`、`IProjectTaskProvider` | 从应用持久记录生成任务及执行快照 |
+| 请求同步、读取任务、维护排期 | `ProjectTasksRuntimeCapability` | 使用 `refresh()`、`graph()`、`change()` 和 `resolveExecution()` |
+| 复用项目文件 | `WorkspaceFilesRuntimeCapability` | 在授权项目范围内读写，保存可跨后台任务使用的文件引用 |
+| 提供统一任务界面 | 平台任务 View、Workbench 扩展协议 | 启用 `project.tasks` feature，复用任务视图 |
+
+## 1. 建立业务项目关联
+
+先决定应用使用通用协作项目，还是由应用持有业务对象并关联项目。后者应声明实体绑定的项目类型，实现 `IProjectTypeProvider`，让打开项目和预配时都能验证已保存的业务关联。
+
+业务对象应保存一次生成的目标项目 ID；在授权上下文中调用 `ensure()`，后续重试保持相同 ID。该操作负责项目预配，不会生成业务任务或启动 Agent。名称和归档状态来自应用已保存的业务事实。
+
+若支持会话首次发送时创建业务项目，可实现可选的 `createForConversation()`：使用宿主提供的创建事务保存业务对象及关联，宿主负责平台项目与会话绑定的提交或回滚。应用有配置确认步骤时仍需先完成确认，不应在该回调内再次预配、启动 Agent 或进行外部 I/O。
+
+详见[项目预配运行时](/zh-Hans/ai/plugin/plugin-sdk/project-provisioning)。项目预配与应用专用工作空间的初始化是不同流程，后者见[应用初始化配置](/zh-Hans/ai/plugin/application-config)。
+
+应用嵌入 ChatKit 时，前端如何启用项目选择器、读取项目类型目录、处理业务创建入口和固定项目 Workbench，参见 [ChatKit：项目与项目类型选择](/zh-Hans/ai/chatkit/chatkit-projects)。前端选定的项目上下文应与上述业务关联保持一致。
+
+## 2. 注册任务来源与业务类型
+
+使用稳定的 Provider key 注册 `IProjectTaskProvider`，并将实现纳入插件模块。`snapshot(context)` 在可信租户、组织、用户和项目范围内读取业务记录；项目不归该来源管理时返回 `null`。
+
+快照包含 `revision` 和任务集合。任务应提供以下信息：
+
+任务集合应覆盖该来源在当前项目中的完整有效计划，不是某次分页或界面筛选的结果。既有来源任务从新快照中消失时，平台会将其标记为已取消并保留记录；不要把暂未加载的任务误当成业务删除。
+
+| 字段 | 用途与约束 |
+| --- | --- |
+| `key` | 稳定业务来源标识；不要使用可变标题或每次读取新建的随机值 |
+| `title`、`kind` | 显示名称与 `task`、`summary`、`milestone` 结构类型 |
+| `taskType` | 可选的已注册业务类型，使用所属 Provider key 加点号作为前缀 |
+| `parentKey`、`predecessorKeys` | 表达任务层级和前置依赖，引用有效节点并避免循环 |
+| `status`、`progress`、`diagnostic` | 应用业务状态、明确记录的 0–100 进度和诊断；不要从模型措辞猜测 |
+| `assigneeXpertId` | 实际负责的 Assistant，不能按当前查看者推断 |
+| `executions` | 每次尝试的稳定 key、序号、状态及实际执行关联、时间和摘要 |
+
+业务类型在 Provider 的 `taskTypes` 中声明本地化名称和受支持图标。`kind` 仍表达任务结构，不应拿业务类型代替它。`progress` 省略时保留既有值，显式 `null` 清除；`taskType` 也支持省略保留、`null` 清除。
+
+可选的 `linked(context, links)` 在平台投影提交后接收来源 key 与平台任务 ID 的对应关系，适合幂等回填关联。`snapshot()` 只读取事实；`linked()` 可以重试，不能在其中启动业务工作。
+
+## 3. 业务提交后请求同步
+
+以下片段展示调用顺序，`context` 和业务命令均由应用服务从已认证并已授权的宿主上下文构造：
+
+```ts
+import {
+  ProjectTasksRuntimeCapability,
+  type ProjectTaskContext,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+async function requestTaskSync(
+  capabilities: RuntimeCapabilityRegistry,
+  context: ProjectTaskContext
+) {
+  // 在业务事务成功提交后调用此函数。
+  return capabilities.require(ProjectTasksRuntimeCapability).refresh(context)
+}
+```
+
+`refresh()` 返回 `{ status: 'queued' }` 表示同步请求已持久保存，不表示快照处理完成。后台读取 Provider 快照并更新平台索引；插件应把业务保存结果与同步结果分开反馈。请求提交失败时保留业务成功结果，记录待同步状态并安排后续重试。
+
+`graph()` 读取已保存任务和当前执行事实，不能用它代替同步请求。`change()` 通过任务 ID 和 `expectedRevision` 维护计划日期等字段；它不能替应用修改来源任务的层级和依赖。`resolveExecution()` 验证并返回特定尝试的执行目标，不应自行猜测“最近一次对话”。
+
+原生业务执行继续由应用现有的工具、委派或后台工作流程负责。任务 Provider 和同步 API 不承担启动与验收职责；平台通用派发、状态更新和验收入口也不能接管应用来源任务。
+
+## 4. 接入工作台与成果入口
+
+在 Assistant 的中间件能力中声明 `project.tasks` feature，复用平台 View `platform.project-tasks__timeline`。该 View 在有项目上下文的会话 Workbench 中按需打开，项目页也使用同一任务数据与执行定位。
+
+若应用提供“打开项目任务”工具，应从可信运行上下文取得当前项目，检查访问后发出标准打开视图事件。这个工具只负责导航，不能顺便创建项目、派发或重试任务。应用自己的业务 View 可继续承载编辑和验收操作，见[视图扩展](/zh-Hans/ai/plugin/plugin-sdk/view-extension)。
+
+成果通过实际文件或 Artifact 接口保存，再向用户提供相应引用。任务快照中的 `outputSummary` 只是执行摘要，不是交付物；文件范围和版本处理见[工作空间文件](/zh-Hans/ai/plugin/plugin-sdk/workspace-files)与 [Artifacts](/zh-Hans/ai/plugin/plugin-sdk/artifacts)。
+
+## 验证接入效果
+
+| 验证场景 | 应达到的结果 |
+| --- | --- |
+| 同一业务项目重复预配 | 复用同一平台项目，保留已管理的 Assistant 成员关系 |
+| 同一业务快照重复同步 | 同一任务与尝试保持稳定关联，不增加重复条目 |
+| 应用保存新状态后同步 | 业务状态、负责人、依赖与尝试在统一视图中对应正确 |
+| 业务已保存而同步失败 | 业务结果保留，有可排查的待同步信息，恢复同步不会重跑 Agent |
+| 阅读、刷新或打开视图 | 不触发业务写入、执行或验收 |
+| 原执行成功但业务仍待检查 | 保留应用业务状态，不自动标记完成 |
+| 打开历史尝试或未授权项目 | 精确定位有权访问的尝试；缺失或拒绝访问时不替换成其他记录 |
+| 修改应用任务的关系或业务状态 | 通用入口拒绝接管，使用应用入口修改；平台排期仍受角色和版本检查 |
+
+上述接口以当前源码契约为准。启用异步同步需要配套的宿主实现与数据库迁移，再部署调用 `refresh()` 的插件；SDK 类型可导入不等于部署环境已提供对应能力。旧宿主缺少 `refresh()` 时应明确报告不可用，不退回通过读接口写入。源码与文档校验不能替代目标环境的实际接入验证。

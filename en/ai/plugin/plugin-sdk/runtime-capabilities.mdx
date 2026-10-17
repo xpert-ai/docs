@@ -137,6 +137,9 @@ Create the scoped API and resolve the capability close to each operation so avai
 | `ActorTokenRuntimeCapability` | `platform.actor-token` | Mint a short-lived host-issued actor token for an outbound API call. |
 | `ProjectAccessRuntimeCapability` | `platform.project.access` | List readable Projects and enforce human edit or management roles. |
 | `ProjectProvisioningRuntimeCapability` | `platform.project.provisioning` | Idempotently create or reconcile a Chat Project and connect an Assistant. |
+| `ProjectTasksRuntimeCapability` | `platform.project.tasks` | Read saved tasks, request background synchronization, manage schedules and resolve specific executions; business rules remain with the plugin. |
+
+See the [SDK project integration guide](/en/ai/projects/plugin-apps/sdk-integration) for combining provisioning, project access and business task capabilities.
 
 Continue with the detailed references:
 

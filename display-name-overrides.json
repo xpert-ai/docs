@@ -53,7 +53,8 @@
     "setup": "Project Setup",
     "tasks": "Task Management",
     "automation": "Project Automation",
-    "help": "Help"
+    "help": "Help",
+    "plugin-apps": "Plugin App Integration"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -135,6 +136,7 @@
     "setup": "项目设置",
     "tasks": "任务管理",
     "automation": "项目自动化",
-    "help": "帮助"
+    "help": "帮助",
+    "plugin-apps": "插件应用集成"
   }
 }

@@ -6,34 +6,35 @@ sidebar_position: 7
 
 `ProjectProvisioningRuntimeCapability` 通过 `platform.project.provisioning` 暴露 `ProjectProvisioningApi`，适用于需要维护业务项目与 Xpert 对话项目一对一映射的插件。
 
-`ensure()` 会创建对话项目，或协调其当前名称、生命周期状态、工作区和连接的助手，同时保持调用方提供的项目 ID 不变。
+`ensure()` 创建或协调调用方指定 ID 的项目，处理名称、生命周期及内容初始化。首次创建时，以入口 Assistant 及其递归外部 Assistant 依赖初始化项目连接；已有项目保留当前成员关系，不会加回已移除的 Assistant，也不会自动加入后来新增的依赖。
+
+完整产品体验见[插件应用与项目](/zh-Hans/ai/projects/plugin-apps/index)。任务映射和同步是另一项能力，见 [SDK 项目任务接入指南](/zh-Hans/ai/projects/plugin-apps/sdk-integration)。
 
 ## 契约
 
 ```ts
-type ProjectEnsureInput = {
-  projectId: string
-  workspaceId: string
-  xpertId: string
-  name: string
-  status: 'active' | 'archived'
-}
-
-type ProjectEnsureResult = {
-  projectId: string
-  workspaceId: string
-  xpertIds: string[]
-  operation: 'created' | 'updated'
-}
-
-interface ProjectProvisioningApi {
-  ensure(input: ProjectEnsureInput): Promise<ProjectEnsureResult>
-}
+import type {
+  ProjectEnsureInput,
+  ProjectEnsureResult,
+  ProjectProvisioningApi
+} from '@xpert-ai/plugin-sdk'
 ```
 
-`xpertIds` 是同步完成后连接的助手完整集合，而不仅是当前调用传入的助手。
+| 输入字段 | 用途 |
+| --- | --- |
+| `projectId` | 调用方预留并保存的项目 ID，重试时保持不变 |
+| `projectType` | 可选的 `{ applicationKey, projectTypeKey }`，新应用应使用已注册的项目类型 |
+| `xpertId` | 用于创建和校验的入口 Assistant |
+| `name`、`status` | 当前业务名称与 `active` 或 `archived` 状态 |
+| `requesterAgentKey` | 可选的主请求 Agent key，用于直接外部 Assistant 的绑定校验 |
+| `externalAssistantExpectations` | 可选的预期直接外部 Assistant 身份，按 `pluginName`、`templateKey`、`agentKey` 校验；必须在项目写入前全部通过 |
+| `workspaceId` | 已弃用的可选兼容字段，项目不再归属于工作空间；新接入不依赖它 |
+
+结果包含 `projectId`、`xpertIds` 和 `operation: 'created' | 'updated'`。`xpertIds` 是当前保存的 Assistant 连接集合。`workspaceId` 仅在旧调用提供时回传，不参与项目归属。
 
 ## 示例
+
+以下逻辑运行在已认证并获授权的宿主请求上下文中。业务对象已保存目标平台项目 ID；示例项目类型应替换为本插件实际注册的实体绑定类型。
 
 ```ts
 import { ProjectProvisioningRuntimeCapability } from '@xpert-ai/plugin-sdk'
@@ -44,7 +45,10 @@ const projects = capabilities.require(
 
 const result = await projects.ensure({
   projectId: businessProject.chatProjectId,
-  workspaceId: businessProject.workspaceId,
+  projectType: {
+    applicationKey: '@example/plugin-case:case-app',
+    projectTypeKey: 'case'
+  },
   xpertId: pluginConfig.assistantId,
   name: businessProject.name,
   status: businessProject.archived ? 'archived' : 'active'
@@ -56,10 +60,24 @@ await projectRepository.update(businessProject.id, {
 })
 ```
 
+实体绑定类型需要对应的 `IProjectTypeProvider`，验证当前范围内已保存的业务对象与项目关联，并提供应用入口。
+
 ## 幂等性与归属
 
 - 创建业务项目时只生成或预留一次 `projectId`，后续重试和协调必须复用该 ID。
 - 超时后不要生成新 ID；使用相同 ID 再次调用 `ensure()`。
-- `workspaceId` 必须与业务项目和所连接助手的归属工作区保持一致。
+- 当前租户、组织和用户来自可信宿主上下文；入口 Assistant 必须匹配项目组织，已有项目的协调要求项目所有者身份。
+- 项目类型来自应用声明与持久关联，不按名称推断；预配不能任意重分类既有项目。
+- 项目连接变更由显式成员管理负责；重试预配不能覆盖现有成员设置。
 - 业务项目归档时同步 `status: 'archived'`，不要静默创建一个新的活动项目作为替代。
 - 将 `operation` 作为协调结果证据。产品逻辑应依据有效结果，不能假定每次成功调用都创建了新记录。
+
+预配成功不代表业务任务已同步、Assistant 已发布或业务工作已执行。
+
+## 会话首次创建与清理
+
+应用可实现可选的 `IProjectTypeProvider.createForConversation()`，在宿主提供的事务中保存业务对象与项目关联。宿主负责平台项目和会话绑定，不在回调内再次调用 `ensure()`、启动 Agent 或进行外部 I/O。需要用户确认配置时，由应用先完成确认；SDK 可选的 `confirmConversation()` 用于确认待创建会话的首个项目，不移动已有会话绑定。
+
+SDK 还声明可选的 `purge()`，仅供所有者物理清理已归档、由插件绑定的项目及其文件空间。它不是日常归档或同步步骤，应确认宿主支持并遵循应用的删除流程。
+
+项目权限、业务任务和视图的接入顺序见[项目集成指南](/zh-Hans/ai/projects/plugin-apps/sdk-integration)。

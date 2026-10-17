@@ -128,10 +128,20 @@ local accounts, test receipts and release checklists out of the product workflow
 ## Projects & Tasks product documentation
 
 AI → Projects & Tasks (项目与任务) is a separate tab immediately after Agent.
-The 12 pages under each `{language}/ai/projects/` tree cover the overview,
+The 16 pages under each `{language}/ai/projects/` tree cover the overview,
 quickstart, project types, Assistants and context, members, files, planning,
-task views, execution and acceptance, group collaboration, schedules and troubleshooting.
+task views, execution and acceptance, group collaboration, plugin app integration,
+schedules and troubleshooting.
 Keep the English and Chinese paths and navigation order aligned.
+
+The **Plugin App Integration / 插件应用集成** group under `plugin-apps/` contains
+four pages: `index` (product experience and the bid application example),
+`business-tasks` (source ownership, task and execution synchronization),
+`shared-context` (project resources and permissions), and `sdk-integration`
+(capability map, integration sequence and verification). Keep business workflows
+in the product pages and SDK field details in the integration guide. Cross-links
+from project types, task views, acceptance, application configuration and SDK
+runtime capabilities make both the user and developer entry paths discoverable.
 
 The old `/{language}/ai/agent/conversation/projects` routes redirect to the new
 overview. Preserve these redirects; internal links should use the new routes.
@@ -152,6 +162,19 @@ Plugin SDK documentation. For subsequent updates, cross-check these sources:
 | Dispatch, acceptance and shared task UI | `packages/server-ai/src/xpert-project/runtime/`, `plugins/project-tasks/README.md`, `views/project-tasks.provider.ts`, `remote-components/project-tasks/` |
 | Execution viewer and schedules | `packages/server-ai/src/agent-invocation/remote-components/coding-execution/README.md`, `packages/server-ai/src/xpert-task/xpert-task.service.ts` |
 | SDK boundaries | `packages/plugin-sdk/docs/README.md` (task types), `en/RESOURCE-CARDS.md`, `en/view-extension-protocol.md`, `en/runtime-capabilities.md` and `workspace-file-tools.md` |
+| Plugin project and task contracts | `packages/plugin-sdk/src/lib/project-task/index.ts`, `project-type/index.ts` and `runtime/capabilities/project-{access,provisioning}.ts` |
+| Task source ownership and synchronization | `packages/server-ai/src/xpert-project/services/project-task-ownership.ts`, `project-task-graph.service.ts`, `task-projection/` and `plugins/project-tasks/README.md` |
+
+The bid example was also checked against the adjacent `apps/bid` source:
+`src/lib/project/task-management/bid-project-tasks.provider.ts`,
+`bid-project-task-sync.service.ts`, `src/lib/project/bid-project-type.provider.ts`
+and `src/lib/application/bid-project-tasks.tool.ts`. Its older implementation notes
+describe write-on-read synchronization; current source uses an explicit queued
+`refresh()` after business commits. Preserve that distinction: `graph()` reads
+saved facts, queued is not synchronized, and opening or refreshing a view never
+starts work. A failed enqueue requires another synchronization request; reading
+the view is not a substitute. These contracts were checked in the current source
+checkout, including ongoing development, and do not assert deployed availability.
 
 Architecture proposals under `docs/zh-Hans/solutions/` include planned features
 and older UI inventories; confirm capabilities against current implementation.
