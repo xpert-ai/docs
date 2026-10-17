@@ -69,8 +69,7 @@
               "pages": [
                 "conversation",
                 "discover-and-add",
-                "assistant-templates",
-                "projects"
+                "assistant-templates"
               ]
             },
             {
@@ -99,6 +98,48 @@
               "slug": "artifacts",
               "pages": [
                 "index"
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "projects",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "quickstart"
+              ]
+            },
+            {
+              "slug": "setup",
+              "pages": [
+                "project-types",
+                "assistants-and-context",
+                "members-and-permissions",
+                "files-and-deliverables"
+              ]
+            },
+            {
+              "slug": "tasks",
+              "pages": [
+                "planning",
+                "views",
+                "execution-and-review",
+                "group-collaboration"
+              ]
+            },
+            {
+              "slug": "automation",
+              "pages": [
+                "scheduled-tasks"
+              ]
+            },
+            {
+              "slug": "help",
+              "pages": [
+                "troubleshooting"
               ]
             }
           ]

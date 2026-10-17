@@ -5,6 +5,8 @@ sidebar_position: 12
 
 The project selector sets the business context before a message is sent. Project types distinguish ordinary conversation projects from application-owned business projects, such as a BOM Case. An Assistant can participate in multiple projects; selecting one does not change the Assistant configuration.
 
+This page covers ChatKit integration. For user workflows covering creation, members, files, dispatch and acceptance, see [Projects & Tasks](/en/ai/projects/index). For connecting a group to a project, see [Group collaboration](/en/ai/projects/tasks/group-collaboration).
+
 ## Enable project selection
 
 Enable `composer.projects` when using the Xpert hosted API:

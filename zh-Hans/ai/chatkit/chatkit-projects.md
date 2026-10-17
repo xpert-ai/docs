@@ -5,6 +5,8 @@ sidebar_position: 12
 
 项目选择器让用户在发送消息前确定业务上下文。项目类型则用来区分普通对话项目和由应用管理的业务项目，例如 BOM Case。同一个 Assistant 可以参与多个项目；选择项目不会修改 Assistant 的配置。
 
+本文面向 ChatKit 集成开发。项目创建、成员和文件管理、任务派发及验收的用户操作，参见[项目与任务](/zh-Hans/ai/projects/index)；群聊关联项目的方法见[群聊项目协作](/zh-Hans/ai/projects/tasks/group-collaboration)。
+
 ## 启用项目选择器
 
 在使用 Xpert 托管 API 的 ChatKit 配置中开启 `composer.projects`：

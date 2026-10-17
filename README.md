@@ -90,7 +90,7 @@ Do not edit `api/openapi.sdk.zh-Hans.json` directly. The localization generator 
 
 ## Live Dashboard product documentation
 
-AI → Live Dashboard (实时看板) is a separate tab immediately after Agent, mirrored
+AI → Live Dashboard (实时看板) is a separate tab after Projects & Tasks, mirrored
 in `en` and `zh-Hans`. Its six task-oriented pages live under
 `{language}/ai/live-dashboard/`:
 
@@ -124,3 +124,39 @@ When updating these pages, distinguish saved definitions from data snapshots, pa
 timers from background subscriptions, draft revisions from formal versions, and
 team read-only sharing from private Workspace script dependencies. Keep commands,
 local accounts, test receipts and release checklists out of the product workflow.
+
+## Projects & Tasks product documentation
+
+AI → Projects & Tasks (项目与任务) is a separate tab immediately after Agent.
+The 12 pages under each `{language}/ai/projects/` tree cover the overview,
+quickstart, project types, Assistants and context, members, files, planning,
+task views, execution and acceptance, group collaboration, schedules and troubleshooting.
+Keep the English and Chinese paths and navigation order aligned.
+
+The old `/{language}/ai/agent/conversation/projects` routes redirect to the new
+overview. Preserve these redirects; internal links should use the new routes.
+The AI overview, Bosi tutorial and ChatKit project-selector guide link to this section.
+Navigation is defined in `docs.json`, `navigation-order-tree.json` and
+`display-name-overrides.json`. Preview generation before applying it: existing
+manual navigation elsewhere in the site can differ from the directory-derived output.
+
+The initial research on 2026-10-17 used the local `xpert` source checkout and its
+Plugin SDK documentation. For subsequent updates, cross-check these sources:
+
+| Product topic | Source in the Xpert repository |
+| --- | --- |
+| Task and group workflows | `docs/zh-Hans/guides/project-tasks.mdx`, `group-project-tasks.mdx` and their English counterparts |
+| Project types and first-send creation | `docs/zh-Hans/guides/project-application-types.mdx`, `docs/conversation-project-bootstrap.md`, `services/project-type.service.ts` and `services/conversation-project.service.ts` under `packages/server-ai/src/xpert-project/` |
+| Visible Cloud actions | `apps/cloud/src/app/features/project/`: routes, creation, plans, files, configuration and membership dialogs |
+| Authorization and governed content | `packages/server-ai/src/xpert-project/services/`: access, membership, content and workspace-file services |
+| Dispatch, acceptance and shared task UI | `packages/server-ai/src/xpert-project/runtime/`, `plugins/project-tasks/README.md`, `views/project-tasks.provider.ts`, `remote-components/project-tasks/` |
+| Execution viewer and schedules | `packages/server-ai/src/agent-invocation/remote-components/coding-execution/README.md`, `packages/server-ai/src/xpert-task/xpert-task.service.ts` |
+| SDK boundaries | `packages/plugin-sdk/docs/README.md` (task types), `en/RESOURCE-CARDS.md`, `en/view-extension-protocol.md`, `en/runtime-capabilities.md` and `workspace-file-tools.md` |
+
+Architecture proposals under `docs/zh-Hans/solutions/` include planned features
+and older UI inventories; confirm capabilities against current implementation.
+Keep product instructions distinct from SDK contracts and deployment procedures.
+In particular, preserve the distinctions between planning and dispatch, successful
+execution and acceptance, working files and committed deliverables, group membership
+and Project authorization, and scheduled runs and business tasks. Source inspection
+and documentation builds do not establish deployed availability or live execution.

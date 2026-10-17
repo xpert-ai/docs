@@ -1,0 +1,55 @@
+---
+title: "Assistants, instructions, skills and connectors"
+description: "Configure participating Assistants, shared rules, reusable skills and business-system connections for a project."
+---
+
+Prepare collaboration resources on the project's **Configuration** page. Decide who participates and which materials and tools are needed before dispatching work.
+
+## Add participating Assistants
+
+An owner or manager uses **Manage experts** to select available Assistants. Configuration shows connected experts and offers an entry to start a project conversation with one of them.
+
+A project can connect multiple Assistants. Each retains its own model, tools and authorization; joining a project does not give them identical capabilities. Project connections also differ from group participation: a group execution target must be explicitly selected into that group's project.
+
+An Assistant that creates, reads, dispatches or accepts tasks needs **Project management**. Enable it during Assistant creation and select a model with tool calling, or adjust it later through supported capability settings. The project's general Assistant includes task management by default.
+
+<Note>
+Project management configures task tools and instructions. It does not grant project permissions, create a project or install a Computer executor. Advanced workflows can also connect a Project Tasks plugin node in Studio.
+</Note>
+
+## Save project instructions
+
+Use **Project instructions** for lasting requirements such as terminology, sources, output language and delivery standards. Saved instructions provide shared project context for subsequent work.
+
+```text
+This project evaluates enterprise collaboration products.
+Every price must include currency, billing period, source and lookup date.
+Separate verified facts, inferences and open questions. Do not invent missing data.
+The final report must include a comparison table, recommendation and check record.
+```
+
+Put one-off scope in task descriptions and completion requirements; put ongoing standards in project instructions. After changing the rules, recheck requirements on unaccepted tasks so that new results are not accepted against an old standard.
+
+## Install and manage project skills
+
+Under **Project skills**, choose **Add project skill**:
+
+1. Select an available repository skill or upload a skill ZIP package.
+2. Check its name, description, version and source after installation.
+3. Use the management dialog to enable, disable or uninstall it.
+
+Skills can hold reusable analysis methods, check procedures and document templates. Installation requires project editing rights. Tools and external services used by a skill must still be available to the Assistant and environment. See the [Skills overview](/en/ai/skill/index).
+
+## Configure connectors
+
+Open **Manage project connectors**, select a supported service, create a connection and complete authorization. New connections in the current project configuration UI use **team authorization**, maintained by an owner or manager.
+
+Team authorization allows authorized project operations to use a shared business account. The external service still controls the objects and actions that account may access. Seeing a connector does not establish permission for every operation.
+
+Personal and team connections have different authorization scopes. Where an existing task or deployment provides personal connections, the corresponding user must authorize them; personal authorization is not a shared project credential.
+
+Reconnect expired or disconnected services before continuing dependent work. Scheduled tasks also require an explicit connector selection; see [Project scheduled tasks](../automation/scheduled-tasks).
+
+## Check readiness
+
+Confirm that the Assistant is connected, its tools cover the work, project instructions are saved, inputs are readable and required connectors are authorized. Assistants and applications supply tool and knowledge capabilities; a project does not automatically contain every tool.

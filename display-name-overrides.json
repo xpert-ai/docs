@@ -48,7 +48,12 @@
     "harness": "Harness",
     "overview": "Overview",
     "cases": "Case Studies",
-    "live-dashboard": "Live Dashboard"
+    "live-dashboard": "Live Dashboard",
+    "projects": "Projects & Tasks",
+    "setup": "Project Setup",
+    "tasks": "Task Management",
+    "automation": "Project Automation",
+    "help": "Help"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -125,6 +130,11 @@
     "harness": "Harness",
     "overview": "概述",
     "cases": "案例",
-    "live-dashboard": "实时看板"
+    "live-dashboard": "实时看板",
+    "projects": "项目与任务",
+    "setup": "项目设置",
+    "tasks": "任务管理",
+    "automation": "项目自动化",
+    "help": "帮助"
   }
 }

@@ -1,0 +1,77 @@
+---
+title: "Project and task troubleshooting"
+description: "Resolve missing projects, tasks that do not start, absent follow-up replies, blocked acceptance, file delivery and scheduling issues."
+---
+
+Identify where the problem occurs: project access, task planning, actual execution, result delivery or business acceptance. Task records and execution details establish more than a “done” message alone.
+
+## Missing projects or entries
+
+| Symptom | Check or action |
+| --- | --- |
+| No project entry or creation unavailable | Ask an administrator to check feature availability and project creation permission |
+| Existing project missing from the list | Confirm the organization, clear name, status and type filters, then check membership |
+| Project missing from an Assistant selector | Check active status, Assistant connection and user access |
+| Cannot change group project settings | Only the group owner can do this; connecting an existing project also requires management rights |
+| Application project cannot be renamed or archived generically | Manage its business object in the owning application |
+| Project tasks absent from Workbench | Check conversation project binding, Assistant Project management and deployment of the corresponding view |
+
+Successful login does not establish that the correct organization is selected. Confirm organization context before concluding that access is missing.
+
+## A plan exists but work has not started
+
+Creating tasks, entering dates and saving dependencies only update the plan. Ask the responsible Assistant to explicitly dispatch work and check for an execution record.
+
+If dispatch is rejected, check accepted predecessors, matching assignee and target, active group participants explicitly selected into the project, and external executor availability. External execution may also be waiting for an existing project attempt to end.
+
+Do not remove dependencies or mark work complete to conceal unmet prerequisites.
+
+## Execution ended but no follow-up reply appeared
+
+Open **Execution history** and distinguish runtime status from result-delivery status.
+
+| Situation | Next action |
+| --- | --- |
+| The original Assistant is still replying | Wait for the current turn; the result may be queued |
+| Conversation awaits input or approval | Complete the required input or approval; automatic continuation preserves this wait |
+| Conversation was paused or stopped | Manually continue when appropriate and request the saved result |
+| Result delivery failed | Retry delivery if authorized, without dispatching the entire task again |
+| Access revoked or original conversation unavailable | Resolve access first; results are not automatically rerouted elsewhere |
+
+Reopening a conversation after disconnection can restore saved messages, but does not guarantee replay of every streamed fragment produced while offline.
+
+## Execution succeeded but acceptance fails
+
+Check whether requirements changed, a newer implementation exists or the referenced file version changed. Old results or reviews cannot substitute for current evidence.
+
+If independent review was requested, the latest valid review must pass. Resolve failed, Changes required or Indeterminate results first. A review report itself still does not replace the final completion decision.
+
+Also confirm project editing rights and whether the task is managed by a business application with its own workflow.
+
+## Execution failed or its outcome is unknown
+
+Inspect that attempt's error, captured output and retained files to establish what actually happened. After fixing model billing, authorization, connectors or executor problems, explicitly arrange a new attempt.
+
+Unknown status does not prove that execution never happened. Rerunning immediately can repeat file changes or external actions. Inspect the existing attempt first. Group errors provide an **Assistant processing records** entry for the corresponding attempt.
+
+## Files are missing or cannot be downloaded
+
+Check **Outputs** for formal delivery. A path in a reply may refer only to a working file. Determine whether delivery was requested, export failed or download permissions changed. Execution and file-export success must be checked separately.
+
+For working files, open **Assets** in the current project rather than using an old reference from another project or personal chat. See [Shared files and deliverables](../setup/files-and-deliverables).
+
+## Dates, progress or views seem inconsistent
+
+- No percentage: the executor or application has not provided explicit progress; use status.
+- Planned and actual dates differ: one records expectations and the other actual execution.
+- Tasks seem missing: clear search, status, assignee and kind filters and expand the task tree.
+- Saving a plan reports a conflict: refresh and review other collaborators' saved changes.
+- Application tasks are stale: allow synchronization and refresh; verify the source operation succeeded and contact its maintainer if the issue persists.
+
+## A scheduled task was paused
+
+Check execution-user membership, project archival, Assistant connection and access, and selected connector validity. Changing the execution user requires the recipient's acceptance. After resolving the cause, an authorized manager can resume scheduling.
+
+## What to share with an administrator
+
+Provide project and task names, the time, selected Assistant, visible status, last action and expected result. Share authorized execution-detail links and visible error summaries where useful. Account tokens or complete private source materials are unnecessary.

@@ -1,0 +1,45 @@
+---
+title: "Project types and conversation scope"
+description: "Choose general or application projects, find existing work and confirm the project context before starting a conversation."
+---
+
+A project type identifies who manages the work and where it should be created and opened. A project can connect multiple Assistants; choosing another Assistant does not change its type.
+
+## General and application projects
+
+| Type | Suitable for | Creation and management |
+| --- | --- | --- |
+| General project | Ongoing research, analysis and content work | Create through the platform and manage shared materials, members and tasks |
+| Application project | Workspaces supplied by installed business applications | Follow the application's project type and creation entry |
+| Project linked to a business object | Work tied to a case, business document or similar object | The application owns its name and lifecycle; enter through the business workflow |
+| Unclassified historical project | Older projects without an explicit type | Find through the unclassified filter; names do not determine application ownership |
+
+Projects linked to business objects cannot be freely renamed, copied, archived or deleted through generic project actions. Manage the object in its application. An unavailable application does not turn its projects into general projects.
+
+## Find an existing project
+
+Use search, status, application and type filters in the project list. Click a project's type prefix to find related projects and use pagination for additional results.
+
+The conversation project selector searches projects available to the current Assistant. Browse by type or switch to the recently updated view. **Recently updated** means the project's modification time, not your last visit.
+
+If a project is missing, check the current organization, type filter and search text, then confirm project membership and the Assistant connection. The selector only shows projects available in the current context.
+
+## Confirm the scope before chatting
+
+| Selection | What happens |
+| --- | --- |
+| Existing project | The new conversation uses that project's context |
+| Create on send | A supporting Assistant creates and binds a project on the first send |
+| No project | An Assistant that permits personal conversations continues outside a project |
+
+Assistants that require projects may not offer No project. Applications can require additional creation steps; follow the displayed flow. If creation fails, inspect the reason before repeatedly creating projects with the same name.
+
+Saved conversations retain their project. Reopening, retrying or continuing uses that saved context instead of creating a project for every turn. Switching to another project starts a different context; it does not move the previous conversation.
+
+Recheck attachments and file references when switching projects. The selector can retain plain-text draft content while clearing previous file selections to prevent carrying materials into the wrong scope.
+
+## Group and personal conversations
+
+In a personal conversation, the user selects the project. In a group, the owner connects a project and explicitly selects participating Assistants. Once established, the group project cannot be changed to another project from that menu. Prepare the scope before formal work begins; see [Group collaboration](../tasks/group-collaboration).
+
+For custom chat integrations, see the [ChatKit project selector](/en/ai/chatkit/chatkit-projects).

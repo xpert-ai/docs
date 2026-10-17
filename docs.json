@@ -173,8 +173,7 @@
                     "pages": [
                       "en/ai/agent/conversation/conversation",
                       "en/ai/agent/conversation/discover-and-add",
-                      "en/ai/agent/conversation/assistant-templates",
-                      "en/ai/agent/conversation/projects"
+                      "en/ai/agent/conversation/assistant-templates"
                     ]
                   },
                   {
@@ -236,6 +235,48 @@
                       "en/ai/agent/toolset/coding-expert",
                       "en/ai/agent/toolset/virtual-environment/git-tools",
                       "en/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Projects & Tasks",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/projects/index",
+                      "en/ai/projects/quickstart"
+                    ]
+                  },
+                  {
+                    "group": "Project Setup",
+                    "pages": [
+                      "en/ai/projects/setup/project-types",
+                      "en/ai/projects/setup/assistants-and-context",
+                      "en/ai/projects/setup/members-and-permissions",
+                      "en/ai/projects/setup/files-and-deliverables"
+                    ]
+                  },
+                  {
+                    "group": "Task Management",
+                    "pages": [
+                      "en/ai/projects/tasks/planning",
+                      "en/ai/projects/tasks/views",
+                      "en/ai/projects/tasks/execution-and-review",
+                      "en/ai/projects/tasks/group-collaboration"
+                    ]
+                  },
+                  {
+                    "group": "Project Automation",
+                    "pages": [
+                      "en/ai/projects/automation/scheduled-tasks"
+                    ]
+                  },
+                  {
+                    "group": "Help",
+                    "pages": [
+                      "en/ai/projects/help/troubleshooting"
                     ]
                   }
                 ]
@@ -995,8 +1036,7 @@
                     "pages": [
                       "zh-Hans/ai/agent/conversation/conversation",
                       "zh-Hans/ai/agent/conversation/discover-and-add",
-                      "zh-Hans/ai/agent/conversation/assistant-templates",
-                      "zh-Hans/ai/agent/conversation/projects"
+                      "zh-Hans/ai/agent/conversation/assistant-templates"
                     ]
                   },
                   {
@@ -1056,6 +1096,48 @@
                       "zh-Hans/ai/agent/toolset/coding-expert",
                       "zh-Hans/ai/agent/toolset/virtual-environment/git-tools",
                       "zh-Hans/ai/agent/toolset/virtual-environment/slideshow-tools"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "项目与任务",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/projects/index",
+                      "zh-Hans/ai/projects/quickstart"
+                    ]
+                  },
+                  {
+                    "group": "项目设置",
+                    "pages": [
+                      "zh-Hans/ai/projects/setup/project-types",
+                      "zh-Hans/ai/projects/setup/assistants-and-context",
+                      "zh-Hans/ai/projects/setup/members-and-permissions",
+                      "zh-Hans/ai/projects/setup/files-and-deliverables"
+                    ]
+                  },
+                  {
+                    "group": "任务管理",
+                    "pages": [
+                      "zh-Hans/ai/projects/tasks/planning",
+                      "zh-Hans/ai/projects/tasks/views",
+                      "zh-Hans/ai/projects/tasks/execution-and-review",
+                      "zh-Hans/ai/projects/tasks/group-collaboration"
+                    ]
+                  },
+                  {
+                    "group": "项目自动化",
+                    "pages": [
+                      "zh-Hans/ai/projects/automation/scheduled-tasks"
+                    ]
+                  },
+                  {
+                    "group": "帮助",
+                    "pages": [
+                      "zh-Hans/ai/projects/help/troubleshooting"
                     ]
                   }
                 ]
@@ -1807,6 +1889,14 @@
     {
       "source": "/zh-Hans/ai/tag/capability-status",
       "destination": "/zh-Hans/ai/agent/tag/capability-status"
+    },
+    {
+      "source": "/en/ai/agent/conversation/projects",
+      "destination": "/en/ai/projects/index"
+    },
+    {
+      "source": "/zh-Hans/ai/agent/conversation/projects",
+      "destination": "/zh-Hans/ai/projects/index"
     }
   ]
 }

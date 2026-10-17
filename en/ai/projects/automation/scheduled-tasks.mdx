@@ -1,0 +1,47 @@
+---
+title: "Project scheduled tasks"
+description: "Run a selected Assistant with project context at scheduled times and manage the execution user, connectors, pauses and recovery."
+---
+
+Use project scheduled tasks for daily reports, recurring material preparation and periodic checks. Manage them under **Configuration → Project automations**. Each automation connects a project Assistant and runs as a confirmed user.
+
+## Scheduled tasks and project tasks
+
+| Feature | Purpose |
+| --- | --- |
+| Project task | Define work, responsibility, dependencies and acceptance |
+| Scheduled task | Decide when a selected Assistant runs a work instruction |
+
+A project task's due date does not schedule execution. A scheduled run does not automatically create a business task each time. If task records are required, instruct an Assistant with Project management to create and manage them during its run.
+
+## Create a scheduled task
+
+1. Confirm at least one available Assistant is connected to the project.
+2. An owner or manager chooses **Add automation** on Configuration.
+3. Enter a name, schedule and work instruction, then select a project Assistant.
+4. Select project connectors needed for external business data.
+5. Save and check the automation's status and execution user.
+
+For example, set the schedule to Monday morning and use this instruction:
+
+> Check unfinished competitor research tasks. Identify missing sources and prices to verify this week, then save a weekly report. Highlight blockers and do not mark unchecked tasks complete.
+
+Put timing in the schedule and business requirements in the instruction. Output channels and external actions depend on the Assistant's tools and authorization; creating a schedule does not grant them.
+
+## Confirm the execution user
+
+The execution user determines whose authorization the automation uses. Configuration shows the current user. A manager or the current execution user can propose a handover to another project member; the recipient must personally accept it.
+
+A proposal does not transfer execution identity immediately. After acceptance, recheck the execution user, Assistant access and connector selection.
+
+## Select connectors
+
+Scheduled runs can use only explicitly selected connectors. Project managers maintain team authorization. Personal connections belong to the corresponding execution user, and only that user can select them.
+
+Recheck connector availability after changing the execution user. Invalid connectors, changed membership, an archived project or an unavailable Assistant can pause the automation and record a reason.
+
+## Pause, resume and check results
+
+Use the pause or resume control in Configuration to manage future scheduling. Pausing a schedule is different from cancelling an already started project-task attempt; handle that attempt in its execution record.
+
+Before resuming, fix the reported issue and confirm that execution-user and resource access remain valid. Then inspect the actual replies or files from subsequent runs. A Scheduled status does not establish business completion. Project tasks that require acceptance still follow the [acceptance workflow](../tasks/execution-and-review).
