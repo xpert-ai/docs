@@ -54,7 +54,10 @@
     "tasks": "Task Management",
     "automation": "Project Automation",
     "help": "Help",
-    "plugin-apps": "Plugin App Integration"
+    "plugin-apps": "Plugin App Integration",
+    "bosi": "Bosi App",
+    "daily-work": "Daily Work",
+    "desktop-guide": "Settings & Help"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -137,6 +140,9 @@
     "tasks": "任务管理",
     "automation": "项目自动化",
     "help": "帮助",
-    "plugin-apps": "插件应用集成"
+    "plugin-apps": "插件应用集成",
+    "bosi": "Bosi App",
+    "daily-work": "日常工作",
+    "desktop-guide": "设置与帮助"
   }
 }

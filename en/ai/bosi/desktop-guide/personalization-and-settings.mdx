@@ -1,0 +1,52 @@
+---
+title: "Personalization, settings and updates"
+description: "Customize the desktop and Assistant appearance, distinguish local preferences from shared configuration, and manage connections and updates."
+---
+
+Open **Settings** from the sidebar user menu or press `Cmd/Ctrl+,`. Search settings by topic. Most changes preview immediately: **Save settings** retains them, and **Cancel changes** restores saved values. Returning to the workspace preserves the Assistant and conversation and prompts about unsaved changes.
+
+## Personal preferences
+
+| Setting | What it controls |
+| --- | --- |
+| General | Interface language and everyday display preferences |
+| Appearance | Light, dark or system mode; desktop and chat colors, fonts, sizes, corners and density |
+| Usage & points | Current plan, balances, consumption trends and details |
+| Service connection | API, Xpert web and ChatKit URLs and certificate policy |
+| Local terminal | Local command permissions, Shell, starting directory and recent execution history |
+
+Desktop fonts must already be installed. An Assistant's character color can affect its conversation theme; groups use the configured chat palette. Local terminal parameters use the separate **Apply Shell settings** action.
+
+## Customize the Assistant's name and appearance
+
+Open customization in the conversation's Assistant panel to choose a built-in appearance, configure a character, select a Pet or upload an image. Available resources come from the deployment. Expression and activity previews are for design and do not change the Assistant's actual execution state.
+
+Public names and appearances belong to the platform Assistant and are visible to its other users. Saving and uploading require workspace editing rights; other users may view the appearance. Saving updates the name and avatar without overwriting workflows, prompts or unpublished drafts.
+
+## Which changes affect other users?
+
+| Change | Scope |
+| --- | --- |
+| Pins, personal sections, local copies and personal profile | Local presentation for the current service, account and organization |
+| Mark unread | A local reminder; marking read updates platform reading state |
+| Public name and Assistant appearance | Users of that platform Assistant |
+| Models, prompts and capabilities | Subsequent use of the Assistant after saving and publishing |
+| Project members, shared materials and business data | Collaboration within the resource's authorized scope |
+
+The personal section of **Edit profile** is separate from shared Assistant configuration. Check editing rights and impact before changing shared models or capabilities. Advanced orchestration remains in Xpert Studio. See [Assistant profile](/en/ai/agent/assistant-profile).
+
+## Connect your own Xpert service
+
+Use the API, web and ChatKit URLs provided by your administrator. Remote services use HTTPS. Saving changed URLs or certificate policy rebuilds the connection and requires signing in again.
+
+**Allow untrusted service certificates** is for explicitly trusted private deployments and is off by default. Enabling it disables certificate identity verification for configured service hosts. Check addresses and deployment certificates first; this setting does not fix account or resource permissions.
+
+Connection diagnostics distinguish certificate problems from network failures. See the [desktop user guide](/en/ai/tutorial/bosi-desktop-user-guide) for URL formats and steps. Bosi encrypts saved sign-in credentials when operating-system secure storage is available. Passwords are not persisted; without secure storage, credentials remain in memory only.
+
+## Update the client
+
+Supported installed stable builds show an update entry in the account area. You can also choose **Check for updates** from the application menu. After download, choose **Install and restart** or **Later**, saving current work before restarting.
+
+If the build does not support in-app updates, obtain an installer from the official download page. Reinstalling may retain local user data and sign-in state; use **Sign out** to clear the saved session.
+
+Bosi, the Xpert server and hosted ChatKit jointly provide the experience. Updating the desktop client does not upgrade the server, business plugins, published Assistants or ChatKit features.

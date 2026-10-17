@@ -1,0 +1,60 @@
+---
+title: "Bosi troubleshooting"
+description: "Locate connection, organization, initialization, model, tool and delivery problems while preserving completed work and actual execution state."
+---
+
+First identify whether the issue occurs during sign-in, personal Bosi initialization or a specific task. Signing in, opening an Assistant, executing a tool and delivering a file are separate stages.
+
+## Connections and organizations
+
+| Symptom | Check or action |
+| --- | --- |
+| Blank conversation panel or loading timeout | Check the ChatKit URL and availability of both its page and deployed assets |
+| Cannot reach a self-hosted service | Verify all three URLs and HTTPS; distinguish certificate, DNS, timeout and connection-refused messages |
+| Signed out after changing connections | The service scope changed; sign in again and confirm the organization |
+| Organization, Assistant or project missing | Check the organization and filters before membership, publication and usage grants |
+| macOS Keychain prompt or session restore failure | Follow the system prompt; sign in again if access was denied, retaining connection preferences |
+
+Successful sign-in does not select the correct organization by itself. Once scope is correct, ask an administrator to address any remaining resource access restriction.
+
+## Bosi creation and app initialization
+
+| Symptom | Check or action |
+| --- | --- |
+| No Create your Bosi entry | An accessible Assistant may already be bound in this organization; check existing entries |
+| Initialization reports inaccessible resources or an upgrade requirement | Resolve the existing binding or service version rather than treating the error as a missing Assistant |
+| Empty model list | Check organization model configuration, authorization and compatibility with selected capabilities |
+| Short plugin or service catalog | The catalog reflects actual packages and connector definitions, not a fixed recommendation list |
+| Welcome flow fails | Recover or retry the existing flow instead of initializing another Assistant |
+| App initializes but business work fails | Check publication, model, connections and business access, then verify with a small task |
+
+Capability selection, resource installation and external account authorization are separate. Connection flows should use the same account and organization as Bosi. See [Experts, apps and plugins](../daily-work/assistants-and-apps).
+
+## Tools and execution location
+
+| Symptom | Check or action |
+| --- | --- |
+| No local Shell entry | Confirm the native macOS app and an Assistant with Desktop Shell enabled and published |
+| A local command is waiting | Inspect its approval card, execution policy and device connectivity |
+| Device offline or busy | Keep the device and app online and inspect existing commands; work does not automatically move to the cloud |
+| Command state unknown | Inspect the original operation and actual files before deciding whether to run again |
+| Cloud computer unavailable | Check deployment support, model requirements and Assistant configuration |
+| Coding tool cannot open | Check installation, model compatibility and desktop control state together |
+
+See [Computers and development](../daily-work/computers-and-coding). A local working directory is not filesystem isolation, and server command output does not prove local execution.
+
+## Voice and delivery
+
+If voice is unavailable, check the Assistant's published voice configuration, model authorization and deployment support. For missing audio, check microphone permission, input device and mute state. A new call can start after disconnection but does not resume the old audio session. Hanging up does not cancel accepted background work.
+
+For missing files, distinguish reply paths, project working files and formal delivery cards. Download failures can involve missing version references, changed access or unavailable files. Do not substitute another version for the original delivery. Task completion also follows its acceptance rules. See [Conversations, Workbench and delivery](../daily-work/conversations-and-workbench).
+
+## Settings and updates
+
+Personal sections, pins and copies do not automatically synchronize to other devices. Public appearance and shared Assistant configuration can affect other users; see [Personalization, settings and updates](./personalization-and-settings).
+
+If a feature is still missing after a desktop update, ask the administrator to check the server, ChatKit, plugins and published Assistant together rather than repeatedly reinstalling the client.
+
+## Information for maintainers
+
+Include the Bosi version, operating system, official or self-hosted service, current organization, time, last action and visible error. For task issues, provide an authorized task or execution-detail link. Passwords, tokens and complete private materials are unnecessary.

@@ -1,0 +1,51 @@
+---
+title: "Projects and group collaboration"
+description: "Keep shared context in projects, coordinate colleagues and Assistants in groups, and inspect execution and delivery through shared task views."
+---
+
+Projects suit ongoing work; groups bring colleagues and multiple Assistants into the same conversation. Combine them to discuss and coordinate in the group while keeping materials, tasks and delivery records in the project.
+
+## Choose a project in the conversation
+
+Select the project near the new conversation's composer before sending materials and requirements. Project types distinguish general collaboration from app-owned business projects.
+
+- Choose an existing project to reuse shared materials and context.
+- Supporting Assistants can create a project on first send; business apps may require configuration first.
+- Opening history restores the conversation's saved project association.
+- Switching projects enters a new conversation context rather than moving the old conversation. Recheck attachments and file selections.
+
+See [Project types and conversation scope](/en/ai/projects/setup/project-types) for user rules and [ChatKit: Projects and Project Types](/en/ai/chatkit/chatkit-projects) for interface integration.
+
+## Turn discussion into trackable tasks
+
+With an Assistant that supports project management, state objectives, assignees, completion requirements and prerequisites, then request saved tasks. Creating tasks or entering dates does not automatically start execution.
+
+> Split this assessment into source checking, option comparison and report writing. The report depends on acceptance of the first two tasks. Specify an assignee and deliverable for each, and save the plan for my review first.
+
+Open **Project tasks** in Workbench to inspect the task tree, Gantt chart, status board and attempts. Ordinary platform tasks require explicit dispatch and result acceptance. App-owned tasks continue through the app's own start and acceptance workflow.
+
+Check business state, execution success and acceptance separately. See [Projects & Tasks](/en/ai/projects/index) and [Business task synchronization](/en/ai/projects/plugin-apps/business-tasks).
+
+## Create a collaboration group
+
+Create a group from the sidebar add menu or **File → New group**, then invite colleagues and available experts. Mention a member to direct a reply; the default Assistant replies when none is specified.
+
+For formal project assignments, the group owner connects a project from the entry below the composer and selects participating Assistants. Connecting an existing project requires the relevant management rights. Once established, the group project cannot simply be switched from that entry.
+
+Group discussion does not automatically create formal tasks. Identify work to register, its responsible executor and required predecessor results. Assistants can collaborate under supported scheduling rules; see [Group project collaboration](/en/ai/projects/tasks/group-collaboration).
+
+## Manage three relationships separately
+
+| Relationship | What it determines |
+| --- | --- |
+| Group members | Who participates in the discussion |
+| Project members and roles | Who can read, edit and manage the project |
+| Participating project Assistants | Which Assistants are connected and assigned work |
+
+Inviting a colleague to a group does not grant project editing rights. Adding an Assistant to a group does not automatically select it as a project executor. Project materials and business apps may have additional access rules.
+
+## Ongoing work and automations
+
+For recurring work, use **Automations** in the Assistant profile or configure a project scheduled task. Each has its own execution identity, triggers and access requirements. Closing a desktop window does not pause server-side automation; disable the schedule in its owning entry.
+
+See [Develop with Bosi](/en/ai/tutorial/develop-with-bosi) and [Project scheduled tasks](/en/ai/projects/automation/scheduled-tasks) for configuration.

@@ -125,6 +125,47 @@ timers from background subscriptions, draft revisions from formal versions, and
 team read-only sharing from private Workspace script dependencies. Keep commands,
 local accounts, test receipts and release checklists out of the product workflow.
 
+## Bosi App product documentation
+
+AI → **Bosi App** is a standalone tab immediately after Getting Started, mirrored
+in English and Simplified Chinese. Each `{language}/ai/bosi/` tree has eight pages:
+
+| Route suffix | Product topic |
+| --- | --- |
+| `index` | Product positioning, desktop experience and the platform relationship |
+| `quickstart` | Installation, organization selection, personal Bosi onboarding and a first task |
+| `daily-work/assistants-and-apps` | Experts, apps, plugin selection and service authorization |
+| `daily-work/projects-and-groups` | Project context, group collaboration, tasks and recurring work |
+| `daily-work/conversations-and-workbench` | Conversation, optional realtime voice, business views and delivery |
+| `daily-work/computers-and-coding` | Local Shell, server sandbox and cloud computer boundaries |
+| `desktop-guide/personalization-and-settings` | Local preferences, public appearance, shared settings and updates |
+| `desktop-guide/troubleshooting` | Connection, onboarding, permission, execution and delivery problems |
+
+Keep labels and order in `display-name-overrides.json` and
+`navigation-order-tree.json` aligned with `docs.json`. Existing Bosi tutorials
+retain their routes and practical walkthroughs, linking to these product pages.
+The AI overview links to the new tab. Do not replace unrelated curated navigation
+with the complete directory-generated output.
+
+Research on 2026-10-17/18 used the local Xpert source checkout:
+
+- `apps/desktop/README.md`, `docs/bosi-desktop-onboarding.md`,
+  `apps/desktop/docs/desktop-shell.md` and `docs/realtime-voice.md`.
+- `apps/desktop/src/bosi/`, `CatalogDialog.tsx`, `groups/DesktopAddMenu.tsx`,
+  `ChatPanel.tsx`, `voice/VoiceProvider.tsx` and `files/DeliveredFile.tsx`.
+- `apps/desktop/src/settings/sections.ts`, `assistant-settings/`, `avatar/`,
+  `packages/server-ai/src/assistant-binding/bosi/` and the related capability contracts.
+- Existing bilingual `bosi-desktop-user-guide` and `develop-with-bosi` tutorials,
+  checked against current source where behavior has evolved.
+
+Treat Bosi App, the personal Bosi Assistant and the Xpert service as distinct
+concepts. Keep local list preferences separate from public appearance and published
+Assistant configuration. Document local Shell as a native macOS preview and cloud
+computer as a deployment-dependent Pro capability. Onboarding illustrations are
+previews, queued work is not completion, and ending a voice call or desktop takeover
+does not cancel accepted background work. Feature documentation and source checks
+do not establish availability in a particular installed release or live environment.
+
 ## Projects & Tasks product documentation
 
 AI → Projects & Tasks (项目与任务) is a separate tab immediately after Agent.

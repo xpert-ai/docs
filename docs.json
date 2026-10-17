@@ -132,6 +132,34 @@
                 ]
               },
               {
+                "tab": "Bosi App",
+                "groups": [
+                  {
+                    "group": "Default",
+                    "pages": [
+                      "en/ai/bosi/index",
+                      "en/ai/bosi/quickstart"
+                    ]
+                  },
+                  {
+                    "group": "Daily Work",
+                    "pages": [
+                      "en/ai/bosi/daily-work/assistants-and-apps",
+                      "en/ai/bosi/daily-work/projects-and-groups",
+                      "en/ai/bosi/daily-work/conversations-and-workbench",
+                      "en/ai/bosi/daily-work/computers-and-coding"
+                    ]
+                  },
+                  {
+                    "group": "Settings & Help",
+                    "pages": [
+                      "en/ai/bosi/desktop-guide/personalization-and-settings",
+                      "en/ai/bosi/desktop-guide/troubleshooting"
+                    ]
+                  }
+                ]
+              },
+              {
                 "tab": "Agent",
                 "groups": [
                   {
@@ -994,6 +1022,34 @@
                       "zh-Hans/ai/getting-started/enterprise/docker/with-doris",
                       "zh-Hans/ai/getting-started/enterprise/docker/with-starrocks",
                       "zh-Hans/ai/getting-started/enterprise/ssl"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tab": "Bosi App",
+                "groups": [
+                  {
+                    "group": "默认",
+                    "pages": [
+                      "zh-Hans/ai/bosi/index",
+                      "zh-Hans/ai/bosi/quickstart"
+                    ]
+                  },
+                  {
+                    "group": "日常工作",
+                    "pages": [
+                      "zh-Hans/ai/bosi/daily-work/assistants-and-apps",
+                      "zh-Hans/ai/bosi/daily-work/projects-and-groups",
+                      "zh-Hans/ai/bosi/daily-work/conversations-and-workbench",
+                      "zh-Hans/ai/bosi/daily-work/computers-and-coding"
+                    ]
+                  },
+                  {
+                    "group": "设置与帮助",
+                    "pages": [
+                      "zh-Hans/ai/bosi/desktop-guide/personalization-and-settings",
+                      "zh-Hans/ai/bosi/desktop-guide/troubleshooting"
                     ]
                   }
                 ]

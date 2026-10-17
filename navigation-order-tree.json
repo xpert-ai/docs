@@ -23,6 +23,34 @@
           ]
         },
         {
+          "slug": "bosi",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "quickstart"
+              ]
+            },
+            {
+              "slug": "daily-work",
+              "pages": [
+                "assistants-and-apps",
+                "projects-and-groups",
+                "conversations-and-workbench",
+                "computers-and-coding"
+              ]
+            },
+            {
+              "slug": "desktop-guide",
+              "pages": [
+                "personalization-and-settings",
+                "troubleshooting"
+              ]
+            }
+          ]
+        },
+        {
           "slug": "digital-expert",
           "groups": []
         },

@@ -1,0 +1,57 @@
+---
+title: "Get started with Bosi"
+description: "Install the client, choose a service and organization, initialize your personal Assistant and verify capabilities with a first task."
+---
+
+Prepare an Xpert account and an organization you can access. The organization needs an authorized model; cloud computers, plugins and external services require their corresponding configuration.
+
+## 1. Install, connect and sign in
+
+Choose an installer matching your operating system and processor from the [Bosi download page](https://xpertai.cn/zh-CN/download/). Use its release information for available versions and installation instructions. Detailed steps are in the [desktop user guide](/en/ai/tutorial/bosi-desktop-user-guide).
+
+Bosi connects to the official service by default. For an organization deployment, open **Connection settings** on the sign-in screen and enter the API, Xpert web and ChatKit URLs supplied by your administrator. Remote services use HTTPS; loopback addresses may use HTTP.
+
+Sign in with email and password, then confirm the organization. If you need an account, open registration from the sign-in screen, complete it in the browser and return to Bosi. Switching organizations changes available Assistants, models, apps and projects.
+
+## 2. Create your Bosi
+
+If your account already has an accessible Bosi in this organization, it opens directly. Otherwise, follow **Create your Bosi**.
+
+| Stage | What to confirm |
+| --- | --- |
+| Introduction | The work you want the Assistant to help with |
+| Plugins and services | Choose optional capabilities from the current organization and connect services as needed; an empty catalog may skip this step |
+| Execution capabilities and model | Select an available cloud computer or local Shell and an authorized model compatible with those capabilities |
+| Creation and welcome | Wait for initialization and publication, then enter the welcome conversation to review enabled capabilities |
+
+Cloud computer is selected by default when available; local Shell starts off. Selecting local Shell does not remove command approvals. The computer illustration is a feature preview; open the real computer from the conversation.
+
+Creation uses a private workspace for the current user. After interruption, use the displayed retry path to reuse the Assistant and saved creation progress. If the welcome fails, recover the existing initialization instead of repeatedly creating copies.
+
+## 3. Connect needed services
+
+Selecting a plugin and authorizing an external service are separate steps. When prompted to **Connect account**, complete the browser flow using the same account and organization as Bosi.
+
+Onboarding selections can become defaults for new personal Bosi conversations. Conversations with explicit selections and project conversations retain their own configuration. Removing a default selection does not uninstall the workspace plugin.
+
+For additional experts or business apps, open **Discover & add** from the sidebar's add entry. See [Experts, apps and plugins](./daily-work/assistants-and-apps).
+
+## 4. Complete a small task
+
+Use a document you can share with the current service and make a bounded request:
+
+> From the meeting notes I uploaded, summarize confirmed decisions, open questions and action items. Retain source references and mark unclear owners as unconfirmed. Show me a draft first.
+
+Inspect the result before asking for changes or a formal file. To produce a downloadable document, confirm that the Assistant has the corresponding document capability and inspect the actual delivery card. For ongoing work, choose a [project](./daily-work/projects-and-groups) before starting the conversation.
+
+## Confirm readiness
+
+| Check | Evidence |
+| --- | --- |
+| Account and organization | The sidebar shows the correct organization and accessible Assistants |
+| Model and conversation | A message sends successfully and receives a response |
+| Plugins and connections | Selected capabilities are available and a small real task succeeds |
+| File delivery | The delivered version opens, can be checked and can be downloaded |
+| Computer capability, when needed | An authorized cloud computer opens, or one approved local command has a verified result |
+
+If something fails, identify whether it involves connectivity, initialization, model access or a specific tool. See [Troubleshooting](./desktop-guide/troubleshooting).
