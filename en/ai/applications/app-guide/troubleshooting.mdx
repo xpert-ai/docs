@@ -1,0 +1,53 @@
+---
+title: "Troubleshooting"
+description: "Locate common problems with app discovery, setup, initialization, access, project tasks and delivery."
+---
+
+First identify the failing stage: discovering an app, initialization, entering its Assistant or executing a business task. The same app can have different configuration and state in different organizations.
+
+## The app is missing
+
+Confirm the service and organization, then check whether an administrator installed and loaded the plugin that provides the app. The app directory shows loaded app declarations in the effective scope. Seeing a package in the plugin marketplace does not establish that the current service has loaded it.
+
+The [Official app directory](../catalog) is a documentation entry. Documentation coverage and app availability in your environment are managed separately.
+
+## Initialization is unavailable, or models and tools are missing
+
+Read the specific checks in the app details:
+
+| Check | Action |
+| --- | --- |
+| No organization or initialization permission | Select the correct organization and involve someone authorized to initialize |
+| Missing primary or specialized model | Configure the required organization model and select it in the wizard |
+| Missing tool provider | Ask an administrator to install and load its plugin |
+| Missing tool configuration | Select an available configuration or add and authorize one through the wizard |
+
+Saved tool configurations remain available after closing the wizard. See [Discover and enable apps](./discovery-and-setup).
+
+## Initialization failed. Should I reinstall?
+
+Refresh the current app's status and inspect the cause. After resolving missing dependencies, retry or repair through the same app entry so the platform can reuse its installation record and valid resources. If initialization is still running, wait for its status to update.
+
+Discard configuration applies only to eligible setup resources. It is not a general reset for enabled apps. Reinstalling a plugin also does not automatically upgrade templates or migrate business data.
+
+## The app is ready, but employees cannot use it
+
+Check the employee's organization, the entry Assistant's published state and access through a user group or another valid relationship. Organization initialization does not automatically authorize all employees.
+
+If the Assistant opens but a project or business record does not, check that resource's access rules. Employees with runtime access only are not expected to see the private authoring workspace. See [Access and app maintenance](./access-and-updates).
+
+## A Workbench view is missing, or a project cannot be selected
+
+Confirm that the app provides the feature, that the page has the relevant business context and that the Assistant and project are accessible. Retry failed project list requests; a loading error does not mean there are no projects.
+
+Create and manage business projects through the app's entry. Pages fixed to one project can restrict switching as part of their business context. See [Projects and task collaboration](./projects-and-tasks).
+
+## Work was scheduled, but there is no result
+
+Distinguish planning, queueing, execution and business acceptance. Inspect the app's current state and the specific execution attempt for pending dependencies, external services or human confirmation. For delayed synchronization, check app records and task synchronization state. Refreshing the task view does not start business work.
+
+## The Assistant says it finished, but the file or business state is wrong
+
+Reopen the actual result through the app and check its content, version, location and business state. A successful Agent execution can still leave review or submission steps pending. Use the app's editing, retry and confirmation workflow. See [Workbench and delivery](./workbench-and-delivery).
+
+When reporting a problem, provide the app name, time, steps, error message and expected result. Share necessary business object information within your authorization scope, without account credentials or unrelated business materials.

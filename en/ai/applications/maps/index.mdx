@@ -1,0 +1,51 @@
+---
+title: "Maps"
+description: "Search places, inspect details and plan routes through chat and interactive maps, then bring selected places back into the conversation."
+---
+
+![Maps cover illustrating place search and routes with simulated map data](/public/img/ai/applications/maps-cover.png)
+
+**Maps** brings place search and route planning into Xpert conversations. Ask the Maps Assistant to find places, then explore markers, result cards and routes in the workbench. It supports comparing meeting locations, finding nearby facilities and preparing travel routes.
+
+## Core capabilities
+
+| Capability | What you can do |
+| --- | --- |
+| Place search | Search by keyword and city, or find nearby places around a specified location or the current map area |
+| Map exploration | Pan, zoom and fit all places, with linked selection between markers and result cards |
+| Place details | Inspect provider-supplied names, addresses, categories and available phone information, and copy addresses |
+| Route planning | Choose endpoints from search results, switch between walking and driving, and inspect the path, distance and estimated duration |
+| Conversation references | Add a selected place to the current message draft, then send a follow-up question |
+
+## Get started
+
+An administrator [enables the app and grants access](/en/ai/applications/app-guide/discovery-and-setup), configures a primary model, and connects and authorizes AMap or Tencent Maps in the app workspace. AMap is the default; the Assistant configuration determines the provider. Live maps require the provider's Web Service Key and available place, static map and route service quotas.
+
+1. **Specify the area.** Open the Maps Assistant, provide a city, place or clear area, and describe what you want to find.
+2. **Explore results.** Select map markers or result cards. Pan the map and use **Search this area** when needed.
+3. **Inspect places.** Verify addresses and provider-supplied details while comparing candidates.
+4. **Plan a route.** Select **Get directions**, choose two different places from the results as endpoints, select walking or driving, then use **Plan route**.
+5. **Continue the conversation.** Use **Reference in chat** to add the place to your draft, then add a question and send it.
+
+For example:
+
+> Find a few cafés near West Lake in Hangzhou and show them on the map. Once I choose two places, help me find a walking route between them.
+
+You can also search directly in the map workbench. The Assistant does not automatically infer your location; provide an area when the city or position is unclear.
+
+## Live maps and simulated previews
+
+| Mode | Purpose |
+| --- | --- |
+| Live maps | Use the current Assistant's authorized AMap or Tencent Maps connector; queries and route coordinates are sent to that provider |
+| Demo | Explore clearly marked fictional places, maps, distances and durations without map credentials |
+
+The standard app entry uses live maps. Simulated previews use the separate **Maps Demo Assistant** template and cannot be used for real navigation. Failed live requests do not fall back to simulated results.
+
+## Scope and limitations
+
+- Maps provides search and route viewing. It does not track live location or save favorites and persistent itineraries.
+- Place details depend on what the provider returns. Routes currently support walking and driving.
+- The map image refreshes after panning or zooming, so service responses can introduce a brief delay. If search fails, check the area, connector authorization and service quota before retrying.
+
+Creating a connector also requires granting it to the current Assistant. Credentials remain on the server. See [Discover and enable apps](/en/ai/applications/app-guide/discovery-and-setup) for shared setup guidance.

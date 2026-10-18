@@ -1,0 +1,54 @@
+---
+title: "Code Review"
+description: "Review GitHub pull requests in Xpert with source evidence, private drafts and repository-level automation."
+---
+
+![Code Review cover illustrating code diffs and review findings](/public/img/ai/applications/code-review-cover.png)
+
+**Code Review** helps developers and maintainers review GitHub pull requests inside Xpert. Use the conversation to explain your focus and investigate findings, while the workbench displays diffs, checks and AI findings tied to a specific commit and code location.
+
+## Core capabilities
+
+| Capability | What you can do |
+| --- | --- |
+| PR inbox | Open a public PR URL, connect GitHub to find requested or authored reviews, and keep recent and pinned records |
+| Code and evidence | Browse diffs at a fixed commit, mark files as viewed, inspect GitHub checks and review coverage |
+| AI review | Set a review focus and analyze changes in the background, then inspect prioritized findings with conditions, impact and locations |
+| Follow-up discussion | Continue a finding in the current conversation to explain and verify it against source code |
+| Review submission | Select findings and a decision, then confirm submission through your connected GitHub account |
+| Repository automation | Schedule reviews from PR events, base branches and ignored paths, and manage pending, published and failed runs in the inbox |
+
+## Get started
+
+An administrator [enables the app and grants access](/en/ai/applications/app-guide/discovery-and-setup), configuring an available primary model for the Assistant. Public PRs can be read directly. Private repositories and review submission require a GitHub account connected in the current workspace with the necessary access.
+
+1. **Open a PR.** Enter a GitHub PR URL and choose public or connected access, or open an entry from the PR list.
+2. **Inspect the change.** Browse the overview, changed files and checks, confirming the commit and available evidence.
+3. **Start a review.** Enter an optional focus and select **Review changes**. Inspect the summary and findings when it finishes.
+4. **Verify findings.** Check the diff and related source, using **Ask in conversation** to investigate further. Results are saved in Xpert for your review first.
+5. **Confirm submission.** Select **Submit review**, choose findings, edit the message and select **Comment, Approve or Request changes**, then confirm submission to GitHub.
+
+For example, set this review focus:
+
+> Focus on authorization checks and concurrent updates. Explain each issue's triggering conditions, practical impact and code location, and identify any areas you could not inspect.
+
+## Enable repository automation
+
+Automatic review requires an administrator to configure a GitHub App and a reachable webhook, then install the App on the target repository. The configuring user also needs a connected GitHub account with write or admin access to that repository.
+
+Add a repository under **Repositories**, open **Configure rules**, and try an existing open PR before enabling automation. Configure events, base branches, ignored paths, review instructions and daily limits. Trials consume model usage and keep their results private.
+
+| Delivery mode | Behavior |
+| --- | --- |
+| Save results for confirmation | The default; inspect completed reviews in the inbox and confirm publication |
+| Automatic comments | Publish a summary and P0/P1 inline findings through the GitHub App, while retaining full results in Xpert |
+
+Automation starts paused and skips draft PRs and bot-created PRs by default. Bot inclusion and event rules can be adjusted. Automatic publication only comments; it does not approve, request changes or merge PRs. Pause rules at any time while retaining history.
+
+## Results and recovery
+
+- **New commits:** Refresh and review again. Findings from an older commit cannot be submitted directly as the review of the new commit.
+- **Incomplete coverage:** Binary files, large diffs or check records may be unavailable. Follow the coverage notices and inspect missing evidence. The app displays existing checks; an AI review does not establish that tests were run.
+- **Check GitHub:** A network failure can leave submission uncertain. Inspect the PR before deciding what to do next to avoid duplicate publication.
+
+Drafts are isolated by user and Assistant, and platform connectors manage GitHub credentials. See [Access and app maintenance](/en/ai/applications/app-guide/access-and-updates) for shared usage and permission guidance.

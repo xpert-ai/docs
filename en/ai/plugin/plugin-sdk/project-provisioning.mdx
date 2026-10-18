@@ -6,34 +6,35 @@ sidebar_position: 7
 
 `ProjectProvisioningRuntimeCapability` exposes `ProjectProvisioningApi` under `platform.project.provisioning`. It is for plugins that own a one-to-one mapping between a business project and an Xpert Chat Project.
 
-The `ensure()` operation creates the Chat Project or reconciles its current name, lifecycle status, workspace, and connected Assistant without changing the caller-supplied project ID.
+`ensure()` creates or reconciles the project with the caller-supplied ID, handling its name, lifecycle and content initialization. Initial creation connects the entry Assistant and its recursive external Assistant dependencies. Existing projects retain current membership: removed Assistants are not restored, and later template dependencies are not automatically added.
+
+See [Plugin apps and projects](/en/ai/projects/plugin-apps/index) for the product experience. Task mapping and synchronization use a separate capability, described in the [SDK project task integration guide](/en/ai/projects/plugin-apps/sdk-integration).
 
 ## Contract
 
 ```ts
-type ProjectEnsureInput = {
-  projectId: string
-  workspaceId: string
-  xpertId: string
-  name: string
-  status: 'active' | 'archived'
-}
-
-type ProjectEnsureResult = {
-  projectId: string
-  workspaceId: string
-  xpertIds: string[]
-  operation: 'created' | 'updated'
-}
-
-interface ProjectProvisioningApi {
-  ensure(input: ProjectEnsureInput): Promise<ProjectEnsureResult>
-}
+import type {
+  ProjectEnsureInput,
+  ProjectEnsureResult,
+  ProjectProvisioningApi
+} from '@xpert-ai/plugin-sdk'
 ```
 
-`xpertIds` is the complete effective set of connected Assistants after synchronization, not only the Assistant supplied by the current call.
+| Input | Purpose |
+| --- | --- |
+| `projectId` | A project ID reserved and saved by the caller, unchanged across retries |
+| `projectType` | Optional `{ applicationKey, projectTypeKey }`; new apps should use their registered project type |
+| `xpertId` | Entry Assistant used for creation and validation |
+| `name`, `status` | Current business name and `active` or `archived` state |
+| `requesterAgentKey` | Optional primary requester Agent key for direct external Assistant validation |
+| `externalAssistantExpectations` | Optional expected direct external Assistants, validated by `pluginName`, `templateKey` and `agentKey`; all must pass before project writes |
+| `workspaceId` | Deprecated optional compatibility field; projects no longer belong to workspaces, and new integrations should not depend on it |
+
+The result contains `projectId`, `xpertIds` and `operation: 'created' | 'updated'`. `xpertIds` is the saved Assistant connection set. `workspaceId` is echoed only when supplied by a legacy caller and does not determine project ownership.
 
 ## Example
+
+This logic runs in authenticated, authorized host request context. The business object has saved its target platform project ID. Replace the example project type with an entity-bound type actually registered by the plugin.
 
 ```ts
 import { ProjectProvisioningRuntimeCapability } from '@xpert-ai/plugin-sdk'
@@ -44,7 +45,10 @@ const projects = capabilities.require(
 
 const result = await projects.ensure({
   projectId: businessProject.chatProjectId,
-  workspaceId: businessProject.workspaceId,
+  projectType: {
+    applicationKey: '@example/plugin-case:case-app',
+    projectTypeKey: 'case'
+  },
   xpertId: pluginConfig.assistantId,
   name: businessProject.name,
   status: businessProject.archived ? 'archived' : 'active'
@@ -56,11 +60,25 @@ await projectRepository.update(businessProject.id, {
 })
 ```
 
+An entity-bound type requires an `IProjectTypeProvider` that validates the saved business-object/project association in the current scope and supplies the app entry.
+
 ## Idempotency and ownership
 
 - Generate or reserve `projectId` once when the business project is created, then reuse it for every retry and reconciliation.
 - Do not generate a new ID after a timeout. Call `ensure()` again with the same ID.
-- Keep `workspaceId` aligned with the workspace that owns both the business project and the connected Assistant.
+- Obtain tenant, organization and user identity from trusted host context. The entry Assistant must match the project organization, and reconciliation of an existing project requires its owner.
+- Derive classification from the app declaration and saved association, never the display name. Provisioning cannot arbitrarily reclassify an existing project.
+- Manage project connections explicitly. Provisioning retries must not overwrite existing membership settings.
 - Synchronize `status: 'archived'` when the business project is archived; do not silently create a replacement active project.
 - Treat `operation` as reconciliation evidence. Product logic should depend on the effective result, not assume every successful call inserted a new record.
+
+Successful provisioning does not establish task synchronization, Assistant publication or business execution.
+
+## First conversation creation and cleanup
+
+Apps may implement optional `IProjectTypeProvider.createForConversation()` to save the business object and project association in a host-owned transaction. The host creates the platform project and conversation binding. Do not call `ensure()` again, start Agents or perform external I/O inside the hook. Complete application configuration confirmation when required. The optional SDK `confirmConversation()` confirms a pending conversation's first project without moving an existing binding.
+
+The SDK also declares optional `purge()`, restricted to an owner physically removing an archived, plugin-bound project and its file workspace. This is not a routine archive or synchronization step. Confirm host support and follow the app's deletion workflow.
+
+See the [Project integration guide](/en/ai/projects/plugin-apps/sdk-integration) for project access, business tasks and views.
 

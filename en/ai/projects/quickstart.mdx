@@ -1,0 +1,62 @@
+---
+title: "Complete your first project task"
+description: "Create a project with shared materials, ask an Assistant to plan and dispatch work, then accept the delivered result."
+---
+
+This example uses existing source material to produce a competitor comparison report. It covers project creation, preparation, execution and acceptance.
+
+You need permission to create projects and access to an Assistant with tool calling and **Project management** enabled. Delegating work to an external executor also requires an administrator to configure that executor; preparing a plan alone does not.
+
+## 1. Create a project
+
+In Cloud, open **Projects**, then choose the general-project entry under **New project**.
+
+1. Enter a name such as “Competitor evaluation” and describe the scope.
+2. Choose **Simple mode** for everyday work, or **Advanced mode** for multiple plans, milestones and sprints.
+3. Select organization members to include, or add them after creation.
+4. Confirm and enter the project workspace.
+
+You can also select or create a project from an Assistant conversation. Some Assistants offer **Create on send**: the project is created on the first send, not when an empty chat opens. Application projects use their own creation entries; see [Project types and conversation scope](./setup/project-types).
+
+## 2. Prepare an Assistant and shared materials
+
+Open project **Configuration** and use **Manage experts** to add an available Assistant. Save shared requirements under **Project instructions**, for example:
+
+> Write the report in English. Include the source and date for each conclusion. List unverifiable information as open questions. Deliver a comparison table, summary and check record.
+
+Upload source material to the project file library on the **Assets** page. Start a conversation with a project Assistant and confirm that the current project name is shown. A project description, project instructions and a one-off message serve different purposes; save lasting rules as project instructions.
+
+## 3. Ask the Assistant to save a task plan
+
+Send:
+
+> Prepare a competitor comparison using the project materials. First create three tasks: organize product information, verify prices and write the report. The report depends on acceptance of the first two tasks. Save an assignee, completion requirements and deliverables for each task, and let me check the plan first.
+
+Open **Project tasks** from Workbench and confirm that the tasks exist. Check names, requirements, assignees and dependencies. A plan table in a chat reply alone does not establish that tasks were saved.
+
+A useful completion requirement is: “Cover the three specified products, include source dates for prices, mark missing information as unresolved and make every report conclusion traceable to the comparison table.”
+
+## 4. Confirm and dispatch
+
+After checking the plan, send:
+
+> Start the first two tasks using the saved requirements and check their results. Dispatch the report task after both have been accepted.
+
+The Assistant uses authorized execution targets. Group-member collaboration requires [group project setup](./tasks/group-collaboration); administrators supply external executors. If no eligible target is available, complete that configuration first.
+
+Dispatch adds an execution card to the conversation and an attempt to the task. You can leave the page and return later; closing the viewer does not cancel background work.
+
+## 5. Inspect and accept the result
+
+1. Open the task by its name and inspect **Execution history** and **Outputs**.
+2. Confirm that the current implementation succeeded and inspect the report, table and check record.
+3. Ask the responsible Assistant to check each requirement. Authorized users can also enter checks and a rationale in execution history and choose **Accept task**.
+4. If requirements are unmet, choose **Request rework**, explain the changes and explicitly arrange another attempt.
+
+Dependent work becomes eligible after predecessors are accepted. Completion alone does not start the next task: the coordinator must explicitly dispatch it.
+
+<Note>
+If you need downloadable files, specify their format and scope before execution. A working-directory path is not a delivered file. Check Outputs and use the corresponding execution viewer to open or download the result.
+</Note>
+
+Continue with [the four task views](./tasks/views), [acceptance and rework](./tasks/execution-and-review), or [scheduled tasks](./automation/scheduled-tasks) for recurring work.

@@ -1,0 +1,73 @@
+---
+title: "Plugin apps and projects"
+description: "Reuse platform projects, task views and execution records while keeping the application's specialized business workflow."
+---
+
+Projects are also a platform capability that plugin apps can reuse. An app for bid preparation or case handling can associate its business object with an Xpert project, then synchronize its business tasks into Project tasks. Users advance specialized work in the app and inspect tasks, responsibility, dependencies and execution in the project.
+
+Plugin SDK capabilities for project provisioning, tasks, access, files and view extensions support this integration. The app owns business rules; the platform supplies the collaboration space and shared task experience.
+
+For app selection, setup and daily business operations, see the standalone [Plugin Apps](/en/ai/applications/index) section. [Projects and task collaboration](/en/ai/applications/app-guide/projects-and-tasks) explains the user workflow.
+
+<CardGroup cols={2}>
+  <Card title="Connect business tasks" icon="list-check" href="/en/ai/projects/plugin-apps/business-tasks">
+    Map business plans, task states and individual attempts to Project tasks while retaining the app's acceptance workflow.
+  </Card>
+  <Card title="Share project resources" icon="folder-open" href="/en/ai/projects/plugin-apps/shared-context">
+    Use Assistants, materials and membership within the same project.
+  </Card>
+  <Card title="SDK integration guide" icon="code" href="/en/ai/projects/plugin-apps/sdk-integration">
+    Understand project associations, task providers, background synchronization and view integration.
+  </Card>
+  <Card title="Shared task views" icon="table-columns" href="/en/ai/projects/tasks/views">
+    Follow application work in a list, task tree, Gantt chart or status board.
+  </Card>
+</CardGroup>
+
+## What users gain
+
+| Scenario | Integrated experience |
+| --- | --- |
+| Create a project in a business app | After business setup, the associated platform project supplies a collaboration entry; retries reuse that project |
+| Break business work into tasks | Tasks can appear in the shared view without users entering the same plan again |
+| Coordinate multiple Assistants | Inspect responsibility, dependencies, current state and historical attempts |
+| Discuss and perform business work together | Open Project tasks on demand in conversation Workbench alongside the app's business views |
+| Investigate failure or rework | Open the specific attempt and retain multiple attempts under the same task |
+| Continue a project over time | Accumulate shared materials, participants and task records around one project |
+
+Project integration does not automatically start business work. Creating, synchronizing and viewing tasks are separate from execution. Start, retry and acceptance actions use the app's own entry points.
+
+## Example: a bid application
+
+See [Bid Studio](/en/ai/applications/bid-studio/index) for product capabilities, the workflow and project task collaboration.
+
+The bid app retains its workflows for outlines, chapters, illustrations and supporting materials. After the coordinating Assistant saves a business plan, the app maps that work to project tasks: phases become summary nodes, outline or chapter work becomes tasks, prerequisites become dependencies, and responsible Assistants and attempts remain attached to their tasks.
+
+Users can follow this path:
+
+1. Select or create a project in the bid app and complete its required business configuration.
+2. Arrange work through the app, such as preparing an outline, writing selected chapters or adding illustrations.
+3. Open **Project tasks** from Workbench's add-view menu. A bid Assistant with the relevant tool can also respond to “Open the current project's task tree and timeline.”
+4. Inspect phase and chapter tasks, and compare planned dates with actual execution in the Gantt chart.
+5. Open a specific attempt to inspect its process. Continue using the bid app to edit content, rearrange business work and confirm results.
+
+This illustrates an integration pattern. Each app determines its business steps, task types and launch actions; installing an arbitrary plugin does not automatically add this task integration.
+
+## Responsibilities
+
+| Content | Main owner |
+| --- | --- |
+| Business objects, business plans, task decomposition and prerequisites | Plugin app |
+| Business task state, start, retry and acceptance rules | Plugin app |
+| Platform project membership and access checks | Platform; the app also checks its own business authorization |
+| Shared project task identity, views and execution navigation | Platform |
+| Planned dates and estimated duration in the platform task view | Users with project editing rights, through platform scheduling actions |
+| Business files, formal results and their versions | The app or execution workflow that saves them and supplies the access entry |
+
+Application tasks retain their source ownership. Generic platform task tools cannot accept business results for the app or bypass its rules to change business state, hierarchy or dependencies. The app must define what “Done” means in its workflow; one successful Agent run is insufficient on its own.
+
+## Prepare for use
+
+Administrators install and initialize an app that supports project integration, grant access to its entry Assistant, and confirm that users can access both the target project and the business object. The app also needs task integration and Workbench support compatible with the deployed platform.
+
+Verify project access, task synchronization and business execution separately: opening an app does not establish that a project exists; seeing a task does not mean it is running; successful execution does not establish business acceptance. See the [SDK integration guide](./sdk-integration) for implementation and [Business task synchronization](./business-tasks) for interpreting task state.

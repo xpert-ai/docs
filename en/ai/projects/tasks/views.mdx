@@ -1,0 +1,60 @@
+---
+title: "Task views and progress"
+description: "Use All tasks, Task tree, Gantt and Status board to inspect responsibility, dependencies, execution history and delivery."
+---
+
+Open **Project tasks** in the project workspace or from a project conversation's Workbench. Both entries use the same view. Earlier versions may label it **Tasks and Timeline**.
+
+## Four views
+
+| View | Questions it answers |
+| --- | --- |
+| All tasks | What tasks exist, who is responsible and what is their status? |
+| Task tree | How is a goal divided into subtasks? |
+| Gantt | How do planned dates, actual execution and dependencies relate? |
+| Status board | What is waiting, running, ready for review or blocked? |
+
+All four share search and filters for status, responsible Assistant and structural task kind. Lists and Gantt also provide grouping, sorting and field visibility. In narrow panels, some controls move into **More actions**.
+
+Business type, hierarchy and status convey separate information. A business icon identifies the category of work, the expansion control shows hierarchy and the status indicator shows business progress. Applications can contribute task types; missing presentation does not remove the task's content.
+
+## Read progress and status
+
+A percentage appears only when an executor or application supplies explicit progress. Otherwise, use the status to understand the stage. The platform does not estimate completion from elapsed time.
+
+100% reflects the source's progress report, not business acceptance. Use [task status and acceptance history](./execution-and-review) to determine completion.
+
+The view synchronizes about every five seconds while visible and supports manual refresh. Opening or refreshing it reads status without rerunning tasks.
+
+## Use Gantt
+
+Gantt distinguishes planned dates from actual intervals for each attempt. Tasks without planned dates appear as unscheduled.
+
+- Choose hour, day or week granularity for short or long work.
+- Zoom and pan to change the visible range.
+- Use **Fit all** for an overview and **Go to now** for the current time.
+- Follow dependency lines to inspect the execution order.
+
+These controls change presentation, not schedules or execution. Open task details to edit dates.
+
+## Open a task or a specific attempt
+
+Click the **task name** to open a centered details dialog:
+
+| Tab | Contents |
+| --- | --- |
+| Overview | Goal, assignee, requirements, hierarchy, dependencies and schedule |
+| Execution history | Implementations and reviews, runtime status, result delivery, acceptance and rework |
+| Outputs | Submitted files by execution, delivery status and diagnostics |
+
+Each **execution dot** in a row or board card represents a specific attempt. Clicking it opens that attempt. Inspect attempts separately after rework so that an earlier result is not mistaken for the current one.
+
+Coding executions open an independent viewer showing captured replies, tools, command output and file changes. You can search loaded content, pause following and copy records. This is a process viewer, not an interactive terminal. Other executions use their available navigation targets.
+
+## Application tasks and historical records
+
+Business applications can contribute tasks to the shared view while retaining their own state rules and editing restrictions. After a business change, the view may briefly show earlier state. If refresh does not resolve it, inspect the source application's result and diagnostics.
+
+See [Plugin apps and projects](../plugin-apps/index) for the integrated experience and responsibilities, and [Business tasks and execution sync](../plugin-apps/business-tasks) for synchronization delays, business state and execution associations.
+
+Some older executions have no navigation target, or their resources have been deleted or access has changed. Retained task information remains useful, but a historical card is not a substitute for the actual result. See [Troubleshooting](../help/troubleshooting).

@@ -1,0 +1,71 @@
+---
+title: "Execution, acceptance and rework"
+description: "Distinguish tasks from execution attempts, inspect background results and use current evidence to accept work or request changes."
+---
+
+A task records the business outcome to achieve. An execution records one attempt to achieve it. A task can retain multiple implementations, retries and independent reviews.
+
+This page describes dispatch and acceptance for ordinary platform project tasks. Plugin-managed tasks use their owning app's business actions and acceptance rules; see [Business tasks and execution sync](../plugin-apps/business-tasks).
+
+## Dispatch and background execution
+
+Create the task and its requirements, then ask the responsible Assistant to dispatch it. Targets can be configured and authorized external executors or [Assistant members explicitly selected into a group project](./group-collaboration).
+
+Successful dispatch creates a conversation card and an attempt. The Assistant can finish its current reply while execution continues in the background. External executors admit work serially within a project to protect shared working files. Different group members can run in parallel; each member accepts one formal task at a time, and attempts for the same task remain serial.
+
+Task management does not supply an execution environment. Available Coding executors depend on deployment configuration; the current Computer executor is provided by Pro.
+
+## Task states
+
+| State | Meaning | Next action |
+| --- | --- | --- |
+| To do | Saved, or returned for rework and waiting for another attempt | Check prerequisites and explicitly dispatch |
+| In progress | The current implementation has actually started | Inspect execution or wait for its result |
+| Review | Implementation succeeded but its business result is unaccepted | Check requirements, outputs and files |
+| Done | A valid completion decision has been recorded | Deliver the result and advance dependent work |
+| Blocked | Failure or another issue needs attention | Read the error and retained results before recovery |
+| Paused / Cancelled | The business task was explicitly paused or cancelled | Follow the business decision |
+
+Successful execution, completed steps and 100% progress do not replace acceptance. Cancelling one run does not automatically cancel the business task.
+
+## Where results return
+
+Saved results return to the responsible Assistant's original conversation. When automatic continuation is allowed, the Assistant can check results or arrange follow-up work; open conversations display those replies.
+
+| Conversation state | Result handling |
+| --- | --- |
+| Assistant is replying | Save and queue the result for processing |
+| Current turn has ended | Continue in the original conversation |
+| Waiting for input or approval, paused or explicitly stopped | Save the result and preserve the wait or stop |
+| Service temporarily unavailable | Recover delivery from saved records |
+| Conversation unavailable or authorization revoked | Retain the record and show why continuation is blocked |
+
+Reconnecting reads saved results and replies. Card updates and full replies can appear at different times. If execution has ended but no reply is visible, inspect result-delivery status in execution history.
+
+## Accept a task
+
+The responsible Assistant can inspect results and decide. Users with project editing rights and access to the corresponding execution and results can also:
+
+1. Open **Execution history** and confirm the latest implementation succeeded.
+2. Compare actual outputs with the current requirements, opening or downloading [deliverables](../setup/files-and-deliverables) as needed.
+3. Enter checks and a rationale, then choose **Accept task**.
+4. Confirm the task is Done and retain the associated execution and result record.
+
+Acceptance is bound to current requirements, implementation and result versions. Changed requirements, a new implementation or replaced evidence invalidate earlier approval for the new work. Application-managed tasks follow their application's decision flow.
+
+## Independent review
+
+The responsible Assistant can delegate independent review and receive Pass, Changes required or Indeterminate. Review and implementation have separate records; a review report does not mark the task Done.
+
+Current independent review requires the Computer OpenCode executor supplied by Pro. It inspects fixed evidence without rerunning implementation tests or proving file authenticity. The responsible Assistant can separately use authorized tools to inspect actual files or rerun tests. Read the report's limitations alongside its verdict.
+
+Once independent review has been requested, acceptance must reference the latest valid passing review. It cannot omit the review or reuse an older report.
+
+## Rework, cancellation and recovery
+
+- **Request rework:** record the problem and rationale. The task returns to To do; explicitly arrange another attempt. Earlier attempts remain available.
+- **Cancel this attempt:** cancel the selected run in execution history. This is separate from cancelling the business task.
+- **Retry result delivery:** resend a saved result that did not reach its destination. This does not rerun task tools.
+- **Failed or unknown execution:** inspect the attempt and existing files to establish what actually started before arranging another run. A missing reply alone is not a reason to dispatch again.
+
+See [Troubleshooting](../help/troubleshooting) for specific recovery steps.

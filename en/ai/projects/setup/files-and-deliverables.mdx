@@ -1,0 +1,53 @@
+---
+title: "Shared files and deliverables"
+description: "Maintain shared project materials and distinguish working files, conversation attachments and traceable task outputs."
+---
+
+Project files provide shared materials for ongoing collaboration. Requirements, intermediate analysis and final reports can stay in one project for authorized Assistants and members to use.
+
+## Use the project file library
+
+Open **Assets** in the project workspace:
+
+1. Browse folders or search for a file and open its content.
+2. With editing rights, upload materials, save supported editable files or delete files you no longer need.
+3. Preview and editing support depend on the format. Use available download actions and appropriate software for unsupported formats.
+
+Identify the materials and desired output in your request, for example:
+
+> Use the product descriptions and price table in this project's library to create `reports/comparison.md`. Keep the original materials and list unverifiable prices separately.
+
+Shared storage allows reuse across project conversations, but does not mean every reply automatically reads every file. Identify relevant inputs and confirm that the Assistant can read and process their format. Uploading files also does not automatically create a searchable knowledge base.
+
+## Distinguish three kinds of content
+
+| Content | Meaning |
+| --- | --- |
+| Conversation attachments | Inputs for an exchange, with the correct conversation and project scope |
+| Project working files | Materials that Assistants and members use and edit; their content can keep changing |
+| Delivered outputs | Files or Artifacts formally submitted by an execution, with associated execution and version records |
+
+Do not reuse another project's file references in the current project. After switching projects, select materials that are authorized in the new scope.
+
+## Specify delivery before dispatch
+
+If you need downloadable results, say which files, formats and packaging you expect and how they should be checked. For example:
+
+> Deliver the final report and price comparison as separate files. Exclude temporary caches and original attachments. Include source dates and unresolved items in the report.
+
+External executors with file-delivery support can submit explicitly selected files or archives. Without requested delivery, an execution may leave only a text result and working files. Group-member tasks use normal Assistant output; their delivery capabilities do not automatically include an external Coding executor's packaging mode.
+
+## Inspect and download outputs
+
+1. Open the task in **Project tasks**.
+2. Select **Outputs** to inspect submitted files and delivery information grouped by execution.
+3. Open the corresponding execution viewer and use its preview or download entry.
+4. Compare the contents with current completion requirements before accepting the task.
+
+A working-directory path, filename or “generated” message is not a delivered file. Execution and file-delivery success are recorded separately. If export fails, inspect retained results and delivery diagnostics before deciding how to supply the missing files.
+
+## Keep results traceable
+
+Acceptance should refer to the implementation and exact result version under review. Later edits to a working file do not extend an earlier approval to the new content. For reports or dashboards that need continued iteration, use [Artifacts](/en/ai/agent/artifacts/index) or [Live Dashboard](/en/ai/live-dashboard/index) saving and versioning.
+
+Project instructions and skills are governed content. Maintain them through project configuration rather than overwriting or deleting instruction files as ordinary attachments; see [Assistants and context](./assistants-and-context).

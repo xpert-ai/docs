@@ -1,0 +1,47 @@
+---
+title: "Projects and task collaboration"
+description: "Connect app projects, materials and tasks with platform collaboration while preserving the application's business rules."
+---
+
+Apps that support project integration can associate business objects with Xpert projects and reuse members, Assistants, files, conversations and shared task views. Users perform specialized work in the app and inspect shared materials, assignments and execution through the project.
+
+This integration requires implementation by the app. Initializing an application does not automatically add project types or task synchronization.
+
+## Choose the correct business project
+
+1. Open the project selector or business project list through the app.
+2. Find an existing project by app and project type, and confirm the object and current stage.
+3. For a new project, use the app's creation entry and supply its required business information.
+4. Check the project name, materials and relevant Assistant before sending work.
+
+Some apps use platform projects directly. Others bind projects to cases, document work or other business objects. For those apps, creation, naming and lifecycle are managed through their business entries. See [Project types](/en/ai/projects/setup/project-types).
+
+Where ChatKit project selection is enabled, you can search, filter by type and switch between grouped and recently updated views. Switching projects enters a new project conversation context; existing conversations retain their original scope. A page dedicated to one project may display a locked project name. See [ChatKit: Project and project type selection](/en/ai/chatkit/chatkit-projects) for the interface and integration behavior.
+
+## Follow business tasks in shared views
+
+An app can synchronize its plans and steps into platform tasks so users can inspect:
+
+- Stages, child tasks and prerequisite relationships.
+- Responsible Assistants, current states and scheduling.
+- Individual execution attempts, process entries and associated results.
+
+Where supported, open **Project tasks** in Workbench and use the list, task tree, Gantt chart or status board. See [Task views](/en/ai/projects/tasks/views).
+
+For example, a document preparation app can map outline preparation and section writing to project tasks. Users arrange writing in the app, track progress in the task view and return to the business editor to review the text. The exact mapping and available actions depend on the application.
+
+## Actions that remain with the app
+
+| Work | Where to do it |
+| --- | --- |
+| Create business objects and fill in business fields | The app's business entry |
+| Arrange business steps, start, retry and accept work | The workflow provided by the app |
+| Inspect task hierarchy, state and execution attempts | Platform task views and application views |
+| Maintain supported planning dates and estimated duration | Platform scheduling actions for users with project editing permission |
+| Manage project membership and shared materials | The platform project; app data retains its own permissions |
+
+Opening or refreshing a view reads current task information. Task synchronization, successful execution and business acceptance represent different stages. Generic platform task actions also preserve the app's business state and dependency rules.
+
+For delayed synchronization, check the app's business records and synchronization status first. For an execution failure, inspect the corresponding attempt and retry through the app. See [Business task synchronization](/en/ai/projects/plugin-apps/business-tasks).
+
+To implement these capabilities, see [Plugin apps and projects](/en/ai/projects/plugin-apps/index) and the [SDK integration guide](/en/ai/projects/plugin-apps/sdk-integration).

@@ -1,0 +1,101 @@
+---
+title: "SDK integration guide"
+description: "Connect project identity, business task projections, synchronization and views, then verify the shared experience against business results."
+---
+
+This page is for app designers and plugin developers connecting application tasks to platform projects. For user entry points, see the [integration overview](./index). The SDK provides types, provider extension points and runtime capabilities; plugins do not need to write directly to platform project task tables.
+
+## Capability map
+
+| Product need | SDK or extension contract | Integration responsibility |
+| --- | --- | --- |
+| Identify and open business projects from the project list | Application `projectTypes`, `IProjectTypeProvider` | Declare types, validate saved business associations and return creation/open entries |
+| Create or reconcile the associated project | `ProjectProvisioningRuntimeCapability` | Reuse a stable project ID through `ensure()` and reconcile name and lifecycle |
+| Reuse project access control | `ProjectAccessRuntimeCapability` | Query readable projects and check edit or management rights, retaining business authorization |
+| Map business tasks into the platform | `@ProjectTaskProvider`, `IProjectTaskProvider` | Build task and execution snapshots from saved application records |
+| Request synchronization, read tasks and manage schedules | `ProjectTasksRuntimeCapability` | Use `refresh()`, `graph()`, `change()` and `resolveExecution()` |
+| Reuse project files | `WorkspaceFilesRuntimeCapability` | Read and write within authorized project scope and retain references usable by background tasks |
+| Provide a shared task interface | Platform task View and Workbench extension protocol | Enable the `project.tasks` feature and reuse the task view |
+
+## 1. Establish the business project association
+
+Decide whether the app uses a general collaboration project or owns a business object associated with a project. For the latter, declare an entity-bound project type and implement `IProjectTypeProvider` so opening and provisioning can validate the persisted association.
+
+Save the target project ID once on the business object. Call `ensure()` in an authorized context, retaining that ID across retries. Provisioning neither generates business tasks nor starts Agents. The name and archive state come from saved business facts.
+
+To support business project creation on a conversation's first send, implement the optional `createForConversation()` hook. Save the business object and association through the host's creation transaction; the host commits or rolls back the platform project and conversation binding. Any application configuration confirmation still applies. Do not re-enter provisioning, start Agents or perform external I/O in this hook.
+
+See [Project provisioning runtime](/en/ai/plugin/plugin-sdk/project-provisioning). Project provisioning is separate from initializing a dedicated application workspace, described in [Application initialization configuration](/en/ai/plugin/application-config).
+
+For apps embedding ChatKit, see [ChatKit: Projects and Project Types](/en/ai/chatkit/chatkit-projects) to enable the selector, read the type catalog, handle business creation entries and lock a Workbench to one project. Keep the frontend's selected project context aligned with the business association above.
+
+## 2. Register the task source and business types
+
+Register `IProjectTaskProvider` under a stable provider key and include its implementation in the plugin module. `snapshot(context)` reads business records within the trusted tenant, organization, user and project scope. Return `null` when the project is not owned by that source.
+
+A snapshot contains a `revision` and task collection. Supply the following task information:
+
+The collection should cover the provider's complete current plan in that project, not a page or UI-filtered subset. When a saved source task disappears from a new snapshot, the platform marks it cancelled and retains its record. Do not treat unloaded tasks as business removals.
+
+| Field | Purpose and constraint |
+| --- | --- |
+| `key` | Stable business source identity; avoid mutable titles or random values generated on every read |
+| `title`, `kind` | Display name and structural kind: `task`, `summary` or `milestone` |
+| `taskType` | Optional registered business type, prefixed by the owning provider key and a dot |
+| `parentKey`, `predecessorKeys` | Hierarchy and predecessor dependencies, referencing valid nodes without cycles |
+| `status`, `progress`, `diagnostic` | Business state, explicitly recorded 0–100 progress and diagnostics; never infer these from model wording |
+| `assigneeXpertId` | The actual responsible Assistant, not an identity inferred from the current viewer |
+| `executions` | Stable key, sequence, status, actual execution association, timestamps and summary for each attempt |
+
+Declare business types in the provider's `taskTypes`, with localized labels and supported icons. `kind` still represents task structure. Omitted `progress` preserves the saved value; explicit `null` clears it. `taskType` follows the same omit-to-preserve and null-to-clear behavior.
+
+The optional `linked(context, links)` callback receives source-key/platform-task-ID associations after the platform projection commits. Use it for idempotent association updates. `snapshot()` only reads facts; `linked()` can retry and must never start business work.
+
+## 3. Request synchronization after the business commit
+
+This fragment shows the invocation order. The application service constructs `context` and business commands from authenticated, authorized host context:
+
+```ts
+import {
+  ProjectTasksRuntimeCapability,
+  type ProjectTaskContext,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+async function requestTaskSync(
+  capabilities: RuntimeCapabilityRegistry,
+  context: ProjectTaskContext
+) {
+  // Call this function after the business transaction commits.
+  return capabilities.require(ProjectTasksRuntimeCapability).refresh(context)
+}
+```
+
+`refresh()` returning `{ status: 'queued' }` means the synchronization request is durably saved, not that snapshot processing has finished. A background worker reads provider snapshots and updates the platform index. Report business persistence and synchronization separately. If request submission fails, preserve the successful business outcome, record pending synchronization and arrange a later retry.
+
+`graph()` reads saved tasks and current execution facts; it cannot substitute for a synchronization request. `change()` uses the task ID and `expectedRevision` to maintain fields such as planned dates; it cannot edit a provider-owned task's hierarchy or dependencies. `resolveExecution()` validates and returns a specific attempt's execution target rather than guessing the latest conversation.
+
+Business execution continues through the app's existing tools, delegation or background workflows. Task providers and synchronization APIs do not start or accept business work. Generic platform dispatch, status updates and acceptance actions cannot take over provider-owned tasks.
+
+## 4. Connect Workbench and result entry points
+
+Declare the `project.tasks` feature through the Assistant's middleware capabilities to reuse the platform View `platform.project-tasks__timeline`. It opens on demand in conversations with project context. The project page uses the same task data and execution resolution.
+
+An app's open-tasks tool should obtain the project from trusted runtime context, check access and emit the standard view-open event. Navigation must not also create a project, dispatch or retry work. The app's business View can continue to handle editing and acceptance; see [View extensions](/en/ai/plugin/plugin-sdk/view-extension).
+
+Save results through actual file or Artifact APIs before supplying references to users. An execution's `outputSummary` is a summary, not a deliverable. See [Workspace files](/en/ai/plugin/plugin-sdk/workspace-files) and [Artifacts](/en/ai/plugin/plugin-sdk/artifacts) for file scope and versions.
+
+## Verify the integration
+
+| Scenario | Expected outcome |
+| --- | --- |
+| Provision the same business project repeatedly | Reuse the platform project and preserve managed Assistant membership |
+| Synchronize the same snapshot repeatedly | Keep stable task and attempt associations without duplicate entries |
+| Synchronize a newly saved business state | Correct state, assignee, dependencies and attempts appear in the shared view |
+| Business persistence succeeds but synchronization fails | Preserve results, expose diagnosable pending synchronization and recover without rerunning Agents |
+| Read, refresh or open a view | No business write, execution or acceptance is triggered |
+| Execution succeeds while business checks remain pending | Preserve the application business state without automatically completing the task |
+| Open a historical attempt or unauthorized project | Resolve the exact authorized attempt; do not substitute other records when missing or denied |
+| Edit application task relationships or business state | Generic actions reject ownership changes; use the app's entry, while platform schedule edits still enforce roles and revisions |
+
+These interfaces reflect the current source contract. Asynchronous synchronization requires the corresponding host implementation and database migration before deploying plugins that call `refresh()`. Importable SDK types do not establish deployed capability availability. If an older host lacks `refresh()`, report it as unavailable rather than falling back to writes through a read API. Source and documentation checks do not replace integration verification in the target environment.

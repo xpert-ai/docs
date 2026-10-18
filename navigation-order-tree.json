@@ -23,6 +23,81 @@
           ]
         },
         {
+          "slug": "bosi",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "quickstart"
+              ]
+            },
+            {
+              "slug": "daily-work",
+              "pages": [
+                "assistants-and-apps",
+                "projects-and-groups",
+                "conversations-and-workbench",
+                "computers-and-coding"
+              ]
+            },
+            {
+              "slug": "desktop-guide",
+              "pages": [
+                "personalization-and-settings",
+                "troubleshooting"
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "applications",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "quickstart",
+                "catalog"
+              ]
+            },
+            {
+              "slug": "app-guide",
+              "pages": [
+                "discovery-and-setup",
+                "workbench-and-delivery",
+                "projects-and-tasks",
+                "access-and-updates",
+                "troubleshooting"
+              ]
+            },
+            {
+              "slug": "bid-studio",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "code-review",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "maps",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "sites",
+              "pages": [
+                "index"
+              ]
+            }
+          ]
+        },
+        {
           "slug": "digital-expert",
           "groups": []
         },
@@ -69,8 +144,31 @@
               "pages": [
                 "conversation",
                 "discover-and-add",
-                "assistant-templates",
-                "projects"
+                "assistant-templates"
+              ]
+            },
+            {
+              "slug": "tag",
+              "pages": [
+                "index",
+                "how-it-works",
+                "admin-setup",
+                "access-and-security",
+                "memory-and-routines",
+                "use-cases",
+                "capability-status"
+              ]
+            },
+            {
+              "slug": "skill",
+              "pages": [
+                "index",
+                "marketplace",
+                "skill-repository-registration-and-use",
+                "workspace",
+                "use-in-agent",
+                "administration",
+                "skill-package-format"
               ]
             },
             {
@@ -92,6 +190,57 @@
           ]
         },
         {
+          "slug": "projects",
+          "groups": [
+            {
+              "slug": "__default__",
+              "pages": [
+                "index",
+                "quickstart"
+              ]
+            },
+            {
+              "slug": "setup",
+              "pages": [
+                "project-types",
+                "assistants-and-context",
+                "members-and-permissions",
+                "files-and-deliverables"
+              ]
+            },
+            {
+              "slug": "tasks",
+              "pages": [
+                "planning",
+                "views",
+                "execution-and-review",
+                "group-collaboration"
+              ]
+            },
+            {
+              "slug": "plugin-apps",
+              "pages": [
+                "index",
+                "business-tasks",
+                "shared-context",
+                "sdk-integration"
+              ]
+            },
+            {
+              "slug": "automation",
+              "pages": [
+                "scheduled-tasks"
+              ]
+            },
+            {
+              "slug": "help",
+              "pages": [
+                "troubleshooting"
+              ]
+            }
+          ]
+        },
+        {
           "slug": "live-dashboard",
           "groups": [
             {
@@ -103,40 +252,6 @@
                 "data-sources",
                 "sharing",
                 "troubleshooting"
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "tag",
-          "groups": [
-            {
-              "slug": "__default__",
-              "pages": [
-                "index",
-                "how-it-works",
-                "admin-setup",
-                "access-and-security",
-                "memory-and-routines",
-                "use-cases",
-                "capability-status"
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "skill",
-          "groups": [
-            {
-              "slug": "__default__",
-              "pages": [
-                "index",
-                "marketplace",
-                "skill-repository-registration-and-use",
-                "workspace",
-                "use-in-agent",
-                "administration",
-                "skill-package-format"
               ]
             }
           ]

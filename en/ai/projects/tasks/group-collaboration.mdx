@@ -1,0 +1,58 @@
+---
+title: "Group project collaboration"
+description: "Connect a group to a project, select participating Assistants and coordinate dependent batches through dispatch, acceptance and delivery."
+---
+
+Connect a project to a group chat when several Assistants need to divide the work. The chat shows discussion and collaboration; project tasks retain formal assignments, dependencies, execution and acceptance. Desktop and Cloud use the same group project entry.
+
+## Prepare the group and project
+
+1. Enable **Project management** on the coordinating Assistant and use a model with tool calling.
+2. Create a group and invite Assistants with the required skills and tools. Execution members also need Project management if they will read or modify tasks.
+3. The group owner opens **Select project** below the composer and selects an existing project or enters a name for a new one.
+4. Confirm participating Assistants, keeping the primary Assistant selected, then submit. Cancelling confirmation does not create a project.
+5. Open **Project tasks** in Workbench and check the project scope.
+
+Connecting an existing project requires project management rights. Being a group owner or member does not automatically grant project editing access.
+
+## Manage participating Assistants
+
+After binding, the same menu shows the project name and **Manage participating Assistants**. The group owner can add eligible members; other users can inspect the selection but cannot change it.
+
+Only active Assistant group members explicitly selected into and connected to the project can receive its formal group tasks. The task assignee must match the chosen execution member.
+
+The menu cannot switch an established group project to another project. It adds participants; omitting an existing participant does not remove its project connection. Complete project and member setup before formal execution where possible.
+
+## Deliver a report in two batches
+
+Ask the coordinating Assistant:
+
+> Have the analyst research competitors and the data specialist verify prices. After both tasks are accepted, have the writer produce the report. Save assignees, dependencies and completion requirements. Request rework for problems and deliver the comparison table and report.
+
+| Task | Assignee | Prerequisite |
+| --- | --- | --- |
+| Research competitors | Analyst | None |
+| Verify prices | Data specialist | None |
+| Write report | Writer | Both earlier tasks accepted |
+
+The coordinator saves three tasks and explicitly dispatches the first two. Different members can run in parallel; a member's formal tasks wait for their own execution opportunity. When results return, the coordinator checks and accepts them before explicitly dispatching the report.
+
+Successful runs or visible group replies alone do not satisfy accepted-task dependencies. Dispatching the report too early is rejected.
+
+Batches are expressed through dependencies and coordinator dispatch. A parent-child relationship or “second batch” text in a message does not create that scheduling relationship by itself.
+
+## Follow the work in chat
+
+Execution members' results remain in the group. Once the formal execution ends and its result is recorded, the coordinator can continue acceptance. Inspect individual attempts in Project tasks and return to chat for follow-up questions.
+
+An ordinary group message that wakes an Assistant does not automatically create a project task. Explicitly ask the coordinator to save and dispatch work that needs formal tracking.
+
+If execution fails, inspect the reason below the message or its **Assistant processing records**. After fixing model, authorization or tool problems, explicitly arrange another attempt. User stops, member removal and revoked access restrict automatic continuation.
+
+## Delivery and acceptance
+
+Members should return results matching the requirements. Group-member dispatch uses normal Assistant output; external Coding file packaging and independent review are not automatically included.
+
+The responsible Assistant or an authorized user accepts current evidence or requests rework. Multiple attempts stay with one task. Keep failure history rather than creating duplicate tasks to conceal it.
+
+See [Execution, acceptance and rework](./execution-and-review) and [Members and permissions](../setup/members-and-permissions).

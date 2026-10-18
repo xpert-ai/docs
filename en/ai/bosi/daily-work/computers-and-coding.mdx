@@ -1,0 +1,52 @@
+---
+title: "Computers and development"
+description: "Choose local Shell, a server sandbox or a cloud computer according to execution location, permissions and task requirements."
+---
+
+Bosi connects conversation to execution. First decide where work should happen, then check that the Assistant has the capability. Installing Bosi does not automatically synchronize local files to the cloud or supply every execution environment.
+
+## Choose the execution location
+
+| Method | Location | Common uses | Requirements |
+| --- | --- | --- | --- |
+| Local Shell | Your current Mac | Inspect directories and run build or test commands | Native macOS Bosi, Assistant Desktop Shell capability and local execution authorization |
+| Server sandbox | An isolated environment on the Xpert server | Process files, execute code and commands | Corresponding sandbox and tools deployed |
+| Cloud computer | A remote desktop on the server | Operate browsers or desktop apps and use coding tools | Cloud computer service and compatible Assistant/model configuration |
+
+Local Shell is currently a preview capability in the native macOS app. Related interfaces on Windows, Linux or browser previews do not establish local execution support. The cloud computer implementation is supplied by Pro; availability depends on the connected deployment.
+
+## Use local Shell
+
+1. Confirm the Assistant has Desktop Shell enabled and published. Initial personal Bosi creation can also offer it when available.
+2. In **Settings → Local terminal**, check the device name, Shell and default working directory. Use **Apply Shell settings** after changing them.
+3. Tell the Assistant explicitly what to run locally. Under the default policy, a message card shows the command, computer and directory and waits for approval or denial.
+4. Inspect output, exit code and actual files. Stop a running command from recent commands in the local terminal settings when needed.
+
+Policies are **Ask for every command**, **Always allow in this organization** and **Never allow**, scoped to the current service, account, organization and device. Always allow skips subsequent per-command prompts; Never allow stops active commands.
+
+Commands run with the signed-in operating-system user's privileges. The working directory is a starting location, not filesystem isolation. Output returns to Xpert. Each command uses a fresh non-interactive Shell without a persistent terminal session or interactive input.
+
+Each device currently runs one command at a time. Offline requests are not queued or silently redirected to the server sandbox. An Unknown state requires checking the original execution, not assuming it never ran. Closing the macOS window leaves the application running; quitting, signing out or changing organizations stops the local execution connection.
+
+## View and control a cloud computer
+
+Open **Computer** in a supporting Assistant's Workbench and connect to the remote desktop. Select **Start controlling** for keyboard and pointer input or **View only** to observe.
+
+You and the Agent share this remote desktop. Leaving control mode or disconnecting the viewer does not stop its tasks or delete files. Use the relevant task or coding-session control to stop work.
+
+The computer illustration in onboarding only introduces the capability; it does not establish that a real computer has been created or connected.
+
+## Use coding tools in the cloud computer
+
+**Coding tools** lists the CLIs available to the current conversation. Check installation, model compatibility and execution mode before opening a tool. The deployed environment determines the tool list.
+
+| Label | How to interpret it |
+| --- | --- |
+| Installed and Model compatible | Both are basic requirements for opening the tool |
+| Managed tasks supported | Can participate in supported managed background task flows |
+| Interactive only | Do not treat it as supporting managed background tasks |
+| Running, Exited or Unknown | Inspect session state; whether you still control the desktop is not an execution indicator |
+
+Interactive coding tools use models available to the current conversation. Project conversations normally work in the project's file root, shared with other project Assistants; coordinate concurrent changes. Ending desktop control does not terminate a coding session. Use **Stop** when it should end.
+
+See [Develop with Bosi](/en/ai/tutorial/develop-with-bosi) for configuration, validation commands and practical steps, and [Execution, acceptance and rework](/en/ai/projects/tasks/execution-and-review) for platform task dispatch and acceptance.

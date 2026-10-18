@@ -90,7 +90,7 @@ Do not edit `api/openapi.sdk.zh-Hans.json` directly. The localization generator 
 
 ## Live Dashboard product documentation
 
-AI → Live Dashboard (实时看板) is a separate tab immediately after Agent, mirrored
+AI → Live Dashboard (实时看板) is a separate tab after Projects & Tasks, mirrored
 in `en` and `zh-Hans`. Its six task-oriented pages live under
 `{language}/ai/live-dashboard/`:
 
@@ -124,3 +124,210 @@ When updating these pages, distinguish saved definitions from data snapshots, pa
 timers from background subscriptions, draft revisions from formal versions, and
 team read-only sharing from private Workspace script dependencies. Keep commands,
 local accounts, test receipts and release checklists out of the product workflow.
+
+## Bosi App product documentation
+
+AI → **Bosi App** is a standalone tab immediately after Getting Started, mirrored
+in English and Simplified Chinese. Each `{language}/ai/bosi/` tree has eight pages:
+
+| Route suffix | Product topic |
+| --- | --- |
+| `index` | Product positioning, desktop experience and the platform relationship |
+| `quickstart` | Installation, organization selection, personal Bosi onboarding and a first task |
+| `daily-work/assistants-and-apps` | Experts, apps, plugin selection and service authorization |
+| `daily-work/projects-and-groups` | Project context, group collaboration, tasks and recurring work |
+| `daily-work/conversations-and-workbench` | Conversation, optional realtime voice, business views and delivery |
+| `daily-work/computers-and-coding` | Local Shell, server sandbox and cloud computer boundaries |
+| `desktop-guide/personalization-and-settings` | Local preferences, public appearance, shared settings and updates |
+| `desktop-guide/troubleshooting` | Connection, onboarding, permission, execution and delivery problems |
+
+Keep labels and order in `display-name-overrides.json` and
+`navigation-order-tree.json` aligned with `docs.json`. Existing Bosi tutorials
+retain their routes and practical walkthroughs, linking to these product pages.
+The AI overview links to the new tab. Do not replace unrelated curated navigation
+with the complete directory-generated output.
+
+Research on 2026-10-17/18 used the local Xpert source checkout:
+
+- `apps/desktop/README.md`, `docs/bosi-desktop-onboarding.md`,
+  `apps/desktop/docs/desktop-shell.md` and `docs/realtime-voice.md`.
+- `apps/desktop/src/bosi/`, `CatalogDialog.tsx`, `groups/DesktopAddMenu.tsx`,
+  `ChatPanel.tsx`, `voice/VoiceProvider.tsx` and `files/DeliveredFile.tsx`.
+- `apps/desktop/src/settings/sections.ts`, `assistant-settings/`, `avatar/`,
+  `packages/server-ai/src/assistant-binding/bosi/` and the related capability contracts.
+- Existing bilingual `bosi-desktop-user-guide` and `develop-with-bosi` tutorials,
+  checked against current source where behavior has evolved.
+
+Treat Bosi App, the personal Bosi Assistant and the Xpert service as distinct
+concepts. Keep local list preferences separate from public appearance and published
+Assistant configuration. Document local Shell as a native macOS preview and cloud
+computer as a deployment-dependent Pro capability. Onboarding illustrations are
+previews, queued work is not completion, and ending a voice call or desktop takeover
+does not cancel accepted background work. Feature documentation and source checks
+do not establish availability in a particular installed release or live environment.
+
+## Plugin Apps product documentation
+
+AI → **Plugin Apps / 插件应用** is a standalone product tab immediately after
+Bosi App, mirrored in English and Simplified Chinese. Its routes use
+`{language}/ai/applications/`; the existing `projects/plugin-apps/` group remains
+the project integration topic, and `ai/plugin/` remains the developer reference.
+
+| Route suffix | Product topic |
+| --- | --- |
+| `index` | App positioning, business value and relationship to Bosi, plugins and templates |
+| `quickstart` | A first business task, from inputs through review and delivery |
+| `catalog` | Official application documentation directory and related product sections |
+| `app-guide/discovery-and-setup` | Discovery, model and tool prerequisites, setup and initialization |
+| `app-guide/workbench-and-delivery` | Chat, business views, result inspection and delivery |
+| `app-guide/projects-and-tasks` | Project context, business-owned tasks and shared views |
+| `app-guide/access-and-updates` | Usage authorization, maintenance, repair and upgrades |
+| `app-guide/troubleshooting` | Discovery, configuration, access, execution and result problems |
+
+### Adding an official application
+
+Add one directory per product at `{language}/ai/applications/{app-slug}/`, using a
+stable product slug and matching English and Chinese paths. Each application gets
+its own navigation group after the shared guide. Start with a concise `index.mdx`
+covering the product and its first-use workflow. Add a dedicated quickstart or
+detailed workflow pages only when the product needs them. Do not publish empty
+product groups or invented app entries to reserve future navigation.
+
+The product introduction should identify intended users, the problem, inputs,
+outputs and supported scope. The quickstart should show a real first result with
+concrete inputs and review criteria. Use actual UI labels and verified screenshots;
+describe app-specific project types, task states, confirmation steps, exports and
+failure recovery where implemented. Link shared initialization, authorization and
+project concepts to these common guides rather than duplicating their contracts.
+
+Add the product link and any dedicated quickstart to `catalog.mdx` in both
+languages when the guide is ready. Bid Studio, Code Review, Maps and Sites each
+have a single product article.
+Related Bosi, Ontology apps and Live Dashboard links retain their existing sections.
+Keep documentation coverage separate from deployment availability.
+
+Update `navigation-order-tree.json`, `display-name-overrides.json` and `docs.json`
+together. Preview the navigation generator and apply only the affected tab, preserving
+other curated navigation and redirects. Validate bilingual path parity, local links,
+navigation tests and the Mintlify build. The AI overview, Bosi app guide, discovery,
+plugin overview and project integration pages link to this product section.
+
+Research on 2026-10-18 used the local Xpert checkout, in particular:
+
+- `packages/server-ai/src/plugin-resource/plugin-application.service.ts`,
+  `plugin-application.controller.ts` and `plugin-application-composition.ts`.
+- `docs/zh-Hans/guides/application-toolsets.mdx` and `project-application-types.mdx`.
+- `apps/desktop/src/CatalogDialog.tsx`, `apps/desktop/src/catalog/` and
+  `apps/cloud/src/app/features/explore/app-detail/`.
+- Existing product references for application configuration, Assistant authorization,
+  ChatKit project selection, Artifacts and plugin project/task integration.
+
+Document organization-scoped initialization, private authoring workspaces and user
+group runtime grants separately. Tool provider installation, saved tool configuration,
+resource readiness, business execution and acceptance are different states. Repair
+does not upgrade existing templates or migrate business data. Project tasks, views,
+exports and multi-role behavior depend on each app. Source inspection does not verify
+availability in a deployed environment.
+
+### Bid Studio product group
+
+`{language}/ai/applications/bid-studio/index.mdx` is a single product article per
+language, in the **Bid Studio / 标书应用 · Bid Studio** group after the common app
+guide. Keep core capabilities, first use, company assets, supporting tools, project
+tasks and delivery checks together; do not split them into separate pages.
+
+Research on 2026-10-18 used the adjacent `apps/bid` checkout: its current README,
+`src/index.ts`, `assistant-suite.json`, workflow documentation under `docs/`,
+project providers under `src/lib/project/`, the `bid-home` and supporting Views,
+and the export and delivery services. Older design documents were cross-checked
+against implemented behavior.
+
+Preserve confirmed project creation, explicit bidder selection, chapter-level
+writing with continued revision, independent commercial review and evidence
+checks. Available-content export can warn about missing chapters; file delivery
+does not complete submission. Keep internal task/version mechanics and UI
+scaffolds out of product instructions. Site validation does not certify a live
+bid workflow or availability in a particular deployment.
+
+### Code Review, Maps and Sites product groups
+
+Each app uses one mirrored `{language}/ai/applications/{app-slug}/index.mdx`
+article and a separate group under Plugin Apps. Keep product workflows concise;
+link shared enablement and permissions rather than duplicating setup internals.
+
+Research on 2026-10-18 used `xpert-plugins/xpertai/apps/`:
+
+| App | Source references | Product distinctions |
+| --- | --- | --- |
+| `code-review` | README, `docs/index.mdx`, `docs/automation.mdx`, review and automation services, Assistant template and workbench | Private manual drafts; confirmed manual decisions; repository automation trials and draft/comment delivery; stale commits, incomplete coverage and uncertain publication |
+| `maps` | README, setup docs, live/demo templates, provider contracts and shared map UI | Authorized AMap/Tencent services; place search, details, walking/driving and draft references; explicit simulation; no location tracking or saved itinerary |
+| `sites` | Bilingual READMEs, app config, version/deployment service, bundler and workbench | Static content; saved versions versus publication; restore as new draft; governed Artifact links; no backend, network APIs or persistent browser state |
+
+App covers are copied unchanged from each plugin's declared marketplace screenshot
+into `public/img/ai/applications/` and shared by the Chinese and English articles.
+Code Review and Maps use illustrative interface covers; Sites uses its branding
+cover. Keep these distinct from actual product screenshots.
+
+These are source-verified product descriptions, not live deployment acceptance.
+Do not imply universal project/task integration across the three apps, test
+execution by Code Review, real navigation from Maps demo data, or backend hosting
+from Sites. Keep the catalog, overview and bilingual navigation aligned.
+
+## Projects & Tasks product documentation
+
+AI → Projects & Tasks (项目与任务) is a separate tab immediately after Agent.
+The 16 pages under each `{language}/ai/projects/` tree cover the overview,
+quickstart, project types, Assistants and context, members, files, planning,
+task views, execution and acceptance, group collaboration, plugin app integration,
+schedules and troubleshooting.
+Keep the English and Chinese paths and navigation order aligned.
+
+The **Plugin App Integration / 插件应用集成** group under `plugin-apps/` contains
+four pages: `index` (product experience and the bid application example),
+`business-tasks` (source ownership, task and execution synchronization),
+`shared-context` (project resources and permissions), and `sdk-integration`
+(capability map, integration sequence and verification). Keep business workflows
+in the product pages and SDK field details in the integration guide. Cross-links
+from project types, task views, acceptance, application configuration and SDK
+runtime capabilities make both the user and developer entry paths discoverable.
+
+The old `/{language}/ai/agent/conversation/projects` routes redirect to the new
+overview. Preserve these redirects; internal links should use the new routes.
+The AI overview, Bosi tutorial and ChatKit project-selector guide link to this section.
+Navigation is defined in `docs.json`, `navigation-order-tree.json` and
+`display-name-overrides.json`. Preview generation before applying it: existing
+manual navigation elsewhere in the site can differ from the directory-derived output.
+
+The initial research on 2026-10-17 used the local `xpert` source checkout and its
+Plugin SDK documentation. For subsequent updates, cross-check these sources:
+
+| Product topic | Source in the Xpert repository |
+| --- | --- |
+| Task and group workflows | `docs/zh-Hans/guides/project-tasks.mdx`, `group-project-tasks.mdx` and their English counterparts |
+| Project types and first-send creation | `docs/zh-Hans/guides/project-application-types.mdx`, `docs/conversation-project-bootstrap.md`, `services/project-type.service.ts` and `services/conversation-project.service.ts` under `packages/server-ai/src/xpert-project/` |
+| Visible Cloud actions | `apps/cloud/src/app/features/project/`: routes, creation, plans, files, configuration and membership dialogs |
+| Authorization and governed content | `packages/server-ai/src/xpert-project/services/`: access, membership, content and workspace-file services |
+| Dispatch, acceptance and shared task UI | `packages/server-ai/src/xpert-project/runtime/`, `plugins/project-tasks/README.md`, `views/project-tasks.provider.ts`, `remote-components/project-tasks/` |
+| Execution viewer and schedules | `packages/server-ai/src/agent-invocation/remote-components/coding-execution/README.md`, `packages/server-ai/src/xpert-task/xpert-task.service.ts` |
+| SDK boundaries | `packages/plugin-sdk/docs/README.md` (task types), `en/RESOURCE-CARDS.md`, `en/view-extension-protocol.md`, `en/runtime-capabilities.md` and `workspace-file-tools.md` |
+| Plugin project and task contracts | `packages/plugin-sdk/src/lib/project-task/index.ts`, `project-type/index.ts` and `runtime/capabilities/project-{access,provisioning}.ts` |
+| Task source ownership and synchronization | `packages/server-ai/src/xpert-project/services/project-task-ownership.ts`, `project-task-graph.service.ts`, `task-projection/` and `plugins/project-tasks/README.md` |
+
+The bid example was also checked against the adjacent `apps/bid` source:
+`src/lib/project/task-management/bid-project-tasks.provider.ts`,
+`bid-project-task-sync.service.ts`, `src/lib/project/bid-project-type.provider.ts`
+and `src/lib/application/bid-project-tasks.tool.ts`. Its older implementation notes
+describe write-on-read synchronization; current source uses an explicit queued
+`refresh()` after business commits. Preserve that distinction: `graph()` reads
+saved facts, queued is not synchronized, and opening or refreshing a view never
+starts work. A failed enqueue requires another synchronization request; reading
+the view is not a substitute. These contracts were checked in the current source
+checkout, including ongoing development, and do not assert deployed availability.
+
+Architecture proposals under `docs/zh-Hans/solutions/` include planned features
+and older UI inventories; confirm capabilities against current implementation.
+Keep product instructions distinct from SDK contracts and deployment procedures.
+In particular, preserve the distinctions between planning and dispatch, successful
+execution and acceptance, working files and committed deliverables, group membership
+and Project authorization, and scheduled runs and business tasks. Source inspection
+and documentation builds do not establish deployed availability or live execution.

@@ -1,0 +1,62 @@
+---
+title: "Shared resources and permissions"
+description: "Reuse project members, Assistants, files and Workbench while preserving business authorization and formal delivery boundaries."
+---
+
+An app associated with a platform project can organize Assistants, conversations, materials and tasks around the same goal. Task integration is one part of this shared collaboration context.
+
+## Business objects and platform projects
+
+For an app with its own business object, such as a bid or a case, the app maintains a stable association between the business record and the platform project. Users create and open the object through the app; the project supplies shared resources and task access.
+
+Apps can declare project types so the project list and conversation selector organize projects by app and type. Opening a project associated with a business object resolves through the app's entry. A project name alone cannot establish ownership.
+
+To display these types, select a project or lock the current project in an app's chat interface, see [ChatKit: Projects and Project Types](/en/ai/chatkit/chatkit-projects).
+
+The project name and lifecycle reconcile with the business object. Archiving the business object should be reflected in the associated project, and retries reuse the same project. Generic project actions cannot arbitrarily rename, copy, archive or delete these app-owned projects. See [Project types](../setup/project-types).
+
+## Assistants and shared working methods
+
+Initial project provisioning can connect the app's entry Assistant and its external Assistant dependencies to the project. Existing project Assistant membership is preserved. Reconciliation does not restore removed Assistants or automatically add dependencies introduced by a later template update.
+
+Project instructions and skills can establish shared terminology, material-handling methods and output standards. Assistants still need the relevant tools and runtime permissions. Showing an assignee in the task list does not enable all of that Assistant's capabilities.
+
+Project membership, Assistant connections and business roles are managed separately. See [Assistants, instructions and skills](../setup/assistants-and-context).
+
+## Materials, working files and formal results
+
+| Content | Suggested use |
+| --- | --- |
+| Shared input materials | Store within the current project's file scope for authorized Assistants and members |
+| Working files produced by the app | Save through SDK file capabilities and retain scoped references for later tasks |
+| Business content and validation records | Let the app maintain its business associations and versions, accessible through its business entry |
+| Downloadable deliverables | Save through the actual delivery workflow; platform Artifacts require references to committed versions |
+| Project or result resource cards | Provide navigation after the resource is saved; access is checked when opened |
+
+Saving a working file, successfully executing a task and delivering a result are three separate outcomes. Task synchronization does not upload files or convert an output summary into an Artifact. Result entry points vary by execution method; use the app's saved version or the platform's committed deliverable.
+
+For background processing, plugins should retain platform file references rather than only absolute paths inside an execution environment. Users do not need to manage those technical identifiers. See [Shared files and deliverables](../setup/files-and-deliverables).
+
+## Both authorization layers apply
+
+Platform project access and application business authorization must both hold. SDK project access capabilities help the app query readable projects and check edit or management rights; they do not determine who may operate on an application business object.
+
+| Authorization relationship | What it determines |
+| --- | --- |
+| Published Assistant usage grant | Whether the user can enter and run the app Assistant |
+| Project membership and role | Whether the user can read, edit or manage this platform project |
+| Assistant connection to the project | Whether the Assistant participates in this project |
+| Application business permission | Whether the user can read or modify the business object and perform particular operations |
+| File, knowledge base and connector authorization | Which materials and external systems the operation may access |
+
+App access does not grant access to every project. Project membership does not grant every connector or application workspace management permission. Connectors must come from bindings authorized for the current operation. Reading, business actions, background synchronization and execution navigation retain the same user, tenant, organization and project scope.
+
+If a project is missing or access is denied, first confirm the current organization and project, then check project membership, Assistant usage and business-object access separately. See [Members and permissions](../setup/members-and-permissions) and [Assistant and application authorization](/en/ai/system/permissions/assistant-application-authorization).
+
+## Business and task views work together
+
+The app's dedicated interface handles specialized operations such as outlines, forms and case materials. The platform's Project tasks interface supplies shared tracking and execution inspection. Both can operate in the same conversation Workbench, allowing the app to reuse the task tree and Gantt chart.
+
+Integrated apps can offer an open-tasks button or Agent tool, or let users open Project tasks from the Workbench menu on demand. Resource cards provide entries to saved resources; they do not grant access, accept results or rerun work.
+
+For the corresponding developer capabilities, see the [SDK integration guide](./sdk-integration).
