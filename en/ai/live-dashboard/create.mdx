@@ -15,7 +15,13 @@ Include the **source, metric definition, period, grouping, filters and layout**.
 
 > Use the Sales source to create a Q3 2026 dashboard. Net sales means paid amount minus refunds, for paid orders only, grouped by month and region. Put the total at the top, the trend on the left and details on the right. Include a region filter and manual refresh. Use a platinum and metallic-blue style with ECharts.
 
-For file processing:
+For a registered file source:
+
+> Use the Sales CSV File source to create an HTML/ECharts Q3 2026 dashboard of net sales by month and region, with a top total, trend and details below, a region filter and manual refresh that rereads updated source content.
+
+Use the same request with the corresponding JSON or XLSX source name. For reconciliation across files, ask for separate panels with one shared filter affecting all panels. Do not add duplicate business records together across sources.
+
+For complex file processing:
 
 > Use Python to process workspace sales/orders.csv with the accompanying metric definitions. Create monthly net sales by region, with a region filter and refresh that rereads the latest file.
 
@@ -25,7 +31,7 @@ These are example requests; they do not create the named sources or files. You c
 
 The Assistant discovers the source, reads fields and business descriptions, previews real data and generates the page. Ambiguous metrics or missing fields require clarification, not a substituted metric.
 
-Saving checks data configuration and filters. HTML also receives an initial-render check. A successful save produces a chat resource card identifying a working draft. Initial generation does not automatically publish a formal version.
+Saving checks data configuration and filters. HTML also receives checks for initial queries and runtime errors during select, button and refresh interactions. A successful save produces a chat resource card identifying a working draft. Initial generation does not automatically publish a formal version. These checks cover a bounded set of native controls, not every custom interaction or business definition; still compare the total, chart and details when reviewing the page.
 
 An HTML file or a reply saying “done” is not proof of a saved dashboard. Check the save status and a draft that reopens in Workbench. If the card is missing, search the live dashboard selector for the saved item; see [Troubleshooting](./troubleshooting).
 

@@ -10,6 +10,9 @@ description: "Choose supported sources and understand scripts, filters and data 
 | PostgreSQL | Query a configured database | Requires source access and read-only query capability |
 | MySQL and Doris | Query configured databases and tables | Doris acceptance covers the internal catalog, not every compatible database |
 | data-xpert ontology | Use published resources and permitted read-only operations | Requires identity integration, resource bindings and viewer policy |
+| MCP | Call approved read-only tools through an existing platform connection | Requires connection workspace access; revoked access or changed contracts block queries |
+| REST/JSON | Call approved read-only operations on a configured OpenAPI connection | Reuses connection authentication with bounded operations, parameters and pagination |
+| CSV, JSON and XLSX | Query registered workspace files with filters, grouping and aggregation | Requires file access and explicit field definitions; Excel formulas are not executed |
 | Workspace Python/JavaScript | Process authorized files or combine declared source results | Definitions are currently private and cannot support team sharing |
 
 The dashboard lists sources that are both accessible and supported by an available adapter. Sharing a page does not grant database, ontology or file access.
@@ -18,7 +21,11 @@ Data-xpert can expose resources through its published ontology adapters. Each re
 
 ## Files and scripts
 
-Place input files and metric definitions in an authorized workspace, then give the Assistant the exact filenames and processing rules. It can write Python or JavaScript to clean, group and calculate data for the dashboard.
+For filtering, grouping, sum, count, minimum and maximum, prefer a registered CSV/JSON/XLSX source without writing a script. An administrator configures the file location, format, field types and business definitions; the Assistant chooses the source and query parameters. Pages and filter values cannot replace file paths.
+
+Refresh rereads the source file. After updating content at the same path, refresh to see new results. Changed file configuration or field contracts require discovery and query validation again. XLSX does not execute formulas and rejects formula cells by default. Explicit cached-value mode reads existing results without guaranteeing recalculation.
+
+Use Workspace Python/JavaScript for complex cleaning or combining sources. Place inputs and metric definitions in an authorized workspace and provide exact filenames and processing rules.
 
 Refresh runs the script again against currently authorized inputs. A definition can pin code or read current code on each execution. This is separate from refreshing input data: fixed code does not freeze the business rows in a file.
 
@@ -36,9 +43,11 @@ The source, page and current permissions all affect refresh. Historical versions
 
 ## Administrator setup
 
-Deploy Live Dashboard and required source plugins, configure database drivers or ontology connections, and enable dashboard tools and skills for the Assistant. HTML save checks require a browser runtime; scripts need a restricted Python/JavaScript runtime. Enabling the Workbench View alone does not enable tools.
+Deploy Live Dashboard and required source plugins, configure the required database drivers, ontology/MCP/OpenAPI connections or file catalogs, and enable dashboard tools and skills for the Assistant. HTML save checks require a browser runtime; scripts need a restricted Python/JavaScript runtime. Enabling the Workbench View alone does not enable tools.
 
-One platform query is limited to 30 seconds, 1,000 rows and 2 MB. Scripts have additional file and invocation limits. Aggregate at the source where appropriate. Repeatedly fetching truncated data does not establish a complete result.
+After upgrading the dashboard plugin, also update the Assistant's installed dashboard skill and verify its content. A plugin update alone does not replace existing skill copies.
+
+One platform query is limited to 30 seconds, 1,000 rows and 2 MB. Declarative file input is limited to 8 MB and 50,000 rows; oversized input fails instead of silently producing partial totals. Scripts have separate file and invocation limits. Aggregate at the source where appropriate. Repeatedly fetching truncated data does not establish a complete result.
 
 See [Troubleshooting](./troubleshooting) for query failures.
 
