@@ -179,6 +179,30 @@
                       "en/ai/applications/app-guide/access-and-updates",
                       "en/ai/applications/app-guide/troubleshooting"
                     ]
+                  },
+                  {
+                    "group": "Bid Studio",
+                    "pages": [
+                      "en/ai/applications/bid-studio/index"
+                    ]
+                  },
+                  {
+                    "group": "Code Review",
+                    "pages": [
+                      "en/ai/applications/code-review/index"
+                    ]
+                  },
+                  {
+                    "group": "Maps",
+                    "pages": [
+                      "en/ai/applications/maps/index"
+                    ]
+                  },
+                  {
+                    "group": "Sites",
+                    "pages": [
+                      "en/ai/applications/sites/index"
+                    ]
                   }
                 ]
               },
@@ -1096,6 +1120,30 @@
                       "zh-Hans/ai/applications/app-guide/projects-and-tasks",
                       "zh-Hans/ai/applications/app-guide/access-and-updates",
                       "zh-Hans/ai/applications/app-guide/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "标书应用 · Bid Studio",
+                    "pages": [
+                      "zh-Hans/ai/applications/bid-studio/index"
+                    ]
+                  },
+                  {
+                    "group": "代码审查 · Code Review",
+                    "pages": [
+                      "zh-Hans/ai/applications/code-review/index"
+                    ]
+                  },
+                  {
+                    "group": "地图 · Maps",
+                    "pages": [
+                      "zh-Hans/ai/applications/maps/index"
+                    ]
+                  },
+                  {
+                    "group": "站点 · Sites",
+                    "pages": [
+                      "zh-Hans/ai/applications/sites/index"
                     ]
                   }
                 ]

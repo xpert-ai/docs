@@ -1,0 +1,57 @@
+---
+title: "Sites"
+description: "Create and revise static sites through conversation, preview saved versions, and publish with an explicit audience."
+---
+
+![Sites cover with website and content card illustrations](/public/img/ai/applications/sites-cover.webp)
+
+**Sites** brings website creation, version previews and publishing into one Xpert workflow. Describe your requirements to the Sites Assistant, revise through the conversation, inspect the page in the workbench, and publish a link when ready.
+
+It suits product pages, event pages, onboarding and team resource hubs, reports, interactive explainers and dashboards based on supplied data.
+
+## Core capabilities
+
+| Capability | What you can do |
+| --- | --- |
+| Conversational building | Generate content, styling and browser interactions from requirements, files and notes, then revise in natural language |
+| Site workbench | Manage sites, preview saved versions and check layouts at desktop and mobile widths |
+| Version management | Save content snapshots, inspect history and restore an earlier version as a new draft |
+| Controlled publishing | Select the exact version and audience, then publish an access link through Xpert Artifacts |
+| Sharing controls | Restrict access or confirm public sharing, and revoke links when needed |
+
+## Get started
+
+An administrator [enables the app and grants access](/en/ai/applications/app-guide/discovery-and-setup), providing an available primary model, platform sandbox and Artifacts capabilities. Open the Sites Assistant, then:
+
+1. **Create a site.** Select **New site** in the workbench and enter a name and brief, including the audience, content, visual direction and interactions.
+2. **Generate and save.** The Assistant creates site files in the current conversation and saves a reviewable version. Provide real materials to ground the content in your business.
+3. **Preview and revise.** Inspect desktop and mobile previews. Select **Continue in chat** to request changes, then review the next saved version.
+4. **Confirm publication.** Select **Publish version** and verify the selected version and access mode. Open the published site to check its content and interactions.
+5. **Share and update.** Give the deployment link to the intended audience. Save later changes as a new version, then publish when ready.
+
+For example:
+
+> Create an employee onboarding hub using the materials I provided. Include a first-week schedule, useful resources and expandable FAQs. Save a mobile-friendly version for me to preview first.
+
+## Versions and publication
+
+A **site project** organizes source files and history, a **saved version** records a specific content snapshot, and **publication** determines which version visitors see. Saving or restoring a draft does not automatically replace the published site.
+
+To return to earlier content, open **Versions**, select a historical entry and choose **Restore as new draft**. Review and publish it again before visitors see the change.
+
+## Access modes
+
+| Option | Typical use |
+| --- | --- |
+| Only me | Personal previews and early checks |
+| Workspace members | Internal sites for members of the current workspace |
+| Selected users | Access for explicitly selected users |
+| Anyone with the link | Public access after confirmation |
+
+Public publishing requires explicit confirmation and shares the generated site. It does not expose the originating conversation or workspace. Revoking a link disables that access path while retaining the project and saved versions. See [Artifacts](/en/ai/agent/artifacts/index) for the underlying sharing model.
+
+## Scope and limitations
+
+Sites currently publishes self-contained static single-page sites with packaged styles, scripts, images, fonts and browser interactions. Pages run in an isolated environment, with interactive state held in memory.
+
+Server APIs, databases, user login, durable form submissions and live external data are outside the current hosting scope. Published pages cannot call network APIs or use persistent browser storage. Custom domains and real traffic analytics are also unavailable. Design dashboards and forms around static content and interactions within the current page session.

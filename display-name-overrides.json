@@ -59,7 +59,11 @@
     "daily-work": "Daily Work",
     "desktop-guide": "Settings & Help",
     "applications": "Plugin Apps",
-    "app-guide": "App Guide"
+    "app-guide": "App Guide",
+    "bid-studio": "Bid Studio",
+    "code-review": "Code Review",
+    "maps": "Maps",
+    "sites": "Sites"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -147,6 +151,10 @@
     "daily-work": "日常工作",
     "desktop-guide": "设置与帮助",
     "applications": "插件应用",
-    "app-guide": "应用使用指南"
+    "app-guide": "应用使用指南",
+    "bid-studio": "标书应用 · Bid Studio",
+    "code-review": "代码审查 · Code Review",
+    "maps": "地图 · Maps",
+    "sites": "站点 · Sites"
   }
 }

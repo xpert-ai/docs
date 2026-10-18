@@ -188,10 +188,10 @@ the project integration topic, and `ai/plugin/` remains the developer reference.
 
 Add one directory per product at `{language}/ai/applications/{app-slug}/`, using a
 stable product slug and matching English and Chinese paths. Each application gets
-its own navigation group after the shared guide. Begin with `index.mdx` and
-`quickstart.mdx`, then add workflow, delivery, configuration or troubleshooting
-pages as the product needs. Do not publish empty product groups or invented app
-entries to reserve future navigation.
+its own navigation group after the shared guide. Start with a concise `index.mdx`
+covering the product and its first-use workflow. Add a dedicated quickstart or
+detailed workflow pages only when the product needs them. Do not publish empty
+product groups or invented app entries to reserve future navigation.
 
 The product introduction should identify intended users, the problem, inputs,
 outputs and supported scope. The quickstart should show a real first result with
@@ -200,10 +200,11 @@ describe app-specific project types, task states, confirmation steps, exports an
 failure recovery where implemented. Link shared initialization, authorization and
 project concepts to these common guides rather than duplicating their contracts.
 
-Add the product and quickstart links to `catalog.mdx` in both languages when the
-manual is ready. The catalog currently has no app-specific manuals; related Bosi,
-Ontology apps and Live Dashboard links are not claims that those products are new
-official app entries. Keep documentation coverage separate from deployment availability.
+Add the product link and any dedicated quickstart to `catalog.mdx` in both
+languages when the guide is ready. Bid Studio, Code Review, Maps and Sites each
+have a single product article.
+Related Bosi, Ontology apps and Live Dashboard links retain their existing sections.
+Keep documentation coverage separate from deployment availability.
 
 Update `navigation-order-tree.json`, `display-name-overrides.json` and `docs.json`
 together. Preview the navigation generator and apply only the affected tab, preserving
@@ -227,6 +228,50 @@ resource readiness, business execution and acceptance are different states. Repa
 does not upgrade existing templates or migrate business data. Project tasks, views,
 exports and multi-role behavior depend on each app. Source inspection does not verify
 availability in a deployed environment.
+
+### Bid Studio product group
+
+`{language}/ai/applications/bid-studio/index.mdx` is a single product article per
+language, in the **Bid Studio / 标书应用 · Bid Studio** group after the common app
+guide. Keep core capabilities, first use, company assets, supporting tools, project
+tasks and delivery checks together; do not split them into separate pages.
+
+Research on 2026-10-18 used the adjacent `apps/bid` checkout: its current README,
+`src/index.ts`, `assistant-suite.json`, workflow documentation under `docs/`,
+project providers under `src/lib/project/`, the `bid-home` and supporting Views,
+and the export and delivery services. Older design documents were cross-checked
+against implemented behavior.
+
+Preserve confirmed project creation, explicit bidder selection, chapter-level
+writing with continued revision, independent commercial review and evidence
+checks. Available-content export can warn about missing chapters; file delivery
+does not complete submission. Keep internal task/version mechanics and UI
+scaffolds out of product instructions. Site validation does not certify a live
+bid workflow or availability in a particular deployment.
+
+### Code Review, Maps and Sites product groups
+
+Each app uses one mirrored `{language}/ai/applications/{app-slug}/index.mdx`
+article and a separate group under Plugin Apps. Keep product workflows concise;
+link shared enablement and permissions rather than duplicating setup internals.
+
+Research on 2026-10-18 used `xpert-plugins/xpertai/apps/`:
+
+| App | Source references | Product distinctions |
+| --- | --- | --- |
+| `code-review` | README, `docs/index.mdx`, `docs/automation.mdx`, review and automation services, Assistant template and workbench | Private manual drafts; confirmed manual decisions; repository automation trials and draft/comment delivery; stale commits, incomplete coverage and uncertain publication |
+| `maps` | README, setup docs, live/demo templates, provider contracts and shared map UI | Authorized AMap/Tencent services; place search, details, walking/driving and draft references; explicit simulation; no location tracking or saved itinerary |
+| `sites` | Bilingual READMEs, app config, version/deployment service, bundler and workbench | Static content; saved versions versus publication; restore as new draft; governed Artifact links; no backend, network APIs or persistent browser state |
+
+App covers are copied unchanged from each plugin's declared marketplace screenshot
+into `public/img/ai/applications/` and shared by the Chinese and English articles.
+Code Review and Maps use illustrative interface covers; Sites uses its branding
+cover. Keep these distinct from actual product screenshots.
+
+These are source-verified product descriptions, not live deployment acceptance.
+Do not imply universal project/task integration across the three apps, test
+execution by Code Review, real navigation from Maps demo data, or backend hosting
+from Sites. Keep the catalog, overview and bilingual navigation aligned.
 
 ## Projects & Tasks product documentation
 

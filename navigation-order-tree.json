@@ -70,6 +70,30 @@
                 "access-and-updates",
                 "troubleshooting"
               ]
+            },
+            {
+              "slug": "bid-studio",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "code-review",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "maps",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "sites",
+              "pages": [
+                "index"
+              ]
             }
           ]
         },
