@@ -5,6 +5,8 @@ description: 使用装饰器定义业务工具与交互式 MCP Apps，并由 Xpe
 
 插件原生 MCP 工具让插件只实现一次业务方法，再由 Xpert 自动适配为 Agent Middleware Tool、MCP Tool，或同时暴露到两个调用面。插件不需要创建 stdio MCP Server；Xpert 通过受管的 [MCP Server](../middleware/mcp-server/index) 负责能力发现、Streamable HTTP、鉴权、策略、审计和启停。
 
+要理解完整的开发逻辑，可阅读[使用 xpert-skills 开发带 MCP 的 Doris 查询插件](../tutorial/doris-query-mcp-tutorial)，了解业务工具、MCP 发布、自定义配置与实例执行之间的关系。
+
 ## 何时使用
 
 | 场景                                                          | 推荐方式                                                  |
