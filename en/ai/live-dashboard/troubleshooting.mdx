@@ -50,6 +50,12 @@ On a save or publish conflict, reread the latest content and reconcile changes. 
 
 Sharing does not transfer the creator's source permissions. Changing a policy invalidates the old link, and revoked access should remain denied.
 
+## Repeated tool calls during generation or editing
+
+Before authoring a page, the Assistant checks source previews and applicable filters. For an existing HTML dashboard, it reads the prepared editing copy before changing it. One tool failure does not necessarily require a new dashboard: retain the current target, let the Assistant repair the reported issue, and require a new draft save receipt.
+
+If retries continue, share the turn's error and requested changes. Administrators can distinguish missing filter checks, file-edit failures, page preflight failures and concurrency conflicts. Automatic recovery cannot bypass permissions or query boundaries and does not guarantee first-attempt success for every model.
+
 ## What to report
 
 Provide reproduction steps, dashboard name, source, draft/formal-version status, selected filters, the error and its time. Avoid including database passwords, API tokens or full sensitive datasets in screenshots or chat. An administrator can inspect tool calls, save records, permissions and runtime availability.
