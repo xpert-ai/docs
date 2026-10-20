@@ -654,6 +654,7 @@
                     "group": "Agentic Apps",
                     "pages": [
                       "en/ai/tutorial/echarts-mcp-app",
+                      "en/ai/tutorial/doris-query-mcp-tutorial",
                       "en/ai/tutorial/chatkit-browser-extension",
                       "en/ai/tutorial/develop-custom-agentic-app",
                       "en/ai/tutorial/dockyard-workbench-plugin"
@@ -1593,6 +1594,7 @@
                     "group": "智能体应用",
                     "pages": [
                       "zh-Hans/ai/tutorial/echarts-mcp-app",
+                      "zh-Hans/ai/tutorial/doris-query-mcp-tutorial",
                       "zh-Hans/ai/tutorial/chatkit-browser-extension",
                       "zh-Hans/ai/tutorial/develop-custom-agentic-app",
                       "zh-Hans/ai/tutorial/dockyard-workbench-plugin"
