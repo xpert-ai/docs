@@ -218,6 +218,14 @@
               ]
             },
             {
+              "slug": "pipelines",
+              "pages": [
+                "index",
+                "executions-and-history",
+                "configuration-and-apps"
+              ]
+            },
+            {
               "slug": "plugin-apps",
               "pages": [
                 "index",

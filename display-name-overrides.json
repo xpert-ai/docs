@@ -63,7 +63,8 @@
     "bid-studio": "Bid Studio",
     "code-review": "Code Review",
     "maps": "Maps",
-    "sites": "Sites"
+    "sites": "Sites",
+    "pipelines": "Pipelines"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -155,6 +156,7 @@
     "bid-studio": "标书应用 · Bid Studio",
     "code-review": "代码审查 · Code Review",
     "maps": "地图 · Maps",
-    "sites": "站点 · Sites"
+    "sites": "站点 · Sites",
+    "pipelines": "项目流水线"
   }
 }

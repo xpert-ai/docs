@@ -355,6 +355,14 @@
                     ]
                   },
                   {
+                    "group": "Pipelines",
+                    "pages": [
+                      "en/ai/projects/pipelines/index",
+                      "en/ai/projects/pipelines/executions-and-history",
+                      "en/ai/projects/pipelines/configuration-and-apps"
+                    ]
+                  },
+                  {
                     "group": "Plugin App Integration",
                     "pages": [
                       "en/ai/projects/plugin-apps/index",
@@ -1292,6 +1300,14 @@
                       "zh-Hans/ai/projects/tasks/views",
                       "zh-Hans/ai/projects/tasks/execution-and-review",
                       "zh-Hans/ai/projects/tasks/group-collaboration"
+                    ]
+                  },
+                  {
+                    "group": "项目流水线",
+                    "pages": [
+                      "zh-Hans/ai/projects/pipelines/index",
+                      "zh-Hans/ai/projects/pipelines/executions-and-history",
+                      "zh-Hans/ai/projects/pipelines/configuration-and-apps"
                     ]
                   },
                   {

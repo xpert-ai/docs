@@ -1,0 +1,46 @@
+---
+title: "Project pipelines"
+description: "Follow multi-agent work by stage, responsibility lane, and execution time in Project Tasks."
+---
+
+Project pipelines bring multi-step work into a shared view: who owns each stage, where work is waiting, which executions took place, and who needs to act. They support both connected business applications and platform-coordinated processes.
+
+## Open an existing pipeline
+
+Open **Project Tasks → Pipeline** in the project workbench or the conversation Workbench. The page displays existing pipelines directly. The configuration dialog opens only when you explicitly select **Configure pipeline**. Opening, switching, or refreshing a view does not start work.
+
+If there are no pipelines, check whether the application has created a process, or configure an available template as described in [Configuration and applications](./configuration-and-apps). Installing a plugin, saving configuration, and creating a business process are separate steps.
+
+## Project, pipeline, and round
+
+| Selection | Meaning                                                                     | Example                                                       |
+| --------- | --------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Project   | Shared goal, members, Assistants, files, and access scope                   | A product delivery project                                    |
+| Pipeline  | A process instance for a particular object or work item within that project | Processing one business document or reviewing one code change |
+| Round     | A preserved processing cycle with its input versions and snapshot           | Cycles before and after an input update                       |
+
+The selector on the left switches **pipeline instances within the current project**. It does not switch projects or select configuration templates. Applications supply instance names, which may resemble the project name. The round selector switches between current and historical rounds. One project can contain multiple instances, each with multiple rounds.
+
+## Read the stage swimlanes
+
+- **Horizontal stages** describe the process order. Titles, icons, and branch labels come from configuration or application data.
+- **Vertical lanes** describe responsibilities. Assistant information appears on the lane. Select a lane or use the lane filter to focus on its work.
+- **Node cards** show the business state of a step. Their dots represent executions belonging to that node and round, without repeating Agent names.
+- **Control nodes** show branching and joining near the relevant steps, rather than in a separate bottom lane.
+- **Branch edges** describe possible paths. They do not mean every branch will execute; use the recorded route to identify the chosen path.
+
+The status summary helps locate completed, running, human-waiting, or blocked nodes. Status reflects business decisions and execution records; color alone does not establish delivery.
+
+## Inspect nodes and executions
+
+Switch to the **Execution timeline** to see recorded executions over time. Select a node for its overview, execution records, and evidence. Select an execution dot to open that specific execution.
+
+Business workbench links and node actions depend on the application and current permissions. Historical rounds retain traceability and cannot advance current business work. An unavailable target is not replaced with a neighboring node or another execution.
+
+See [Executions and history](./executions-and-history) for successful executions on blocked nodes, deduplication, and analytics scopes.
+
+## Move between workspaces
+
+Cloud and Desktop conversation Workbenches share the Project Tasks pipeline view. Use the business workbench to handle specialist content, then return to the relevant pipeline and node. Restorable selections are scoped to the user and project; stale or inaccessible targets are revalidated.
+
+The standalone Desktop project entry opens the configured platform page. Available applications, templates, and execution viewers depend on deployment, plugins, and authorization. Being able to view a project does not grant every related capability.

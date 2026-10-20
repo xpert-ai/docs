@@ -99,3 +99,7 @@ Save results through actual file or Artifact APIs before supplying references to
 | Edit application task relationships or business state | Generic actions reject ownership changes; use the app's entry, while platform schedule edits still enforce roles and revisions |
 
 These interfaces reflect the current source contract. Asynchronous synchronization requires the corresponding host implementation and database migration before deploying plugins that call `refresh()`. Importable SDK types do not establish deployed capability availability. If an older host lacks `refresh()`, report it as unavailable rather than falling back to writes through a read API. Source and documentation checks do not replace integration verification in the target environment.
+
+## Integrate project pipelines
+
+Applications that need stage swimlanes, branch paths, and round history can add project pipelines alongside task integration. Existing business engines synchronize facts through a Provider while retaining control. Platform-coordinated processes integrate through templates and execution adapters. Applications still own domain decisions, readable labels, icons, and business entries; shared capabilities cover execution ownership, persistence, queries, and interaction. See [Configuration and applications](../pipelines/configuration-and-apps).

@@ -1,0 +1,52 @@
+---
+title: "Configuration and applications"
+description: "Choose templates and execution roles, and understand the responsibilities of the platform and business applications."
+---
+
+The platform provides shared pipeline views, execution tracking, and authorization boundaries. Applications supply specialist inputs, decisions, evidence, and workbenches. They can reuse project pipelines without adopting identical business rules.
+
+## Configure a pipeline
+
+1. Open **Project Tasks → Pipeline** in the target project.
+2. Explicitly select **Configure pipeline** and choose an available template.
+3. Select the roles, executors, and allowed parameters requested by its form.
+4. Review validation messages and save. Resolve unsupported capabilities, unavailable roles, or authorization issues first.
+
+Saving creates a binding between the project and the template; it does not start execution. An existing application process may be created and synchronized by the application, so use its business entry point to establish an instance. Entering or refreshing the page does not open configuration automatically.
+
+Templates, parameters, and executor choices depend on loaded plugins and host capabilities. If the catalog is empty, check actual plugin availability, organization and project context, and configuration permissions.
+
+## Advance work
+
+Use current-round node details to inspect available actions, disabled reasons, and business workbench links. Prepare inputs and explicitly submit according to the application. Authorized users handle required reviews and decisions. Opening a workbench or refreshing the page does not trigger the next step.
+
+Check request acceptance, execution completion, and business completion separately. Wait for or reconcile an unknown operation before repeating it. Cancellation also requires confirmation of the final outcome. Historical details support traceability and cannot advance current work.
+
+## Two integration approaches
+
+| Approach             | Who advances the process                                                                                                             | What project pipelines provide                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| Application-managed  | The application owns its state, routes, and business operations                                                                      | Snapshot presentation, swimlanes, execution links, and business workbench navigation |
+| Platform-coordinated | The platform coordinates configured steps, dependencies, and dispatch; plugins supply specialist execution and result interpretation | Run and node state, execution tracking, human intervention, and recovery             |
+
+Displaying an application-managed process does not transfer its control to the platform. Platform coordination does not put specialist business rules into the shared UI. See [Plugin application SDK integration](../plugin-apps/sdk-integration) for integration responsibilities.
+
+## BOM application example
+
+The BOM application owns document and product inputs, BOM matching, change decisions, master data, quotations, and downstream business workbenches. Project pipelines display its stages, responsibility lanes, readable branch conditions, and associated execution records.
+
+Create or select a business scenario in the application, then follow it in the project pipeline. Open the node or business workbench entry to handle specialist data. The shared page does not define a valid BOM or replace application approval.
+
+These entries depend on compatible plugins and migration acceptance. Retire the old BOM swimlane only after the required migrated functions pass acceptance, not merely because the new page is visible.
+
+## Code Review application example
+
+The Code Review application supplies code and input versions, reviewer roles, review criteria, finding verification, and result archival. Project pipelines organize and display preparation, parallel review, aggregation, verification, and human handling where required.
+
+Local Git reviews can retain results in the platform. Remote PR support, comment publication, and other external actions depend on the selected template, plugin, and authorization. A successful review does not imply that results were published to a code-hosting service.
+
+## Availability boundaries
+
+Stage labels, icons, business entries, and evidence come from configuration and application data. Processes without readable condition labels may still display technical identifiers; maintainers should supply the appropriate configuration rather than relying on automatic business-term translation.
+
+Template availability depends on deployed plugin versions, Assistant configuration, host capabilities, and permissions. Budget extensions, automatic continuation, and other undelivered capabilities are not enabled merely because related fields appear in a template.

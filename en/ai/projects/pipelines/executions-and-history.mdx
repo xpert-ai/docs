@@ -1,0 +1,54 @@
+---
+title: "Executions and history"
+description: "Distinguish runtime outcomes from business state and trace executions by node and round."
+---
+
+A successful execution means the executor finished that run. Whether the node is complete also depends on acceptance, approval, or the application's business rules. Pipelines retain both kinds of information to explain why a process may still be waiting.
+
+## What an execution dot represents
+
+Node dots display only executions explicitly associated with **that node and round**. A new round does not inherit the previous round's dots. Returning to a historical round preserves access to its corresponding executions.
+
+Repeated reports of the same execution are deduplicated, including lane summaries. Distinct retry executions remain separate. Records without reliable ownership are not associated by guessing from an Assistant name or a shared task.
+
+Select a dot to open its execution, or the card to open node details. Project access and execution-detail access are separate permissions. Deleted executions, inaccessible targets, or missing historical navigation data may prevent opening a record; the viewer does not substitute a different execution.
+
+## Business snapshots and runtime outcomes
+
+| What you see                                                        | Meaning                                                                                      |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Execution succeeded, business remains blocked                       | Runtime has ended, but a business issue, review, or input condition remains unresolved       |
+| Historical business state is unchanged, execution now shows success | The historical business decision is preserved while a confirmed runtime outcome is displayed |
+| No dots in a new round                                              | No corresponding execution has been recorded for that round; old executions are not reused   |
+| Request accepted, no terminal outcome                               | Execution or reconciliation is still pending; acceptance does not mean success               |
+| Cancellation requested, not yet cancelled                           | The executor has not confirmed cancellation; do not assume work has stopped                  |
+
+Historical rounds support audit and traceability. Viewing them does not rewrite previous business decisions or start a new round.
+
+## Use analytics
+
+**Statistics** focuses on the selected pipeline; **Project statistics** covers the project. Both answer different questions from the swimlane summary of current business state.
+
+| Dimension             | What it explains                                                                                     |
+| --------------------- | ---------------------------------------------------------------------------------------------------- |
+| Pipeline and template | Which processes generated executions, with their counts and outcomes                                 |
+| Executor              | Work performed by each Assistant or execution target                                                 |
+| Execution status      | Successful, failed, cancelled, and unfinished executions                                             |
+| Duration              | Mean, median, and high-percentile duration for executions with valid start and end times             |
+| Retries               | Explicitly recorded technical retries; an additional execution for a task is not necessarily a retry |
+| Model usage and cost  | Reported usage, currency, and cost; missing data does not mean zero cost                             |
+| Queue and human wait  | Waiting time where the relevant timestamps are recorded                                              |
+
+Execution analytics filters by actual start time, including the beginning and excluding the end of the range, for a maximum of 93 days per query. Current business summaries reflect current rounds; changing the analytics window does not reconstruct business state at a past date.
+
+Success rate uses successful, failed, and cancelled terminal executions as its denominator. Running executions are not counted as failures. With no terminal samples, no success rate is available. Missing duration or cost information affects coverage, and amounts in different currencies are not added together.
+
+An execution may be referenced by several processes, so deduplicated totals can differ from the sum of individual rows. Check the project, pipeline, time range, and data coverage before comparing results.
+
+## Investigate unexpected records
+
+1. Confirm the selected project, pipeline, and round.
+2. Refresh once, then inspect the node's execution records and business state.
+3. If ownership still appears incorrect, retain the node, round, and execution context for the administrator or application maintainer to investigate.
+
+Refresh only synchronizes the display. Reconcile an unknown operation before starting another one; repeated submissions are not a way to repair missing records. See [Configuration and applications](./configuration-and-apps) for business actions.
