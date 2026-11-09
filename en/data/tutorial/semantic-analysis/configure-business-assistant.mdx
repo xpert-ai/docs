@@ -1,0 +1,162 @@
+---
+title: Configure and Publish a Business Assistant
+description: Create or edit a procurement price assistant, configure its domain, template, environment, user groups, and semantic model resources, then publish and verify it.
+sidebar_position: 2
+---
+
+This tutorial configures **Procurement price assistant v1** through **create or edit → basic information → capabilities → resources and access → check and publish → verify a real query**.
+
+The examples use a **Procurement** business domain, a **Procurement users** group, and a `ProcurementPrices` semantic model. Replace them with your own business objects. Configure the assistant in Data Xpert, then use its assistant entry point after publication.
+
+## 1. Prepare the prerequisites
+
+- Your account can maintain business assistants in the target workspace.
+- Required runtime services, models, and plugins are available, with no blocking organization readiness checks.
+- The target semantic model is published and belongs to the intended business domain.
+- The intended user group exists and contains the people who will use the assistant.
+- Those users have the required business domain, resource, and query permissions.
+
+If you need organization assistants first, see [Initialize Organization Ontology and Modeling Assistants](./initialize-organization-assistants). Creating a business assistant against an available semantic model does not require reinitializing an organization assistant.
+
+| Setting | What it determines |
+| --- | --- |
+| Workspace | Where the assistant configuration is stored and who can maintain it |
+| Business scope: personal or team | Whether the assistant appears under My assistants or Team assistants |
+| Business area | The assistant's business ownership and related access scope |
+| Accessible user groups | Which groups form the assistant's audience |
+| Accessible resources | Which authorized resources this assistant can call |
+| Caller's own permissions | Which data the current user can actually query or operate on |
+
+Selecting **Team** does not open access to the whole organization. Selecting a business domain does not bind all its models. Assistant usage and workspace maintenance have different permissions; ordinary chat users do not need editing access to the entire workspace.
+
+## 2. Open creation or editing
+
+Open **AI Workspaces → Target workspace → Assistant Agents** to reach the Business Assistants list. If readiness checks report missing prerequisites, click **View details** and resolve the relevant runtime conditions first.
+
+### Create a business assistant
+
+1. Click **Create Business Assistant** at the top right.
+2. On the **Create Assistant** page, select **Business template**.
+3. Complete Basic information, Capabilities, Resources and access, and Publication checks as described below.
+
+The page may also offer **Create new** and **Bind existing**. This tutorial uses **Business template**. To connect an already published Assistant, use **Bind existing** rather than creating a duplicate from a template.
+
+### Edit an existing business assistant
+
+Find the assistant in the list and select **… → Edit** on its row. The configuration sections follow the same sequence as creation. Use this entry point when changing an existing assistant's user groups, resources, or menu settings.
+
+## 3. Fill in basic information
+
+For a new assistant:
+
+| Field | Example or action |
+| --- | --- |
+| Name | Procurement price assistant v1 |
+| Agent code | `procurement_price_assistant_v1` |
+| Business scope | Team |
+| Business area | Procurement, matching the target model's domain |
+| Menu category | Optional, for example “Price lookup” |
+| Menu order | For example, `100`, following your team's menu convention |
+| Show in menu | On |
+| Description | Look up purchase prices, currencies, and applicable conditions for a material |
+
+The agent code identifies both the business assistant and its assistant agent. Use a unique value starting with a letter or number and containing only letters, numbers, underscores, or hyphens. If **Procurement price assistant** already exists, creating **v1** produces a separate configuration; test the exact assistant you publish here.
+
+A business area is not a model name. Select the domain first, then explicitly select the model under Resources and access.
+
+## 4. Configure capabilities
+
+Open **Capabilities**:
+
+| Field | Setting |
+| --- | --- |
+| Template | Select the plugin-provided `Business assistant with data-xpert tools` |
+| Environment | Select an environment prepared for this template in the current workspace |
+| MCP instance | For a new assistant, choose **Automatically create default MCP toolset**, or select an existing suitable instance |
+| Channels | Configure as needed; this tutorial does not add an external channel |
+
+The environment may be named `Ontology Runtime` or `Semantic Model Workbench`. Its name is a display label: check that it contains the required variables and runtime configuration instead of creating or replacing it only because its name differs from the example. The system creates the default MCP toolset, so there is no need to create a duplicate outside the wizard.
+
+Maintain the assistant's instructions for the business task. For price lookup, use constraints such as:
+
+```text
+You are a procurement price assistant. Use only resources authorized for this assistant and accessible to the current user.
+Look up purchase prices by the material or drawing number supplied by the user. State the currency, tax basis, and applicable conditions.
+If multiple quotations exist, list differences such as supplier and validity period, then ask the user to select the intended record.
+Do not add unit prices together. If no result is found, say so instead of inventing a price.
+```
+
+Instructions guide business responses; they do not replace resource and audience authorization. A template may include capabilities beyond price lookup, and an assistant's self-description does not prove that an operation is authorized or has succeeded.
+
+## 5. Configure the audience and model resources
+
+Open **Resources and access** and configure both sections.
+
+### 5.1 Select accessible user groups
+
+1. Under **Accessible user groups**, select **Procurement users**.
+2. Confirm that the group is selected; the active theme typically emphasizes selected items with a filled background.
+3. If IT, Legal, and Procurement groups appear as candidates, only selected groups enter this group configuration. A visible candidate name is not an access grant.
+4. Confirm that actual users belong to a selected group. When multiple groups are selected, membership in any one satisfies the group membership condition; other access requirements still apply.
+
+A user group is a set of platform users. It may represent a department or span departments. Select the procurement group to include procurement staff. Selecting only the IT group does not give procurement staff group access merely because “procurement” appears in the assistant's name.
+
+<Note>
+Do not interpret an empty group selection as “nobody can use this.” Existing business domain and sharing rules still matter when no group is specified. For an assistant intended for a defined audience, select its groups explicitly and test both menu and direct-link access with ordinary members.
+</Note>
+
+### 5.2 Select accessible resources
+
+1. Under **Accessible resources**, search for the target model and check its resource code and model identifier.
+2. Select the resource corresponding to `ProcurementPrices`.
+3. Switch to **Selected** and confirm that only intended resources are included. This example should show **1 selected**.
+
+Some versions display a resource code such as `datax-semantic-model-<model ID>` instead of the business model name, and the type may be `business_ontology`. Match the ID against the semantic model details. Do not infer the model from its list position, owner name, or resource type.
+
+**The assistant's resource scope and the user's own permissions both apply.** Selecting a model for an assistant does not grant every assistant user access to that model. A user's existing model access does not automatically bind that model to this assistant. Do not grant ordinary users business area management permission simply to make an assistant visible.
+
+## 6. Save and publish
+
+1. Review basic information, capabilities, groups, and selected resources.
+2. Click **Save draft** to preserve the configuration. Saving a draft alone does not apply changes to authorized members.
+3. When ready, click **Check and publish** to open **Publication checks**.
+4. Review all results. Required extensions should be registered, and the assistant template should be available and parse successfully. Resolve any other failed checks, then **Recheck**.
+5. Confirm that the summary shows **Team** and **1 resource** for this example. Enter release notes such as “Limit procurement price model access to Procurement users.”
+6. Wait for saving to finish and the publication button to become available, then publish. When editing an existing assistant, the button is **Publish changes**.
+
+**Unpublished changes** means the draft differs from the published configuration. After publication, look for the success message confirming that the business assistant and assistant agent were created and published, and verify the **Published** status. Return to the list and confirm that the menu status is **Enabled**.
+
+Menu enablement controls entry-point display and does not replace usage authorization. Hiding a menu entry is not a substitute for revoking direct-link access.
+
+## 7. Open the assistant and verify it
+
+As an authorized ordinary member, refresh the assistant list and open the newly published **Procurement price assistant v1**. The menu label may include a business domain prefix. Make sure you did not open an older assistant with a similar name.
+
+Send a greeting to check that chat starts, then ask a real question:
+
+> Look up the purchase price for material 123456. Include currency, tax basis, supplier, and validity period. If there are multiple records, list their differences first without adding unit prices together.
+
+Compare the answer with known business records and check that the tool call used the intended semantic model. A capability list returned after a greeting only proves that this conversation can respond; it does not validate the price lookup tool, model binding, or data permissions.
+
+| Account or scenario | Expected result |
+| --- | --- |
+| Ordinary member of a selected group with target resource and query permissions | Can see and open the assistant; a real query returns the expected data |
+| Ordinary member outside the selected groups, without other special grants | Cannot discover the restricted assistant or run it through a direct link |
+| Selected-group member without target data access | Assistant usage eligibility does not grant access to that data |
+| Model not bound to the assistant | The assistant cannot bypass its resource scope to access the model |
+| Groups or resources changed | Save and republish, then verify new requests against the updated scope |
+
+Use ordinary accounts for permission acceptance. Administrators may have additional management or authoring permissions, so their successful access cannot substitute for testing a restricted member.
+
+## 8. Troubleshooting
+
+| Symptom | Action |
+| --- | --- |
+| Business template is missing | Open readiness details and check plugin registration, template availability, and the current workspace prerequisites |
+| A displayed group has no effect | Confirm that it is selected, that the user belongs to it, and that changes have been published |
+| Members still receive old behavior after saving | Check for a draft-only change, publish it, then refresh and make a new request |
+| The assistant is visible but cannot query the model | Check the resource ID, model publication, domain ownership, and the caller's data and query permissions |
+| A new assistant behaves like an older one | Verify the opened name, code, and actual published assistant |
+| The reply claims modeling or action capabilities | A reply is not proof of authorization; actual operations require tools, resources, and action permissions. Narrow instructions and configuration to the business task |
+
+For the full modeling, authorization, and query workflow, see [From Semantic Modeling to a Business Assistant](./modeling-to-business-assistant).

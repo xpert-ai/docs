@@ -900,6 +900,8 @@
                     "group": "Semantic Modeling and Analysis",
                     "pages": [
                       "en/data/tutorial/semantic-analysis/modeling-to-business-assistant",
+                      "en/data/tutorial/semantic-analysis/initialize-organization-assistants",
+                      "en/data/tutorial/semantic-analysis/configure-business-assistant",
                       "en/data/tutorial/semantic-analysis/mdx",
                       "en/data/tutorial/semantic-analysis/mdx-introduction",
                       "en/data/tutorial/semantic-analysis/moving-average",
@@ -1840,6 +1842,8 @@
                     "group": "语义模型与分析",
                     "pages": [
                       "zh-Hans/data/tutorial/semantic-analysis/modeling-to-business-assistant",
+                      "zh-Hans/data/tutorial/semantic-analysis/initialize-organization-assistants",
+                      "zh-Hans/data/tutorial/semantic-analysis/configure-business-assistant",
                       "zh-Hans/data/tutorial/semantic-analysis/mdx",
                       "zh-Hans/data/tutorial/semantic-analysis/mdx-introduction",
                       "zh-Hans/data/tutorial/semantic-analysis/moving-average",

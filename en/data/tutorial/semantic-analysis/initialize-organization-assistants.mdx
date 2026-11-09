@@ -1,0 +1,167 @@
+---
+title: Initialize Organization Ontology and Modeling Assistants
+description: Prepare a shared organization workspace, initialize ontology and semantic modeling assistants, and verify their bindings and runtime access.
+sidebar_position: 1
+---
+
+This tutorial is for platform administrators. It prepares reusable ontology and semantic model modeling assistants for the current organization, so members do not need to initialize their own copies.
+
+Follow **check the tenant runtime → prepare a shared organization workspace → initialize the required assistant → verify the binding → test as an ordinary member**. If you only need AI help with modeling, complete the modeling assistant section; initialize the ontology assistant when needed.
+
+| Assistant | When to use it | Wizard steps |
+| --- | --- | --- |
+| Organization ontology assistant | Explore ontology entities, relationships, available actions, and policies, such as suppliers related to a purchase order | Select workspace → Create environment → Create MCP toolset → Import Xpert DSL |
+| Organization semantic model modeling assistant | Inspect model structure, validate a model, and edit drafts in the semantic model Workbench | Select workspace → Create environment → Import Xpert DSL |
+
+For business audiences and resources, see [Configure and Publish a Business Assistant](./configure-business-assistant). For the complete modeling-to-query workflow, see [From Semantic Modeling to a Business Assistant](./modeling-to-business-assistant).
+
+## 1. Check the prerequisites
+
+1. Sign in as a `SUPER_ADMIN` and select the same organization in Xpert and Data Xpert.
+2. In Data Xpert, open **System Management → Platform Initialization → Tenant Ontology Runtime**.
+3. Confirm that runtime credentials are initialized and the **Data Xpert AI Tools** plugin is ready.
+4. Confirm that the current organization has an available Copilot model to select when importing the template.
+
+The tenant ontology runtime prepares service connection credentials and tool loading. It is not a separate sandbox for each user and does not grant business data access. Credentials and the plugin have separate statuses: saved credentials do not mean that a plugin awaiting loading is ready.
+
+For a first deployment, select or create a tenant ontology workspace on the runtime page, then click **Initialize ontology runtime**. If the plugin reports **Xpert restart required**, ask the operator to restart the Xpert API instances using the deployment procedure, then refresh. A ready runtime does not need reinitialization when a new member joins.
+
+## 2. Prepare a shared organization workspace
+
+In Xpert:
+
+1. Open the workspace name dropdown and create or select a dedicated workspace, such as **Organization assistants**.
+2. From the same dropdown, open **Settings → General**.
+3. Under **Workspace access**, enable **Organization-shared workspace**.
+4. Click **Update** and confirm the organization-shared status.
+
+Return to the Data Xpert initialization page. An eligible workspace belongs to the current organization, is not archived, is writable by the operator, and has organization sharing enabled. If none is suitable, use **Initialize default workspace** in the wizard. Both organization assistants can use the same workspace.
+
+<Note>
+Organization sharing lets organization members view and edit workspace resources; published Assistant usage is authorized separately. Use a dedicated workspace rather than sharing a workspace containing private business configurations. Access to models and data still depends on the caller's permissions for those resources.
+</Note>
+
+If the page reports that the previously bound workspace is unavailable in the selection, choose an eligible workspace and complete the entire initialization wizard. Changing the dropdown alone does not update the active binding.
+
+## 3. Initialize the organization ontology assistant
+
+Open **System Management → Platform Initialization → Current Organization Ontology Assistant**.
+
+### 3.1 Select the workspace
+
+Select **Organization assistants** as the target workspace and click **Next**. Check the organization selector first: the workspace, Copilot model, assistant, and binding must belong to the same organization.
+
+### 3.2 Create the environment
+
+Use an environment name such as `Ontology Runtime`. Keep the variable definitions provided by the wizard:
+
+```json
+[
+  { "name": "oidc_token", "type": "secret", "value": "" },
+  { "name": "business_assistant_id", "type": "secret", "value": "" }
+]
+```
+
+These fields carry the caller identity and business assistant context at runtime. Keep the default empty values during initialization; do not enter an administrator's personal token for all members to share. Secret fields may not display their values when reopened, so an empty field alone does not establish whether a runtime request carries an identity.
+
+Confirm the environment name and JSON, then click **Next**.
+
+### 3.3 Create the MCP toolset
+
+The MCP toolset connects to Data Xpert's ontology capabilities.
+
+| Field | Value |
+| --- | --- |
+| Toolset name | For example, `Ontology MCP Toolset` |
+| MCP transport | Keep the deployment default; this example uses HTTP |
+| Toolset description | Optional description of its purpose |
+| Tool name prefix | Optional deployment-specific prefix, such as `ontology` |
+| MCP headers JSON | Keep the environment variable references below |
+
+```json
+{
+  "x-uose-actor-token": "{{env.oidc_token}}",
+  "x-business-assistant-id": "{{env.business_assistant_id}}"
+}
+```
+
+The double-brace expressions are variable references, not examples to replace with fixed credentials. The deployment supplies the connection URL. If it is missing or unreachable, ask the administrator to check the service address and network connectivity. Confirm the settings and click **Next**.
+
+### 3.4 Import and publish the assistant
+
+Under **Import Xpert DSL**, configure:
+
+| Field | Setting |
+| --- | --- |
+| Enable assistant binding | On, so this initialization becomes the current organization's active binding |
+| Copilot model | An available model in the current organization; no specific provider or model name is required |
+| Xpert DSL template | Ontology assistant |
+| Xpert name | Keep the generated name or provide a unique name |
+| Release notes | For example, “Initialize organization ontology assistant v1” |
+
+Review the workspace, environment, MCP toolset, and model summary at the bottom of the page, then click **Start initialization**.
+
+### 3.5 Confirm the binding
+
+Wait for the green success message and check:
+
+- The status is **Configured**.
+- **Current binding** contains the assistant identifier.
+- **Current workspace** is **Organization assistants**, as selected.
+- **Last initialization time** matches this operation.
+
+With **Enable assistant binding** turned off, the configuration record can remain saved without making this assistant the organization's active binding.
+
+## 4. Initialize the organization semantic model modeling assistant
+
+Switch to **Current Organization Semantic Model Modeling Assistant** and complete:
+
+1. **Select workspace**: choose the same shared **Organization assistants** workspace, then click **Next**.
+2. **Create environment**: use a name such as `Semantic Model Workbench`; keep the two default secret variables and empty values shown above, then click **Next**.
+3. **Import Xpert DSL**: enable the binding, select an available Copilot model in the current organization, and choose the **Semantic model modeling assistant** template.
+4. Review the name, release notes, and summary, then click **Start initialization**.
+5. Check the configured status, current binding, current workspace, and last initialization time.
+
+This wizard has no separate **Create MCP toolset** step. Complete its three displayed steps; do not add the ontology assistant's fourth step manually.
+
+<Note>
+Some UI versions reuse an ontology-assistant success message after modeling assistant initialization. Check the active tab and binding details together to confirm that the semantic model modeling assistant was initialized.
+</Note>
+
+## 5. Inspect the generated resources
+
+Return to Xpert, refresh, and switch to **Organization assistants**. Check the resources for the assistant types you initialized:
+
+| Resource | What to check |
+| --- | --- |
+| Semantic model modeling assistant | Published; its template includes tools for semantic modeling, the model Workbench, metrics, or query analysis |
+| Ontology assistant | Published; the template display name may be “Unified ontology semantic execution expert” |
+| Ontology MCP Toolset | The ontology assistant's tool connection is available; its graph node may be named `HttpUOSE` |
+
+Display names may vary by template or customization. If there are assistants with the same name, use the initialization page's current binding and target workspace to identify the correct one.
+
+The modeling assistant uses tools to read, validate, or modify models. The ontology assistant uses MCP to query entities, relationships, and action capabilities. A node in the configuration graph establishes configuration only; actual calls still require resource permissions and ready runtime services.
+
+## 6. Verify use as an ordinary member
+
+After configuration succeeds, test with an ordinary member who has access to the target resources:
+
+1. Open the target semantic model Workbench in Data Xpert and expand the modeling assistant.
+2. Ask, “List the current model's cubes, dimensions, and measures without making changes.” Confirm that the structure belongs to the current model.
+3. If you initialized the ontology assistant, use the corresponding ontology entry point to query a known entity and its relationships, then check the result.
+4. Test with a member who lacks access to the target model or entity and confirm that the resource still cannot be read or modified.
+
+Organization initialization makes the assistant configuration reusable. It does not grant access to everyone's models or replace query, editing, publication, or action approval permissions. A green success message, a published card, or a greeting response does not replace these runtime checks.
+
+## 7. Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Target workspace is missing | Check the current organization, organization sharing, archive status, and the operator's write access; refresh after changes |
+| `Access denied to workspace` | Check the selected workspace and current account permissions; do not reuse an administrator's token to bypass the denial |
+| Credentials are initialized but the plugin is unavailable | Check plugin installation, API URL, and runtime loading separately; follow the deployment procedure if a restart is required |
+| The assistant exists but the Workbench still uses an old one | Enable the binding and complete initialization; verify the current binding and workspace, then reopen the Workbench |
+| Missing `ChatKit client secret` | Check the current organization binding and the specific session-creation error; end users should not enter an API key |
+| The assistant opens but tool calls fail | Check the caller's resource permissions, model publication, and service connectivity; initialization success is not query success |
+
+Next, [configure and publish a business assistant](./configure-business-assistant) to offer a published model to selected user groups.
