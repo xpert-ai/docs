@@ -1,0 +1,56 @@
+---
+title: REST 客户端运行时
+description: 通过已保存的 OpenAPI 工具集执行受治理的 JSON 读取，不暴露凭据或任意 URL。
+---
+
+`RestClientRuntimeCapability`（`platform.rest.client`）暴露独立于 Analytics 的 `RestClientRuntimeApi`。它复用平台已有 OpenAPI 工具集及认证配置，不是任意 HTTP 代理。
+
+## 发现与调用
+
+```ts
+import {
+  RestClientRuntimeCapability,
+  type RestClientScope,
+  type RestOperationCall,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+export async function callApprovedOperation(
+  capabilities: RuntimeCapabilityRegistry,
+  scope: RestClientScope,
+  request: RestOperationCall
+) {
+  const client = capabilities.require(RestClientRuntimeCapability)
+  const operations = await client.operations.list(scope)
+  const selected = operations.find((item) => item.operationId === request.operationId)
+  if (!selected || selected.contractHash !== request.contractHash) {
+    throw new Error('Rediscover and approve the changed operation contract')
+  }
+  return client.operations.call(scope, request)
+}
+```
+
+调用方提供已批准的操作与经过校验的参数。`scope` 包含可信 actor、已保存的工作区／工具集 ID、signal 和绝对截止时间。宿主要求与当前身份一致，且工具集属于相同范围，category 为 API、type 为 `openapi`。
+
+发现结果包含启用的操作、描述、参数 schema 和不透明的 contract hash。调用以该 hash 固定端点、方法、序列化与 schema。连接或契约变化后必须重新发现，不会静默替换。
+
+## 支持的操作
+
+| 范围 | 契约 |
+| --- | --- |
+| 方法 | GET；POST 必须持久声明 `x-xpert-read-only: true`，可携带 JSON body |
+| 参数 | `query`、`path`、`body`；校验时不强制转换类型或注入默认值 |
+| Query 序列化 | OpenAPI form 标量／数组 |
+| Path 序列化 | simple 标量；不能路径穿越或替换 host、method、query |
+| 认证 | 已保存的 `none` 或 `api_key` 配置；凭据保留在服务端 |
+| 结果 | 成功的 JSON 响应，包含 `body` 和 `sourceFetchedAt` |
+
+不支持 header／cookie 参数及其他序列化方式。调用者不能传 headers、URL、凭据快照或策略覆盖。重定向被禁用。POST 的只读声明用于缩小操作范围，不能证明远端无副作用；只应登记可信且已批准的连接。
+
+## 授权与限制
+
+宿主在 I/O 前后检查工作区访问权及当前连接／操作定义。权限撤销、操作停用或定义变化后丢弃响应。公开错误不复制原始 HTTP 异常、凭据或来源内容。
+
+单次操作最多 30 秒，并受调用方截止时间限制。输入信封／契约最多 64,000 字节，发现最多 1,000 个操作，响应最多 2,500,000 字节。该能力不缓存成功结果。
+
+分页和 Dataset 投影由消费方负责。跨页保留相同调用者身份、signal 和绝对截止时间。需要将受治理查询结果呈现为 Dataset 时使用 [Analytics](./analytics)；已有 MCP 连接使用 [MCP 客户端](./mcp-client)。调用前需部署匹配的宿主与 SDK 支持。

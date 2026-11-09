@@ -70,58 +70,53 @@ if (!files) {
 
 ## 在 NestJS 服务提供器中解析能力
 
-NestJS 服务提供器不天然绑定某一次智能体执行，因此必须先区分能力是否依赖当前运行作用域：
+Nest 实例化模块后，平台通过 `RuntimeCapabilityProvider` 发现并填充注册表。注入 `XPERT_RUNTIME_CAPABILITIES_TOKEN`，在发现完成后的实际操作中解析能力；不要在服务构造函数中解析工厂。
 
-| 使用位置 | 获取方式 |
+| 使用位置/API | 获取方式 |
 | --- | --- |
-| 智能体中间件 | 直接使用 `context.runtime.capabilities`。 |
-| NestJS Provider 中与用户、Xpert 或 Project 绑定的能力 | 注入 `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN`，并为每次操作调用 `createScopedApi(scope)`。 |
-| 与数据所有者无关的全局能力 | 注入 `XPERT_RUNTIME_CAPABILITIES_TOKEN`。 |
+| 智能体中间件 | 使用 `context.runtime.capabilities`，其中包含宿主绑定的操作 API。 |
+| View、HTTP Handler 或任务中的无状态领域 API | 使用平台注册表。知识库、产物、项目预配和工作区文件在每次操作中执行授权。 |
+| 中间件之外与调用者/执行绑定的 API | 从平台解析对应工厂，再用可信且已授权的上下文创建 scoped API。 |
+| 中间件之外需要 Agent 运行时默认值 | 使用 `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN.createScopedApi(scope)`，scope 来自宿主。 |
 
-`WorkspaceFilesRuntimeCapability` 等涉及数据归属的能力必须优先从 scoped runtime API 获取。未绑定 `xpertId` 或 `projectId` 的全局注册表可能会故意不提供工作区文件能力，插件不能通过放宽宿主权限来绕过这个限制。
+当前平台注册表直接提供工作区文件能力。显式操作仍需正确授权的存储卷，运行时相对路径仍需绑定项目或助手；并非每个领域 API 都要求创建完整 Agent 运行时。
 
-下面的示例在每次导出操作时创建作用域能力。全局注册表只作为兼容旧宿主的回退，新插件如果不需要兼容旧宿主，可以省略该回退：
+| 平台工厂 | 作用域内操作能力键 |
+| --- | --- |
+| `ConnectorRuntimeFactoryCapability` | `ConnectorRuntimeCapability` |
+| `ActorTokenRuntimeFactoryCapability` | `ActorTokenRuntimeCapability` |
+| `KnowledgeDocumentVisualAssetsRuntimeFactoryCapability` | `KnowledgeDocumentVisualAssetsRuntimeCapability` |
+| `AgentRuntimeFactoryCapability` | `AgentInvocationRuntimeCapability` |
+
+在平台注册表中应检查工厂能力是否存在，不能通过检查其 scoped 操作键来判断工厂是否安装。
 
 ```ts
-import { Inject, Injectable, Optional } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import {
-  WorkspaceFilesRuntimeCapability,
-  XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN,
+  ActorTokenRuntimeFactoryCapability,
   XPERT_RUNTIME_CAPABILITIES_TOKEN,
-  type AgentMiddlewareRuntimeScope,
-  type AgentMiddlewareRuntimeServiceApi,
+  type ActorTokenRuntimeScope,
   type RuntimeCapabilityRegistry
 } from '@xpert-ai/plugin-sdk'
 
 @Injectable()
 export class ExportService {
   constructor(
-    @Optional()
-    @Inject(XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN)
-    private readonly runtimeService?: AgentMiddlewareRuntimeServiceApi,
-    @Optional()
     @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
-    private readonly globalCapabilities?: RuntimeCapabilityRegistry
+    private readonly capabilities: RuntimeCapabilityRegistry
   ) {}
 
-  private workspaceFiles(scope: AgentMiddlewareRuntimeScope) {
-    const files = this.runtimeService
-      ?.createScopedApi(scope)
-      .capabilities?.get(WorkspaceFilesRuntimeCapability)
-      ?? this.globalCapabilities?.get(WorkspaceFilesRuntimeCapability)
-
-    if (!files) {
-      throw new Error('当前运行作用域未提供工作区文件能力')
-    }
-
-    return files
+  bindTokenApi(authorizedScope: ActorTokenRuntimeScope) {
+    return this.capabilities
+      .require(ActorTokenRuntimeFactoryCapability)
+      .createScopedApi(authorizedScope)
   }
 }
 ```
 
-传给 `createScopedApi()` 的 `tenantId`、`organizationId`、`userId`、`xpertId`、`projectId`、`conversationId`、`catalog` 和 `scopeId` 必须来自宿主已解析的服务端上下文，不能来自 iframe、表单或 action input 中未经信任的 ID。
+`authorizedScope` 来自经过认证与授权的请求、已解析的 View 上下文或已恢复的任务身份。不能从 iframe 或工具输入构造租户、组织、用户、助手、项目、会话或执行身份。工厂本身不授予权限。
 
-应在实际操作附近重新创建 scoped API 并解析能力，以便准确报告可用性。不要跨请求缓存与用户或执行上下文绑定的 API 或能力实例。
+返回的 API 仅在当前操作内复用，不能缓存在单例或重新注册回平台注册表。连接绑定、令牌缓存和已签发视觉路径属于单次调用者/执行。
 
 ## 运行时包中的能力
 
@@ -138,6 +133,14 @@ export class ExportService {
 | `ProjectAccessRuntimeCapability` | `platform.project.access` | 列出用户可读项目，并校验人类编辑或管理角色。 |
 | `ProjectProvisioningRuntimeCapability` | `platform.project.provisioning` | 幂等创建或协调对话项目，并连接助手。 |
 | `ProjectTasksRuntimeCapability` | `platform.project.tasks` | 读取已保存任务、请求后台同步、管理排期并定位特定执行；业务规则由插件维护。 |
+| `ArtifactDraftsRuntimeCapability` | `platform.artifact-drafts` | 按修订号保存工作副本并显式发布。 |
+| `ArtifactContentRuntimeCapability` | `platform.artifact-content` | 保存产物拥有的受保护内容字节。 |
+| `ArtifactLibraryRuntimeCapability` | `platform.artifact-library` | 管理经过授权的项目引用与分享。 |
+| `AgentInvocationRuntimeCapability` | `platform.agent_invocation` | 启动并观察已授权的智能体调用。 |
+| `McpClientRuntimeCapability` | `platform.mcp.client` | 发现并调用受治理的只读 MCP 工具。 |
+| `RestClientRuntimeCapability` | `platform.rest.client` | 发现并调用已保存的只读 OpenAPI 操作。 |
+| `AnalyticsRuntimeCapability` | `platform.analytics` | 调用提供器并校验 Dataset 契约。 |
+| `ToolImagesRuntimeCapability` | `platform.tool-images` | 保存图片引用，仅为一次模型请求还原像素。 |
 
 将预配、项目访问与业务任务能力组合使用的产品体验和步骤，见 [SDK 项目集成指南](/zh-Hans/ai/projects/plugin-apps/sdk-integration)。
 
@@ -149,6 +152,13 @@ export class ExportService {
 - [沙箱任务](./sandbox-jobs)
 - [操作者令牌](./actor-token)
 - [项目预配](./project-provisioning)
+- [内容与编辑器](./content-runtime)
+- [智能体调用](./agent-invocation)
+- [MCP 客户端](./mcp-client)
+- [REST 客户端](./rest-client)
+- [分析查询与提供器](./analytics)
+- [HTML 产物文档](./artifact-documents)
+- [工具图片](./tool-images)
 
 ## 定义能力与测试消费者
 
@@ -189,7 +199,8 @@ const capabilities = new DefaultRuntimeCapabilityRegistry().register(
 ## 兼容性规则
 
 - 从 `@xpert-ai/plugin-sdk` 导入能力键和 API 类型，不要在插件中复制接口。
-- NestJS Provider 消费作用域敏感能力时，必须使用 `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN.createScopedApi()`；不要把未绑定数据所有者的全局注册表作为主要来源。
+- 根据契约选择领域 API、作用域工厂或 Agent facade；作用域 API 缺失时不能回退到更宽的权限。
+- 跨 SDK 副本使用稳定能力 ID，不要由插件分发平台 CQRS 类。宿主内部服务仍使用普通 Nest 注入，不能只为解耦模块而导出 SDK 能力。
 - 将能力可用性视为运行时条件。插件安装成功，并不代表宿主服务、提供器、绑定或已注册沙箱操作一定就绪。
 - 在异步边界传递可移植引用和结构化 DTO，不要通过队列或持久化聊天元数据传递原始文件字节、持有者令牌、宿主路径或实现实例。
 - 将能力返回值限制在当前授权范围内；后续任务或回调应重新解析所需资源。

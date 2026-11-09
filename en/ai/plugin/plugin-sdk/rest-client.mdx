@@ -1,0 +1,56 @@
+---
+title: REST Client Runtime
+description: Execute governed JSON reads through saved OpenAPI toolsets without exposing credentials or arbitrary URLs.
+---
+
+`RestClientRuntimeCapability` (`platform.rest.client`) exposes `RestClientRuntimeApi` independently of Analytics. It reuses saved platform OpenAPI toolsets and their authentication; it is not an arbitrary HTTP proxy.
+
+## Discover and call
+
+```ts
+import {
+  RestClientRuntimeCapability,
+  type RestClientScope,
+  type RestOperationCall,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+export async function callApprovedOperation(
+  capabilities: RuntimeCapabilityRegistry,
+  scope: RestClientScope,
+  request: RestOperationCall
+) {
+  const client = capabilities.require(RestClientRuntimeCapability)
+  const operations = await client.operations.list(scope)
+  const selected = operations.find((item) => item.operationId === request.operationId)
+  if (!selected || selected.contractHash !== request.contractHash) {
+    throw new Error('Rediscover and approve the changed operation contract')
+  }
+  return client.operations.call(scope, request)
+}
+```
+
+The caller supplies a previously approved operation and validated arguments. `scope` contains the trusted actor, saved workspace/toolset IDs, signal and absolute deadline. The host requires the current identity and a same-scope toolset with category API and type `openapi`.
+
+Discovery returns enabled operations, descriptions, argument schemas and opaque contract hashes. Calls pin endpoint, method, serialization and schema to that hash. A changed connection or contract requires rediscovery; it is not silently substituted.
+
+## Supported operations
+
+| Area | Contract |
+| --- | --- |
+| Methods | GET; POST only with persisted `x-xpert-read-only: true` and an optional JSON body |
+| Arguments | `query`, `path`, `body`; validate without coercion or defaults |
+| Query serialization | OpenAPI form scalars/arrays |
+| Path serialization | Simple scalars; no traversal or host/method/query replacement |
+| Authentication | Saved `none` or `api_key` configuration; credentials remain server-side |
+| Results | Successful JSON responses, with `body` and `sourceFetchedAt` |
+
+Header/cookie parameters and unsupported serializers are rejected. Callers cannot provide headers, URLs, credential snapshots or policy overrides. Redirects are disabled. A read-only POST declaration narrows eligible operations but cannot prove the remote service has no side effects; register only trusted, approved connections.
+
+## Authorization and limits
+
+The host checks workspace access and current connection/operation definitions before and after I/O. A revoked grant, disabled operation or changed definition discards the response. Raw HTTP failures, credentials and source content are not copied into public errors.
+
+The maximum operation budget is 30 seconds, bounded by the caller's deadline. Input envelopes/contracts are limited to 64,000 bytes, discovery to 1,000 operations and responses to 2,500,000 bytes. Successful responses are not cached by this capability.
+
+Pagination and Dataset projection belong to the consumer. Preserve the same caller identity, signal and absolute deadline across pages. Use [Analytics](./analytics) when presenting governed query results as Datasets, or [MCP Client](./mcp-client) for existing MCP connections. Deploy matching host and SDK support before using this capability.

@@ -189,6 +189,8 @@ const created = await documents.createDocuments({
 
 ## 安全消费视觉资产
 
+以下操作 API 应从当前智能体的 scoped 注册表获取。NestJS View 或任务则从平台注册表解析 `KnowledgeDocumentVisualAssetsRuntimeFactoryCapability`，使用完整且已授权的执行绑定及已限定作用域的 Workspace Files writer 调用 `createScopedApi`。签发路径和批次属于该 API/执行，不能跨请求缓存 API。详见[运行时能力](./runtime-capabilities)。
+
 `KnowledgeDocumentVisualAssetsApi` 采用受治理的四步生命周期：
 
 1. `issueCandidates()` 根据文本锚点和业务作用域返回执行级逻辑路径。

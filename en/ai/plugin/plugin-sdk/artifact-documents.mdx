@@ -1,0 +1,59 @@
+---
+title: HTML Artifact Documents
+description: Host interactive HTML through an isolated document SDK and a dedicated, authorized query bridge.
+---
+
+`@xpert-ai/plugin-sdk/artifact-document` is a browser-safe entry without Nest or chart-library dependencies. It provides an isolated iframe, a query protocol and `window.xpertLiveArtifact`. The plugin owns saved definitions, allowed Bindings, dependency admission and the server query callback.
+
+This is a dedicated document protocol, separate from the [Remote Component host bridge](./remote-component-bridge). Authored HTML cannot invoke general View Actions or select a replacement Artifact version, provider or query definition.
+
+## Mount a document
+
+Install the frame policy on a **dedicated document host page**, then mount the iframe. The policy affects the entire host document and rejects child URL navigation while allowing `srcdoc`; do not install it on an application root that needs other remote iframes.
+
+```ts
+import {
+  installArtifactDocumentFramePolicy,
+  mountArtifactDocument,
+  type ArtifactDocumentHostOptions
+} from '@xpert-ai/plugin-sdk/artifact-document'
+
+export function mountSavedDocument<T>(
+  frame: HTMLIFrameElement,
+  options: ArtifactDocumentHostOptions<T>
+) {
+  installArtifactDocumentFramePolicy(frame.ownerDocument)
+  return mountArtifactDocument(frame, options)
+}
+```
+
+The trusted caller supplies `html`, optional `dependencies`/`networkPolicy`, `context` and `query(input, signal)`. Context contains only allowed Binding IDs, default controls, locale and theme. The SDK validates and snapshots it; later mutation cannot add Bindings.
+
+The query callback holds Artifact/version/actor scope in its closure, calls the server, loads the saved Binding and reauthorizes the current viewer. Forward cancellation. Never execute a query definition supplied by the HTML. Use `refresh(bindingId?)` to requery and `dispose()` before replacing the document or trusted query scope.
+
+## Page API and refresh
+
+Authored HTML uses `window.xpertLiveArtifact.ready`, `query`, `refresh`, `queryMany`, `subscribe` and `bindSelect`. Requests select an allowed `bindingId` and declared control values. Use subscription updates for host refreshes, and unsubscribe when removing a view.
+
+The host bounds concurrency, queueing, execution time and dispatch rate. Newer controls supersede older requests; stale or disposed results are discarded. `queryMany` groups a round of results, including individual failures. Show failed or unavailable data explicitly instead of presenting old values as fresh results.
+
+## Packaged dependencies
+
+Each `ArtifactDocumentDependencyAsset` includes `id`, exact `version`, `format: 'classic-script'`, exported `global`, UTF-8 `source` and `sha256`. A dependency lock omits source. Resolve bytes from trusted packages or an authorized immutable snapshot, never from a page-supplied URL or library name.
+
+`verifyArtifactDocumentDependencies` checks hashes, order, uniqueness and size: at most 8 assets, 4 MB each and 8 MB total. A checksum proves integrity, not authorization or library safety. Preserve dependency bytes with the saved version so historical documents do not silently load newer code.
+
+## Network policy and isolation
+
+The host chooses `networkPolicy`; authored HTML cannot expand it.
+
+| Mode | Behavior |
+| --- | --- |
+| Omitted or `restricted` | Blocks external resources by default. Trusted `scripts`, `styles`, `fonts` and `images` lists may each allow up to 16 exact HTTPS origins. Fetch/XHR, nested frames and workers remain blocked. |
+| `unrestricted` | Explicitly permits broad network access, including HTTP(S), WebSockets and supported data/blob resources. Use only when that access is intended; this is not the offline mode. |
+
+Origin lists cannot contain paths, wildcards or credentials. Online resources are not immutable dependency snapshots. Use the same trusted policy for preview and display; a successful offline check does not validate an online dependency.
+
+Both modes retain `sandbox="allow-scripts"`, without same-origin, form, popup or download permissions. CSP does not enable `eval`; the dedicated host policy still prevents the document's own URL navigation. Broad network access does not grant more Bindings or host API permissions.
+
+HTML validation is not sanitization or business acceptance. Verify the document's data interpretation and presentation separately. Store and publish through [Artifacts](./artifacts); use [Analytics](./analytics) when the query callback returns Datasets.

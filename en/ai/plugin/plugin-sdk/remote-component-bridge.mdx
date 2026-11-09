@@ -5,7 +5,7 @@ description: Connect a Workbench Remote Component, its host, and its View Provid
 
 # Remote Component Host Bridge
 
-The host bridge connects a Remote Component iframe, the Workbench host, and the plugin View Provider. It is not a generic RPC tunnel: every capability requires a manifest declaration, a host message handler, and the corresponding server implementation.
+The host bridge connects a Remote Component iframe, the Workbench host, and the plugin View Provider. It is not a generic RPC tunnel: business capabilities require their manifest declaration, a host handler and, where applicable, a server implementation. The common context lifecycle event is delivered without a subscription.
 
 ```text
 Remote Component
@@ -38,11 +38,12 @@ interface RemoteMessageEnvelope {
   instanceId?: string
   type: string
   requestId?: string
+  scopeRevision?: number
 }
 ```
 
 - The iframe sends `ready` after loading.
-- The host returns `init` with the `instanceId`, manifest, initial query, locale, theme, and debug configuration.
+- The host returns `init` with the `instanceId`, `runtimeScope`, `scopeRevision`, manifest, initial query, locale, theme and debug configuration.
 - Later messages must carry the matching `instanceId`.
 - Requests and responses share one `requestId`.
 - The iframe accepts messages only from `window.parent`; the host accepts messages only from the current iframe `contentWindow`.
@@ -54,7 +55,7 @@ Host to iframe:
 | Message | Purpose |
 | --- | --- |
 | `init` | Initialize the manifest, query, locale, theme, and debug state |
-| `hostEvent` | Forward an event matched by `manifest.hostEvents` |
+| `hostEvent` | Forward subscribed business events or the common `view.context.changed` event |
 | `data` | Response to `requestData` |
 | `parameterOptions` | Parameter option response |
 | `actionResult` | JSON action response |
@@ -90,132 +91,207 @@ Iframe to host:
 | Host event | `hostEvents.subscriptions[]` | `hostEvent` | Host-managed |
 | Remote entry | `view.type = 'remote_component'` | Host-managed | `getRemoteComponentEntry` |
 
+## Context changes without remounting
+
+For the same authenticated identity, organization and Assistant, changing Project or conversation preserves the iframe. The host reauthorizes the target View and entry, suspends operations while resolving it, then sends `view.context.changed` to every mounted View, including hidden tabs. No manifest subscription or acknowledgment is required.
+
+`init.runtimeScope` and the event's `data.runtimeScope` are complete snapshots. Unbound fields are `null`; use the target snapshot rather than merging it with old IDs. The current Angular host supplies Project/conversation fields; hosts supporting group routing may also supply `groupId`.
+
+```json
+{
+  "channel": "xpertai.remote_component",
+  "protocolVersion": 1,
+  "instanceId": "view-instance",
+  "type": "hostEvent",
+  "event": {
+    "id": "context-change-2",
+    "type": "view.context.changed",
+    "source": "chatkit",
+    "receivedAt": "2026-11-09T00:00:00.000Z",
+    "data": {
+      "revision": 2,
+      "runtimeScope": { "projectId": null, "conversationId": "target-conversation" }
+    }
+  }
+}
+```
+
+Revisions increase monotonically within one instance, not necessarily consecutively. Ignore stale revisions, reject pending work, clear selections and refresh or rebind against the new scope. Every subsequent request includes the latest `scopeRevision`. The host uses its own authorized context, never request-supplied scope, and rotates file sessions.
+
+Changing identity, organization, Assistant or entry, explicitly reloading, or closing the View destroys the old instance. Denied entry access removes the previous document. Cancellation or a discarded response does not undo a server mutation already committed.
+
 ## TypeScript bridge client
 
-Keep the bridge in `bridge.ts`; business components should not construct wire messages directly.
+Keep the bridge in `bridge.ts`; business components should not construct wire messages directly. This example targets hosts with context revisions and installs one bridge per iframe. Validate result payloads in typed business wrappers before using them.
 
 ```ts
 const CHANNEL = 'xpertai.remote_component'
 const VERSION = 1
+const responses = {
+  requestData: 'data',
+  requestParameterOptions: 'parameterOptions',
+  executeAction: 'actionResult',
+  executeFileAction: 'fileActionResult',
+  requestFileAccess: 'fileAccessResult',
+  invokeClientCommand: 'clientCommandResult'
+} as const
 
-type RemoteRequestType =
-  | 'requestData'
-  | 'requestParameterOptions'
-  | 'executeAction'
-  | 'executeFileAction'
-  | 'requestFileAccess'
-  | 'invokeClientCommand'
-
-type RemoteOutboundType = RemoteRequestType | 'ready' | 'resize' | 'notify'
-
-interface PendingRequest {
-  resolve: (value: unknown) => void
-  reject: (error: Error) => void
-  timeout: number
+type RequestType = keyof typeof responses
+type RuntimeScope = {
+  groupId: string | null
+  projectId: string | null
+  conversationId: string | null
 }
-
 interface BridgeMessage {
-  channel?: unknown
-  protocolVersion?: unknown
+  channel: typeof CHANNEL
+  protocolVersion: typeof VERSION
+  type: string
   instanceId?: unknown
-  type?: unknown
+  scopeRevision?: unknown
+  runtimeScope?: unknown
   requestId?: unknown
+  event?: unknown
   message?: unknown
   data?: unknown
   result?: unknown
-  [key: string]: unknown
+}
+interface PendingRequest {
+  revision: number
+  responseType: string
+  resolve(value: unknown): void
+  reject(error: Error): void
+  timeout: number
 }
 
 let instanceId: string | null = null
+let revision: number | null = null
 let sequence = 0
 const pending = new Map<string, PendingRequest>()
+export const currentScopeRevision = () => revision
 
 export function installBridge(handlers: {
-  onInit: (message: BridgeMessage) => void
-  onHostEvent: (event: unknown) => void
+  onInit(message: BridgeMessage): void
+  onContextChange(scope: RuntimeScope, revision: number): void
+  onHostEvent(event: unknown): void
 }) {
-  const listener = (event: MessageEvent) => {
+  const listener = (event: MessageEvent<unknown>) => {
     if (event.source !== window.parent || !isBridgeMessage(event.data)) return
     const message = event.data
-
     if (message.type === 'init') {
-      instanceId = typeof message.instanceId === 'string'
-        ? message.instanceId
-        : null
+      const scope = parseScope(message.runtimeScope)
+      if (typeof message.instanceId !== 'string' || !scope ||
+          !isRevision(message.scopeRevision)) return
+      if (instanceId && message.instanceId !== instanceId) return
+      if (revision !== null && message.scopeRevision < revision) return
+      if (revision !== message.scopeRevision) rejectPending('view_context_changed')
+      instanceId = message.instanceId
+      revision = message.scopeRevision
       handlers.onInit(message)
       return
     }
-
-    if (message.instanceId !== instanceId) return
+    if (!instanceId || message.instanceId !== instanceId) return
     if (message.type === 'hostEvent') {
+      const change = parseContextChange(message.event)
+      if (change) {
+        if (revision !== null && change.revision <= revision) return
+        rejectPending('view_context_changed')
+        revision = change.revision
+        handlers.onContextChange(change.scope, revision)
+        return
+      }
       handlers.onHostEvent(message.event)
       return
     }
-
-    const requestId = typeof message.requestId === 'string'
-      ? message.requestId
-      : null
-    const request = requestId ? pending.get(requestId) : undefined
-    if (!request || !requestId) return
-
-    pending.delete(requestId)
+    if (typeof message.requestId !== 'string') return
+    const request = pending.get(message.requestId)
+    if (!request || request.revision !== revision) return
+    if (message.scopeRevision !== undefined && message.scopeRevision !== revision) return
+    if (message.type !== 'error' && message.type !== request.responseType) return
+    pending.delete(message.requestId)
     window.clearTimeout(request.timeout)
     if (message.type === 'error') {
-      request.reject(new Error(
-        typeof message.message === 'string'
-          ? message.message
-          : 'remote_request_failed'
-      ))
+      request.reject(new Error(typeof message.message === 'string'
+        ? message.message : 'remote_request_failed'))
     } else {
       request.resolve(message.data ?? message.result)
     }
   }
-
   window.addEventListener('message', listener)
-  post('ready')
+  window.parent.postMessage({ channel: CHANNEL, protocolVersion: VERSION, type: 'ready' }, '*')
   return () => {
     window.removeEventListener('message', listener)
-    for (const request of pending.values()) {
-      window.clearTimeout(request.timeout)
-      request.reject(new Error('remote_bridge_disposed'))
-    }
-    pending.clear()
+    rejectPending('remote_bridge_disposed')
+    instanceId = null
+    revision = null
   }
 }
 
-export function requestHost(
-  type: RemoteRequestType,
-  body: Record<string, unknown>
-) {
+export function requestHost(type: RequestType, body: object) {
+  const requestRevision = revision
+  if (!instanceId || requestRevision === null) {
+    return Promise.reject(new Error('remote_bridge_not_initialized'))
+  }
   const requestId = `${Date.now()}-${++sequence}`
   return new Promise<unknown>((resolve, reject) => {
     const timeout = window.setTimeout(() => {
       pending.delete(requestId)
       reject(new Error('remote_request_timeout'))
     }, 30_000)
-    pending.set(requestId, { resolve, reject, timeout })
-    post(type, { requestId, ...body })
+    pending.set(requestId, {
+      revision: requestRevision, responseType: responses[type], resolve, reject, timeout
+    })
+    try {
+      window.parent.postMessage({
+        ...body, channel: CHANNEL, protocolVersion: VERSION,
+        instanceId, scopeRevision: requestRevision, type, requestId
+      }, '*')
+    } catch {
+      pending.delete(requestId)
+      window.clearTimeout(timeout)
+      reject(new Error('remote_request_not_cloneable'))
+    }
   })
 }
 
-function post(type: RemoteOutboundType, body: Record<string, unknown> = {}) {
-  window.parent.postMessage({
-    channel: CHANNEL,
-    protocolVersion: VERSION,
-    instanceId,
-    type,
-    ...body
-  }, '*')
+function rejectPending(code: string) {
+  for (const request of pending.values()) {
+    window.clearTimeout(request.timeout)
+    request.reject(new Error(code))
+  }
+  pending.clear()
 }
-
+function isRevision(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+}
+function isId(value: unknown): value is string | null {
+  return value === null || typeof value === 'string'
+}
+function parseScope(value: unknown): RuntimeScope | null {
+  if (!value || typeof value !== 'object' ||
+      !('projectId' in value) || !isId(value.projectId) ||
+      !('conversationId' in value) || !isId(value.conversationId)) return null
+  const groupId = 'groupId' in value ? value.groupId : null
+  if (!isId(groupId)) return null
+  return { groupId, projectId: value.projectId, conversationId: value.conversationId }
+}
+function parseContextChange(value: unknown) {
+  if (!value || typeof value !== 'object' || !('type' in value) ||
+      value.type !== 'view.context.changed' || !('data' in value)) return null
+  const data = value.data
+  if (!data || typeof data !== 'object' || !('revision' in data) ||
+      !isRevision(data.revision) || !('runtimeScope' in data)) return null
+  const scope = parseScope(data.runtimeScope)
+  return scope ? { revision: data.revision, scope } : null
+}
 function isBridgeMessage(value: unknown): value is BridgeMessage {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
-  const message = value as BridgeMessage
-  return message.channel === CHANNEL &&
-    message.protocolVersion === VERSION &&
-    typeof message.type === 'string'
+  return !!value && typeof value === 'object' && !Array.isArray(value) &&
+    'channel' in value && value.channel === CHANNEL &&
+    'protocolVersion' in value && value.protocolVersion === VERSION &&
+    'type' in value && typeof value.type === 'string'
 }
 ```
+
+In `onContextChange`, clear scope-dependent state before reloading or rebinding. If a wrapper does asynchronous processing after a response, capture `currentScopeRevision()` and compare it again before applying the processed result. Repeated `init` for the same revision may update theme/locale without resetting the selected resource.
 
 Build named wrappers such as `requestData()`, `executeAction()`, and `invokeClientCommand()` on top of this boundary. Return stable error codes from the bridge and translate them at the UI boundary.
 
@@ -284,6 +360,16 @@ await requestHost('invokeClientCommand', {
 
 Do not navigate the top window directly from the iframe.
 
+### Current host commands
+
+| Command | Input and behavior |
+| --- | --- |
+| `workspace.connector.connect` | `{ provider, authMethodId?, integrationId? }`; opens authorized connector setup. Selecting an integration also requires its auth method. Success data reports `connected` or `cancelled`, without credentials. |
+| `workbench.content.resolve` | `{ resourceId, providerKey }`; resolves an authorized content editor. Forward returned `navigation` unchanged to `workbench.navigation.open`. |
+| `artifact.presentation.open` | `{ url: presentationUrl }`; opens the platform's authenticated Artifact viewer. Only platform `/artifacts/view/:slug` URLs are accepted. |
+
+Declare each command you use, check structured results and surface unavailable handlers or blocked popups. A manifest does not guarantee that every host implements a command. Never add tenant/workspace identity or credentials to these payloads.
+
 ## Host events
 
 A Remote Component can subscribe to normalized host events, such as a completed Agent middleware tool:
@@ -321,6 +407,6 @@ Do not rely on `localStorage` or `sessionStorage`. Keep ephemeral state in React
 - Reject actions, file capabilities, and client commands that are absent from the manifest.
 - Do not log tokens, file contents, complete business snapshots, or personally sensitive data.
 - Re-run authorization and tenant/organization isolation for every provider read and mutation.
-- Test the message source, protocol version, instance ID, and request ID boundaries.
+- Test message source, protocol version, instance ID, request ID and revision boundaries, including a slow response after a context switch.
 
 Return to [Workbench Remote Components](./remote-component) for the complete development workflow.

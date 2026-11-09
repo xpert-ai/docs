@@ -47,7 +47,6 @@ const actor = await actorTokens.getToken({
   audience: 'plugins',
   ttlSeconds: 120,
   act: {
-    sub: 'valve_business_workbench',
     view: 'valve-object-360'
   }
 })
@@ -59,6 +58,12 @@ const object = await governedClient.getObject({
 ```
 
 应请求接收 API 支持的最窄受众和最短有效期，并在签发后立即使用，用完即丢弃。
+
+## 在中间件之外绑定令牌 API
+
+平台注册表提供 `ActorTokenRuntimeFactoryCapability`（`platform.actor-token.factory`），不提供共享的令牌操作 API。每个请求或任务恢复并授权身份后，调用 `createScopedApi(authorizedScope)`。工厂固定宿主声明的 `act`，并隔离令牌缓存。
+
+单次 `getToken` 的 `act` 只能补充元数据，不能覆盖宿主固定声明。不能接受表单或工具参数中的委托身份，也不能跨调用者复用 scoped API。详见[运行时能力](./runtime-capabilities)。
 
 ## 安全规则
 

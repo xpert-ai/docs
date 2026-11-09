@@ -1,0 +1,52 @@
+---
+title: MCP Client Runtime
+description: Discover and call read-only tools through existing authorized platform MCP connections.
+---
+
+`McpClientRuntimeCapability` (`platform.mcp.client`) exposes `McpClientRuntimeApi` for consuming existing platform MCP connections. It is independent of Analytics and dashboard plugins. To publish your own server or App, use [MCP Tools and Apps](../mcp-tools-and-apps).
+
+The current client exposes **read-only `tools.list/call`**. Resources, Prompts, Tasks and subscriptions are not exposed by this API.
+
+## Discover and call
+
+```ts
+import {
+  McpClientRuntimeCapability,
+  type McpClientScope,
+  type McpClientToolCall,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+export async function callApprovedTool(
+  capabilities: RuntimeCapabilityRegistry,
+  scope: McpClientScope,
+  request: McpClientToolCall
+) {
+  const client = capabilities.require(McpClientRuntimeCapability)
+  const tools = await client.tools.list(scope)
+  const selected = tools.find((tool) => tool.name === request.toolName)
+  if (!selected || selected.contractHash !== request.contractHash) {
+    throw new Error('Rediscover and approve the changed tool contract')
+  }
+  return client.tools.call(scope, request)
+}
+```
+
+Before calling this helper, restrict `request.toolName` to your application's approved operation catalog and validate its arguments. Discovery alone does not approve every returned tool for your workflow. In a controlled execution, set `operationKey` to the host's stable call identity to prevent replay.
+
+`McpClientScope` contains the trusted actor's tenant, organization and user, saved `workspaceId`/`toolsetId`/`serverName`, an `AbortSignal` and absolute `deadlineAt` in milliseconds. The host requires the current authenticated identity, workspace access and a matching MCP toolset. URLs, credentials, connection snapshots and policy overrides are not inputs.
+
+## Tool policy and results
+
+- Eligible tools are enabled and model-visible, declare `readOnlyHint: true`, and do not declare `destructiveHint: true` or require task execution. Read-only hints narrow selection; they neither grant access nor prove remote behavior.
+- `contractHash` pins schemas and annotations, not remote code or authorization. Changed contracts require rediscovery and explicit caller review.
+- Arguments and structured output undergo JSON Schema validation without coercion. Interaction requests, tool errors and invalid output fail.
+- Results contain optional `structuredContent` and plain `text` blocks. Accept text JSON only when your application's contract explicitly permits it. Resource links are not fetched automatically.
+
+## Execution limits
+
+Each operation has a maximum 30-second budget bounded by the parent deadline. Discovery is limited to 20 pages and 1,000 tools, with cyclic cursors rejected. Call envelopes and individual tool metadata are limited to 64,000 bytes; results to 2,500,000 bytes. Consumers may impose smaller limits.
+
+The host owns authentication, connection lifecycle, cancellation and cleanup. It rechecks access and current connection/tool selection around I/O; revoked access discards the result. Successful results are not cached by this capability.
+
+Use a matching host and SDK that expose this capability. An installed MCP plugin does not by itself establish runtime availability. Continue with [REST Client](./rest-client) or [Analytics](./analytics).

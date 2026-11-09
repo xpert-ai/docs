@@ -1,0 +1,45 @@
+---
+title: Analytics and Data Providers
+description: Implement read-only data providers and consume validated Datasets with current-actor authorization.
+---
+
+`AnalyticsRuntimeCapability` exposes `AnalyticsRuntimeApi` under **`platform.analytics`**. Import the exported key rather than copying a capability ID from an older design document. Analytics separates source query syntax from Dataset projection and presentation.
+
+## Consume Analytics
+
+Resolve the key from the platform registry. `list(actor)` returns authorized sources and providers; `discover(actor, request)` returns provider-owned metadata and query contracts; `query(actor, request, execution?)` returns an `AnalyticalDataset`.
+
+The actor comes from authenticated server context and must match the current request. HTTP consumers use `/api/data-source/analytics/sources`, `/discover` and `/query`; request bodies cannot select actor, tenant or organization. Discovery does not grant query permission.
+
+Use the root `@xpert-ai/plugin-sdk` entry on the server. Browser code imports schemas and normalization from `@xpert-ai/plugin-sdk/analytics`, without Nest runtime dependencies.
+
+## Implement a provider
+
+Implement `AnalyticsQueryProvider`, decorate it with `@AnalyticsProvider('vendor.operation')` and register it in the plugin module. Declare source types and operation contract versions in the descriptor.
+
+- The provider interprets and validates `binding.payload`, source syntax and typed parameters. SQL, MDX, REST paths and file formats remain provider-owned.
+- Enforce read-only behavior at the source. Honor `context.signal`, `maxRows` and the absolute `deadlineAt`; connection options remain server-only.
+- Return explicit columns even for zero rows. Include actual completeness and `sourceFetchedAt`; set `dataAsOf` only when the source supplies a business-data timestamp.
+- For nested queries, forward `signal`, `deadlineAt` and `ancestry` through the third argument of `query`. A child cannot extend its parent's deadline.
+
+Optional `discover` returns bounded business metadata and a native query contract. Supply declared types, descriptions and metric definitions; callers must not infer business meaning from labels or sample values. `validateAnalyticsPayload` can check a discovered payload schema before execution, but does not coerce values, grant access or replace provider semantic validation.
+
+## Dataset correctness and diagnostics
+
+Views bind to `output.datasetId` and stable `output.fields[].id`. Use `sourceField` or an exact `semanticRef` to select native columns. Preserve `int64` and `decimal` as exact strings and timezone-qualified timestamps. Do not silently round values that a renderer cannot represent.
+
+The host applies a 30-second deadline, a 1,000-row limit and a 2 MB normalized result budget. It validates columns, cells, grain and completeness, then rechecks source revision and provider availability. A partial result must remain explicitly partial. Successful queries are not served from a shared result cache.
+
+Providers may throw `AnalyticsProviderError` with an authored `AnalyticsDiagnostic`. Use stable codes, safe repair guidance and opaque audit references; do not copy driver exceptions, SQL, values or connection options into public messages. Parse diagnostic envelopes with `parseAnalyticsDiagnostic` at trust boundaries. Exception class identity across SDK copies is not validation.
+
+## Related extension points
+
+| Need | Integration |
+| --- | --- |
+| Existing MCP or OpenAPI connections | [MCP Client](./mcp-client) or [REST Client](./rest-client); the Analytics provider owns catalog, projection and pagination |
+| Interactive HTML presentation | [HTML Artifact Documents](./artifact-documents); the saved Binding and current viewer remain server-authorized |
+| Immutable saved definitions and shares | [Artifacts](./artifacts) |
+
+Database Workbench is a separate contract: `DataSourceRuntimeCapability` uses `platform.datasource.workbench`. An `IDataSourceStrategy` opts in with `workbench: { engine: '<stable-id>' }`; its runner exposes `getWorkbenchAdapter(location?)`. The plugin owns dialect, location validation and driver cleanup. The host owns actor/source authorization, write permissions and session lifecycle.
+
+The SDK no longer supplies the mixed-engine `SqlDatabaseWorkbenchAdapter`, `WorkbenchTransport` or SQL lexer/pagination helpers. Use the database plugin's implementation. A strategy without an explicit Workbench declaration is not exposed. Coordinate SDK, host and plugin versions and verify installation against the published packages; source exports alone do not establish release availability.

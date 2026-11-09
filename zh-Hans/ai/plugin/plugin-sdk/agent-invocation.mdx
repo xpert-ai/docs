@@ -1,0 +1,57 @@
+---
+title: Agent 调用运行时
+description: 调用已授权的 Agent 绑定，并观察、回答或取消同一次持久化调用。
+---
+
+`AgentInvocationRuntimeCapability`（`platform.agent_invocation`）暴露绑定到单个已授权调用者／执行的 `AgentInvocationApi`，用于通过已保存的 Agent 绑定委派任务。宿主负责授权、目标版本、持久化、幂等和执行历史；提供器负责具体执行机制。
+
+## 解析与启动
+
+派发前立即解析绑定，并原样传递返回的 target。`callId` 使用宿主工具调用或操作 ID；只有目标和输入相同时才能复用。
+
+```ts
+import {
+  AgentInvocationRuntimeCapability,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+export async function startBoundAgent(
+  capabilities: RuntimeCapabilityRegistry,
+  bindingId: string,
+  callId: string,
+  prompt: string
+) {
+  const api = capabilities.require(AgentInvocationRuntimeCapability)
+  if (!api.resolve) throw new Error('This host requires a pre-resolved Agent target')
+  const target = await api.resolve(bindingId)
+  return api.start({ target, callId, input: { prompt } })
+}
+```
+
+返回的快照可能仍在运行。启动回执不等于完成结果。工具参数不能提供调用者身份、任意 runner 配置或凭据；宿主重新检查目标访问权、版本和提供器来源。
+
+## 观察与交互
+
+| 方法 | 含义 |
+| --- | --- |
+| `inspect(id)` | 刷新已有调用，不重新启动任务 |
+| `cancel(id)` | 请求支持的取消操作，随后观察状态以确认结果 |
+| `respond(id, interactionId, response)` | 按提供器的响应 schema 回答指定的当前交互 |
+| `awaitResult?(id, options)` | 在有界时间内观察；返回快照仍可能处于运行中 |
+| `waitForTasks?(request, options)` | 在宿主支持时，有界等待依赖任务 |
+
+使用可选方法前检查其是否存在。后台执行保留 invocation ID，稍后观察同一任务。cancelling 或 unknown 不证明进程已经停止；执行成功也不证明所要求的文件已导出或通过人工验收。
+
+## 在 Agent 中间件之外使用
+
+平台注册表提供 `AgentRuntimeFactoryCapability`（`platform.agent_invocation.factory`）。可信任务或 View 操作恢复并授权身份后，可以调用 `createScopedApi(authorizedScope)`。每个调用者／执行创建独立 API，不缓存为全局单例。
+
+工厂键和操作键不同。在平台注册表检查 scoped operation key，不能判断工厂是否可用。参见[运行时能力](./runtime-capabilities)。
+
+## 实现执行提供器
+
+实现 `IAgentRuntimeStrategy`，通过 `@AgentRuntimeStrategy(key)` 注册并加入插件模块。准确声明恢复方式（`checkpoint`、`session` 或 `none`）、交互、取消和后台执行支持。
+
+等待外部工作前，通过 `context.checkpoint` 持久化提供器回执。重新连接应恢复原会话或原操作，不能对执行结果不确定的输入再次发送 prompt。支持 session 恢复本身不保证进程崩溃后仍可恢复。
+
+图执行适配留在宿主。提供器不能在自己的执行器里回调宿主 Task facade，也不能跨插件边界派发平台 CQRS 类。项目任务流程参见[项目 SDK 接入指南](/zh-Hans/ai/projects/plugin-apps/sdk-integration)。

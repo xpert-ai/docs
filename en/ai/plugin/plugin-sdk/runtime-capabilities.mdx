@@ -70,58 +70,53 @@ The registry is scoped by the host. Capability methods still enforce tenant, org
 
 ## Resolve a capability in a NestJS provider
 
-A NestJS provider is not inherently bound to one Agent execution, so first distinguish whether a capability depends on the current runtime scope:
+The platform registry is populated through `RuntimeCapabilityProvider` discovery after Nest instantiates the modules. Inject `XPERT_RUNTIME_CAPABILITIES_TOKEN`, then resolve capabilities when an operation runs, after discovery; do not resolve factories in a service constructor.
 
-| Consumer | Resolution path |
+| Consumer/API | Resolution path |
 | --- | --- |
-| Agent middleware | Use `context.runtime.capabilities` directly. |
-| A user-, Xpert-, or Project-scoped capability in a NestJS provider | Inject `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN` and call `createScopedApi(scope)` for each operation. |
-| A global capability that does not depend on a data owner | Inject `XPERT_RUNTIME_CAPABILITIES_TOKEN`. |
+| Agent middleware | Use `context.runtime.capabilities`, including its host-bound operation APIs. |
+| Stateless domain API in a View, HTTP handler or job | Use the platform registry. Knowledgebase, Artifacts, Project Provisioning and Workspace Files authorize each operation. |
+| Caller/execution-bound API outside Agent middleware | Resolve its platform factory and create one scoped API from trusted, authorized context. |
+| Agent-style defaults needed outside middleware | Use `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN.createScopedApi(scope)` with host-resolved scope. |
 
-Data-owning capabilities such as `WorkspaceFilesRuntimeCapability` must be resolved from the scoped runtime API first. An unbound global registry may intentionally omit Workspace Files when no `xpertId` or `projectId` is bound. A plugin must not work around that boundary by asking the host to restore unscoped file access.
+Workspace Files is available directly in the current platform registry. Explicit operations still require the correct authorized volume; runtime-relative paths require a bound Project or Assistant. Creating a complete Agent runtime is not mandatory for every domain API.
 
-The following example creates a scoped API for each export operation. The global registry is only a compatibility fallback for older hosts; omit that fallback in a new plugin that does not support those hosts:
+| Platform factory | Scoped operation key |
+| --- | --- |
+| `ConnectorRuntimeFactoryCapability` | `ConnectorRuntimeCapability` |
+| `ActorTokenRuntimeFactoryCapability` | `ActorTokenRuntimeCapability` |
+| `KnowledgeDocumentVisualAssetsRuntimeFactoryCapability` | `KnowledgeDocumentVisualAssetsRuntimeCapability` |
+| `AgentRuntimeFactoryCapability` | `AgentInvocationRuntimeCapability` |
+
+Check factory availability in the platform registry. Checking its scoped operation key there does not establish whether the factory is installed.
 
 ```ts
-import { Inject, Injectable, Optional } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import {
-  WorkspaceFilesRuntimeCapability,
-  XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN,
+  ActorTokenRuntimeFactoryCapability,
   XPERT_RUNTIME_CAPABILITIES_TOKEN,
-  type AgentMiddlewareRuntimeScope,
-  type AgentMiddlewareRuntimeServiceApi,
+  type ActorTokenRuntimeScope,
   type RuntimeCapabilityRegistry
 } from '@xpert-ai/plugin-sdk'
 
 @Injectable()
 export class ExportService {
   constructor(
-    @Optional()
-    @Inject(XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN)
-    private readonly runtimeService?: AgentMiddlewareRuntimeServiceApi,
-    @Optional()
     @Inject(XPERT_RUNTIME_CAPABILITIES_TOKEN)
-    private readonly globalCapabilities?: RuntimeCapabilityRegistry
+    private readonly capabilities: RuntimeCapabilityRegistry
   ) {}
 
-  private workspaceFiles(scope: AgentMiddlewareRuntimeScope) {
-    const files = this.runtimeService
-      ?.createScopedApi(scope)
-      .capabilities?.get(WorkspaceFilesRuntimeCapability)
-      ?? this.globalCapabilities?.get(WorkspaceFilesRuntimeCapability)
-
-    if (!files) {
-      throw new Error('Workspace Files is unavailable in the current runtime scope')
-    }
-
-    return files
+  bindTokenApi(authorizedScope: ActorTokenRuntimeScope) {
+    return this.capabilities
+      .require(ActorTokenRuntimeFactoryCapability)
+      .createScopedApi(authorizedScope)
   }
 }
 ```
 
-The `tenantId`, `organizationId`, `userId`, `xpertId`, `projectId`, `conversationId`, `catalog`, and `scopeId` passed to `createScopedApi()` must come from host-resolved server context, never from untrusted iframe, form, or action-input identifiers.
+`authorizedScope` comes from an authenticated and authorized request, resolved View context or restored job identity. Never construct tenant, organization, user, Assistant, Project, conversation or execution identity from iframe or tool input. A factory does not grant access.
 
-Create the scoped API and resolve the capability close to each operation so availability is reported accurately. Do not cache user- or execution-scoped APIs or capability instances across requests.
+Reuse the returned API within that operation only. Do not cache it in a singleton or register it back into the platform registry. Connector bindings, token caches and issued visual paths belong to one caller/execution.
 
 ## Capabilities in the runtime package
 
@@ -138,6 +133,14 @@ Create the scoped API and resolve the capability close to each operation so avai
 | `ProjectAccessRuntimeCapability` | `platform.project.access` | List readable Projects and enforce human edit or management roles. |
 | `ProjectProvisioningRuntimeCapability` | `platform.project.provisioning` | Idempotently create or reconcile a Chat Project and connect an Assistant. |
 | `ProjectTasksRuntimeCapability` | `platform.project.tasks` | Read saved tasks, request background synchronization, manage schedules and resolve specific executions; business rules remain with the plugin. |
+| `ArtifactDraftsRuntimeCapability` | `platform.artifact-drafts` | Save working copies with revision checks and explicitly publish them. |
+| `ArtifactContentRuntimeCapability` | `platform.artifact-content` | Store protected Artifact-owned bytes. |
+| `ArtifactLibraryRuntimeCapability` | `platform.artifact-library` | Manage authorized Project references and shares. |
+| `AgentInvocationRuntimeCapability` | `platform.agent_invocation` | Start and observe an authorized Agent invocation. |
+| `McpClientRuntimeCapability` | `platform.mcp.client` | Discover and call governed read-only MCP tools. |
+| `RestClientRuntimeCapability` | `platform.rest.client` | Discover and call saved read-only OpenAPI operations. |
+| `AnalyticsRuntimeCapability` | `platform.analytics` | Query providers and validate Dataset contracts. |
+| `ToolImagesRuntimeCapability` | `platform.tool-images` | Save image references and hydrate one model request. |
 
 See the [SDK project integration guide](/en/ai/projects/plugin-apps/sdk-integration) for combining provisioning, project access and business task capabilities.
 
@@ -149,6 +152,13 @@ Continue with the detailed references:
 - [Sandbox Jobs](./sandbox-jobs)
 - [Actor Token](./actor-token)
 - [Project Provisioning](./project-provisioning)
+- [Content and editors](./content-runtime)
+- [Agent invocation](./agent-invocation)
+- [MCP Client](./mcp-client)
+- [REST Client](./rest-client)
+- [Analytics and providers](./analytics)
+- [HTML Artifact documents](./artifact-documents)
+- [Tool images](./tool-images)
 
 ## Define and test capability consumers
 
@@ -189,7 +199,8 @@ Production plugin code normally consumes platform keys; host infrastructure owns
 ## Compatibility rules
 
 - Import keys and API types from `@xpert-ai/plugin-sdk`; do not copy the interfaces into a plugin.
-- A NestJS provider that consumes a scope-sensitive capability must use `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN.createScopedApi()`; do not use an unbound global registry as its primary source.
+- Choose a domain API, scoped factory or Agent facade according to its contract. Never fall back from a missing scoped API to broader authority.
+- Use stable capability IDs across SDK copies; do not dispatch platform CQRS classes from plugins. Host-internal services keep normal Nest injection and are not exported merely to decouple modules.
 - Treat capability availability as a runtime condition. Package installation alone does not prove that a host service, provider, binding, or registered Sandbox Action is ready.
 - Keep portable references and structured DTOs at async boundaries. Do not pass raw file bytes, bearer tokens, host paths, or implementation instances through queues or persisted chat metadata.
 - Keep capability results within the current authorized scope and re-resolve them for later jobs or callbacks.

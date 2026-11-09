@@ -5,7 +5,7 @@ description: 使用受控消息协议连接工作台远程组件、宿主和视�
 
 # 远程组件宿主桥接
 
-宿主桥接连接远程组件 iframe、工作台宿主和插件视图提供器。它不是任意远程调用通道：每项能力都必须同时具有清单声明、宿主消息处理和对应的服务端实现。
+宿主桥接连接远程组件 iframe、工作台宿主和插件视图提供器。它不是任意远程调用通道：业务能力需要清单声明、宿主处理器，以及适用时的服务端实现。通用上下文生命周期事件不需要订阅。
 
 ```text
 远程组件
@@ -38,11 +38,12 @@ interface RemoteMessageEnvelope {
   instanceId?: string
   type: string
   requestId?: string
+  scopeRevision?: number
 }
 ```
 
 - iframe 加载完成后发送 `ready`。
-- 宿主使用 `init` 返回 `instanceId`、视图清单、初始查询、语言、主题和调试配置。
+- 宿主使用 `init` 返回 `instanceId`、`runtimeScope`、`scopeRevision`、视图清单、初始查询、语言、主题和调试配置。
 - 后续消息必须携带匹配的 `instanceId`。
 - 请求与响应使用同一个 `requestId`。
 - iframe 只接受 `window.parent` 发出的消息；宿主只接受当前 iframe `contentWindow` 发出的消息。
@@ -54,7 +55,7 @@ interface RemoteMessageEnvelope {
 | 消息 | 用途 |
 | --- | --- |
 | `init` | 初始化清单、查询、语言、主题和调试状态 |
-| `hostEvent` | 转发与 `manifest.hostEvents` 匹配的宿主事件 |
+| `hostEvent` | 转发已订阅业务事件或通用 `view.context.changed` 事件 |
 | `data` | `requestData` 的响应 |
 | `parameterOptions` | 参数选项响应 |
 | `actionResult` | JSON 操作响应 |
@@ -90,134 +91,209 @@ iframe 发送给宿主：
 | 宿主事件 | `hostEvents.subscriptions[]` | `hostEvent` | 宿主管理 |
 | 远程入口 | `view.type = 'remote_component'` | 宿主管理 | `getRemoteComponentEntry` |
 
+## 切换上下文而不重建 iframe
+
+同一认证身份、组织和助手下切换项目或会话时，iframe 保持不变。宿主重新授权目标 View 和入口，在解析期间暂停操作；完成后向所有已挂载 View（包括隐藏页签）发送 `view.context.changed`，无需清单订阅或确认握手。
+
+`init.runtimeScope` 与事件中的 `data.runtimeScope` 都是完整快照。未绑定字段为 `null`，应整体替换，不能合并旧 ID。当前 Angular 宿主提供项目与会话字段，支持分组路由的宿主还可提供 `groupId`。
+
+```json
+{
+  "channel": "xpertai.remote_component",
+  "protocolVersion": 1,
+  "instanceId": "view-instance",
+  "type": "hostEvent",
+  "event": {
+    "id": "context-change-2",
+    "type": "view.context.changed",
+    "source": "chatkit",
+    "receivedAt": "2026-11-09T00:00:00.000Z",
+    "data": {
+      "revision": 2,
+      "runtimeScope": { "projectId": null, "conversationId": "target-conversation" }
+    }
+  }
+}
+```
+
+revision 在同一实例内单调增加，但不保证连续。忽略过期修订，拒绝旧待处理请求，清空选择，并在新作用域刷新或重新绑定。后续每次请求携带最新 `scopeRevision`。宿主使用自己的授权上下文，不接受请求指定身份范围，并随上下文轮换文件会话。
+
+更换身份、组织、助手或入口，显式重新加载或关闭 View 会销毁旧实例。入口访问被拒绝时，旧文档也必须移除。取消请求或丢弃响应不会撤销已经提交的服务端修改。
+
 ## TypeScript 桥接客户端
 
-将桥接代码集中在 `bridge.ts`，不要让业务组件直接拼接消息。
+桥接集中在 `bridge.ts`，业务组件不直接拼装协议消息。以下示例面向支持上下文修订的宿主，每个 iframe 只安装一次桥接。业务包装函数在使用结果前仍需校验返回载荷。
 
 ```ts
 const CHANNEL = 'xpertai.remote_component'
 const VERSION = 1
+const responses = {
+  requestData: 'data',
+  requestParameterOptions: 'parameterOptions',
+  executeAction: 'actionResult',
+  executeFileAction: 'fileActionResult',
+  requestFileAccess: 'fileAccessResult',
+  invokeClientCommand: 'clientCommandResult'
+} as const
 
-type RemoteRequestType =
-  | 'requestData'
-  | 'requestParameterOptions'
-  | 'executeAction'
-  | 'executeFileAction'
-  | 'requestFileAccess'
-  | 'invokeClientCommand'
-
-type RemoteOutboundType = RemoteRequestType | 'ready' | 'resize' | 'notify'
-
-interface PendingRequest {
-  resolve: (value: unknown) => void
-  reject: (error: Error) => void
-  timeout: number
+type RequestType = keyof typeof responses
+type RuntimeScope = {
+  groupId: string | null
+  projectId: string | null
+  conversationId: string | null
 }
-
 interface BridgeMessage {
-  channel?: unknown
-  protocolVersion?: unknown
+  channel: typeof CHANNEL
+  protocolVersion: typeof VERSION
+  type: string
   instanceId?: unknown
-  type?: unknown
+  scopeRevision?: unknown
+  runtimeScope?: unknown
   requestId?: unknown
+  event?: unknown
   message?: unknown
   data?: unknown
   result?: unknown
-  [key: string]: unknown
+}
+interface PendingRequest {
+  revision: number
+  responseType: string
+  resolve(value: unknown): void
+  reject(error: Error): void
+  timeout: number
 }
 
 let instanceId: string | null = null
+let revision: number | null = null
 let sequence = 0
 const pending = new Map<string, PendingRequest>()
+export const currentScopeRevision = () => revision
 
 export function installBridge(handlers: {
-  onInit: (message: BridgeMessage) => void
-  onHostEvent: (event: unknown) => void
+  onInit(message: BridgeMessage): void
+  onContextChange(scope: RuntimeScope, revision: number): void
+  onHostEvent(event: unknown): void
 }) {
-  const listener = (event: MessageEvent) => {
+  const listener = (event: MessageEvent<unknown>) => {
     if (event.source !== window.parent || !isBridgeMessage(event.data)) return
     const message = event.data
-
     if (message.type === 'init') {
-      instanceId = typeof message.instanceId === 'string'
-        ? message.instanceId
-        : null
+      const scope = parseScope(message.runtimeScope)
+      if (typeof message.instanceId !== 'string' || !scope ||
+          !isRevision(message.scopeRevision)) return
+      if (instanceId && message.instanceId !== instanceId) return
+      if (revision !== null && message.scopeRevision < revision) return
+      if (revision !== message.scopeRevision) rejectPending('view_context_changed')
+      instanceId = message.instanceId
+      revision = message.scopeRevision
       handlers.onInit(message)
       return
     }
-
-    if (message.instanceId !== instanceId) return
+    if (!instanceId || message.instanceId !== instanceId) return
     if (message.type === 'hostEvent') {
+      const change = parseContextChange(message.event)
+      if (change) {
+        if (revision !== null && change.revision <= revision) return
+        rejectPending('view_context_changed')
+        revision = change.revision
+        handlers.onContextChange(change.scope, revision)
+        return
+      }
       handlers.onHostEvent(message.event)
       return
     }
-
-    const requestId = typeof message.requestId === 'string'
-      ? message.requestId
-      : null
-    const request = requestId ? pending.get(requestId) : undefined
-    if (!request || !requestId) return
-
-    pending.delete(requestId)
+    if (typeof message.requestId !== 'string') return
+    const request = pending.get(message.requestId)
+    if (!request || request.revision !== revision) return
+    if (message.scopeRevision !== undefined && message.scopeRevision !== revision) return
+    if (message.type !== 'error' && message.type !== request.responseType) return
+    pending.delete(message.requestId)
     window.clearTimeout(request.timeout)
     if (message.type === 'error') {
-      request.reject(new Error(
-        typeof message.message === 'string'
-          ? message.message
-          : 'remote_request_failed'
-      ))
+      request.reject(new Error(typeof message.message === 'string'
+        ? message.message : 'remote_request_failed'))
     } else {
       request.resolve(message.data ?? message.result)
     }
   }
-
   window.addEventListener('message', listener)
-  post('ready')
+  window.parent.postMessage({ channel: CHANNEL, protocolVersion: VERSION, type: 'ready' }, '*')
   return () => {
     window.removeEventListener('message', listener)
-    for (const request of pending.values()) {
-      window.clearTimeout(request.timeout)
-      request.reject(new Error('remote_bridge_disposed'))
-    }
-    pending.clear()
+    rejectPending('remote_bridge_disposed')
+    instanceId = null
+    revision = null
   }
 }
 
-export function requestHost(
-  type: RemoteRequestType,
-  body: Record<string, unknown>
-) {
+export function requestHost(type: RequestType, body: object) {
+  const requestRevision = revision
+  if (!instanceId || requestRevision === null) {
+    return Promise.reject(new Error('remote_bridge_not_initialized'))
+  }
   const requestId = `${Date.now()}-${++sequence}`
   return new Promise<unknown>((resolve, reject) => {
     const timeout = window.setTimeout(() => {
       pending.delete(requestId)
       reject(new Error('remote_request_timeout'))
     }, 30_000)
-    pending.set(requestId, { resolve, reject, timeout })
-    post(type, { requestId, ...body })
+    pending.set(requestId, {
+      revision: requestRevision, responseType: responses[type], resolve, reject, timeout
+    })
+    try {
+      window.parent.postMessage({
+        ...body, channel: CHANNEL, protocolVersion: VERSION,
+        instanceId, scopeRevision: requestRevision, type, requestId
+      }, '*')
+    } catch {
+      pending.delete(requestId)
+      window.clearTimeout(timeout)
+      reject(new Error('remote_request_not_cloneable'))
+    }
   })
 }
 
-function post(type: RemoteOutboundType, body: Record<string, unknown> = {}) {
-  window.parent.postMessage({
-    channel: CHANNEL,
-    protocolVersion: VERSION,
-    instanceId,
-    type,
-    ...body
-  }, '*')
+function rejectPending(code: string) {
+  for (const request of pending.values()) {
+    window.clearTimeout(request.timeout)
+    request.reject(new Error(code))
+  }
+  pending.clear()
 }
-
+function isRevision(value: unknown): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+}
+function isId(value: unknown): value is string | null {
+  return value === null || typeof value === 'string'
+}
+function parseScope(value: unknown): RuntimeScope | null {
+  if (!value || typeof value !== 'object' ||
+      !('projectId' in value) || !isId(value.projectId) ||
+      !('conversationId' in value) || !isId(value.conversationId)) return null
+  const groupId = 'groupId' in value ? value.groupId : null
+  if (!isId(groupId)) return null
+  return { groupId, projectId: value.projectId, conversationId: value.conversationId }
+}
+function parseContextChange(value: unknown) {
+  if (!value || typeof value !== 'object' || !('type' in value) ||
+      value.type !== 'view.context.changed' || !('data' in value)) return null
+  const data = value.data
+  if (!data || typeof data !== 'object' || !('revision' in data) ||
+      !isRevision(data.revision) || !('runtimeScope' in data)) return null
+  const scope = parseScope(data.runtimeScope)
+  return scope ? { revision: data.revision, scope } : null
+}
 function isBridgeMessage(value: unknown): value is BridgeMessage {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
-  const message = value as BridgeMessage
-  return message.channel === CHANNEL &&
-    message.protocolVersion === VERSION &&
-    typeof message.type === 'string'
+  return !!value && typeof value === 'object' && !Array.isArray(value) &&
+    'channel' in value && value.channel === CHANNEL &&
+    'protocolVersion' in value && value.protocolVersion === VERSION &&
+    'type' in value && typeof value.type === 'string'
 }
 ```
 
 业务代码可以在此基础上封装 `requestData()`、`executeAction()` 和 `invokeClientCommand()` 等具名方法。桥接层返回稳定错误代码，由 UI 多语言层转换成用户可见文案。
+
+在 `onContextChange` 中先清空依赖作用域的状态，再刷新或重新绑定。响应后的异步处理也应保存 `currentScopeRevision()`，在写入结果前再次比较。相同修订的重复 `init` 可更新主题/语言，不应重置所选资源。
 
 ## 查询数据
 
@@ -283,6 +359,16 @@ await requestHost('invokeClientCommand', {
 ```
 
 不要从 iframe 直接修改顶层窗口地址。
+
+### 当前宿主命令
+
+| 命令 | 输入与行为 |
+| --- | --- |
+| `workspace.connector.connect` | `{ provider, authMethodId?, integrationId? }`；打开已授权的连接配置。选择具体 integration 时还需对应认证方法，成功数据返回 `connected` 或 `cancelled`，不返回凭据。 |
+| `workbench.content.resolve` | `{ resourceId, providerKey }`；解析有权访问的内容编辑器，将返回的 `navigation` 原样传给 `workbench.navigation.open`。 |
+| `artifact.presentation.open` | `{ url: presentationUrl }`；打开平台认证产物展示页，仅接受平台 `/artifacts/view/:slug` URL。 |
+
+声明实际使用的命令，检查结构化结果，并展示处理器不可用或弹窗拦截。清单声明不代表每个宿主都实现了命令。不能在载荷中添加租户/工作区身份或凭据。
 
 ## 宿主事件
 

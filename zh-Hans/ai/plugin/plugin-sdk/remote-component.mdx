@@ -264,6 +264,7 @@ function App() {
 
   useEffect(() => installBridge({
     onInit: (message) => setContext(normalizeInitContext(message)),
+    onContextChange: (scope, revision) => resetAndReloadForScope(scope, revision),
     onHostEvent: (event) => handleHostEvent(event)
   }), [])
 
@@ -275,6 +276,8 @@ createRoot(document.getElementById('root')!).render(<App />)
 ```
 
 完整的消息类型、超时、操作、文件、客户端命令和宿主事件处理见[远程组件宿主桥接](./remote-component-bridge)。
+
+`resetAndReloadForScope` 由业务实现：整体替换作用域，清空旧资源选择并阻止过期异步结果写入。同一身份和助手下切换项目/会话会保留 iframe，隐藏 View 也接收事件。即使清单没有业务事件订阅，也必须处理该事件，详见[上下文切换](./remote-component-bridge)。
 
 ## 数据与操作
 

@@ -1,0 +1,45 @@
+---
+title: 分析查询与数据提供器
+description: 实现只读数据提供器，并以当前用户权限消费经过校验的 Dataset。
+---
+
+`AnalyticsRuntimeCapability` 以 **`platform.analytics`** 暴露 `AnalyticsRuntimeApi`。请导入 SDK 导出的能力键，不要从旧设计文档复制能力 ID。Analytics 将数据源查询语法与 Dataset 映射、展示分开。
+
+## 消费 Analytics
+
+从平台注册表解析能力。`list(actor)` 返回有权访问的数据源与提供器；`discover(actor, request)` 返回提供器维护的元数据和查询契约；`query(actor, request, execution?)` 返回 `AnalyticalDataset`。
+
+actor 来自服务端认证上下文，并须匹配当前请求身份。HTTP 调用使用 `/api/data-source/analytics/sources`、`/discover` 和 `/query`；请求体不能指定 actor、租户或组织。发现元数据不代表获得查询权限。
+
+服务端使用 `@xpert-ai/plugin-sdk` 根入口。浏览器从 `@xpert-ai/plugin-sdk/analytics` 导入 schema 与规范化能力，避免引入 Nest 运行时依赖。
+
+## 实现提供器
+
+实现 `AnalyticsQueryProvider`，使用 `@AnalyticsProvider('vendor.operation')` 并注册到插件模块。descriptor 声明支持的数据源类型及操作契约版本。
+
+- 提供器解释并校验 `binding.payload`、源查询语法与类型化参数。SQL、MDX、REST 路径和文件格式归提供器所有。
+- 在数据源侧落实只读限制，遵守 `context.signal`、`maxRows` 和绝对 `deadlineAt`；连接配置只留在服务端。
+- 即使返回零行也声明列。提供真实的完整性状态与 `sourceFetchedAt`；只有数据源提供业务数据时间时才设置 `dataAsOf`。
+- 组合查询通过 `query` 的第三个参数传递 `signal`、`deadlineAt` 和 `ancestry`。子查询不能延长父查询截止时间。
+
+可选 `discover` 返回有界的业务元数据和原生查询契约。提供声明的类型、说明和指标定义；调用方不能根据名称或样例值猜测业务含义。`validateAnalyticsPayload` 可在执行前检查发现的参数 schema，但不转换值、不授予权限，也不替代提供器的语义校验。
+
+## Dataset 正确性与诊断
+
+视图绑定 `output.datasetId` 与稳定的 `output.fields[].id`。通过 `sourceField` 或精确 `semanticRef` 选择原生列。`int64`、`decimal` 保持精确字符串，时间戳必须包含时区。渲染器无法表达的数值不能静默舍入。
+
+宿主限制单次查询为 30 秒、1,000 行和 2 MB 规范化结果；校验列、单元格、粒度及完整性，并在执行后重新检查数据源版本和提供器可用性。部分结果必须明确标为部分。成功查询不使用共享结果缓存。
+
+提供器可抛出携带人工编写 `AnalyticsDiagnostic` 的 `AnalyticsProviderError`。使用稳定错误码、安全的修复建议和不透明审计引用；不要把驱动异常、SQL、参数值或连接配置复制到公开错误中。在信任边界使用 `parseAnalyticsDiagnostic` 解析诊断信封，不能以跨 SDK 副本的异常类身份代替校验。
+
+## 相关扩展点
+
+| 需求 | 集成方式 |
+| --- | --- |
+| 已有 MCP 或 OpenAPI 连接 | [MCP 客户端](./mcp-client)或 [REST 客户端](./rest-client)；Analytics 提供器负责目录、结果映射与分页 |
+| 交互式 HTML 展示 | [HTML 产物文档](./artifact-documents)；已保存 Binding 与当前用户仍由服务端授权 |
+| 不可变定义版本与分享 | [产物运行时](./artifacts) |
+
+数据库工作台是独立契约：`DataSourceRuntimeCapability` 使用 `platform.datasource.workbench`。`IDataSourceStrategy` 通过 `workbench: { engine: '<stable-id>' }` 显式启用，其 runner 提供 `getWorkbenchAdapter(location?)`。插件负责方言、位置校验和驱动清理；宿主负责身份、数据源授权、写权限和会话生命周期。
+
+SDK 已不再提供混合引擎的 `SqlDatabaseWorkbenchAdapter`、`WorkbenchTransport` 或 SQL 词法/分页辅助实现，应使用数据库插件的实现。未显式声明 Workbench 的策略不会暴露。需要配套发布 SDK、宿主和插件，并使用实际发布的包验证安装；源码存在导出不代表对应版本已经发布。
