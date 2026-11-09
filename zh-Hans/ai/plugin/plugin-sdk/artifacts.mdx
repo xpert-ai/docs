@@ -6,7 +6,7 @@ sidebar_position: 4
 
 `ArtifactsRuntimeCapability` 通过 `platform.artifacts` 暴露 `ArtifactsApi`。它管理插件与智能体生成的持久化交付物，包括 HTML、Markdown、PDF、PowerPoint、图片、普通文件、站点和演示文稿。
 
-产物内容字节存放在[工作区文件](./workspace-files)中。产物服务在此基础上增加稳定业务身份、不可变版本历史、受治理访问链接、生命周期状态和访问计数。
+普通生成文件可保存在[工作区文件](./workspace-files)中；受保护定义使用下文介绍的产物专属内容存储。产物服务在此基础上增加稳定业务身份、不可变版本历史、受治理访问链接、生命周期状态和访问计数。
 
 ## 数据模型
 
@@ -31,6 +31,8 @@ sidebar_position: 4
 | `createArtifactVersion(input)` | 创建不可变版本。 |
 | `ensureArtifactVersion(input)` | 幂等创建或复用版本。 |
 | `listArtifactVersions(input)` | 按可选幂等键或状态列出版本。 |
+
+`listArtifacts` 支持按字面值匹配 `resourceIdPrefix`，以及不加载内容的 `includeCurrentVersion` 元数据。`ensureArtifactVersion.expectedCurrentVersionId` 提供比较后写入保护，`null` 表示预期尚无当前版本。幂等重试不能把旧保存恢复到新版本之上。
 
 容器状态为 `active`、`archived` 或 `deleted`；版本状态为 `active` 或 `deleted`。
 
@@ -61,7 +63,7 @@ sidebar_position: 4
 
 ## 发布生成文件
 
-先将字节写入工作区文件，再创建或复用产物版本和共享：
+普通生成文件应从已授权 Agent 运行时解析 `capabilities`，先写入工作区文件，再创建或复用产物版本和共享。以下为服务端集成片段，ID 和字节来自已授权操作：
 
 ```ts
 import {
@@ -125,9 +127,64 @@ return link.publicUrl
 
 请使用能代表相同不可变内容的确定性版本 `idempotencyKey`。`ensureArtifactVersion()` 返回 `created` 或 `reused`；`ensureArtifactShare()` 返回 `created`、`reused` 或 `replaced`。
 
+## 草稿与显式发布
+
+`ArtifactDraftsRuntimeCapability`（`platform.artifact-drafts`）提供与正式版本分离的可变工作副本：
+
+| 方法 | 用途 |
+| --- | --- |
+| `list(artifactIds)`、`get(artifactId)` | 读取有权访问的草稿；草稿修订号不是正式版本号 |
+| `save(input)` | 通过 `expectedRevision` 与 `expectedCurrentVersionId` 检查后保存 |
+| `publish(input)` | 将用户确认的具体修订发布为不可变版本 |
+| `setRecycled(input)` | 由管理者执行、受 `expectedRevision` 保护的生命周期变更 |
+
+新草稿使用修订号 `0`，预期尚无正式版本时使用 `null`。冲突必须重新加载并协调，不能静默把过期编辑覆盖到新版本。重试同一次发布返回相同正式版本；保存草稿不会更新已发布链接。
+
+`publish` 只能由用户显式确认后的可信应用操作调用，不能暴露为智能体工具。类型可声明 `versioning: { mode: 'draft-only' }`，使用 `authorizeDraft` 和 `assertDraftPublication` 增加策略；后者在发布锁内再次执行。普通版本上传不能绕过此流程。
+
+回收会撤销链接，恢复不会重新启用旧链接。普通编辑器不要设置 `get` 的 `includeArchived`，该选项用于目录或回收站读取。
+
+## 类型提供器与受保护内容
+
+通过 `@ArtifactTypeProvider(resourceType)` 注册实现 `IArtifactTypeProvider` 的提供器，并加入插件模块。`definition` 声明允许的 kind、MIME、字节限制、分享规则和展示模式；`authorize` 执行业务限制，`validateContent` 校验字节。可选的发布与链接钩子可进一步收紧策略。
+
+`type` 是业务类型，`kind` 是格式族，`mimeType` 描述字节格式。显式 `{ pluginName, resourceType }` 类型必须匹配来源；加载器绑定安装来源，必要提供器缺失时拒绝访问。省略 `type` 选择普通内置文件行为，但不能绕过已注册的自定义来源类型。过去未绑定类型的试验记录需要经过授权重新发布。
+
+展示模式包括：
+
+- `file`：提供经过授权的不可变文件。
+- `snapshot`：通过打包的隔离入口展示明确发布的快照数据，不提供查询操作。
+- `authenticated`：由同一安装来源的 `ArtifactPresentationProvider` 按当前访问者身份展示。
+
+普通项目/助手文件列表和工具不应暴露的产物定义，使用 `ArtifactContentRuntimeCapability`（`platform.artifact-content`）。`write({ artifactId, buffer })` 返回可移植引用；`read(reference)` 对拥有这些具体字节的草稿或正式版本执行授权。宿主检查规范引用、完整性及 50 MB 限制；拒绝时不能回退到原始文件读取。
+
+## 所有权与来源授权
+
+规范来源为 `pluginName` + `resourceType` + `resourceId`。可选 `authorizationProviderKey` 指定为同一个资源执行授权的内容资源提供器，不替代所有者或分享受众。
+
+省略 `scope.userId` 保留当前用户所有权；显式 `scope: { projectId, userId: null }` 选择项目共享所有权，并保留真实认证创建者。项目读、编辑和管理策略仍然生效；列表和来源查找只返回当前有权访问的产物。
+
+默认情况下，项目成员资格与分享受众需要同时满足。类型仅能在认证展示及组织/工作区受众下显式声明 `sharing.projectAccess: 'link-audience'`，允许管理者把正式定义分享给项目外受众，同时保留提供器和资源 ACL。此例外不覆盖草稿、编辑、库引用、普通文件 API、数据查询或匿名分享。
+
+## 认证展示
+
+为认证类型注册 `@ArtifactPresentationProvider({ pluginName, resourceType })`，实现 `IArtifactPresentationProvider`。`getEntry()` 返回打包 HTML，`read(context)` 提供初始数据，`operations` 声明只读操作名，`query(context, request)` 按 `context.actor` 执行。
+
+context 包含已授权的正式版本与内容字节。不能用创建者替换当前访问者；需要校验输入，保存、编辑草稿和发布不属于该接口。宿主在返回查询结果前再次检查链接状态、权限和目标版本。跟随最新版本的链接在目标变化后需重新打开。
+
+使用平台返回的 `ArtifactLinkRecord.presentationUrl`（`/artifacts/view/:slug`）。创作端远程视图声明并调用 `artifact.presentation.open`，传入 `{ url: presentationUrl }`；应处理命令不可用或弹窗被拦截的结果，不要放宽 iframe sandbox。独立展示页需要正常认证登录，仅提供已声明只读操作，不开放创作、导航或文件通道。
+
+外层产物展示仍是隔离、无网络的宿主。如果渲染器嵌入 [HTML 产物文档](./artifact-documents)，内层文档的显式策略属于独立集成契约，不代表可以放宽外层宿主。
+
+## 项目库引用与复制
+
+`ArtifactLibraryRuntimeCapability`（`platform.artifact-library`）提供 `add`、`open`、`selectVersion`、`share` 和 `revoke`。添加固定版本引用不创建公开链接，也不授予来源访问。打开时同时检查项目成员资格与当前来源权限。重命名、移动或删除引用不修改原产物，切换引用版本也不更新已发布链接。
+
+`readArtifactVersion({ artifactId, artifactVersionId, purpose })` 对正式字节执行来源授权、内容与摘要校验。`purpose: 'copy'` 还要求 `definition.collection.allowCopy: true`。自定义类型默认不允许复制，普通内置文件允许。复制品具有独立生命周期并采用目标项目 ACL，收集界面须说明并确认这一边界。会话快照只允许引用。
+
 ## 安全与生命周期规则
 
-- 不要在产物元数据中保存内容字节；应写入工作区文件并传递可移植引用。
+- 不要在产物元数据中保存内容字节。普通输出使用工作区文件，受保护定义使用 Artifact Content，并传递可移植引用。
 - 请求 `public_link` 前必须取得用户明确确认，并在访问输入中设置 `userConfirmedPublicLink`。
 - `createSignedPreviewLink()` 只用于短期预览；持久共享策略应保存 `shareKey` 并调用 `ensureArtifactShare()`。
 - 评审、审批、审计和可复现交付应固定到具体版本；只有读者应始终看到最新内容时才使用 `latest`。

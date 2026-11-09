@@ -331,3 +331,19 @@ In particular, preserve the distinctions between planning and dispatch, successf
 execution and acceptance, working files and committed deliverables, group membership
 and Project authorization, and scheduled runs and business tasks. Source inspection
 and documentation builds do not establish deployed availability or live execution.
+
+## Plugin SDK Core
+
+Maintain `en/ai/plugin/plugin-sdk` and `zh-Hans/ai/plugin/plugin-sdk` together.
+The section covers plugin-facing runtime contracts, content/editor integration,
+Artifacts, remote Views, Agent invocation, governed MCP/REST clients, Analytics
+and tool images. Keep the SDK Core order in `docs.json` and
+`navigation-order-tree.json` aligned; do not regenerate unrelated curated tabs.
+
+Use Xpert's `packages/plugin-sdk/docs` and feature documents as context, then
+check public exports and owning implementations before copying examples. This
+update was checked against Xpert `fb7072b8abd18e8e4b5a31e83bfdad7ea267ab06`.
+In particular, `AnalyticsRuntimeCapability.id` is `platform.analytics`, and
+Artifact document networking has explicit restricted/unrestricted modes.
+Do not infer published SDK versions or customer deployment status from source
+availability. Keep internal rollout instructions out of product procedures.

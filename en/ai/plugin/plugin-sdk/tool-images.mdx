@@ -1,0 +1,53 @@
+---
+title: Tool Images Runtime
+description: Return immutable image references from tools and project verified pixels into one model request.
+---
+
+`ToolImagesRuntimeCapability` (`platform.tool-images`) is available in a scoped Agent middleware runtime. The host binds tenant, organization, user, conversation and Workspace identity; tools cannot supply those fields or arbitrary storage paths.
+
+## Save and return an image
+
+After your plugin authorizes and loads a candidate, call `save({ buffer, mimeType, title })`. Supported MIME types are `image/png`, `image/jpeg` and `image/webp`. The host validates the image, stores its bytes and creates an immutable Artifact version.
+
+For a LangChain tool, use `responseFormat: 'content_and_artifact'` and return `[summary, presentation]`, where `presentation` is the `ToolOutputPresentation` returned by `save`. Keep summary text small. Do not put buffers, Base64 data URLs, signed URLs or storage paths in tool content, business state or checkpoints.
+
+Saving an image does not prove that the model or a person inspected it. Keep any business acceptance step separate.
+
+## Supply pixels to the model
+
+Inside middleware, project the current complete tool round into the outbound request:
+
+```ts
+import {
+  mergeModelRequirements,
+  type AgentMiddleware,
+  type ToolImagesApi
+} from '@xpert-ai/plugin-sdk'
+
+export function imageProjection(
+  images: ToolImagesApi,
+  toolNames: readonly string[]
+): AgentMiddleware {
+  return {
+    name: 'verified-tool-images',
+    wrapModelCall: async (request, handler) => {
+      const projected = await images.prepareModelInput(request.messages, toolNames)
+      return handler({
+        ...request,
+        messages: projected.messages,
+        requirements: mergeModelRequirements(request.requirements, projected.requirements)
+      })
+    }
+  }
+}
+```
+
+Resolve `images` from `context.runtime.capabilities` inside `createMiddleware`. `toolNames` identifies tools whose successful output must carry an image presentation. Ordinary error ToolMessages stay textual so the model can recover.
+
+`prepareModelInput` verifies ownership, conversation, immutable version, MIME, dimensions, byte length and SHA-256. It materializes at most three images in one request and preserves tool-call ID/summary mapping. Historical rounds are not hydrated again.
+
+The projected temporary messages are **outbound-only**: never append them to persisted message channels or checkpoints. Merge returned model requirements with `mergeModelRequirements`; image input requires registered VISION support in the main model and every fallback. A text-only or unknown model must fail rather than silently discard pixels.
+
+Persisted references can resume in the same authorized conversation without an in-memory allowlist. Foreign, revoked or changed assets fail explicitly. Deploy matching ChatKit types, SDK and host runtime before adoption; source validation does not prove that a compatible package is published.
+
+See [Knowledgebase visual assets](./knowledgebase#consume-visual-assets-safely) for document-image candidates and [Artifacts](./artifacts) for durable delivery.

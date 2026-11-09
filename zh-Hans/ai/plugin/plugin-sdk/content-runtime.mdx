@@ -1,0 +1,67 @@
+---
+title: 内容与编辑器运行时
+description: 通过受授权的平台 API 接入项目文档、引用、文件和插件编辑器。
+---
+
+插件需要共享项目文档、编辑会话或引用其他业务资源时，使用内容平台 API。平台负责授权、协作状态和版本检查；插件负责资源关系、编辑器模型和具体格式的操作。
+
+## 选择 API
+
+从 `@xpert-ai/plugin-sdk` 导入以下能力键与 API 类型，并从[平台注册表](./runtime-capabilities)解析。
+
+| 能力 | 稳定 ID | 职责 |
+| --- | --- | --- |
+| `ContentResourcesRuntimeCapability` | `platform.content.resources` | 资源授权，以及授权范围内的主体与目录解析 |
+| `ContentDocumentsRuntimeCapability` | `platform.content.documents` | 协同文本文档、版本、修改提案和评论 |
+| `ContentReferencesRuntimeCapability` | `platform.content.references` | 同时授权包含引用的文档与被引用目标 |
+| `ContentEditorsRuntimeCapability` | `platform.content.editors` | 编辑器发现、资源路由和带版本检查的文件读写 |
+| `ProjectFilesRuntimeCapability` | `platform.project.files` | 项目文件树和支持冲突检查的原子写入 |
+| `ProjectKnowledgeRuntimeCapability` | `platform.project.knowledge` | 每个项目唯一的内置知识库 |
+| `ConnectorDocumentsRuntimeCapability` | `platform.connector.documents` | 使用已授权连接发现和读取外部文档 |
+
+传入服务端认证的 `RuntimeActor`，需要组织身份的接口使用 `OrganizationRuntimeActor`。View 从已解析的宿主获取身份；后台任务恢复自身已授权的执行上下文。不能从 action body 或模型参数复制 actor 字段。每次操作都会重新检查访问权限。
+
+## 协同文本文档
+
+通过 `ContentDocumentsApi.register` 注册 Markdown 文件，提供已授权项目、来源资源、文件路径和已安装的模型键。协作状态由平台管理，插件不应另建一套协作房间或审阅表。
+
+| 操作 | 用途 |
+| --- | --- |
+| `get`、`session`、`update` | 读取状态、加入兼容的编辑会话并持久化更新 |
+| `history`、`preview`、`checkpoint`、`restore` | 使用规定的 sequence 和 epoch 检查管理文档版本 |
+| `propose`、`proposals`、`decide` | 提交和审阅有界文本修改 |
+| `comments`、`comment`、`resolveComment` | 管理文档或块级评论 |
+| `hierarchy`、`createChild` | 读取来源方的页面关系，以稳定 request ID 创建子页面 |
+| `reconcile` | 对照预期文件 hash、sequence 和 epoch 处理外部文件变化 |
+
+`ContentDocumentInput.resourceId` 标识**平台文档**；来源回调中的 `ContentSourceInput.sourceResourceId` 标识**来源业务资源**。两者不能互换。
+
+协作更新已接收与文件已物化是不同状态：`update` 返回的 `materializationStatus` 为 `ready`、`pending` 或 `failed`。界面应展示状态并保留冲突信息，不能用旧编辑器快照覆盖外部文件变化。
+
+## 插件编辑器
+
+使用 `@ContentEditorProvider(key)` 将提供器注册到插件模块。descriptor 明确声明 `text-document`、`file` 或 `resource`，不能从文件名或标题推断模型。
+
+- 文本编辑器提供协作流程使用的具体文档模型。
+- 文件编辑器实现 `create()` 和 `validateFile(buffer)`。工作簿、幻灯片等格式操作由插件自己的服务与 Remote View 实现。
+- 资源编辑器通过声明的 View 打开已注册的业务资源。
+
+资源提供器暴露 `editor.describe`，需要版本化字节时提供 `editor.files.read/write`，并负责位置和原子版本检查。`ContentEditorsApi.prepare` 只创建或验证字节，不创建目标资源，也不授予目标访问权。写入时将读取返回的 revision 作为 `expectedRevision`；冲突后需要重新读取并协调修改。
+
+Remote View 在 `clientCommands` 中声明 `workbench.content.resolve` 和 `workbench.navigation.open`。先解析 `{ resourceId, providerKey }`，再将返回的 `navigation` 原样传给打开命令，以保留来源方和所选编辑器。参见[宿主桥接](./remote-component-bridge)。
+
+## 项目文件与知识库
+
+普通项目文件使用 `ProjectFilesApi.write` 的 `expectedHash`：`null` 表示只允许创建新文件；更新已有文件需要当前 hash。不匹配时保留现有文件。已注册的协作文档必须继续走文档／编辑器流程，不能用原始文件写入绕过它。
+
+`ProjectKnowledgeApi.ensureBinding({ actor, projectId, title })` 创建或复用项目知识库；请求／任务上下文必须与显式 actor 一致。权限来自项目成员关系，与是否安装 Spaces 或缓存的知识库 ID 无关。
+
+连接器文档读取使用选定的已授权连接。读取外部文档不会自动创建本地副本、安排同步或允许远端回写。导入应用负责这些决定，并说明目标项目的共享范围。
+
+## Assistant 入口授权
+
+View 需要中间件配置和 scoped runtime 时，使用 `ViewMiddlewareRuntimeCapability.resolve`；入口只需检查指定中间件访问权时，使用 `AssistantMiddlewareAccessRuntimeCapability.assertAccess`。
+
+独立 Assistant scope 遵循已发布 Assistant 的访问策略；Project scope 遵循当前成员关系和指定 Assistant 绑定，项目拒绝后不回退到独立访问。资源操作仍保留自己的 ACL。功能开关或另一个声明相同功能的 provider 都不构成授权。
+
+继续阅读[工作区文件](./workspace-files)、[产物](./artifacts)和[项目 SDK 接入指南](/zh-Hans/ai/projects/plugin-apps/sdk-integration)。

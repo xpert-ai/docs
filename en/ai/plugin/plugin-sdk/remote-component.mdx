@@ -264,6 +264,7 @@ function App() {
 
   useEffect(() => installBridge({
     onInit: (message) => setContext(normalizeInitContext(message)),
+    onContextChange: (scope, revision) => resetAndReloadForScope(scope, revision),
     onHostEvent: (event) => handleHostEvent(event)
   }), [])
 
@@ -275,6 +276,8 @@ createRoot(document.getElementById('root')!).render(<App />)
 ```
 
 See [Remote Component Host Bridge](./remote-component-bridge) for message types, timeouts, actions, files, client commands, and host events.
+
+`resetAndReloadForScope` is application-specific: replace the complete scope, clear old resource selections and suppress stale asynchronous results. The same iframe survives Project/conversation switches under one identity and Assistant. Hidden Views also receive the event. Handle it even when the manifest declares no business event subscriptions; see [context changes](./remote-component-bridge#context-changes-without-remounting).
 
 ## Data and actions
 

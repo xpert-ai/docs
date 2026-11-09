@@ -24,13 +24,15 @@ type WorkspaceFileCatalog =
 
 Explicit APIs accept `WorkspaceFileScope` fields such as `tenantId`, `organizationId`, `userId`, `catalog`, `scopeId`, `projectId`, `knowledgeId`, `rootId`, and `xpertId`. Runtime-aware APIs infer the current Agent workspace when possible.
 
-For files in the current Agent runtime, the host exposes the capability only after binding a concrete data owner: Project mode binds `projectId`, while non-Project mode binds `xpertId`. A personal Xpert uses `catalog: 'user-xperts'`, where `scopeId` is the Xpert ID and `userId` remains a separate user-isolation field. Never concatenate `userId` and `xpertId` into one `scopeId`.
+For runtime-relative files, the host binds a concrete data owner: Project mode binds `projectId`, while non-Project mode binds `xpertId`. A personal Xpert uses `catalog: 'user-xperts'`, where `scopeId` is the Xpert ID and `userId` remains a separate user-isolation field. Never concatenate `userId` and `xpertId` into one `scopeId`.
 
 `filePath` is always relative to a workspace Volume. It is not `/workspace/...` and is never a host/API-process filesystem path.
 
 ## Resolve Workspace Files in a NestJS provider
 
-Agent middleware uses `context.runtime.capabilities` directly. A View Provider, controller, or other NestJS service must inject `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN` and create a scoped API from host-resolved context:
+Agent middleware uses `context.runtime.capabilities` directly. A View Provider, controller or job may resolve Workspace Files from `XPERT_RUNTIME_CAPABILITIES_TOKEN` and use explicit scope-aware methods such as `readBuffer` and `uploadBuffer`. Each operation still resolves and authorizes its Volume.
+
+When a provider needs Agent-style defaults for runtime-relative paths, inject `XPERT_AGENT_MIDDLEWARE_RUNTIME_TOKEN` and create a scoped API from host-resolved context:
 
 ```ts
 import { Inject, Optional } from '@nestjs/common'
@@ -62,7 +64,15 @@ export class DocumentService {
 }
 ```
 
-Do not resolve Workspace Files only from `XPERT_RUNTIME_CAPABILITIES_TOKEN` inside a provider. That token represents the global capability set without a bound data owner, and current hosts intentionally omit `WorkspaceFilesRuntimeCapability` from it. See [Runtime Capabilities](./runtime-capabilities#resolve-a-capability-in-a-nestjs-provider) for the complete provider rules.
+The current platform registry includes `WorkspaceFilesRuntimeCapability`. A direct domain API and an Agent-scoped facade serve different call shapes; neither is a fallback around failed authorization. Scoped calls cannot override the bound owner with tool input. See [Runtime Capabilities](./runtime-capabilities#resolve-a-capability-in-a-nestjs-provider) for the complete provider rules.
+
+## Assistant files and application state
+
+The authoring `XpertWorkspace` is not an Assistant file ACL. Non-Project files use the exact published Assistant's access policy: shared mode is collaborative for authorized users, while user mode binds the current authenticated user. Authoring workspace membership or the Assistant creator's identity must not substitute for runtime file access. Project files retain current membership and Assistant binding checks.
+
+`files.appData({ pluginName, projectId?, requireUserIsolation? })` returns a bound `WorkspaceStorage` handle for durable plugin application state. The host resolves the namespace from loaded plugin metadata. Use `read`, `write`, `mkdir`, `list`, `remove` and `withLock`; paths and lock keys are canonical relative paths. Recreate handles after a workspace policy change and keep personal data in explicitly user-isolated storage. Locks coordinate writes; they do not grant access.
+
+For Project file trees and compare-and-set editing, see [Content and Editor Runtime](./content-runtime).
 
 ## Choose the right reference
 
@@ -176,7 +186,7 @@ if (status.vectorIndexStatus === 'ready') {
 
 ## Safety and lifecycle
 
-- Create a scoped API from host-resolved server context for each request. Do not cache file capability instances across users, Xperts, Projects, or requests.
+- Derive explicit scope or create the scoped facade from trusted server context for each operation. Do not cache bound file APIs or storage handles across users, Assistants or Projects.
 - Prefer `resolveFile()` when only metadata or an openable URL is required; use byte-reading methods only for actual processing.
 - Never pass `/workspace/...` paths into a delayed job. Convert them with `resolveRuntimeReference()` first.
 - Validate stored evidence with `validateUnderstandingReferences()` before presenting or acting on it.

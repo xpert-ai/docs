@@ -189,6 +189,8 @@ Use `expectedVersion` when moving a document that may be edited concurrently.
 
 ## Consume visual assets safely
 
+Resolve the operation API below from the current Agent's scoped registry. A NestJS View or job instead resolves `KnowledgeDocumentVisualAssetsRuntimeFactoryCapability` from the platform registry and calls `createScopedApi` with a complete authorized execution binding and an already scoped Workspace Files writer. Issued paths and batches belong to that API/execution; do not cache the API across requests. See [Runtime Capabilities](./runtime-capabilities).
+
 `KnowledgeDocumentVisualAssetsApi` is a governed four-step lifecycle:
 
 1. `issueCandidates()` returns execution-scoped logical paths selected from text anchors and business scope.

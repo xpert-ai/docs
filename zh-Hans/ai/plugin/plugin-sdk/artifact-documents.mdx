@@ -1,0 +1,59 @@
+---
+title: HTML 产物文档
+description: 通过隔离的文档 SDK 和专用授权查询桥接展示交互式 HTML。
+---
+
+`@xpert-ai/plugin-sdk/artifact-document` 是不依赖 Nest 或图表库的浏览器安全入口，提供隔离 iframe、查询协议和 `window.xpertLiveArtifact`。插件负责已保存定义、允许的 Binding、依赖准入和服务端查询回调。
+
+它使用独立的文档协议，与[远程组件宿主桥接](./remote-component-bridge)分开。作者 HTML 不能调用通用 View Actions，也不能选择替代的产物版本、提供器或查询定义。
+
+## 挂载文档
+
+先在**专用文档宿主页**安装框架策略，再挂载 iframe。策略作用于整个宿主文档，拒绝子框架 URL 导航并允许 `srcdoc`；不要安装到需要其他远程 iframe 的应用根页面。
+
+```ts
+import {
+  installArtifactDocumentFramePolicy,
+  mountArtifactDocument,
+  type ArtifactDocumentHostOptions
+} from '@xpert-ai/plugin-sdk/artifact-document'
+
+export function mountSavedDocument<T>(
+  frame: HTMLIFrameElement,
+  options: ArtifactDocumentHostOptions<T>
+) {
+  installArtifactDocumentFramePolicy(frame.ownerDocument)
+  return mountArtifactDocument(frame, options)
+}
+```
+
+可信调用方提供 `html`、可选 `dependencies`/`networkPolicy`、`context` 和 `query(input, signal)`。context 只含允许的 Binding ID、默认控件值、语言和主题。SDK 会校验并复制快照，后续修改原对象不能扩大 Binding 集合。
+
+查询回调在闭包中保留产物、版本和身份范围，调用服务端读取已保存 Binding，并重新授权当前访问者。应传递取消信号，不能执行 HTML 提交的查询定义。使用 `refresh(bindingId?)` 重新查询；更换文档或可信查询范围前调用 `dispose()`。
+
+## 页面 API 与刷新
+
+作者 HTML 使用 `window.xpertLiveArtifact.ready`、`query`、`refresh`、`queryMany`、`subscribe` 和 `bindSelect`。请求只能选择允许的 `bindingId` 与声明的控件值。通过订阅接收宿主刷新结果，移除视图时取消订阅。
+
+宿主限制并发、排队、执行时间和调度频率。新控件值取代旧请求，过期或销毁后的结果会被丢弃。`queryMany` 汇总同一轮结果及各项失败；失败或不可用的数据应明确展示，不能把旧值当作新结果。
+
+## 打包依赖
+
+每个 `ArtifactDocumentDependencyAsset` 包含 `id`、精确 `version`、`format: 'classic-script'`、导出的 `global`、UTF-8 `source` 和 `sha256`。依赖锁不含源码。字节必须来自可信包或已授权的不可变快照，不能按页面传入的 URL 或库名称下载。
+
+`verifyArtifactDocumentDependencies` 校验摘要、顺序、唯一性和大小：最多 8 项，单项 4 MB，合计 8 MB。摘要只证明完整性，不证明授权或库的安全性。依赖字节应随版本保存，避免历史文档静默加载新代码。
+
+## 网络策略与隔离
+
+`networkPolicy` 由可信宿主选择，作者 HTML 不能扩大策略。
+
+| 模式 | 行为 |
+| --- | --- |
+| 省略或 `restricted` | 默认阻止外部资源。可信的 `scripts`、`styles`、`fonts`、`images` 列表可各允许最多 16 个精确 HTTPS origin；fetch/XHR、子框架和 worker 仍被阻止。 |
+| `unrestricted` | 显式允许广泛联网，包括 HTTP(S)、WebSocket 及受支持的 data/blob 资源。仅在确实需要该访问时使用；它不具备离线模式的网络限制。 |
+
+origin 列表不能包含路径、通配符或凭据。在线资源不等同于不可变依赖快照。预览与展示必须采用相同可信策略；离线检查成功不能验证在线依赖。
+
+两种模式均保留 `sandbox="allow-scripts"`，不授予同源、表单、弹窗或下载权限。CSP 不启用 `eval`，专用宿主策略仍阻止文档自身 URL 导航。扩大网络访问不会增加 Binding 或宿主 API 权限。
+
+HTML 格式校验不等于内容净化或业务验收，仍需核对数据解释和实际展示。通过[产物运行时](./artifacts)保存与发布；查询回调返回 Dataset 时可使用 [Analytics](./analytics)。

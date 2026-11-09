@@ -1,0 +1,52 @@
+---
+title: MCP 客户端运行时
+description: 通过平台已有的已授权 MCP 连接发现并调用只读工具。
+---
+
+`McpClientRuntimeCapability`（`platform.mcp.client`）暴露 `McpClientRuntimeApi`，供插件消费平台已有的 MCP 连接，独立于 Analytics 和看板插件。发布自己的服务或 App，请阅读 [MCP Tools 和 Apps](../mcp-tools-and-apps)。
+
+当前客户端仅暴露**只读 `tools.list/call`**，不提供 Resources、Prompts、Tasks 或订阅。
+
+## 发现与调用
+
+```ts
+import {
+  McpClientRuntimeCapability,
+  type McpClientScope,
+  type McpClientToolCall,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+export async function callApprovedTool(
+  capabilities: RuntimeCapabilityRegistry,
+  scope: McpClientScope,
+  request: McpClientToolCall
+) {
+  const client = capabilities.require(McpClientRuntimeCapability)
+  const tools = await client.tools.list(scope)
+  const selected = tools.find((tool) => tool.name === request.toolName)
+  if (!selected || selected.contractHash !== request.contractHash) {
+    throw new Error('Rediscover and approve the changed tool contract')
+  }
+  return client.tools.call(scope, request)
+}
+```
+
+调用此辅助函数前，先将 `request.toolName` 限定为应用已批准的操作目录，并校验参数。发现工具不代表已批准工作流使用其中每个工具。受控执行中的 `operationKey` 应使用宿主稳定的调用身份，防止重放。
+
+`McpClientScope` 包含可信 actor 的 tenant、organization、user，已保存的 `workspaceId`/`toolsetId`/`serverName`，`AbortSignal` 和以毫秒表示的绝对 `deadlineAt`。宿主要求与当前认证身份一致，并检查工作区访问权和匹配的 MCP 工具集。输入不能携带 URL、凭据、连接快照或策略覆盖。
+
+## 工具策略与结果
+
+- 可用工具必须已启用、对模型可见，声明 `readOnlyHint: true`，且没有 `destructiveHint: true` 或强制任务执行要求。只读提示用于缩小范围，既不授予权限，也不证明远端实际行为。
+- `contractHash` 固定 schema 与 annotations，不固定远端代码或授权。契约变化后需要重新发现并由调用方明确审核。
+- 参数与结构化输出按 JSON Schema 校验，不进行类型强制转换。交互请求、工具错误或非法输出都会失败。
+- 结果包含可选 `structuredContent` 和纯文本 `text` 块。只有应用契约明确允许时才能接受文本 JSON。资源链接不会自动读取。
+
+## 执行限制
+
+单次操作最多 30 秒，并受父级截止时间限制。发现最多 20 页、1,000 个工具，循环游标会被拒绝。调用信封和单条工具元数据最多 64,000 字节，结果最多 2,500,000 字节；消费方可以设置更小的限制。
+
+宿主负责认证、连接生命周期、取消和清理，并在 I/O 前后重新检查访问权及当前连接／工具选择；权限撤销后丢弃结果。该能力不缓存成功结果。
+
+使用同时提供此能力的宿主与 SDK。已安装 MCP 插件不等于运行时能力已就绪。继续阅读 [REST 客户端](./rest-client)或 [Analytics](./analytics)。

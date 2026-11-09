@@ -1,0 +1,53 @@
+---
+title: 工具图片运行时
+description: 工具返回不可变图片引用，并仅为一次模型请求还原经过校验的图片像素。
+---
+
+`ToolImagesRuntimeCapability`（`platform.tool-images`）在有作用域的智能体中间件运行时中提供。宿主绑定租户、组织、用户、会话和工作区身份；工具不能指定这些字段或任意存储路径。
+
+## 保存并返回图片
+
+插件完成候选图片的业务授权与读取后，调用 `save({ buffer, mimeType, title })`。支持 `image/png`、`image/jpeg` 和 `image/webp`。宿主校验图片，保存字节并创建不可变产物版本。
+
+LangChain 工具使用 `responseFormat: 'content_and_artifact'`，返回 `[summary, presentation]`；其中 `presentation` 是 `save` 返回的 `ToolOutputPresentation`。摘要保持简短，不要把 Buffer、Base64 data URL、签名 URL 或存储路径放进工具正文、业务状态或检查点。
+
+保存成功不代表模型或人工已经查看图片，业务验收应独立判断。
+
+## 向模型提供像素
+
+在中间件内，将当前完整工具轮次投影到待发出的模型请求：
+
+```ts
+import {
+  mergeModelRequirements,
+  type AgentMiddleware,
+  type ToolImagesApi
+} from '@xpert-ai/plugin-sdk'
+
+export function imageProjection(
+  images: ToolImagesApi,
+  toolNames: readonly string[]
+): AgentMiddleware {
+  return {
+    name: 'verified-tool-images',
+    wrapModelCall: async (request, handler) => {
+      const projected = await images.prepareModelInput(request.messages, toolNames)
+      return handler({
+        ...request,
+        messages: projected.messages,
+        requirements: mergeModelRequirements(request.requirements, projected.requirements)
+      })
+    }
+  }
+}
+```
+
+在 `createMiddleware` 中从 `context.runtime.capabilities` 解析 `images`。`toolNames` 指定成功结果必须包含图片展示引用的工具。普通错误 ToolMessage 仍保持文本，供模型恢复或选择其他候选。
+
+`prepareModelInput` 校验所有者、会话、不可变版本、MIME、尺寸、字节数和 SHA-256。单次请求最多还原三张图片，并保留工具调用 ID 与摘要映射；不会再次还原历史轮次。
+
+投影产生的临时消息**仅用于发出的模型请求**，不能写回持久化消息通道或检查点。使用 `mergeModelRequirements` 合并返回的模型要求；主模型和所有回退模型都必须已声明 VISION 支持。纯文本或未知模型应明确失败，不能静默丢弃图片。
+
+持久化引用可在同一授权会话内恢复，无需依赖内存白名单。外部会话引用、撤销或被修改的图片会明确失败。采用该接口前需部署配套 ChatKit 类型、SDK 和宿主；源码验证不代表兼容包已经发布。
+
+文档图片候选见[知识库视觉资源](./knowledgebase)，长期交付见[产物运行时](./artifacts)。

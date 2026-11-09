@@ -47,7 +47,6 @@ const actor = await actorTokens.getToken({
   audience: 'plugins',
   ttlSeconds: 120,
   act: {
-    sub: 'valve_business_workbench',
     view: 'valve-object-360'
   }
 })
@@ -59,6 +58,12 @@ const object = await governedClient.getObject({
 ```
 
 Request the narrowest audience and lifetime supported by the receiving API. Use the token immediately and discard it after the call.
+
+## Bind a token API outside middleware
+
+The platform registry exposes `ActorTokenRuntimeFactoryCapability` (`platform.actor-token.factory`), not a shared token operation API. Call `createScopedApi(authorizedScope)` per request/job after restoring and authorizing identity. The factory captures host-defined `act` claims and isolates its token cache.
+
+Per-call `act` adds metadata but cannot override fixed host claims. Never accept delegated identity from a form or tool argument, or reuse a scoped API across callers. See [Runtime Capabilities](./runtime-capabilities).
 
 ## Security rules
 

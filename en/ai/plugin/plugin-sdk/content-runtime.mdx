@@ -1,0 +1,67 @@
+---
+title: Content and Editor Runtime
+description: Integrate Project documents, references, files and plugin-owned editors through authorized platform APIs.
+---
+
+Use the content APIs when a plugin needs shared Project documents, editor sessions or references to other business resources. The platform owns authorization, collaboration state and version checks; plugins own their resource relationships, editor models and format-specific operations.
+
+## Choose an API
+
+Import these capability keys and their API types from `@xpert-ai/plugin-sdk` and resolve them from the [platform registry](./runtime-capabilities).
+
+| Capability | Stable ID | Responsibility |
+| --- | --- | --- |
+| `ContentResourcesRuntimeCapability` | `platform.content.resources` | Resource authorization and authorized principal/directory resolution |
+| `ContentDocumentsRuntimeCapability` | `platform.content.documents` | Collaborative text documents, revisions, proposals and comments |
+| `ContentReferencesRuntimeCapability` | `platform.content.references` | References whose containing document and target are both authorized |
+| `ContentEditorsRuntimeCapability` | `platform.content.editors` | Editor discovery, resource routing and versioned file reads/writes |
+| `ProjectFilesRuntimeCapability` | `platform.project.files` | Project file tree and conflict-aware atomic writes |
+| `ProjectKnowledgeRuntimeCapability` | `platform.project.knowledge` | One Project-owned built-in knowledge library |
+| `ConnectorDocumentsRuntimeCapability` | `platform.connector.documents` | Credential-bound external document discovery and reading |
+
+Pass a server-authenticated `RuntimeActor`, or `OrganizationRuntimeActor` where required. A View derives this identity from its resolved host; a background job restores its authorized execution context. Never copy actor fields from action bodies or model arguments. Access is checked again on each operation.
+
+## Collaborative text documents
+
+Register a Markdown file using `ContentDocumentsApi.register`, supplying the authorized Project, source resource, file path and installed model key. The platform manages the collaborative state; the plugin must not create parallel rooms or review tables.
+
+| Operation | Use |
+| --- | --- |
+| `get`, `session`, `update` | Read document state, join a compatible editor session and persist updates |
+| `history`, `preview`, `checkpoint`, `restore` | Work with document revisions using the required sequence and epoch checks |
+| `propose`, `proposals`, `decide` | Submit and review a bounded text change |
+| `comments`, `comment`, `resolveComment` | Maintain document or block comments |
+| `hierarchy`, `createChild` | Read provider-owned page relationships and create a child with a stable request ID |
+| `reconcile` | Resolve an external file change against the expected file hash, sequence and epoch |
+
+`ContentDocumentInput.resourceId` identifies the **platform document**. A provider hook's `ContentSourceInput.sourceResourceId` identifies the **source business resource**. These identifiers are not interchangeable.
+
+An accepted collaborative update and a materialized file are separate states: `update` returns `materializationStatus` as `ready`, `pending` or `failed`. Show that state, retain conflict information and do not overwrite an external file change with an old editor snapshot.
+
+## Plugin-owned editors
+
+Register the provider in the plugin module with `@ContentEditorProvider(key)`. Its descriptor explicitly selects `text-document`, `file` or `resource`; do not infer the model from a filename or title.
+
+- A text editor supplies its typed document model for the collaboration pipeline.
+- A file editor implements `create()` and `validateFile(buffer)`. Its own service and Remote View implement workbook, slide or other format operations.
+- A resource editor opens a registered business resource through its declared View.
+
+The resource provider exposes `editor.describe` and, for versioned bytes, `editor.files.read/write`. It owns location and atomic revision checks. `ContentEditorsApi.prepare` validates or creates bytes but does not create a destination resource or grant permission to it. Use the returned revision as `expectedRevision` on writes; a conflict requires reloading and reconciling.
+
+In a Remote View, declare `workbench.content.resolve` and `workbench.navigation.open` in `clientCommands`. Resolve `{ resourceId, providerKey }`, then pass the returned `navigation` unchanged to the open command. This preserves the provider and selected editor. See the [host bridge](./remote-component-bridge).
+
+## Project files and knowledge
+
+For ordinary Project files, `ProjectFilesApi.write` takes `expectedHash`: `null` means create-only; an existing file requires its current hash. A mismatch preserves the current file. Registered collaborative documents must continue through their document/editor pipeline rather than raw file overwrites.
+
+`ProjectKnowledgeApi.ensureBinding({ actor, projectId, title })` creates or reuses the Project's library. Its request/job context must match the explicit actor. Project membership remains the authority, independent of a Spaces installation or cached knowledgebase ID.
+
+Connector document reads use the selected authorized connection. Reading an external document does not create a local copy, schedule synchronization or authorize remote write-back. An importing application owns those decisions and must explain the destination Project's sharing boundary.
+
+## Assistant entry authorization
+
+Use `ViewMiddlewareRuntimeCapability.resolve` when a View needs middleware configuration and a scoped runtime. Use `AssistantMiddlewareAccessRuntimeCapability.assertAccess` for an entry that only needs access to the exact installed middleware.
+
+Standalone Assistant scope follows published Assistant access. Project scope follows current membership and the requested Assistant binding, with no fallback to standalone access after a denial. Resource operations retain their own ACLs. A feature flag or another provider advertising the same feature is not an authorization grant.
+
+Continue with [Workspace Files](./workspace-files), [Artifacts](./artifacts) and [Project SDK integration](/en/ai/projects/plugin-apps/sdk-integration).

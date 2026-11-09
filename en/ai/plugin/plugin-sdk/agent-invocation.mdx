@@ -1,0 +1,57 @@
+---
+title: Agent Invocation Runtime
+description: Invoke an authorized Agent binding and observe, respond to or cancel the same durable invocation.
+---
+
+`AgentInvocationRuntimeCapability` (`platform.agent_invocation`) exposes an `AgentInvocationApi` bound to one authorized caller/execution. Use it to delegate work through a saved Agent binding. The host owns authorization, target revisions, persistence, idempotency and execution history; the provider owns its execution mechanism.
+
+## Resolve and start
+
+Resolve the binding immediately before dispatch and pass the returned target unchanged. Use the host's tool-call or operation ID as `callId`; reuse it only for the same target and input.
+
+```ts
+import {
+  AgentInvocationRuntimeCapability,
+  type RuntimeCapabilityRegistry
+} from '@xpert-ai/plugin-sdk'
+
+export async function startBoundAgent(
+  capabilities: RuntimeCapabilityRegistry,
+  bindingId: string,
+  callId: string,
+  prompt: string
+) {
+  const api = capabilities.require(AgentInvocationRuntimeCapability)
+  if (!api.resolve) throw new Error('This host requires a pre-resolved Agent target')
+  const target = await api.resolve(bindingId)
+  return api.start({ target, callId, input: { prompt } })
+}
+```
+
+The returned snapshot may still be running. A start receipt is not a completed result. Tool arguments must not supply caller identity, arbitrary runner configuration or credentials. The host rechecks target access, revision and provider provenance.
+
+## Observe and interact
+
+| Method | Meaning |
+| --- | --- |
+| `inspect(id)` | Refresh the existing invocation; never relaunch it |
+| `cancel(id)` | Request supported cancellation; inspect subsequent state for confirmation |
+| `respond(id, interactionId, response)` | Answer the exact current interaction using the provider's response schema |
+| `awaitResult?(id, options)` | Observe within a bounded wait; the returned snapshot may still be running |
+| `waitForTasks?(request, options)` | Wait for dependencies within a bounded window where supported |
+
+Feature-detect optional methods. In background execution, retain the invocation ID and observe the same work later. A cancelling or unknown state does not prove that the process stopped, and a successful execution does not prove requested output files were exported or accepted by a reviewer.
+
+## Use outside Agent middleware
+
+The platform registry exposes `AgentRuntimeFactoryCapability` (`platform.agent_invocation.factory`). Trusted jobs or View operations can call `createScopedApi(authorizedScope)` after restoring and authorizing their identity. Create a new API per caller/execution and do not cache it in a singleton.
+
+The factory and invocation keys intentionally differ. Checking the scoped operation key in the platform registry is not a check for factory availability. See [Runtime Capabilities](./runtime-capabilities).
+
+## Implement an execution provider
+
+Implement `IAgentRuntimeStrategy`, register it with `@AgentRuntimeStrategy(key)` and include the provider in the plugin module. Declare recovery (`checkpoint`, `session` or `none`), interaction, cancellation and background support accurately.
+
+Persist the provider receipt through `context.checkpoint` before waiting on external work. Reattachment must recover the original session or operation; it must not resend a prompt whose execution is uncertain. Session recovery alone does not guarantee survival of a worker crash.
+
+Keep graph-specific adapters in the host. Providers must not call the host Task facade back from their own executor or dispatch platform CQRS classes across the plugin boundary. For Project task workflows, use the [Project SDK integration guide](/en/ai/projects/plugin-apps/sdk-integration).
