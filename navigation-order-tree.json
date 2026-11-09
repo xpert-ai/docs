@@ -505,6 +505,7 @@
             {
               "slug": "semantic-analysis",
               "pages": [
+                "modeling-to-business-assistant",
                 "mdx",
                 "mdx-introduction",
                 "moving-average",

@@ -1,0 +1,219 @@
+---
+title: From Semantic Modeling to a Business Assistant
+description: Set up organization assistants, publish a procurement model, configure a business assistant, and verify access with ordinary member accounts.
+sidebar_position: 0
+---
+
+Build a procurement price assistant through this workflow: **prepare runtime services → refine a semantic model with an assistant → publish the model → configure a business assistant → verify access and queries as an ordinary member**.
+
+This tutorial uses a **Procurement** business domain, a **Procurement users** group, and a `ProcurementPrices` semantic model. Replace these example names and business fields with your own. You will use both Xpert and Data Xpert; select the same organization in both applications.
+
+## 1. Understand the objects you will configure
+
+| Object | Purpose | Use in this tutorial |
+| --- | --- | --- |
+| Tenant ontology runtime | Prepares platform credentials, system task templates, and the Data Xpert AI Tools plugin | A platform administrator checks it before provisioning assistants |
+| Organization semantic model modeling assistant | Understands models, looks up schema, validates, and edits drafts in the model Workbench | Helps a model author refine the procurement model |
+| Organization ontology assistant | Explores ontology entities, relationships, Actions, and their availability | Used for related business objects or controlled operations |
+| Business assistant | Combines instructions, tools, an audience, and resources for a business task | Lets procurement users look up prices |
+| Workspace | Holds authoring resources such as models, assistants, environments, and tools | Controls who can enter and maintain those configurations |
+| Business domain | Defines resource ownership and a data-access scope | Places the procurement model and assistant in the Procurement domain |
+| User group | Maintains a set of users | Selects Procurement users as the assistant's audience |
+| Accessible resources | Limits the resources a particular business assistant can call | Binds the procurement model without automatically binding other models in the domain |
+
+**Using an assistant, editing an assistant, and querying data require different permissions.** Publishing in a workspace does not make an assistant available to the whole organization. Sharing an assistant does not automatically grant access to all of its data.
+
+Price lookup alone does not require ontology entities and relationships or a separately initialized organization ontology assistant. Initialize the semantic model modeling assistant if you want AI help with modeling. If a usable model already exists, proceed to business assistant configuration.
+
+## 2. Prepare runtime services
+
+### 2.1 Check the tenant ontology runtime
+
+As a `SUPER_ADMIN`, open **System Management → Platform Initialization → Tenant Ontology Runtime** in Data Xpert.
+
+1. Select an existing tenant ontology workspace, or create a suitable one on this page.
+2. Click **Initialize ontology runtime** and wait for completion.
+3. Check the runtime credential status and the **Data Xpert AI Tools** plugin status separately.
+4. If the plugin reports **Xpert restart required**, ask the operator to restart the Xpert API instances using the deployment's procedure, then refresh until the plugin is ready.
+
+A saved runtime credential confirms only the credential step. Initialization is incomplete while the plugin is unavailable, waiting to load, or waiting for a restart.
+
+This runtime connects Data Xpert to Xpert and loads tools. It does not create a Python or Shell sandbox for every user or grant business data access. A business assistant also checks its own workspace runtime credential. If the creation page reports missing prerequisites, follow its link to configure the relevant workspace.
+
+### 2.2 Prepare a shared workspace for organization assistants
+
+Organization built-in assistants require an **organization-shared workspace in the current organization that the provisioning user can write to**.
+
+1. In Xpert, open the workspace menu and create or select a dedicated workspace, such as **Organization assistants**.
+2. Open **Settings → General → Workspace access**.
+3. Enable **Organization-shared workspace** and click **Update**.
+4. Return to the Data Xpert initialization wizard and select this target workspace.
+
+Alternatively, click **Initialize Default Workspace** in the wizard. Both organization assistants can use the same shared workspace.
+
+<Note>
+Organization sharing lets organization members view and edit resources in that workspace. Published Assistant usage is authorized separately. Use a dedicated shared workspace for organization assistants; do not share a business workspace containing private resources merely to let procurement users chat.
+</Note>
+
+### 2.3 Initialize the organization semantic model modeling assistant
+
+As a `SUPER_ADMIN`, open **Current Organization Semantic Model Modeling Assistant**:
+
+1. **Choose Workspace**: select the organization-shared workspace and click **Next**.
+2. **Create Environment**: confirm the environment name, such as **Semantic Model Workbench**. Keep the variable definitions supplied by the wizard; do not insert an administrator's personal token as a fixed credential for all users.
+3. **Import Xpert DSL**: turn on **Enable assistant binding**, select an available Copilot model from the current organization, and choose the **Semantic model modeling assistant** template.
+4. Review the Xpert name and release notes, then click **Start provisioning**.
+5. Wait for the success message. Confirm that the status is **Configured** and the current workspace matches your selection.
+
+Provisioning creates or updates the assistant and updates the current organization's binding. If the old workspace is no longer selectable, select an eligible shared workspace and initialize again. Changing the dropdown alone does not activate the new binding.
+
+### 2.4 Initialize the ontology assistant when needed
+
+Open **Current Organization Ontology Assistant**, select the same shared workspace, and complete **Create Environment → Create MCP Toolset → Import Xpert DSL**. Choose the ontology assistant template and an available model, enable the binding, and start provisioning.
+
+The MCP toolset connects to Data Xpert's ontology capabilities. Keep the connection parameters supplied by your deployment. If the MCP URL is missing, an administrator must fix the service configuration before retrying.
+
+Use this assistant in a resource detail page or ontology Workbench for questions such as “Which suppliers are related to this purchase order?” or “Which Actions are available for this resource?” Executing an Action still requires its permissions, policies, and approvals. Editing an ontology definition draft has separate management requirements; opening the assistant does not grant ontology editing rights.
+
+**Checkpoint:** The required plugin is ready, the organization assistant binding is enabled, and the model Workbench can open its assistant. Individual members do not need to initialize separate organization assistants.
+
+## 3. Configure the business domain, group, and member permissions
+
+Decide who maintains resources and who consumes them before granting access.
+
+1. In Xpert, open **Settings → User Groups**, create **Procurement users**, and add the intended users. A user group is a set of people; it does not have to match a company department.
+2. In Data Xpert, open **Governance → Business Domains**, select **Procurement**, and grant this group **Data consumer** (`consumer`) under **Members & access**. If the domain does not exist, a user with business-area management permission must create it.
+3. Give model authors authoring access to the model workspace and the domain's **Data publisher** (`publisher`) role. Use **Domain administrator** (`domain_admin`) for people who manage grants within that domain.
+4. Check members' platform feature permissions. Domain roles do not grant query or modeling features automatically, and do not replace data source binding or credential checks.
+
+| Domain role | Allows | Does not automatically grant |
+| --- | --- | --- |
+| Data consumer `consumer` | Consumption of published domain resources | Authoring workspace membership or model editing |
+| Data publisher `publisher` | Consumption and publication when the user also has authoring access | Management of domain grants |
+| Domain administrator `domain_admin` | Domain grant management and domain publication capability | Changes to organization groups, platform roles, or the domain hierarchy |
+
+`BUSINESS_AREA_MANAGE` is a platform permission for domain administration. Do not use it as the routine way to let procurement users look up prices. Parent-child domain relationships organize resources; grants do not inherit from a parent to its children. Personal grants, group grants, and platform permissions can coexist, so check other sources after revoking one grant.
+
+<Note>
+A Procurement domain consumer can consume eligible published resources throughout that domain, not just this tutorial's model. Separate domains when their models require different data audiences. The assistant's resource list limits that assistant; it does not revoke data permissions the user already has through other entry points.
+</Note>
+
+## 4. Refine and publish the semantic model
+
+### 4.1 Prepare a queryable model
+
+In Data Xpert, open the target **AI Workspace → Data Intelligence → Semantic Models**. If you do not have a model, follow the [Analytics Quick Start](../../analytics/quick-start) to bind a data source and configure a model, dimensions, and measures.
+
+This example requires a model that supports price lookup by material or drawing number. Define the lookup key, price field, currency, tax treatment, and selection rules when a material has multiple prices. Do not sum unit prices as a price-lookup result.
+
+### 4.2 Use the modeling assistant in the Workbench
+
+1. Open `ProcurementPrices` and wait for the draft to show **Synchronized**.
+2. Open the assistant panel on the right and select the relevant cube, dimension, or measure.
+3. Inspect the structure before requesting edits. For example:
+
+> Check the material dimension, price measure, and relationships in the current model. List any issues that affect price lookup. Do not edit or publish yet.
+
+After reviewing the proposed approach, continue with:
+
+> Apply the agreed changes to the current model draft. Explain which objects changed and report the validation results. Do not publish.
+
+4. Review the changes and quality messages, then wait for the draft to synchronize again.
+5. Run model validation and check a query against a known material.
+
+The Workbench assistant uses the current model context. Hosting it in a shared workspace does not give it editing rights to every user's models. SQL and XMLA models have different editing boundaries; use metadata refresh and source-system configuration for remote XMLA technical bindings.
+
+### 4.3 Publish to the correct business domain
+
+Assign the model to **Procurement**, pass validation, and click **Publish**. Confirm that a published version exists. Business consumption uses the published model; later draft changes require another publication before consumers use them.
+
+Verify a known result in the query lab. A sample such as `SELECT 1 AS value` does not mean that the system has generated a query for your business model. Write a query, use a template, or ask the assistant to help generate SQL / MDX appropriate for the model, then run and verify it.
+
+**Checkpoint:** The model is published in Procurement, and a known material's price, currency, and selection conditions match business records.
+
+## 5. Create the procurement price business assistant
+
+In Data Xpert, open **AI Workspaces → Target workspace → Assistant Agents**. This workspace holds the business assistant's configuration; it can differ from the shared workspace used by the organization modeling assistant.
+
+Use an account with business assistant management permission, write access to the target workspace, and publication permission in the target business domain.
+
+Click **Create Business Assistant** and select **Business template**. To update an existing assistant, use **… → Edit** on its list row. This tutorial follows the business template flow; **Create new** and **Bind existing** are alternative creation methods.
+
+### 5.1 Enter basic information
+
+| Field | Example or action |
+| --- | --- |
+| Name | Procurement price assistant |
+| Agent code | `procurement_price_assistant`, distinct from existing codes |
+| Business scope | Select **Team** |
+| Business area | Select **Procurement**, the model's domain |
+| Show in menu | Enable it to provide an entry for authorized users |
+| Description | Look up material prices with currency, tax treatment, and applicability conditions |
+
+**Team** determines the assistant's business display scope; it does not open access to the whole organization. Configure the audience under **Resources & access**. Hiding a menu entry also does not revoke usage permission.
+
+### 5.2 Configure capabilities
+
+1. Open **Capabilities**.
+2. Choose the plugin template **Business assistant with data-xpert tools**.
+3. Select an available environment prepared for this assistant in the current workspace. Its name may be **Ontology Runtime**, **Semantic Model Workbench**, or a custom name. The name itself does not confer data access.
+4. For **MCP Instance**, select **Auto-create default MCP toolset**, or an existing compatible instance prepared by your administrator.
+5. Where business instructions are editable, define the lookup scope and rules. For example:
+
+> Use the authorized procurement model to look up material prices. Return the price, currency, tax treatment, and applicability conditions. When multiple records match, explain the differences and ask for more conditions instead of summing unit prices. If authorized data is unavailable, explain why and do not invent a price.
+
+The template supplies tools, and instructions guide the response. Resource and caller permissions still control actual data access.
+
+### 5.3 Select the audience and resources
+
+Open **Resources & access**:
+
+1. Select **Procurement users** under **Allowed user groups**. Confirm that the group is selected; a visible candidate group is not necessarily an authorized group.
+2. Under **Accessible resources**, select the resource for `ProcurementPrices`. Some lists show `datax-semantic-model-<model ID>`; check the model ID before selecting it.
+3. Confirm the selected count and include only resources needed for the task.
+
+The business assistant and its bound semantic models must belong to the same business domain. Selecting a domain does not automatically bind every model in it.
+
+When groups are selected, these Data Xpert-managed business assistants restrict their audience to those groups. Members must still meet domain and resource access requirements. Do not leave groups empty to mean “nobody can use this”; existing domain or sharing rules may allow access when no group is specified.
+
+### 5.4 Check and publish
+
+1. Click **Save draft**. Saving a draft is not publication.
+2. Click **Review and publish** and review readiness, template, extension capability, and resource checks.
+3. Resolve failures and click **Check again**.
+4. Confirm the business scope, resource count, and release notes, then publish. For an existing assistant, use **Publish changes**.
+5. Wait for the creation and publication success message. Confirm that the list shows **Published** and the menu is enabled.
+
+## 6. Verify with ordinary member accounts
+
+Use test accounts and known sample data to verify both allowed and denied cases. An administrator seeing the entry, or an assistant answering “hello,” does not prove that ordinary members have the correct query access.
+
+| Scenario | Expected result |
+| --- | --- |
+| Procurement group member with domain consumption and required query permissions | Can open the assistant and query its bound, published model |
+| Organization member outside every selected group | Should not receive usage access; copying the assistant's direct link must not bypass the group restriction |
+| Selected group member without required domain or data access | Cannot successfully query restricted data |
+| User can query models A and B, but the assistant binds only A | This assistant uses only A; the user's existing access to B elsewhere is unchanged |
+| Test member removed from all selected groups, then making a new request | Cannot continue using the assistant through that group authorization |
+| User can chat but lacks authoring workspace access | Does not gain assistant or model editing rights |
+
+As an authorized member, open **Procurement price assistant** from the menu and ask:
+
+> Look up the procurement price of material 123456. Include the currency, tax treatment, and applicability conditions. If multiple records match, list their differences first.
+
+Check that the result comes from the intended model and matches known business records. If the assistant only describes its capabilities, run an actual query before marking the workflow successful. Repeat the relevant checks after changing groups, model ownership, or bound resources.
+
+## 7. Troubleshooting
+
+| Symptom | What to check |
+| --- | --- |
+| Initialization reports `Access denied to workspace` | Check the current organization, workspace ownership, archive status, and the provisioning user's write access. Organization built-ins additionally require an organization-shared workspace |
+| Credentials are initialized but the plugin is unavailable | Check installation and runtime loading separately. For an API URL error, configure a Data Xpert API URL reachable from the Xpert API service, then retry |
+| The plugin requires a restart | Have the operator restart the Xpert API instances and refresh until ready; users do not need to initialize individually |
+| The model assistant reports a missing `ChatKit client secret` | Confirm the current organization's binding is enabled and its workspace is accessible, then inspect the chat-session creation error. Do not ask users to enter an administrator's key |
+| The business assistant is missing | Check the organization, publication state, menu switch, selected-group membership, and business domain access |
+| Chat works but queries fail | Check bound resources, the published model version, matching domains, caller query permissions, data source binding, and connection status |
+| A former group member can still query procurement data | Distinguish use of this assistant from data queries elsewhere. Check other groups, personal grants, and platform management permissions |
+| An update still uses old configuration | Confirm changes were published; for organization assistants, check the active binding too. An image update or saved draft alone does not prove that configuration is active |
+
+Continue with the [Semantic Modeling Workspace](../../analytics/semantic-model/semantic-modeling-workspace), [Semantic Model Assistant](../../analytics/semantic-model/ai-assistant), [Query Lab](../../analytics/semantic-model/query-lab), or [Ontology Studio](../../ontology/ontology-studio).
