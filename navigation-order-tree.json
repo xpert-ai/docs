@@ -172,6 +172,24 @@
               ]
             },
             {
+              "slug": "middleware",
+              "pages": [
+                "index",
+                "custom",
+                "built-in/index",
+                "built-in/browser-automation",
+                "built-in/ralph-loop",
+                "built-in/human-in-the-loop",
+                "built-in/sensitive-filter",
+                "built-in/agent-behavior-monitor",
+                "mcp-server/index"
+              ]
+            },
+            {
+              "slug": "workflow",
+              "pages": []
+            },
+            {
               "slug": "ai-assistant",
               "pages": [
                 "configure-ai-provider",
@@ -269,6 +287,39 @@
           "groups": []
         },
         {
+          "slug": "knowledge",
+          "includeTabs": [
+            {
+              "slug": "knowledge-base",
+              "group": "knowledge-base"
+            }
+          ],
+          "groups": [
+            {
+              "slug": "overview",
+              "pages": [
+                "index"
+              ]
+            },
+            {
+              "slug": "knowledge-base",
+              "pages": []
+            },
+            {
+              "slug": "spaces",
+              "pages": [
+                "index",
+                "quickstart",
+                "organizing-content",
+                "editing-and-collaboration",
+                "assistant-writing",
+                "document-import",
+                "search-and-reuse"
+              ]
+            }
+          ]
+        },
+        {
           "slug": "knowledge-base",
           "groups": []
         },
@@ -277,31 +328,8 @@
           "groups": []
         },
         {
-          "slug": "workflow",
-          "groups": []
-        },
-        {
           "slug": "ai-assistant",
           "groups": []
-        },
-        {
-          "slug": "middleware",
-          "groups": [
-            {
-              "slug": "__default__",
-              "pages": []
-            },
-            {
-              "slug": "built-in",
-              "pages": []
-            },
-            {
-              "slug": "mcp-server",
-              "pages": [
-                "index"
-              ]
-            }
-          ]
         },
         {
           "slug": "plugin",

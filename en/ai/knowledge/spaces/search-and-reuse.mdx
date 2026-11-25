@@ -1,0 +1,30 @@
+---
+title: "Search and Reuse Knowledge"
+description: "Distinguish list search from text retrieval, enable project knowledge and verify indexing and citations."
+---
+
+Spaces list search finds content within the current list. Answering questions from document text requires indexing and retrieval through the project knowledge base.
+
+## Prepare project knowledge
+
+A project administrator enables its built-in knowledge base. The project reuses one binding, and connected Assistants work within the authorized project scope. Project knowledge access follows current membership.
+
+Text is saved to project files before indexing begins. Default keyword retrieval does not require an embedding model; other retrieval modes depend on configuration. Creating a page or uploading a file does not mean indexing is complete.
+
+## Check processing
+
+| State | Next step |
+| --- | --- |
+| Pending / Processing | Wait; new content may not appear in results yet |
+| Ready | Test a concrete fact from the document and inspect the source |
+| Failed | Inspect the error, fix it and retry; saved files remain available |
+
+For example, add explicit delivery requirements to the manual. Save it, wait for indexing, then ask: “What delivery checks are required before project startup?” Open the returned citations and verify that the answer matches the current version.
+
+## Access and content changes
+
+Retrieval checks current resource access and versions. Invalid, removed or index-inconsistent content is not returned as valid evidence. Recent edits may take time to appear; indexing failure does not undo a saved file.
+
+Project archival and membership changes still follow project rules. If a page opens but recent text cannot be found, check saving and indexing. If access is denied, check project membership and the Assistant connection.
+
+For retrieval strategies, filtering and validation, see [Knowledge bases](../../knowledge-base/index), [Intelligent filtering](../../knowledge-base/intelligent-filtering) and [Recall testing](../../knowledge-base/recall-test). For browsing and questioning existing libraries, see [Knowledgebase Workbench](../../knowledge-base/knowledge-workbench).

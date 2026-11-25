@@ -65,7 +65,7 @@ LLM具有支持构建工作流程和智能体的增强功能。这些包括结�
 
 ![Routing](/public/img/ai/workflow/effective-agents-routing.webp)
 
-在 Xpert AI 平台上实现路由工作流，要使用 [**条件分支**](/docs/ai/workflow/if-else) 节点实现，添加多个判断条件并为条件添加后续节点。
+在 Xpert AI 平台上实现路由工作流，要使用 [**条件分支**](/zh-Hans/ai/agent/workflow/logical-branch-routing) 节点实现，添加多个判断条件并为条件添加后续节点。
 
 ![Routing agents](/public/img/ai/workflow/xpert-routing.png)
 
@@ -81,7 +81,7 @@ LLM具有支持构建工作流程和智能体的增强功能。这些包括结�
 
 ![Orchestrator-Worker](/public/img/ai/workflow/effective-agents-orchestrator-worker.webp)
 
-在 Xpert AI 平台上实现协调者-工作者智能体工作流，可以使用 [**迭代**](/docs/ai/workflow/iterating) 逻辑节点来实现。
+在 Xpert AI 平台上实现协调者-工作者智能体工作流，可以使用 [**迭代**](/zh-Hans/ai/agent/workflow/iteration) 逻辑节点来实现。
 迭代节点可以对一个数组的每个元素调用子智能体工作流进行处理，可以按顺序执行也可以并发执行（可以设定限量）每个子处理。当所有元素都处理完成后将结果数组返回，并执行后续节点。
 
 ![Orchestrator-Worker agents](/public/img/ai/workflow/xpert-orchestrator-worker.png)
@@ -98,7 +98,7 @@ LLM具有支持构建工作流程和智能体的增强功能。这些包括结�
 
 ![Evaluator-optimizer](/public/img/ai/workflow/effective-agents-evaluator-optimizer.webp)
 
-在 Xpert AI 平台上实现评估优化器智能体工作流，可以使用智能体的 [结构化输出](/docs/ai/workflow/agent#结构化输出) 加上 [路由](/docs/ai/workflow/if-else) 判断实现。
+在 Xpert AI 平台上实现评估优化器智能体工作流，可以使用智能体的 [结构化输出](/zh-Hans/ai/agent/workflow/agent#结构化输出) 加上 [路由](/zh-Hans/ai/agent/workflow/logical-branch-routing) 判断实现。
 
 ![Evaluator-optimizer](/public/img/ai/workflow/xpert-evaluator-optimizer.png)
 

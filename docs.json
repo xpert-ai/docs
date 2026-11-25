@@ -276,6 +276,56 @@
                     ]
                   },
                   {
+                    "group": "Agent Middleware",
+                    "pages": [
+                      "en/ai/agent/middleware/index",
+                      "en/ai/agent/middleware/custom",
+                      "en/ai/agent/middleware/built-in/index",
+                      "en/ai/agent/middleware/built-in/browser-automation",
+                      "en/ai/agent/middleware/built-in/ralph-loop",
+                      "en/ai/agent/middleware/built-in/human-in-the-loop",
+                      "en/ai/agent/middleware/built-in/sensitive-filter",
+                      "en/ai/agent/middleware/built-in/agent-behavior-monitor",
+                      "en/ai/agent/middleware/mcp-server/index"
+                    ]
+                  },
+                  {
+                    "group": "Workflow",
+                    "pages": [
+                      "en/ai/agent/workflow/index",
+                      "en/ai/agent/workflow/agent",
+                      "en/ai/agent/workflow/external",
+                      "en/ai/agent/workflow/variables",
+                      "en/ai/agent/workflow/error-handling",
+                      "en/ai/agent/workflow/terminal",
+                      "en/ai/agent/workflow/trigger",
+                      "en/ai/agent/workflow/dingtalk-trigger",
+                      "en/ai/agent/workflow/if-else",
+                      "en/ai/agent/workflow/answer",
+                      "en/ai/agent/workflow/assigner",
+                      "en/ai/agent/workflow/subflow",
+                      "en/ai/agent/workflow/iterating",
+                      "en/ai/agent/workflow/list-operator",
+                      "en/ai/agent/workflow/variable-aggregator",
+                      "en/ai/agent/workflow/knowledge",
+                      "en/ai/agent/workflow/http",
+                      "en/ai/agent/workflow/note",
+                      "en/ai/agent/workflow/code",
+                      "en/ai/agent/workflow/template",
+                      "en/ai/agent/workflow/classifier",
+                      "en/ai/agent/workflow/toolset",
+                      "en/ai/agent/workflow/tool",
+                      "en/ai/agent/workflow/agent-workflow",
+                      "en/ai/agent/workflow/task",
+                      "en/ai/agent/workflow/source",
+                      "en/ai/agent/workflow/processor",
+                      "en/ai/agent/workflow/chunker",
+                      "en/ai/agent/workflow/understanding",
+                      "en/ai/agent/workflow/knowledgebase",
+                      "en/ai/agent/workflow/middleware"
+                    ]
+                  },
+                  {
                     "group": "AI Assistant",
                     "pages": [
                       "en/ai/agent/ai-assistant/command",
@@ -402,10 +452,16 @@
                 ]
               },
               {
-                "tab": "Knowledge Base",
+                "tab": "Knowledge",
                 "groups": [
                   {
-                    "group": "Default",
+                    "group": "Overview",
+                    "pages": [
+                      "en/ai/knowledge/overview/index"
+                    ]
+                  },
+                  {
+                    "group": "Knowledge Base",
                     "pages": [
                       "en/ai/knowledge-base/index",
                       "en/ai/knowledge-base/maintain-documents",
@@ -416,88 +472,30 @@
                       "en/ai/knowledge-base/connect-external-knowledge-base",
                       "en/ai/knowledge-base/recall-test",
                       "en/ai/knowledge-base/ways-to-use-knowledge-base",
-                      "en/ai/knowledge-base/knowledge-workbench"
+                      "en/ai/knowledge-base/knowledge-workbench",
+                      {
+                        "group": "Create Knowledge Base Via Pipeline",
+                        "pages": [
+                          "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline",
+                          "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-2-pipeline-orchestration",
+                          "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-3-publish-pipeline",
+                          "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-4-upload-files",
+                          "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-5-manage-use-knowledge-base",
+                          "en/ai/knowledge-base/create-knowledge-base-via-pipeline/data-source-authorization"
+                        ]
+                      }
                     ]
                   },
                   {
-                    "group": "Create Knowledge Base Via Pipeline",
+                    "group": "Spaces",
                     "pages": [
-                      "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline",
-                      "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-2-pipeline-orchestration",
-                      "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-3-publish-pipeline",
-                      "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-4-upload-files",
-                      "en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-5-manage-use-knowledge-base",
-                      "en/ai/knowledge-base/create-knowledge-base-via-pipeline/data-source-authorization"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Workflow",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/ai/workflow/index",
-                      "en/ai/workflow/agent",
-                      "en/ai/workflow/external",
-                      "en/ai/workflow/variables",
-                      "en/ai/workflow/error-handling",
-                      "en/ai/workflow/terminal",
-                      "en/ai/workflow/trigger",
-                      "en/ai/workflow/dingtalk-trigger",
-                      "en/ai/workflow/if-else",
-                      "en/ai/workflow/answer",
-                      "en/ai/workflow/assigner",
-                      "en/ai/workflow/subflow",
-                      "en/ai/workflow/iterating",
-                      "en/ai/workflow/list-operator",
-                      "en/ai/workflow/variable-aggregator",
-                      "en/ai/workflow/knowledge",
-                      "en/ai/workflow/http",
-                      "en/ai/workflow/note",
-                      "en/ai/workflow/code",
-                      "en/ai/workflow/template",
-                      "en/ai/workflow/classifier",
-                      "en/ai/workflow/toolset",
-                      "en/ai/workflow/tool",
-                      "en/ai/workflow/agent-workflow",
-                      "en/ai/workflow/task",
-                      "en/ai/workflow/source",
-                      "en/ai/workflow/processor",
-                      "en/ai/workflow/chunker",
-                      "en/ai/workflow/understanding",
-                      "en/ai/workflow/knowledgebase",
-                      "en/ai/workflow/middleware"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "Agent Middleware",
-                "groups": [
-                  {
-                    "group": "Default",
-                    "pages": [
-                      "en/ai/middleware/index",
-                      "en/ai/middleware/custom"
-                    ]
-                  },
-                  {
-                    "group": "Built In",
-                    "pages": [
-                      "en/ai/middleware/built-in/index",
-                      "en/ai/middleware/built-in/browser-automation",
-                      "en/ai/middleware/built-in/sensitive-filter",
-                      "en/ai/middleware/built-in/agent-behavior-monitor",
-                      "en/ai/middleware/built-in/ralph-loop",
-                      "en/ai/middleware/built-in/human-in-the-loop"
-                    ]
-                  },
-                  {
-                    "group": "MCP Server",
-                    "pages": [
-                      "en/ai/middleware/mcp-server/index"
+                      "en/ai/knowledge/spaces/index",
+                      "en/ai/knowledge/spaces/quickstart",
+                      "en/ai/knowledge/spaces/organizing-content",
+                      "en/ai/knowledge/spaces/editing-and-collaboration",
+                      "en/ai/knowledge/spaces/assistant-writing",
+                      "en/ai/knowledge/spaces/document-import",
+                      "en/ai/knowledge/spaces/search-and-reuse"
                     ]
                   }
                 ]
@@ -1237,6 +1235,58 @@
                     ]
                   },
                   {
+                    "group": "智能体中间件",
+                    "pages": [
+                      "zh-Hans/ai/agent/middleware/index",
+                      "zh-Hans/ai/agent/middleware/custom",
+                      "zh-Hans/ai/agent/middleware/built-in/index",
+                      "zh-Hans/ai/agent/middleware/built-in/browser-automation",
+                      "zh-Hans/ai/agent/middleware/built-in/ralph-loop",
+                      "zh-Hans/ai/agent/middleware/built-in/human-in-the-loop",
+                      "zh-Hans/ai/agent/middleware/built-in/sensitive-filter",
+                      "zh-Hans/ai/agent/middleware/built-in/agent-behavior-monitor",
+                      "zh-Hans/ai/agent/middleware/mcp-server/index"
+                    ]
+                  },
+                  {
+                    "group": "工作流",
+                    "pages": [
+                      "zh-Hans/ai/agent/workflow/agent",
+                      "zh-Hans/ai/agent/workflow/external-agent",
+                      "zh-Hans/ai/agent/workflow/session-variables",
+                      "zh-Hans/ai/agent/workflow/error-handling",
+                      "zh-Hans/ai/agent/workflow/execution-endpoint",
+                      "zh-Hans/ai/agent/workflow/trigger",
+                      "zh-Hans/ai/agent/workflow/answer",
+                      "zh-Hans/ai/agent/workflow/sub-process",
+                      "zh-Hans/ai/agent/workflow/variable-assignment",
+                      "zh-Hans/ai/agent/workflow/iteration",
+                      "zh-Hans/ai/agent/workflow/list-operator",
+                      "zh-Hans/ai/agent/workflow/variable-aggregation",
+                      "zh-Hans/ai/agent/workflow/knowledge-retrieval",
+                      "zh-Hans/ai/agent/workflow/comment",
+                      "zh-Hans/ai/agent/workflow/http-request",
+                      "zh-Hans/ai/agent/workflow/code-execution",
+                      "zh-Hans/ai/agent/workflow/template-conversion",
+                      "zh-Hans/ai/agent/workflow/question-classifier",
+                      "zh-Hans/ai/agent/workflow/toolset",
+                      "zh-Hans/ai/agent/workflow/tool-invocation",
+                      "zh-Hans/ai/agent/workflow/agent-workflow",
+                      "zh-Hans/ai/agent/workflow/task-transfer",
+                      "zh-Hans/ai/agent/workflow/document-source",
+                      "zh-Hans/ai/agent/workflow/document-converter",
+                      "zh-Hans/ai/agent/workflow/document-chunker",
+                      "zh-Hans/ai/agent/workflow/document-image-understanding",
+                      "zh-Hans/ai/agent/workflow/document-knowledge-base",
+                      "zh-Hans/ai/agent/workflow/database-custom-sql",
+                      "zh-Hans/ai/agent/workflow/database-create",
+                      "zh-Hans/ai/agent/workflow/database-update",
+                      "zh-Hans/ai/agent/workflow/database-delete",
+                      "zh-Hans/ai/agent/workflow/agent-middleware",
+                      "zh-Hans/ai/agent/workflow/logical-branch-routing"
+                    ]
+                  },
+                  {
                     "group": "AI 助手",
                     "pages": [
                       "zh-Hans/ai/agent/ai-assistant/configure-ai-provider",
@@ -1361,10 +1411,16 @@
                 ]
               },
               {
-                "tab": "知识库",
+                "tab": "知识",
                 "groups": [
                   {
-                    "group": "默认",
+                    "group": "概览",
+                    "pages": [
+                      "zh-Hans/ai/knowledge/overview/index"
+                    ]
+                  },
+                  {
+                    "group": "知识库",
                     "pages": [
                       "zh-Hans/ai/knowledge-base/index",
                       "zh-Hans/ai/knowledge-base/maintain-documents",
@@ -1375,90 +1431,30 @@
                       "zh-Hans/ai/knowledge-base/connect-external-knowledge-base",
                       "zh-Hans/ai/knowledge-base/recall-test",
                       "zh-Hans/ai/knowledge-base/ways-to-use-knowledge-base",
-                      "zh-Hans/ai/knowledge-base/knowledge-workbench"
+                      "zh-Hans/ai/knowledge-base/knowledge-workbench",
+                      {
+                        "group": "通过流水线创建知识库",
+                        "pages": [
+                          "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline",
+                          "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-2-pipeline-orchestration",
+                          "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-3-publish-pipeline",
+                          "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-4-upload-files",
+                          "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-5-manage-use-knowledge-base",
+                          "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/data-source-authorization"
+                        ]
+                      }
                     ]
                   },
                   {
-                    "group": "通过流水线创建知识库",
+                    "group": "协作空间 Spaces",
                     "pages": [
-                      "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1-create-pipeline",
-                      "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-2-pipeline-orchestration",
-                      "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-3-publish-pipeline",
-                      "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-4-upload-files",
-                      "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/step-5-manage-use-knowledge-base",
-                      "zh-Hans/ai/knowledge-base/create-knowledge-base-via-pipeline/data-source-authorization"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "工作流",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/ai/workflow/agent",
-                      "zh-Hans/ai/workflow/external-agent",
-                      "zh-Hans/ai/workflow/session-variables",
-                      "zh-Hans/ai/workflow/error-handling",
-                      "zh-Hans/ai/workflow/execution-endpoint",
-                      "zh-Hans/ai/workflow/trigger",
-                      "zh-Hans/ai/workflow/answer",
-                      "zh-Hans/ai/workflow/sub-process",
-                      "zh-Hans/ai/workflow/variable-assignment",
-                      "zh-Hans/ai/workflow/iteration",
-                      "zh-Hans/ai/workflow/list-operator",
-                      "zh-Hans/ai/workflow/variable-aggregation",
-                      "zh-Hans/ai/workflow/knowledge-retrieval",
-                      "zh-Hans/ai/workflow/comment",
-                      "zh-Hans/ai/workflow/http-request",
-                      "zh-Hans/ai/workflow/code-execution",
-                      "zh-Hans/ai/workflow/template-conversion",
-                      "zh-Hans/ai/workflow/question-classifier",
-                      "zh-Hans/ai/workflow/toolset",
-                      "zh-Hans/ai/workflow/tool-invocation",
-                      "zh-Hans/ai/workflow/agent-workflow",
-                      "zh-Hans/ai/workflow/task-transfer",
-                      "zh-Hans/ai/workflow/document-source",
-                      "zh-Hans/ai/workflow/document-converter",
-                      "zh-Hans/ai/workflow/document-chunker",
-                      "zh-Hans/ai/workflow/document-image-understanding",
-                      "zh-Hans/ai/workflow/document-knowledge-base",
-                      "zh-Hans/ai/workflow/database-custom-sql",
-                      "zh-Hans/ai/workflow/database-create",
-                      "zh-Hans/ai/workflow/database-update",
-                      "zh-Hans/ai/workflow/database-delete",
-                      "zh-Hans/ai/workflow/agent-middleware",
-                      "zh-Hans/ai/workflow/logical-branch-routing"
-                    ]
-                  }
-                ]
-              },
-              {
-                "tab": "智能体中间件",
-                "groups": [
-                  {
-                    "group": "默认",
-                    "pages": [
-                      "zh-Hans/ai/middleware/index",
-                      "zh-Hans/ai/middleware/custom"
-                    ]
-                  },
-                  {
-                    "group": "内置",
-                    "pages": [
-                      "zh-Hans/ai/middleware/built-in/index",
-                      "zh-Hans/ai/middleware/built-in/browser-automation",
-                      "zh-Hans/ai/middleware/built-in/ralph-loop",
-                      "zh-Hans/ai/middleware/built-in/human-in-the-loop",
-                      "zh-Hans/ai/middleware/built-in/sensitive-filter",
-                      "zh-Hans/ai/middleware/built-in/agent-behavior-monitor"
-                    ]
-                  },
-                  {
-                    "group": "MCP Server",
-                    "pages": [
-                      "zh-Hans/ai/middleware/mcp-server/index"
+                      "zh-Hans/ai/knowledge/spaces/index",
+                      "zh-Hans/ai/knowledge/spaces/quickstart",
+                      "zh-Hans/ai/knowledge/spaces/organizing-content",
+                      "zh-Hans/ai/knowledge/spaces/editing-and-collaboration",
+                      "zh-Hans/ai/knowledge/spaces/assistant-writing",
+                      "zh-Hans/ai/knowledge/spaces/document-import",
+                      "zh-Hans/ai/knowledge/spaces/search-and-reuse"
                     ]
                   }
                 ]
@@ -2149,6 +2145,358 @@
     {
       "source": "/zh-Hans/ai/skill/skill-package-format",
       "destination": "/zh-Hans/ai/agent/skill/skill-package-format"
+    },
+    {
+      "source": "/en/ai/middleware/index",
+      "destination": "/en/ai/agent/middleware/index"
+    },
+    {
+      "source": "/en/ai/middleware/custom",
+      "destination": "/en/ai/agent/middleware/custom"
+    },
+    {
+      "source": "/en/ai/middleware/built-in/index",
+      "destination": "/en/ai/agent/middleware/built-in/index"
+    },
+    {
+      "source": "/en/ai/middleware/built-in/browser-automation",
+      "destination": "/en/ai/agent/middleware/built-in/browser-automation"
+    },
+    {
+      "source": "/en/ai/middleware/built-in/sensitive-filter",
+      "destination": "/en/ai/agent/middleware/built-in/sensitive-filter"
+    },
+    {
+      "source": "/en/ai/middleware/built-in/agent-behavior-monitor",
+      "destination": "/en/ai/agent/middleware/built-in/agent-behavior-monitor"
+    },
+    {
+      "source": "/en/ai/middleware/built-in/ralph-loop",
+      "destination": "/en/ai/agent/middleware/built-in/ralph-loop"
+    },
+    {
+      "source": "/en/ai/middleware/built-in/human-in-the-loop",
+      "destination": "/en/ai/agent/middleware/built-in/human-in-the-loop"
+    },
+    {
+      "source": "/en/ai/middleware/mcp-server/index",
+      "destination": "/en/ai/agent/middleware/mcp-server/index"
+    },
+    {
+      "source": "/en/ai/middleware",
+      "destination": "/en/ai/agent/middleware/index"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/index",
+      "destination": "/zh-Hans/ai/agent/middleware/index"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/custom",
+      "destination": "/zh-Hans/ai/agent/middleware/custom"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/built-in/index",
+      "destination": "/zh-Hans/ai/agent/middleware/built-in/index"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/built-in/browser-automation",
+      "destination": "/zh-Hans/ai/agent/middleware/built-in/browser-automation"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/built-in/ralph-loop",
+      "destination": "/zh-Hans/ai/agent/middleware/built-in/ralph-loop"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/built-in/human-in-the-loop",
+      "destination": "/zh-Hans/ai/agent/middleware/built-in/human-in-the-loop"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/built-in/sensitive-filter",
+      "destination": "/zh-Hans/ai/agent/middleware/built-in/sensitive-filter"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/built-in/agent-behavior-monitor",
+      "destination": "/zh-Hans/ai/agent/middleware/built-in/agent-behavior-monitor"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware/mcp-server/index",
+      "destination": "/zh-Hans/ai/agent/middleware/mcp-server/index"
+    },
+    {
+      "source": "/zh-Hans/ai/middleware",
+      "destination": "/zh-Hans/ai/agent/middleware/index"
+    },
+    {
+      "source": "/en/ai/workflow/agent",
+      "destination": "/en/ai/agent/workflow/agent"
+    },
+    {
+      "source": "/en/ai/workflow/iterating",
+      "destination": "/en/ai/agent/workflow/iterating"
+    },
+    {
+      "source": "/en/ai/workflow/http",
+      "destination": "/en/ai/agent/workflow/http"
+    },
+    {
+      "source": "/en/ai/workflow/template",
+      "destination": "/en/ai/agent/workflow/template"
+    },
+    {
+      "source": "/en/ai/workflow/knowledgebase",
+      "destination": "/en/ai/agent/workflow/knowledgebase"
+    },
+    {
+      "source": "/en/ai/workflow/variable-aggregator",
+      "destination": "/en/ai/agent/workflow/variable-aggregator"
+    },
+    {
+      "source": "/en/ai/workflow/note",
+      "destination": "/en/ai/agent/workflow/note"
+    },
+    {
+      "source": "/en/ai/workflow/tool",
+      "destination": "/en/ai/agent/workflow/tool"
+    },
+    {
+      "source": "/en/ai/workflow/assigner",
+      "destination": "/en/ai/agent/workflow/assigner"
+    },
+    {
+      "source": "/en/ai/workflow/source",
+      "destination": "/en/ai/agent/workflow/source"
+    },
+    {
+      "source": "/en/ai/workflow/knowledge",
+      "destination": "/en/ai/agent/workflow/knowledge"
+    },
+    {
+      "source": "/en/ai/workflow/trigger",
+      "destination": "/en/ai/agent/workflow/trigger"
+    },
+    {
+      "source": "/en/ai/workflow/toolset",
+      "destination": "/en/ai/agent/workflow/toolset"
+    },
+    {
+      "source": "/en/ai/workflow/middleware",
+      "destination": "/en/ai/agent/workflow/middleware"
+    },
+    {
+      "source": "/en/ai/workflow/list-operator",
+      "destination": "/en/ai/agent/workflow/list-operator"
+    },
+    {
+      "source": "/en/ai/workflow/external",
+      "destination": "/en/ai/agent/workflow/external"
+    },
+    {
+      "source": "/en/ai/workflow/answer",
+      "destination": "/en/ai/agent/workflow/answer"
+    },
+    {
+      "source": "/en/ai/workflow/classifier",
+      "destination": "/en/ai/agent/workflow/classifier"
+    },
+    {
+      "source": "/en/ai/workflow/chunker",
+      "destination": "/en/ai/agent/workflow/chunker"
+    },
+    {
+      "source": "/en/ai/workflow/terminal",
+      "destination": "/en/ai/agent/workflow/terminal"
+    },
+    {
+      "source": "/en/ai/workflow/understanding",
+      "destination": "/en/ai/agent/workflow/understanding"
+    },
+    {
+      "source": "/en/ai/workflow/index",
+      "destination": "/en/ai/agent/workflow/index"
+    },
+    {
+      "source": "/en/ai/workflow/subflow",
+      "destination": "/en/ai/agent/workflow/subflow"
+    },
+    {
+      "source": "/en/ai/workflow/task",
+      "destination": "/en/ai/agent/workflow/task"
+    },
+    {
+      "source": "/en/ai/workflow/processor",
+      "destination": "/en/ai/agent/workflow/processor"
+    },
+    {
+      "source": "/en/ai/workflow/error-handling",
+      "destination": "/en/ai/agent/workflow/error-handling"
+    },
+    {
+      "source": "/en/ai/workflow/agent-tool",
+      "destination": "/en/ai/agent/workflow/agent-tool"
+    },
+    {
+      "source": "/en/ai/workflow/if-else",
+      "destination": "/en/ai/agent/workflow/if-else"
+    },
+    {
+      "source": "/en/ai/workflow/code",
+      "destination": "/en/ai/agent/workflow/code"
+    },
+    {
+      "source": "/en/ai/workflow/dingtalk-trigger",
+      "destination": "/en/ai/agent/workflow/dingtalk-trigger"
+    },
+    {
+      "source": "/en/ai/workflow/agent-workflow",
+      "destination": "/en/ai/agent/workflow/agent-workflow"
+    },
+    {
+      "source": "/en/ai/workflow/variables",
+      "destination": "/en/ai/agent/workflow/variables"
+    },
+    {
+      "source": "/en/ai/workflow",
+      "destination": "/en/ai/agent/workflow/index"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/document-knowledge-base",
+      "destination": "/zh-Hans/ai/agent/workflow/document-knowledge-base"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/list-operator",
+      "destination": "/zh-Hans/ai/agent/workflow/list-operator"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/trigger",
+      "destination": "/zh-Hans/ai/agent/workflow/trigger"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/document-converter",
+      "destination": "/zh-Hans/ai/agent/workflow/document-converter"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/variable-assignment",
+      "destination": "/zh-Hans/ai/agent/workflow/variable-assignment"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/http-request",
+      "destination": "/zh-Hans/ai/agent/workflow/http-request"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/variable-aggregation",
+      "destination": "/zh-Hans/ai/agent/workflow/variable-aggregation"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/task-transfer",
+      "destination": "/zh-Hans/ai/agent/workflow/task-transfer"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/template-conversion",
+      "destination": "/zh-Hans/ai/agent/workflow/template-conversion"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/external-agent",
+      "destination": "/zh-Hans/ai/agent/workflow/external-agent"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/tool-invocation",
+      "destination": "/zh-Hans/ai/agent/workflow/tool-invocation"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/execution-endpoint",
+      "destination": "/zh-Hans/ai/agent/workflow/execution-endpoint"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/agent",
+      "destination": "/zh-Hans/ai/agent/workflow/agent"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/code-execution",
+      "destination": "/zh-Hans/ai/agent/workflow/code-execution"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/database-custom-sql",
+      "destination": "/zh-Hans/ai/agent/workflow/database-custom-sql"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/document-image-understanding",
+      "destination": "/zh-Hans/ai/agent/workflow/document-image-understanding"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/agent-tools",
+      "destination": "/zh-Hans/ai/agent/workflow/agent-tools"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/database-delete",
+      "destination": "/zh-Hans/ai/agent/workflow/database-delete"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/iteration",
+      "destination": "/zh-Hans/ai/agent/workflow/iteration"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/dingtalk-trigger",
+      "destination": "/zh-Hans/ai/agent/workflow/dingtalk-trigger"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/toolset",
+      "destination": "/zh-Hans/ai/agent/workflow/toolset"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/document-source",
+      "destination": "/zh-Hans/ai/agent/workflow/document-source"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/document-chunker",
+      "destination": "/zh-Hans/ai/agent/workflow/document-chunker"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/error-handling",
+      "destination": "/zh-Hans/ai/agent/workflow/error-handling"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/sub-process",
+      "destination": "/zh-Hans/ai/agent/workflow/sub-process"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/agent-workflow",
+      "destination": "/zh-Hans/ai/agent/workflow/agent-workflow"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/database-create",
+      "destination": "/zh-Hans/ai/agent/workflow/database-create"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/answer",
+      "destination": "/zh-Hans/ai/agent/workflow/answer"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/question-classifier",
+      "destination": "/zh-Hans/ai/agent/workflow/question-classifier"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/database-update",
+      "destination": "/zh-Hans/ai/agent/workflow/database-update"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/logical-branch-routing",
+      "destination": "/zh-Hans/ai/agent/workflow/logical-branch-routing"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/comment",
+      "destination": "/zh-Hans/ai/agent/workflow/comment"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/knowledge-retrieval",
+      "destination": "/zh-Hans/ai/agent/workflow/knowledge-retrieval"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/session-variables",
+      "destination": "/zh-Hans/ai/agent/workflow/session-variables"
+    },
+    {
+      "source": "/zh-Hans/ai/workflow/agent-middleware",
+      "destination": "/zh-Hans/ai/agent/workflow/agent-middleware"
     }
   ]
 }

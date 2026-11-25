@@ -64,7 +64,7 @@ Routing classifies inputs and guides them to subsequent tasks. As mentioned in t
 
 ![Routing](/public/img/ai/workflow/effective-agents-routing.webp)
 
-On the Xpert AI platform, the routing workflow can be implemented using [**conditional branches**](/docs/ai/workflow/if-else) by adding multiple conditions and assigning subsequent nodes to each condition.
+On the Xpert AI platform, the routing workflow can be implemented using [**conditional branches**](/en/ai/agent/workflow/if-else) by adding multiple conditions and assigning subsequent nodes to each condition.
 
 ![Routing agents](/public/img/ai/workflow/xpert-routing.png)
 
@@ -80,7 +80,7 @@ In the **orchestrator-worker** pattern, a coordinator breaks down tasks and dele
 
 ![Orchestrator-Worker](/public/img/ai/workflow/effective-agents-orchestrator-worker.webp)
 
-On the Xpert AI platform, you can implement the orchestrator-worker agent workflow using [**iteration**](/docs/ai/workflow/iterating) logic nodes. The iteration node can process each element of an array by calling a sub-agent workflow, executing sequentially or concurrently (with a limit set) for each sub-task. After all elements are processed, the result array is returned, and subsequent nodes are executed.
+On the Xpert AI platform, you can implement the orchestrator-worker agent workflow using [**iteration**](/en/ai/agent/workflow/iterating) logic nodes. The iteration node can process each element of an array by calling a sub-agent workflow, executing sequentially or concurrently (with a limit set) for each sub-task. After all elements are processed, the result array is returned, and subsequent nodes are executed.
 
 ![Orchestrator-Worker agents](/public/img/ai/workflow/xpert-orchestrator-worker.png)
 
@@ -96,7 +96,7 @@ In an evaluator-optimizer workflow, one large language model (LLM) generates a r
 
 ![Evaluator-optimizer](/public/img/ai/workflow/effective-agents-evaluator-optimizer.webp)
 
-On the Xpert AI platform, you can implement the evaluator-optimizer agent workflow by using the agent's [structured output](/docs/ai/workflow/agent#structured-output) along with [routing](/docs/ai/workflow/if-else) logic.
+On the Xpert AI platform, you can implement the evaluator-optimizer agent workflow by using the agent's [structured output](/en/ai/agent/workflow/agent#structured-output) along with [routing](/en/ai/agent/workflow/if-else) logic.
 
 ![Evaluator-optimizer](/public/img/ai/workflow/xpert-evaluator-optimizer.png)
 

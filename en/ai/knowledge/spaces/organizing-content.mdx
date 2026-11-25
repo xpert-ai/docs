@@ -1,0 +1,37 @@
+---
+title: "Pages, Files and Organization"
+description: "Organize project content, collect results and restore items from the trash."
+---
+
+Find material by content type, folder or last update. Recent updates describe content changes, not your personal visit history.
+
+| Entry | Content |
+| --- | --- |
+| All content | Pages, project files and collected results |
+| Pages | Pages opened by the Markdown editor |
+| Files and results | Uploaded files and collected results; editing depends on format and editor |
+| Folders | The project's file directory structure |
+| Trash | Removed content that can be restored with the appropriate access |
+
+## Create and move
+
+Start a page from a blank document or a built-in template. Uploads are saved in the current project directory and can be referenced, downloaded or opened with a matching editor. Rename and move operations preserve resource identity so references can still resolve. Conflicting target paths are rejected.
+
+**Folders and child pages describe different relationships.** Folders determine physical file location; child pages describe a logical hierarchy. Renaming or moving a parent page does not move its children. Trashing a parent does not recursively delete them. Moving a folder does move the files inside it.
+
+## Collect results
+
+Under **Add material → Artifacts**, select a published version and a collection mode:
+
+| Mode | Subsequent behavior |
+| --- | --- |
+| Add reference | Pins a version and checks both project and source access when viewed. It does not grant project members access to a private source |
+| Copy to project | Available only when the result type permits copying. Confirmation creates a project-shared copy that remains independent of later source updates or access revocation |
+
+Click a reference name to open its read-only viewer. Use **Artifact version and sharing** to select a fixed version and manage permitted sharing modes. Changing the reference version does not change an existing share link's version. Public sharing requires confirmation and remains subject to result-type policies and source permissions. See [Artifacts](../../agent/artifacts/index).
+
+## Remove, restore and export
+
+With the appropriate access, move content to the trash and restore it. References to trashed resources are unavailable; they can resolve again after restoration. Trashing an Artifact reference affects that reference, not its source or existing share links.
+
+Exported Markdown may contain resource links that require an authorized Xpert environment. A complete offline package containing all attachments and page hierarchy is not currently provided. Open downloaded files and check the text and required attachments.

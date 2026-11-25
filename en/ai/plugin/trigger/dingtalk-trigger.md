@@ -122,6 +122,6 @@ DingTalk Trigger uses `bootstrap.mode = skip`:
 ## Related features
 
 - DingTalk integration configuration: [DingTalk Integration](../integration/dingtalk-integration/)
-- Trigger node overview: [Workflow Trigger](../../workflow/trigger/)
+- Trigger node overview: [Workflow Trigger](../../agent/workflow/trigger/)
 - Trigger plugin overview: [Trigger Plugins](./)
 - Source code: [xpert-plugins / dingtalk integration](https://github.com/xpert-ai/xpert-plugins/tree/main/xpertai/integrations/dingtalk)

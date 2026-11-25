@@ -42,7 +42,7 @@ The **custom parameters** feature of the Agent allows users to define multiple p
 ## Node Properties
 
 - **Sensitive**: Sets the node as sensitive, causing the process to pause before this node is executed, awaiting manual confirmation before continuing. See [Human-in-the-Loop](/docs/ai/xpert/human-in-the-loop).
-- **End Point**: Sets the node as the endpoint, indicating the end of the process. Once this node completes execution, the flow ends and returns to the caller. See [Execution Endpoint](../terminal/).
+- **End Point**: Sets the node as the endpoint, indicating the end of the process. Once this node completes execution, the flow ends and returns to the caller. See [Execution Endpoint](./terminal/).
 - **Disable Output**: Disables the output of this Agent node to the user dialog box.
 - **Parallel Tool Invocation**: Allows the Agent node to invoke multiple tools in parallel, improving task execution efficiency (only supported by some LLMs, such as OpenAI).
 
@@ -60,4 +60,4 @@ Users can define structured output for the Agent node to return task execution r
 
 ## Write to Memory
 
-Customize the writing of the Agent node's output to memory ([session variables](/docs/ai/workflow/variables/)) for use in subsequent flow nodes.
+Customize the writing of the Agent node's output to memory ([session variables](/en/ai/agent/workflow/variables)) for use in subsequent flow nodes.

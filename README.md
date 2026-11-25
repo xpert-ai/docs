@@ -88,6 +88,41 @@ node --test scripts/test-sdk-openapi.mjs scripts/test-navigation.mjs
 
 Do not edit `api/openapi.sdk.zh-Hans.json` directly. The localization generator preserves endpoint paths, schemas and examples. Navigation uses [Mintlify OpenAPI groups](https://mintlify.com/docs/api-playground/openapi-setup) to render the method badges, parameter reference, generated code samples and API playground. A successful documentation render does not verify live API execution.
 
+## Agent Middleware documentation
+
+AI → Agent / 智能体 contains Agent Middleware / 智能体中间件 as a group after
+Skills. Its nine pages per language live under `{language}/ai/agent/middleware/`,
+with `built-in/` and `mcp-server/` subdirectories retained. Keep the group and page
+order in `navigation-order-tree.json` aligned with `docs.json` when regenerating
+navigation. The former `{language}/ai/middleware/` page routes redirect to the new
+locations; preserve these redirects and use the new paths for internal links.
+
+## Workflow documentation
+
+AI → Agent / 智能体 contains Workflow / 工作流 as a group after Agent Middleware.
+Workflow pages live under `{language}/ai/agent/workflow/`, with their existing
+filenames and hidden compatibility pages retained. Navigation follows each page's
+`sidebar_position`. Preserve the former `{language}/ai/workflow/` route redirects
+in `docs.json`, and use the new paths for internal links.
+
+## Knowledge and Spaces documentation
+
+AI → Knowledge / 知识 groups the shared overview, Knowledge Base / 知识库 and
+Spaces / 协作空间 Spaces. User guides live under `{language}/ai/knowledge/`;
+existing knowledge-base routes remain at `{language}/ai/knowledge-base/`.
+The application catalog links to Spaces here instead of maintaining another guide.
+
+`includeTabs` in `navigation-order-tree.json` imports an existing generated tab
+as a named group. Its default pages retain their URLs and its subgroups (including
+knowledge pipelines) become nested groups. Keep the order tree, display names and
+`docs.json` aligned; preview generation and apply only the affected topic tab.
+
+Keep page saving, indexing, Assistant access and project membership distinct.
+Spaces guides cover creation, organization, collaborative editing, Assistant review,
+external text-copy imports and knowledge reuse. Runtime/API details stay in Plugin
+SDK Core; planning and execution remain in Projects & Tasks. Verify deployment and
+actual editor behavior separately from documentation checks.
+
 ## Live Dashboard product documentation
 
 AI → Live Dashboard (实时看板) is a separate tab after Projects & Tasks, mirrored

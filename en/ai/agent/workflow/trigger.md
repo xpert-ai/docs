@@ -14,8 +14,8 @@ Triggers determine "who" sends input into the Digital Expert workflow and "when"
 Typical entry points include:
 
 - **Chat Trigger**: User input from the in-platform chat interface.
-- **[Lark Trigger](../plugin/trigger/lark-trigger/)**: Input from Lark message events.
-- **[Schedule Trigger](../plugin/trigger/schedule-trigger/)**: System input from Cron-based scheduled tasks.
+- **[Lark Trigger](../../plugin/trigger/lark-trigger/)**: Input from Lark message events.
+- **[Schedule Trigger](../../plugin/trigger/schedule-trigger/)**: System input from Cron-based scheduled tasks.
 
 After receiving input, triggers inject data into workflow state, and then downstream nodes (Agent, tool invocation, knowledge retrieval, etc.) continue processing.
 
@@ -42,5 +42,5 @@ A list of parameters for defining a pre-input form for the digital expert conver
 
 ## Related docs
 
-- How a Digital Expert connects to different conversation channels via triggers: [Chat Channels](../agent/chat-channels/)
-- Trigger plugin implementation details (including Lark and Schedule): [Plugin Trigger](../plugin/trigger/)
+- How a Digital Expert connects to different conversation channels via triggers: [Chat Channels](../chat-channels/)
+- Trigger plugin implementation details (including Lark and Schedule): [Plugin Trigger](../../plugin/trigger/)

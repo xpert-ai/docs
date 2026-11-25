@@ -46,7 +46,6 @@
     "indicator-management": "Indicator Management",
     "semantic-model": "Semantic Model",
     "harness": "Harness",
-    "overview": "Overview",
     "cases": "Case Studies",
     "live-dashboard": "Live Dashboard",
     "projects": "Projects & Tasks",
@@ -64,7 +63,10 @@
     "code-review": "Code Review",
     "maps": "Maps",
     "sites": "Sites",
-    "pipelines": "Pipelines"
+    "pipelines": "Pipelines",
+    "knowledge": "Knowledge",
+    "spaces": "Spaces",
+    "knowledge/overview": "Overview"
   },
   "zh-Hans": {
     "ai": "AI",
@@ -139,7 +141,6 @@
     "trigger": "触发器",
     "built-in": "内置",
     "harness": "Harness",
-    "overview": "概述",
     "cases": "案例",
     "live-dashboard": "实时看板",
     "projects": "项目与任务",
@@ -157,6 +158,9 @@
     "code-review": "代码审查 · Code Review",
     "maps": "地图 · Maps",
     "sites": "站点 · Sites",
-    "pipelines": "项目流水线"
+    "pipelines": "项目流水线",
+    "knowledge": "知识",
+    "spaces": "协作空间 Spaces",
+    "knowledge/overview": "概览"
   }
 }

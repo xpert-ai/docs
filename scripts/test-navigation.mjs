@@ -34,6 +34,29 @@ async function withFixture(pages, tabs, check) {
 
 const aiTabs = config => config.navigation.languages[0].products.find(product => product.product === 'AI').tabs;
 
+test('Knowledge imports existing library URLs and nested pipeline pages without duplicate tabs', async () => {
+  const library = 'en/ai/knowledge-base/index';
+  const pipeline = 'en/ai/knowledge-base/create-knowledge-base-via-pipeline/step-1';
+  const overview = 'en/ai/knowledge/overview/index';
+  const spaces = 'en/ai/knowledge/spaces/index';
+  await withFixture(Object.fromEntries([library, pipeline, overview, spaces].map(page => [
+    `${page}.mdx`, '---\ntitle: Guide\n---\nContent\n'
+  ])), [{ tab: 'Knowledge Base', groups: [
+    { group: 'Default', pages: [library] },
+    { group: 'Create Knowledge Base Via Pipeline', pages: [pipeline] }
+  ] }], async generate => {
+    const config = await generate();
+    const tabs = aiTabs(config);
+    assert.deepEqual(tabs.map(tab => tab.tab), ['Knowledge']);
+    const groups = tabs[0].groups;
+    assert.deepEqual(groups.map(group => group.group), ['Overview', 'Knowledge Base', 'Spaces']);
+    assert.equal(groups[1].pages[0], library);
+    assert.deepEqual(groups[1].pages[1].pages, [pipeline]);
+    assert.deepEqual(groups[2].pages, [spaces]);
+    assert.deepEqual(await generate(), config);
+  });
+});
+
 test('SDK group aliases merge once and retain manual metadata', async () => {
   const page = 'en/ai/chatkit/sdk/integration';
   await withFixture({ [`${page}.md`]: '---\ntitle: Integration\n---\nGuide\n' }, [{

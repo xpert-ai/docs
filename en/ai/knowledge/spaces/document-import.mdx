@@ -1,0 +1,30 @@
+---
+title: "Import External Documents"
+description: "Import an authorized Feishu text copy, retain its source and continue collaborating in the project."
+---
+
+Feishu document sources currently import modern documents as Markdown text copies in the project. You can edit, reference and collaborate on the local copy in Xpert.
+
+## Before importing
+
+An administrator installs a compatible Feishu connector and configures the project connection. Its authorized account must be able to read the source. You need edit access to a non-archived project, and the Assistant must connect to it.
+
+Document sources use a shared connection. Source access follows that connection's account; the imported copy is shared under the destination project's permissions. Check the scope before confirming.
+
+## Import steps
+
+1. In Spaces, choose **New → Import from document platform**.
+2. Select Feishu. After authorizing a connection, use **Recheck connection** if needed.
+3. Search by title or paste a document link and preview it.
+4. Check the title, source, text and format-loss notice.
+5. Choose **Import text copy**, then open the new page to inspect it.
+
+Supported sources include Feishu and Lark `/docx/` links and `/wiki/` links whose target is a modern document. An empty query lists only the drive root; try a direct link if search does not find the document.
+
+## Formatting and updates
+
+The current import reads plain text. Images, attachments, formulas, table structure, layout, comments and rich text styles are not preserved. Add required content to the imported page afterward.
+
+If the source changes after preview, refresh the preview before confirming. The copy records its source, version and import time. Later source changes do not synchronize automatically, and local edits are not written back. Revoking remote access does not automatically delete the imported project copy.
+
+Other document platforms, bidirectional sync and scheduled updates require their own connector and feature support; they are not implied by this import workflow.

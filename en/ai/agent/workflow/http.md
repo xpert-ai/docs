@@ -50,7 +50,7 @@ The HTTP Request node outputs three default session variables:
 
 ### 7. Error Handling
 
-Refer to [Error Handling](/docs/ai/workflow/error-handling/).
+Refer to [Error Handling](/en/ai/agent/workflow/error-handling).
 
 ## ✅ Usage Example
 

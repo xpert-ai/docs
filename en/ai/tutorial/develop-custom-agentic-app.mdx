@@ -10,7 +10,7 @@ tags:
 An Agentic App is not just a longer prompt, and it is not finished when a few tools are attached to an agent. A production-ready Agentic App usually combines five parts:
 
 - **[Business plugin](../plugin/develop)**: declares app metadata, configuration, lifecycle hooks, and target product surfaces.
-- **[Agent middleware tools](../middleware/custom)**: tools exposed by Agent middleware that turn business actions into schema-driven model calls.
+- **[Agent middleware tools](../agent/middleware/custom)**: tools exposed by Agent middleware that turn business actions into schema-driven model calls.
 - **Services and data models**: persist structured outputs, review states, source evidence, and execution records.
 - **[Workbench view](../../data/features/agent-execution/workbench-and-chatkit)**: gives users a place to review, correct, approve, reject, and submit results.
 - **[Assistant template](../agent/ai-assistant/configure-ai-assistant)**: lets business users create a pre-wired assistant with tools, prompts, and runtime settings.
@@ -22,7 +22,7 @@ This tutorial uses a BOM Document Intake style business plugin as the reference 
 Use these platform docs alongside this tutorial:
 
 - [Plugin development](../plugin/develop), [plugin concepts](../plugin/concepts), and [plugin schema](../plugin/schema)
-- [Agent middleware](../middleware), [custom middleware](../middleware/custom), and the tools exposed by middleware
+- [Agent middleware](../agent/middleware), [custom middleware](../agent/middleware/custom), and the tools exposed by middleware
 - [Workbench and ChatKit](../../data/features/agent-execution/workbench-and-chatkit), [ChatKit](../chatkit), and [Workbench Remote Components](../plugin/plugin-sdk/remote-component)
 - [Assistant configuration](../agent/ai-assistant/configure-ai-assistant) and [plugin install/use](../plugin/install)
 
@@ -110,7 +110,7 @@ Design guidance:
 
 ## Step 2: Register Server Modules, Entities, and Lifecycle Hooks
 
-Server modules are registered with `@XpertServerPlugin`; see [plugin concepts](../plugin/concepts) for the surrounding model. A BOM-style plugin registers TypeORM entities, business services, [Agent middleware](../middleware), and a Workbench view provider in its server module.
+Server modules are registered with `@XpertServerPlugin`; see [plugin concepts](../plugin/concepts) for the surrounding model. A BOM-style plugin registers TypeORM entities, business services, [Agent middleware](../agent/middleware), and a Workbench view provider in its server module.
 
 An Agentic App usually needs at least three provider categories:
 
@@ -154,7 +154,7 @@ The BOM plugin follows this pattern for contract product lines, technical attrib
 
 ## Step 3: Expose Business Actions as Agent Middleware Tools
 
-[Agent middleware](../middleware/custom) is the automation entry point of an Agentic App. In this tutorial, "tools" means callable tools returned by middleware to the agent runtime. The BOM plugin does not expose one giant "parse contract" tool. Instead, it uses an ordered middleware tool sequence:
+[Agent middleware](../agent/middleware/custom) is the automation entry point of an Agentic App. In this tutorial, "tools" means callable tools returned by middleware to the agent runtime. The BOM plugin does not expose one giant "parse contract" tool. Instead, it uses an ordered middleware tool sequence:
 
 ```text
 bom_upsert_parsed_contract

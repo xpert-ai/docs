@@ -1,0 +1,31 @@
+---
+title: "Editing and Team Collaboration"
+description: "Edit Markdown, insert resources and understand collaboration and save states."
+---
+
+Open a page in a Workbench editor tab. Use the title menu to search and switch between project pages. The toolbar and block menu provide formatting, insertion, undo and redo.
+
+## Edit content
+
+Supported content includes paragraphs, headings, lists, checklists, quotes, code blocks, dividers, constrained tables, inline and block formulas, images, attachments and page references. Type `/` in a supported top-level paragraph to search insert options; code blocks and links do not trigger the menu.
+
+Tables have one header row and do not support merged cells or nested blocks. Formulas use LaTeX. A child page is an independent page that opens and edits separately.
+
+Upload or select images and attachments from the current project. References retain stable resource identities across renames and moves and check access when opened. If an upload succeeds but its insertion point is no longer valid, the file remains in the project for you to insert again.
+
+## Collaborate
+
+Members opening the same page in the same project through different Assistants can edit together and see collaborator presence and cursors. Current project access and Assistant bindings still apply.
+
+## Confirm saving
+
+| State | Meaning |
+| --- | --- |
+| Collaboration update accepted | The server has received the collaborative change |
+| File saved | The change has been written to the corresponding file and published version |
+
+Wait for File saved before checking downloads, versions and subsequent indexing. If saving fails, keep the editor open and address the message. Reconnection fills missing updates and retries the current window's queue. Durable offline drafts that survive closing the browser are not currently provided.
+
+Changes from an external file tool may cause a conflict. Compare both versions before choosing one, so stale editor content does not overwrite external changes. Restoring history requires old collaboration sessions to reload.
+
+Handle AI proposals, comments and history through the corresponding Assistant and ChatKit entries. See [Writing with Assistants](./assistant-writing).

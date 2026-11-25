@@ -11,7 +11,7 @@ With the **Code Node**, developers can embed custom Python (in development) or J
 
 ## Configuration Guide  
 
-If the **Code Node** needs to use variables from other nodes, you must define variable names in the **input variables** section and reference them in your code. For detailed variable management, refer to [Session Variables](/docs/ai/workflow/variables/).  
+If the **Code Node** needs to use variables from other nodes, you must define variable names in the **input variables** section and reference them in your code. For detailed variable management, refer to [Session Variables](/en/ai/agent/workflow/variables).
 
 ## Advanced Features  
 
@@ -33,4 +33,4 @@ Errors may occur during code execution. To prevent a single node failure from di
 1. Enable the **"Exception Handling"** option in the **Code Node**.  
 2. Select an appropriate exception handling strategy and configure it accordingly.  
 
-For more exception handling strategies, refer to [Exception Handling](/docs/ai/workflow/error-handling/).
+For more exception handling strategies, refer to [Exception Handling](/en/ai/agent/workflow/error-handling).

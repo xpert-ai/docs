@@ -1,0 +1,53 @@
+---
+title: "Create Your First Shared Page"
+description: "Enable Spaces, select a project and save a team page you can reopen."
+---
+
+Create a Project Operations Manual, confirm it survives reopening, and make it available to Assistants connected to the project.
+
+## Before you begin
+
+An administrator installs compatible Spaces and Markdown editor plugins and completes any required API restart. Choose an available tool-capable model for the Assistant, enable **Collaborative space** under **Assistant capabilities** during creation or **Settings → Capabilities** for an existing Assistant, then publish it.
+
+Enabling the capability configures the Assistant; it does not create a project or grant project access.
+
+## 1. Select a project and open Spaces
+
+Create or select a Collaborative space project, connect the Assistant and assign roles to collaborators.
+
+Expand the Assistant menu in the left sidebar and choose **Spaces**. If prompted, select an existing Collaborative space project or create one from the project picker. From an existing project conversation, you can also open the views panel in the upper-right corner and select the **Spaces** tab.
+
+If the entry is missing, check plugin loading, the published Assistant's capability, the project binding and your membership.
+
+## 2. Create a page
+
+Choose **New → Page**, switch to **Blank page**, enter Project Operations Manual as the name, confirm the location and click **Create page**. The editor opens automatically. You can also start from a project brief, meeting notes or team weekly report template.
+
+Enter the following in the blank page:
+
+```markdown
+# Project Operations Manual
+
+## Goal
+Record the materials needed to start a team project.
+
+## Startup checklist
+- [ ] Confirm project members
+- [ ] Organize input material
+- [ ] Confirm delivery requirements
+```
+
+The editor shows a saving indicator while changes are pending and **Saved to project file** when complete. Wait for that confirmation, then close and reopen the page to check its content. If saving fails, keep the editor open and address the message; closing the window is not a save operation.
+
+## 3. Continue with an Assistant
+
+Click **Review in Assistant** in the editor toolbar. Enter “Add completion criteria for each startup check. Propose changes first.” in the assistance field and send it to the Assistant. Once a proposal is ready, reopen the review panel, compare the original and suggested text, and accept or reject the change. After accepting, return to the editor and confirm that the updated text is saved. See [Writing with Assistants](./assistant-writing).
+
+## 4. Check the result
+
+- Reopen the page and confirm the title, text and checklist remain.
+- An editor can collaborate on the same page; a read-only member can view it but cannot change it.
+- Another Assistant connected to this project uses the same content.
+- For questions about page text, [enable knowledge retrieval](./search-and-reuse) and wait for indexing.
+
+Continue maintaining the page in the project. Archiving the project makes its content read-only.

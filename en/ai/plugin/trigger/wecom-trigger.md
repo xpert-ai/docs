@@ -175,7 +175,7 @@ If users often send multiple short messages that are processed separately, incre
 
 ## Related features
 
-- Trigger node overview: [Workflow Trigger](../../workflow/trigger/)
+- Trigger node overview: [Workflow Trigger](../../agent/workflow/trigger/)
 - Multi-channel access for Digital Expert: [Digital Expert](../../agent/agent/)
 - WeCom integration configuration: [WeCom Integration](../integration/wecom-integration/)
 - Trigger plugin overview: [Trigger Plugins](./)

@@ -10,7 +10,7 @@ tags:
 智能体应用不是一个更长的提示词，也不是把几个工具挂到智能体上就结束。一个可投入业务的智能体应用通常由五部分组成：
 
 - **[业务插件](../plugin/plugin-development)**：声明应用元数据、配置、生命周期和目标产品面。
-- **[智能体中间件工具](../middleware/custom)**：由智能体中间件暴露，把业务动作转换成模型可按结构定义调用的工具。
+- **[智能体中间件工具](../agent/middleware/custom)**：由智能体中间件暴露，把业务动作转换成模型可按结构定义调用的工具。
 - **业务服务与数据模型**：保存结构化结果、审核状态、来源证据和执行记录。
 - **[工作台视图](../../data/features/agent-execution/workbench-and-chatkit)**：给用户一个可核对、可修正、可提交的人工协同界面。
 - **[助手模板](../agent/ai-assistant/configure-ai-assistant)**：让业务用户一键创建已经装配好工具、提示词和运行参数的智能体。
@@ -22,7 +22,7 @@ tags:
 阅读本文时，可以结合以下平台功能文档：
 
 - [插件开发](../plugin/plugin-development)、[插件核心概念](../plugin/core-concepts) 与 [插件配置表单](../plugin/schema-ui-extension)
-- [智能体中间件](../middleware)、[自定义中间件](../middleware/custom) 与其中暴露的中间件工具
+- [智能体中间件](../agent/middleware)、[自定义中间件](../agent/middleware/custom) 与其中暴露的中间件工具
 - [工作台与资源对话](../../data/features/agent-execution/workbench-and-chatkit)、[ChatKit](../chatkit) 与[工作台远程组件](../plugin/plugin-sdk/remote-component)
 - [助手配置](../agent/ai-assistant/configure-ai-assistant) 与 [插件发布和使用](../plugin/publish-and-use)
 
@@ -110,7 +110,7 @@ export default plugin
 
 ## 步骤 2：注册服务端模块、实体和生命周期
 
-插件的服务端模块通常使用 `@XpertServerPlugin` 注册，相关概念可参考[插件核心概念](../plugin/core-concepts)。BOM 类插件会在服务端模块中注册 TypeORM 实体、业务服务、[智能体中间件](../middleware)和工作台视图提供器。
+插件的服务端模块通常使用 `@XpertServerPlugin` 注册，相关概念可参考[插件核心概念](../plugin/core-concepts)。BOM 类插件会在服务端模块中注册 TypeORM 实体、业务服务、[智能体中间件](../agent/middleware)和工作台视图提供器。
 
 一个智能体应用至少需要三类提供器：
 
@@ -154,7 +154,7 @@ BOM 插件就是这样处理合同成品行、技术属性、技术差异、BOM 
 
 ## 步骤 3：把业务动作暴露成智能体中间件工具
 
-[智能体中间件](../middleware/custom)是智能体应用的自动化入口。这里的“工具”指中间件返回给智能体运行时的可调用工具。BOM 插件没有把“解析合同”做成一个大而全的工具，而是拆成了顺序明确的中间件工具：
+[智能体中间件](../agent/middleware/custom)是智能体应用的自动化入口。这里的“工具”指中间件返回给智能体运行时的可调用工具。BOM 插件没有把“解析合同”做成一个大而全的工具，而是拆成了顺序明确的中间件工具：
 
 ```text
 bom_upsert_parsed_contract
