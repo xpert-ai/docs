@@ -486,6 +486,7 @@
               "pages": [
                 "overview",
                 "ontology-studio",
+                "enable-studio-assistant",
                 "ontology-workspace",
                 "snapshot-and-projection",
                 "entity-graph"

@@ -816,6 +816,7 @@
                     "pages": [
                       "en/data/ontology/overview",
                       "en/data/ontology/ontology-studio",
+                      "en/data/ontology/enable-studio-assistant",
                       "en/data/ontology/ontology-workspace",
                       "en/data/ontology/snapshot-and-projection",
                       "en/data/ontology/entity-graph"
@@ -1764,6 +1765,7 @@
                     "pages": [
                       "zh-Hans/data/ontology/overview",
                       "zh-Hans/data/ontology/ontology-studio",
+                      "zh-Hans/data/ontology/enable-studio-assistant",
                       "zh-Hans/data/ontology/ontology-workspace",
                       "zh-Hans/data/ontology/snapshot-and-projection",
                       "zh-Hans/data/ontology/entity-graph"

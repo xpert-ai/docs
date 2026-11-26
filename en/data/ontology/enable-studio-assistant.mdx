@@ -1,0 +1,99 @@
+---
+title: Enable the Ontology Studio Assistant
+description: Initialize the organization ontology assistant, enable draft authoring in Studio, and verify it with real tool calls.
+sidebar_position: 2.5
+---
+
+The **Assistant** button in Ontology Studio opens or hides its floating panel. Conversations also require an initialized **Current Organization Ontology Assistant**. Multiple ontology definitions can reuse this organization binding.
+
+An unconfigured-assistant message means that the current organization has no effective binding. **Open exploration assistant** switches to the Studio exploration entry point; it does not initialize the organization assistant.
+
+<Info>
+**Initialization role:** `SUPER_ADMIN`. **Users:** organization members with access to the target ontology. Studio uses the ontology assistant. The **semantic model modeling assistant** serves the semantic model workbench and does not replace this binding.
+</Info>
+
+## 1. Check the runtime
+
+- Data Xpert must connect to a real Xpert API and OIDC service, with working user sign-in.
+- Select the same organization in Xpert and Data Xpert.
+- Configure an available Copilot model and its model-provider credentials in that organization.
+- Under **System Management → Platform Initialization → Tenant Ontology Runtime**, verify both runtime credentials and the required managed plugins are ready.
+- Verify that Xpert can reach the Data Xpert MCP service.
+
+A rendered graph or a configured status alone does not prove that model inference and tools work.
+
+<Accordion title="Local connection settings for operators">
+Check the configuration used by the actual processes. Process environment variables can override `.env`.
+
+| Setting | Purpose |
+| --- | --- |
+| `XPERTAI_API_URL` | Xpert API URL used by the Data Xpert backend, including `/api` |
+| `OIDC_ISSUER`, `OIDC_CLIENT_ID`, `OIDC_AUDIENCE` | Issuer, client, and audience used to validate real sign-in tokens |
+| `VITE_XPERTAI_API_URL`, `VITE_OIDC_ISSUER`, `VITE_OIDC_CLIENT_ID` | Corresponding frontend API and sign-in settings |
+| `VITE_API_BASE_URL` | Data Xpert API URL used by the frontend |
+| `DATA_XPERT_PUBLIC_MCP_URL` | MCP URL reachable from Xpert, ending in `/v1/mcp`, not `/api/v1/mcp` |
+| `DATA_XPERT_API_BASE_URL` | Data Xpert service root used by managed plugins |
+| `DATA_XPERT_WEB_BASE_URL` | Data Xpert Web URL used by plugins |
+
+For a Data Xpert API on local port `5189`, the MCP URL can be `http://localhost:5189/v1/mcp` and the plugin API root can be `http://localhost:5189`. These examples apply only when Xpert can reach the same process through that `localhost`. Use a reachable service address for containers or separate hosts.
+
+Register the Data Xpert sign-in callback with the OIDC client. Restart affected services after configuration changes, then sign in normally. Temporary identity fixtures used to display the UI do not provide a real model or assistant runtime.
+</Accordion>
+
+## 2. Initialize the organization assistant
+
+Open **System Management → Platform Initialization → Current Organization Ontology Assistant**:
+
+1. **Select workspace:** choose a shared workspace in the current organization, or use **Initialize default workspace**.
+2. **Create environment:** retain the default `oidc_token` and `business_assistant_id` secret variables with empty initial values. Runtime requests provide the caller context.
+3. **Create MCP toolset:** use the deployment URL and transport, preserving the default header variable references.
+4. **Import Xpert DSL:** select the current **Ontology Assistant** template and an available Copilot model, enable the binding, and start provisioning.
+
+See [Initialize Organization Ontology and Modeling Assistants](../tutorial/semantic-analysis/initialize-organization-assistants) for field and header examples. Check an existing binding before creating another assistant with the same name.
+
+Verify the configured state, current binding, workspace, and last provisioning time. A template or custom display name is not sufficient to identify the effective binding.
+
+<Note>
+Studio also checks whether the binding enables ontology draft authoring tools. An older assistant that can query published entities may still require an upgrade. Reinitialize and publish it through the initialization page using the current ontology assistant template, then return to Studio. Renaming the assistant does not add tools.
+</Note>
+
+## 3. Open it in Studio
+
+1. Open **Data & Ontology → Ontology Studio** and select the target ontology.
+2. Wait for the draft to finish saving. Resolve save failures or revision conflicts first.
+3. Select **Assistant**. The panel should show a conversation interface rather than the unconfigured state.
+4. Select an entity type and request a read operation. Studio supplies the definition, draft revision, workspace, and selected schema context.
+
+Refresh Studio after provisioning to reload the organization binding. Moving, hiding, or resizing the panel only changes its layout.
+
+## 4. Verify with a manufacturing example
+
+Start with read-only checks, then test a bounded change in a test draft. Use the actual entity names and codes from your model.
+
+| Check | Example prompt | Expected evidence |
+| --- | --- | --- |
+| Read the current draft | “Use tools to read this ontology draft. Report its name, revision, and entity types. Do not modify or publish anything.” | Successful tool results match the current Studio draft |
+| Read the selected entity | Select Production Order, then ask: “Read this entity's stable code, all fields, and related relationships. Do not modify anything.” | Actual fields and relationships belong to the selected ontology |
+| Validate | “Validate this draft and explain errors and warnings. Do not fix them automatically.” | A validation tool result, including any genuine domain validation errors |
+| Bounded change | “Only change this ontology's description to ‘Automotive manufacturing acceptance draft’. Preserve everything else and do not publish.” | A successful write, a new draft revision, and refreshed UI; other content and the published version remain unchanged |
+
+Run the last check in a test ontology, or record the original description and restore it through the assistant afterward. Draft editing and publication are separate operations. Validate and confirm publication in the **Versions** workspace when required.
+
+Record the organization, ontology, before/after revisions, tool results, and screenshots. A greeting or a textual claim of success does not replace tool execution and persisted data evidence.
+
+Sharing the assistant does not grant additional ontology permissions. Before wider rollout, verify access with both an authorized member and a member who must remain unable to read or edit the restricted ontology.
+
+## Troubleshooting
+
+| Symptom | Check |
+| --- | --- |
+| Still unconfigured | Check the current organization, enabled binding, and provisioning result; refresh Studio |
+| Assistant upgrade required | Reinitialize and publish using the current ontology assistant template with draft authoring tools |
+| No model available | Configure a model provider and Copilot model in the current organization |
+| MCP unreachable or no tools discovered | Check `/v1/mcp`, transport, and deployment authentication from the Xpert runtime |
+| Session creation fails or ChatKit client secret is missing | Inspect the effective binding, Xpert connection, and session error; users do not enter a key into the panel |
+| Replies work but draft reads fail | Inspect tool calls, ontology context, caller permissions, and authoring capability |
+| UI does not reflect a change | Confirm tool success; handle unsaved local edits or revision conflicts using Studio's prompts |
+| Results describe published objects instead of the draft | Ask explicitly for the current Studio draft; published snapshots can differ |
+
+Continue with [Ontology Studio](./ontology-studio), [Ontology Workspace](./ontology-workspace), or [Workbench and ChatKit](../features/agent-execution/workbench-and-chatkit).

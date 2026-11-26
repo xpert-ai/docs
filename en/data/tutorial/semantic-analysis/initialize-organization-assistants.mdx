@@ -6,6 +6,8 @@ sidebar_position: 1
 
 This tutorial is for platform administrators. It prepares reusable ontology and semantic model modeling assistants for the current organization, so members do not need to initialize their own copies.
 
+For the floating assistant in Ontology Studio, also see [Enable the Ontology Studio Assistant](../../ontology/enable-studio-assistant) for draft authoring requirements and manufacturing acceptance checks.
+
 Follow **check the tenant runtime → prepare a shared organization workspace → initialize the required assistant → verify the binding → test as an ordinary member**. If you only need AI help with modeling, complete the modeling assistant section; initialize the ontology assistant when needed.
 
 | Assistant | When to use it | Wizard steps |
@@ -19,7 +21,7 @@ For business audiences and resources, see [Configure and Publish a Business Assi
 
 1. Sign in as a `SUPER_ADMIN` and select the same organization in Xpert and Data Xpert.
 2. In Data Xpert, open **System Management → Platform Initialization → Tenant Ontology Runtime**.
-3. Confirm that runtime credentials are initialized and the **Data Xpert AI Tools** plugin is ready.
+3. Confirm that runtime credentials are initialized and both the **Data Xpert AI Tools** and **Ontology Explorer** managed plugins are ready.
 4. Confirm that the current organization has an available Copilot model to select when importing the template.
 
 The tenant ontology runtime prepares service connection credentials and tool loading. It is not a separate sandbox for each user and does not grant business data access. Credentials and the plugin have separate statuses: saved credentials do not mean that a plugin awaiting loading is ready.
