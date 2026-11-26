@@ -1,0 +1,230 @@
+---
+title: "安装与首次使用"
+description: "在自托管 Xpert 中安装 Live Dashboard，配置模型与运行环境，生成、筛选、刷新和保存第一份看板。"
+---
+
+Live Dashboard 是运行在 Xpert 平台中的开源插件。安装分为三步：部署平台、安装插件、初始化实时看板应用。应用初始化完成后，才能在对话里生成看板。
+
+本文先使用随技能提供的文件样例。文件样例需要可用的 Sandbox 后端；HTML 看板还需要 Browser Runtime。**Data Xpert 本体系统、Spaces、SAP 和外部业务数据库都不是入门前提。** 接入自己的业务数据可以在样例跑通后进行。
+
+## 1. 准备平台和管理员
+
+准备 Docker Engine / Docker Desktop、Docker Compose、Git，以及一个支持工具调用的模型账号。
+
+已有平台时先核对版本与管理员权限，可以跳到安装插件。新平台按[社区版 Docker 部署](/zh-Hans/ai/getting-started/community/docker)启动：
+
+```bash
+git clone https://github.com/xpert-ai/xpert.git xpert-live-dashboard
+cd xpert-live-dashboard/docker
+cp env.example .env
+```
+
+启动前修改 `.env` 中的数据库、Redis、会话和加密密钥，配置浏览器实际访问的 `API_BASE_URL`、`CLIENT_BASE_URL`。不要把示例密钥用于公网环境，也不要把 `.env` 提交到 Git。
+
+需要替换的字段包括 `DB_PASS`、`REDIS_PASSWORD`、`SESSION_SECRET`、`JWT_SECRET`、`JWT_REFRESH_SECRET`、`SECRETS_ENCRYPTION_KEY`、`XPERT_MCP_APP_TOKEN_SECRET` 和 `XPERT_MCP_REQUEST_STATE_SECRET`。可在自己的终端多次运行 `openssl rand -hex 32`，为各字段生成独立值。后续升级保留已有加密密钥，不能每次启动都重新生成。
+
+**全新入门实例预装四家模型提供商**：OpenAI 兼容、DeepSeek、通义千问和火山方舟。在 `.env` 中设置：
+
+```dotenv
+PLUGINS=@xpert-ai/plugin-openai-compatible@0.0.10,@xpert-ai/plugin-deepseek@0.1.5,@xpert-ai/plugin-tongyi@0.2.5,@xpert-ai/plugin-volcengine@0.5.3
+```
+
+在**首次启动平台之前**保存这项配置。平台启动流程会安装并加载这些插件，模型密钥在第 3.1 节配置。Live Dashboard 和文件来源插件在第 2 节安装。已有业务实例请保留原来的 `PLUGINS`，补充缺少的插件。
+
+```bash
+docker compose pull
+docker compose up -d
+docker compose ps -a
+```
+
+Compose 先通过 `schema-sync` 安装启动插件并同步数据库结构，再启动 API 与 Web。等待 `schema-sync` 显示 `Exited (0)`、API 就绪后，继续初始化平台。可以查看同步进度：
+
+```bash
+docker compose logs --tail=60 schema-sync
+```
+
+启动后访问 `CLIENT_BASE_URL`，在欢迎页选择开始，填写初始管理员、密码和组织名称。首位管理员属于 `Default` 租户并具备 Super Admin 权限。
+
+检查 API 就绪状态：
+
+```bash
+curl --fail http://localhost:3000/api/health/ready
+```
+
+使用自定义端口时，将命令中的地址替换为实际 API 地址。
+
+### 可选：使用独立的本地端口
+
+独立本地实例使用新的克隆目录和专用的 `docker/volumes` 数据目录。以下配置使用 Web `18080`、API `13080`，数据库和 Redis 仅在容器网络内访问。请在启动前完成配置。
+
+在 `.env` 中设置 `CLIENT_BASE_URL=http://localhost:18080`、`API_BASE_URL=http://localhost:13080`，并在 `docker/` 新建 `compose.ports.yml`：
+
+```yaml
+services:
+  db:
+    ports: !reset []
+  redis:
+    ports: !reset []
+  webapp:
+    ports: !override
+      - "127.0.0.1:18080:80"
+      - "127.0.0.1:13080:3000"
+```
+
+使用支持上述标签的 Compose，先校验配置再启动：
+
+```bash
+docker compose -p live-dashboard-demo -f docker-compose.yml -f compose.ports.yml config --quiet
+docker compose -p live-dashboard-demo -f docker-compose.yml -f compose.ports.yml up -d
+```
+
+后续所有 Compose 命令都保留相同的 `-p live-dashboard-demo` 和 `-f` 参数。此时通过 `http://localhost:18080` 访问平台，通过 `http://localhost:13080/api/health/ready` 检查 API 就绪状态。
+
+### 版本要求
+
+本教程使用以下版本：
+
+| 组件 | 版本或要求 |
+| --- | --- |
+| Live Dashboard | `@xpert-ai/plugin-live-dashboard@0.7.3` |
+| 文件数据来源 | `@xpert-ai/plugin-analytics-files@0.2.0` |
+| 本机文件 Sandbox | `@xpert-ai/plugin-local-shell-sandbox@0.2.2` |
+| OpenAI 兼容 | `@xpert-ai/plugin-openai-compatible@0.0.10` |
+| DeepSeek | `@xpert-ai/plugin-deepseek@0.1.5` |
+| 通义千问 | `@xpert-ai/plugin-tongyi@0.2.5` |
+| 火山方舟 | `@xpert-ai/plugin-volcengine@0.5.3` |
+| API / Web 镜像代码版本 | `518b89537dc9a17a8c28165e95d942c6bcd51bd9`，SDK / Contracts 为 `3.38.1` |
+| Live Dashboard 的平台依赖 | `@xpert-ai/plugin-sdk` 与 `@xpert-ai/contracts` 均要求 `^3.36.0` |
+
+使用配套的 API 与 Web 镜像，并确保平台 SDK / Contracts 满足插件依赖范围。
+
+## 2. 安装看板和文件来源插件
+
+使用 **Default 租户中的 Super Admin** 登录，打开 **设置 → 插件**，进行系统级安装。
+
+点击 **安装插件 → NPM**，分别填写包名和版本并安装：
+
+| NPM 包名 | 版本 |
+| --- | --- |
+| `@xpert-ai/plugin-analytics-files` | `0.2.0` |
+| `@xpert-ai/plugin-live-dashboard` | `0.7.3` |
+
+将包名和版本分别填入对应输入框。安装完成后，在维护窗口重启 API，使插件加载生效：
+
+```bash
+docker compose restart api
+```
+
+使用 Compose 覆盖文件时，命令中保留原来的项目名和全部 `-f` 参数。等待 API 就绪，再确认插件管理中两项插件均已加载。
+
+## 3. 准备模型、技能和运行环境
+
+| 能力 | 首次使用要求 |
+| --- | --- |
+| 主模型 | 配置可实际调用、支持工具调用的模型 |
+| 文件访问 | 助理需要 SandboxFile 与项目文件访问能力 |
+| 看板技能 | 安装插件随附的 `live-dashboard` 技能，并由助理读取 |
+| 标准图表 | 不依赖 HTML 浏览器预检 |
+| HTML / ECharts | 额外需要可用的 Sandbox Jobs Browser Runtime 和 Provider Binding |
+| Python / JavaScript 数据处理 | 额外需要对应脚本来源插件和受限计算环境 |
+| 本体数据 | 按需安装 Data Xpert 来源插件并配置授权资源 |
+
+本文使用标准图表和文件样例，需要在初始化应用前准备好主模型和文件 Sandbox。应用模板会配置看板技能及相关工具。
+
+<Note>
+HTML / ECharts 看板还需要额外部署兼容的 Browser Runtime Provider，并完成 Provider Binding。标准图表样例无需此项配置。参见 [Sandbox Jobs 与 Browser Runtime](/zh-Hans/ai/plugin/sandbox-jobs)。
+</Note>
+
+文件样例无需知识库或嵌入模型。模型密钥在平台的模型配置页面输入。
+
+### 3.1 模型
+
+打开当前组织的**模型提供商**页面（`/copilot`）。完成第 1 节的默认配置并加载成功后，应能看到 OpenAI 兼容、DeepSeek、通义千问和火山方舟四个提供商。只需配置实际使用的一家，不必为四家都购买服务或填写密钥。
+
+1. 在选定提供商卡片中添加 API 密钥，按该厂商的表单填写连接信息；需要时添加实际可用的模型名称或服务地址。
+2. 完成凭据验证，启用一个支持工具调用的大语言模型。
+3. 在**默认模型设置**中将其设为当前组织的主模型，然后再初始化实时看板应用。
+
+使用 OpenAI 兼容插件时，填写实际服务提供的 API 地址、模型名称与密钥；它不要求 OpenAI 账号，实际服务须支持对应协议和工具调用。厂商专用插件则提供相应厂商的连接表单和模型目录。
+
+### 3.2 选择文件 Sandbox
+
+在初始化应用前，按部署环境准备一种文件 Sandbox。应用初始化时会选择可用的提供方。
+
+| 环境 | 选择 |
+| --- | --- |
+| Linux 服务器，需要隔离执行 | 按官方 [NsJail Runner 部署说明](https://github.com/xpert-ai/xpert/blob/develop/.deploy/nsjail-runner/README.md)部署与 API 配套的 Runner，共享同一个 Sandbox 目录，并配置 `NSJAIL_RUNNER_URL` 和 `NSJAIL_RUNNER_TOKEN` |
+| 单用户本机体验 | 可使用下面的 Local Shell 开发方案；它在 API 所在环境执行命令，不提供 NsJail 的进程隔离 |
+| HTML 看板 | 无论选择上述哪一种文件后端，都还要单独满足 Browser Runtime 条件 |
+
+在受支持、架构匹配的 Linux 环境部署 NsJail。官方配置中的相对路径以**仓库根目录**为基准；API 与 Runner 的 Sandbox 挂载应指向同一宿主目录，Runner 控制端口仅供 API 访问。
+
+### 3.3 单用户本机体验：Local Shell
+
+Local Shell 适用于自行控制的单用户本地容器，在 API 环境内执行文件操作。
+
+1. 下载 [Local Shell Sandbox 0.2.2 安装包](/downloads/plugins/xpert-ai-plugin-local-shell-sandbox-0.2.2.tar.gz)。
+2. 使用 Default 租户中的 Super Admin，打开 **设置 → 插件 → 安装插件 → 压缩包**。
+3. 上传下载的 `.tar.gz` 文件并完成安装。
+
+然后在 API 的 Compose 环境中加入显式开关，并重新创建 API：
+
+```yaml
+# docker/compose.local-shell.yml
+services:
+  api:
+    environment:
+      XPERT_LOCAL_SANDBOX_ENABLED: "true"
+```
+
+```bash
+# 在克隆仓库的 docker 目录执行；有其他覆盖文件时一并保留
+docker compose -f docker-compose.yml -f compose.local-shell.yml \
+  up -d --no-deps --force-recreate api
+```
+
+等待 API 就绪，并确认插件管理中 **Local Shell Sandbox / 本地 Shell 沙盒** 已加载。下一步初始化应用时使用这个 Sandbox 提供方。
+
+## 4. 初始化实时看板应用
+
+1. 登录后在左上角选择目标组织，打开 `/explore?catalog=applications`，选择“实时看板”。
+2. 核对初始化清单中的依赖、组织主模型和 Sandbox 提供方。本机体验使用 **Local Shell Sandbox / 本地 Shell 沙盒**。
+3. 点击**应用到当前组织**，在展开的初始化面板中确认。平台会准备私有配置工作空间、模板依赖和入口助理。
+4. 等待状态就绪，进入“实时看板”助理。
+5. 在聊天输入区下方打开**选择项目 → 新建项目 · 实时看板项目**，填写名称，例如“区域销售演示”。
+6. 创建项目后，从侧栏进入“实时看板”助理，在**选择项目**中选中刚创建的项目，然后开始对话。
+
+## 5. 生成第一份可操作的看板
+
+在助理开场提示中选择 **“区域销售 · 入门”**，提示词填入输入框后点击**发送**。助理会读取示例配方、准备项目文件、登记文件来源、预览查询并保存看板草稿。样例数据会标注为演示数据。
+
+完成后应看到“区域销售 · 演示数据”资源卡片，以及类似 **Dashboard · Draft r1** 的修订信息。点击卡片的“打开”，等待独立看板标签中的图表和明细加载完成，再检查：
+
+1. 当前项目和看板名称正确，默认显示四个区域。图表金额与明细一致。
+2. 在顶部**区域**文本框输入 `East`，点击**应用筛选**，图表和明细应只剩 East、金额 12,000 元；改为 `West` 并再次应用，应只剩 West、金额 18,000 元。
+3. 保留 `West`，点击看板工具栏的**刷新**；等待查询完成，区域输入仍为 West，图表和明细仍为 18,000 元。
+4. 清空区域文本框，点击**应用筛选**，恢复全部四个区域。
+5. 关闭当前看板标签，再点击同一资源卡片“打开”，确认已保存的草稿与数据仍存在。
+6. 向助理发送“将当前看板标题改为‘区域销售总览 · 演示数据’，保存到同一草稿，保留数据绑定与筛选，不新建、不发布”。收到新修订回执后，打开看板并点击工具栏的**刷新**，查看新标题和草稿修订。再刷新整个浏览器页面，确认修改后的看板和数据已保存。
+
+| 筛选条件 | 明细行数 | 应核对的金额（CNY） |
+| --- | --- | --- |
+| 空白，即全部 | 4 | West 18,000；East 12,000；South 11,000；North 9,000；合计 50,000 |
+| East | 1 | 12,000 |
+| West | 1 | 18,000 |
+
+助理生成和修改看板时会保存草稿，并返回修订信息，例如 `Draft r1`、`Draft r2`。本教程保留草稿；需要正式发布时，由项目管理者通过**发布草稿**完成定稿，参见[持续修改与人工定稿](./edit)。
+
+配置好 Browser Runtime 后，还可以选择 **“销售总览 · 入门”**，体验 HTML / ECharts 看板。
+
+## 6. 换成自己的数据
+
+选择“使用我的数据”，或按照[创建第一份看板](./create)描述来源、指标口径、分组与筛选。先核对数据，再制作页面。可用来源取决于安装的适配器和当前用户权限，参见[数据来源、文件与刷新](./data-sources)。
+
+接入业务数据后，逐项核对查询绑定、指标口径与页面数值；全部替换并确认后再移除演示标识。
+
+## 继续阅读
+
+- [持续修改与人工定稿](./edit)
+- [团队分享与独立页](./sharing)
+- [数据来源、文件与刷新](./data-sources)

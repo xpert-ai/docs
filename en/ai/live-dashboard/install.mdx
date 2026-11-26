@@ -1,0 +1,228 @@
+---
+title: "Installation and first use"
+description: "Install Live Dashboard in self-hosted Xpert, configure the model and runtime, then generate, filter, refresh and save your first dashboard."
+---
+
+Live Dashboard is an open-source plugin that runs inside Xpert. Getting started has three stages: deploy the platform, install the plugins, and initialize the Live Dashboard application.
+
+This guide starts with files supplied by the dashboard skill. File examples need a working Sandbox backend; HTML dashboards also need Browser Runtime. **Data Xpert ontology, Spaces, SAP and an external business database are optional.** Connect your own data after the example works.
+
+## 1. Prepare the platform and administrator
+
+Install Docker Engine or Docker Desktop, Docker Compose and Git. You also need a model account that supports tool calling.
+
+If Xpert is already deployed, check its version and your administrator permissions, then continue to plugin installation. For a new instance, start with [community Docker deployment](/en/ai/getting-started/community/docker):
+
+```bash
+git clone https://github.com/xpert-ai/xpert.git xpert-live-dashboard
+cd xpert-live-dashboard/docker
+cp env.example .env
+```
+
+Before starting, replace the database, Redis, session and encryption secrets in `.env`. Set `API_BASE_URL` and `CLIENT_BASE_URL` to the addresses the browser will use. Do not use example secrets for a public deployment or commit `.env` to Git.
+
+Replace `DB_PASS`, `REDIS_PASSWORD`, `SESSION_SECRET`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `SECRETS_ENCRYPTION_KEY`, `XPERT_MCP_APP_TOKEN_SECRET` and `XPERT_MCP_REQUEST_STATE_SECRET`. Run `openssl rand -hex 32` in your own terminal to generate an independent value for each. Preserve existing encryption keys when upgrading; do not regenerate them on every startup.
+
+**New tutorial instances preinstall four model providers**: OpenAI-compatible, DeepSeek, Tongyi Qianwen and Volcengine Ark. Set the following in `.env`:
+
+```dotenv
+PLUGINS=@xpert-ai/plugin-openai-compatible@0.0.10,@xpert-ai/plugin-deepseek@0.1.5,@xpert-ai/plugin-tongyi@0.2.5,@xpert-ai/plugin-volcengine@0.5.3
+```
+
+Save this setting **before the first platform start**. The startup process installs and loads these plugins; configure model credentials in section 3.1. Install the dashboard and file-source plugins in section 2. For an existing deployment, preserve its `PLUGINS` list and append missing packages.
+
+```bash
+docker compose pull
+docker compose up -d
+docker compose ps -a
+```
+
+Compose runs `schema-sync` to install startup plugins and synchronize the database before starting the API and Web services. Wait for `schema-sync` to show `Exited (0)` and the API to become ready before initializing the platform. View synchronization progress with:
+
+```bash
+docker compose logs --tail=60 schema-sync
+```
+
+Open `CLIENT_BASE_URL`, choose the welcome page's start action, and enter the initial administrator, password and organization. This administrator belongs to the `Default` tenant and has the Super Admin role.
+
+Check API readiness, replacing the address if you changed ports:
+
+```bash
+curl --fail http://localhost:3000/api/health/ready
+```
+
+### Optional: dedicated local ports
+
+Use a new clone and a dedicated `docker/volumes` data directory for an independent local instance. The following configuration uses Web port `18080` and API port `13080`, with database and Redis access confined to the container network. Configure it before starting the services.
+
+Set `CLIENT_BASE_URL=http://localhost:18080` and `API_BASE_URL=http://localhost:13080` in `.env`, then create `docker/compose.ports.yml`:
+
+```yaml
+services:
+  db:
+    ports: !reset []
+  redis:
+    ports: !reset []
+  webapp:
+    ports: !override
+      - "127.0.0.1:18080:80"
+      - "127.0.0.1:13080:3000"
+```
+
+Use a Compose version supporting these tags, validate the configuration, then start:
+
+```bash
+docker compose -p live-dashboard-demo -f docker-compose.yml -f compose.ports.yml config --quiet
+docker compose -p live-dashboard-demo -f docker-compose.yml -f compose.ports.yml up -d
+```
+
+Keep `-p live-dashboard-demo` and the same `-f` arguments in all subsequent Compose commands. Open the platform at `http://localhost:18080` and check API readiness at `http://localhost:13080/api/health/ready`.
+
+### Version requirements
+
+This guide uses the following versions:
+
+| Component | Version or requirement |
+| --- | --- |
+| Live Dashboard | `@xpert-ai/plugin-live-dashboard@0.7.3` |
+| File data sources | `@xpert-ai/plugin-analytics-files@0.2.0` |
+| Local file Sandbox | `@xpert-ai/plugin-local-shell-sandbox@0.2.2` |
+| OpenAI-compatible | `@xpert-ai/plugin-openai-compatible@0.0.10` |
+| DeepSeek | `@xpert-ai/plugin-deepseek@0.1.5` |
+| Tongyi Qianwen | `@xpert-ai/plugin-tongyi@0.2.5` |
+| Volcengine Ark | `@xpert-ai/plugin-volcengine@0.5.3` |
+| API / Web image revision | `518b89537dc9a17a8c28165e95d942c6bcd51bd9`, with SDK / Contracts `3.38.1` |
+| Dashboard platform peers | Both `@xpert-ai/plugin-sdk` and `@xpert-ai/contracts` require `^3.36.0` |
+
+Use matching API and Web images, with platform SDK / Contracts versions that satisfy the plugin peer requirements.
+
+## 2. Install the dashboard and file plugins
+
+Sign in as **Super Admin in the Default tenant** and open **Settings → Plugins** for system-level installation.
+
+Choose **Install Plugin → NPM** and install each package using the separate name and version fields:
+
+| NPM package name | Version |
+| --- | --- |
+| `@xpert-ai/plugin-analytics-files` | `0.2.0` |
+| `@xpert-ai/plugin-live-dashboard` | `0.7.3` |
+
+Enter each package name and version in its corresponding field. After installation, restart the API during a maintenance window to load the plugins:
+
+```bash
+docker compose restart api
+```
+
+Include the original project name and all `-f` arguments when using Compose overrides. Wait for API readiness, then confirm that both plugins are loaded in plugin management.
+
+## 3. Prepare the model, skill and runtime
+
+| Capability | Requirement |
+| --- | --- |
+| Primary model | A working model with tool calling |
+| File access | SandboxFile and access to the selected Project's files |
+| Dashboard skill | The plugin's `live-dashboard` skill, available to the Assistant |
+| Standard charts | No HTML browser preflight |
+| HTML / ECharts | Sandbox Jobs Browser Runtime and a working Provider Binding |
+| Python / JavaScript transformations | The corresponding source plugin and a restricted compute runtime |
+| Ontology queries | Optional Data Xpert adapter and authorized resources |
+
+This guide uses standard charts and file examples. Configure the primary model and file Sandbox before initializing the application. The application template configures the dashboard skill and its tools.
+
+<Note>
+HTML / ECharts dashboards additionally require a compatible Browser Runtime Provider and Provider Binding. The standard-chart example does not need this configuration. See [Sandbox Jobs and Browser Runtime](/en/ai/plugin/sandbox-jobs).
+</Note>
+
+File examples do not require a knowledge base or embedding model. Enter model credentials in the platform's model configuration UI.
+
+### 3.1 Model
+
+Open **Model Providers** (`/copilot`) in the current organization. After section 1's default packages load, the page should list OpenAI-compatible, DeepSeek, Tongyi Qianwen and Volcengine Ark. Configure the provider you intend to use; accounts and credentials for all four are not required.
+
+1. Add an API key on the selected provider's card and complete its connection form. Supply the actual model name or service URL when required.
+2. Validate the credentials and enable a large language model that supports tool calling.
+3. Open **Default Model Settings** and set it as the organization's primary model before initializing Live Dashboard.
+
+For an OpenAI-compatible service, enter its actual API URL, model name and credentials. An OpenAI account is not required; the service must support the protocol and tool calling. Vendor-specific plugins supply the corresponding connection forms and model catalogs.
+
+### 3.2 Choose a file Sandbox
+
+Prepare a file Sandbox for your deployment environment before initializing the application. Initialization selects an available provider for the template.
+
+| Environment | Choice |
+| --- | --- |
+| Linux server requiring execution isolation | Deploy an API-compatible Runner using the official [NsJail instructions](https://github.com/xpert-ai/xpert/blob/develop/.deploy/nsjail-runner/README.md), share the same Sandbox directory and configure `NSJAIL_RUNNER_URL` and `NSJAIL_RUNNER_TOKEN` |
+| Single-user local evaluation | Use the Local Shell development path below; it executes within the API environment without NsJail process isolation |
+| HTML dashboards | Either file backend still needs a separate working Browser Runtime |
+
+Deploy NsJail on a supported Linux environment with matching architecture. Relative paths in the official configuration use the **repository root** as their base. The API and Runner must mount the same host Sandbox directory, and the Runner control port should be accessible only to the API.
+
+### 3.3 Single-user local evaluation with Local Shell
+
+Local Shell is for a single-user local container you control. It performs file operations within the API environment.
+
+1. Download the [Local Shell Sandbox 0.2.2 package](/downloads/plugins/xpert-ai-plugin-local-shell-sandbox-0.2.2.tar.gz).
+2. Sign in as Super Admin in the Default tenant and open **Settings → Plugins → Install Plugin → Archive file**.
+3. Upload the downloaded `.tar.gz` file and complete installation.
+
+Add an explicit opt-in to the API's Compose environment and recreate the API:
+
+```yaml
+# docker/compose.local-shell.yml
+services:
+  api:
+    environment:
+      XPERT_LOCAL_SANDBOX_ENABLED: "true"
+```
+
+```bash
+# Run in the clone's docker directory; preserve other override files
+docker compose -f docker-compose.yml -f compose.local-shell.yml \
+  up -d --no-deps --force-recreate api
+```
+
+Wait for API readiness and confirm that **Local Shell Sandbox** is loaded in plugin management. Use this Sandbox provider when initializing the application in the next step.
+
+## 4. Initialize Live Dashboard
+
+1. Select the target organization in the upper-left switcher, open `/explore?catalog=applications`, and choose Live Dashboard.
+2. Review the dependencies, organization primary model and Sandbox provider in the initialization checklist. For local use, the Sandbox provider is **Local Shell Sandbox**.
+3. Click **Apply to current organization** and confirm in the setup panel. The platform prepares the private configuration Workspace, template dependencies and entry Assistant.
+4. Wait until ready, then open the Live Dashboard Assistant.
+5. Below the chat composer, choose **Select Project → New Project · Live Dashboard Project** and enter a name, such as “Regional sales demo”.
+6. After creating the Project, open Live Dashboard from the sidebar and select the new Project in **Select Project** before starting the conversation.
+
+## 5. Create and check your first dashboard
+
+Choose **Regional sales · Starter** (`区域销售 · 入门`) from the Assistant's opening prompts, then click **Send** once the prompt fills the composer. The Assistant reads the recipe, prepares Project files, registers the source, previews queries and saves a dashboard draft. The example is labeled as demo data.
+
+The result should include a “Regional sales · Demo data” resource card and a revision label such as **Dashboard · Draft r1**. Click the card's Open action and wait for the chart and detail table in the separate dashboard tab to load:
+
+1. Confirm the Project and dashboard title. All four regions appear initially, with matching chart and table amounts.
+2. Enter `East` in the **Region** text field and click **Apply filters**. Both the chart and table should show only East, amount 12,000 CNY. Replace it with `West` and apply again: only West, amount 18,000 CNY, should remain.
+3. Keep `West` selected and click **Refresh** in the dashboard toolbar. After the query completes, the input should still contain West and both views should still show 18,000 CNY.
+4. Clear the Region input and apply filters to restore all four regions.
+5. Close the dashboard tab, then open the same resource card again. The saved draft and its data should remain available.
+6. Ask the Assistant to rename the current dashboard to “Regional sales overview · Demo data”, save to the same draft, preserve bindings and filters, and neither create a new dashboard nor publish. After receiving the new revision receipt, open the dashboard and click **Refresh** in its toolbar to view the updated title and revision. Reload the full browser page to confirm that the updated dashboard and data are saved.
+
+| Filter | Detail rows | Expected amounts (CNY) |
+| --- | --- | --- |
+| Empty input: all regions | 4 | West 18,000; East 12,000; South 11,000; North 9,000; total 50,000 |
+| East | 1 | 12,000 |
+| West | 1 | 18,000 |
+
+The Assistant saves a draft when creating or editing a dashboard and returns a revision such as `Draft r1` or `Draft r2`. This tutorial keeps the dashboard as a draft. When ready for formal publication, a Project manager can use **Publish draft**; see [Edit and publish](./edit).
+
+Once Browser Runtime is configured, choose **Sales overview · Starter** (`销售总览 · 入门`) to explore HTML / ECharts dashboards.
+
+## 6. Use your own data
+
+Choose “Use my data” or follow [Create your first dashboard](./create) to describe the source, metric definitions, grouping and filters. Check the data before building the page. Available sources depend on installed adapters and user permissions; see [Data sources, files and refresh](./data-sources).
+
+After connecting business data, check each query binding, metric definition and displayed value. Remove the demo label once all demo data has been replaced and verified.
+
+## Continue reading
+
+- [Edit and publish](./edit)
+- [Team sharing and standalone viewing](./sharing)
+- [Data sources, files and refresh](./data-sources)

@@ -442,6 +442,7 @@
                     "group": "Default",
                     "pages": [
                       "en/ai/live-dashboard/index",
+                      "en/ai/live-dashboard/install",
                       "en/ai/live-dashboard/create",
                       "en/ai/live-dashboard/edit",
                       "en/ai/live-dashboard/data-sources",
@@ -1401,6 +1402,7 @@
                     "group": "默认",
                     "pages": [
                       "zh-Hans/ai/live-dashboard/index",
+                      "zh-Hans/ai/live-dashboard/install",
                       "zh-Hans/ai/live-dashboard/create",
                       "zh-Hans/ai/live-dashboard/edit",
                       "zh-Hans/ai/live-dashboard/data-sources",
